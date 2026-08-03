@@ -1,0 +1,1777 @@
+/* ═════════════════════════════════════════════════════════════════════
+   DeS Save Editor — macOS System Settings Theme
+   Light/Dark mode, 1024×768 fixed canvas
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* ── Design Tokens (Light Mode — default) ───────────────────────────── */
+:root {
+  /* Native UA widgets (dropdown popups, autofill, scrollbars, selection) */
+  color-scheme: light dark;
+
+  /* Canvas */
+  --canvas-width: 1024px;
+  --canvas-height: 768px;
+
+  /* Colors — macOS light palette */
+  --page-bg: #d8d8de;
+  --window-bg: #ececee;
+  --sidebar-bg: #e3e3e8;
+  --card-bg: #fff;
+  --card-bg-secondary: rgb(0 0 0 / 2%);
+  --card-border: rgb(0 0 0 / 8%);
+  --separator: rgb(0 0 0 / 8%);
+
+  /* Accent — Apple blue */
+  --accent: #0071e3;
+  --accent-hover: #0077ed;
+  --accent-pressed: #06c;
+  --accent-dim: rgb(0 113 227 / 8%);
+  --accent-glow: rgb(0 113 227 / 30%);
+
+  /* Status — dirty / added / danger indicators */
+  --warning: #f0a020;
+  --success: #28a745;
+  --danger: #d70015;
+  --danger-hover: #bf0010;
+  --danger-text: #d04040;
+  --danger-rgb: 220 50 50;
+
+  /* Text */
+  --text: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --text-muted: #86868b;
+  --text-on-accent: #fff;
+
+  /* Disabled dropdown option text — much lighter than normal text so
+     already-owned items are instantly distinguishable. */
+  --option-disabled: #b0b0b8;
+
+  /* Surface tiers (elevation) */
+  --surface-0: rgb(0 0 0 / 2%);
+  --surface-1: rgb(0 0 0 / 4%);
+  --surface-2: rgb(0 0 0 / 6%);
+  --surface-hover: rgb(0 0 0 / 5%);
+  --input-bg: #fff;
+  --input-border: rgb(0 0 0 / 12%);
+  --input-focus: var(--accent);
+
+  /* Dimensions */
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --control-h: 36px;
+  --control-h-sm: 30px;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 6px;
+  --space-3: 8px;
+  --space-4: 12px;
+  --space-5: 16px;
+  --space-6: 20px;
+  --space-7: 24px;
+
+  /* Type scale */
+  --text-2xs: 10px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 14px;
+  --text-lg: 15px;
+  --text-xl: 16px;
+  --text-2xl: 18px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 8%);
+  --shadow: 0 4px 16px rgb(0 0 0 / 10%);
+  --shadow-lg: 0 24px 60px rgb(0 0 0 / 25%);
+
+  /* Typography */
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
+}
+
+/* ── Dark Mode ──────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    --page-bg: #0a0a0c;
+    --window-bg: #1d1d1f;
+    --sidebar-bg: #282829;
+    --card-bg: #2d2d2f;
+    --card-bg-secondary: rgb(255 255 255 / 3%);
+    --card-border: rgb(255 255 255 / 10%);
+    --separator: rgb(255 255 255 / 10%);
+    --accent: #0a84ff;
+    --accent-hover: #1a8fff;
+    --accent-pressed: #0070ee;
+    --accent-dim: rgb(10 132 255 / 12%);
+    --accent-glow: rgb(10 132 255 / 30%);
+
+    /* Status — brightened for dark backgrounds */
+    --warning: #ff9f0a;
+    --success: #30d158;
+    --danger: #ff453a;
+    --danger-hover: #ff6961;
+    --danger-text: #ff6961;
+    --danger-rgb: 255 69 58;
+    --text: #f5f5f7;
+    --text-secondary: #98989d;
+    --text-muted: #6d6d72;
+    --text-on-accent: #fff;
+
+    /* Disabled dropdown option text — much dimmer than normal text so
+       already-owned items are instantly distinguishable. */
+    --option-disabled: #54545a;
+    --surface-0: rgb(255 255 255 / 3%);
+    --surface-1: rgb(255 255 255 / 5%);
+    --surface-2: rgb(255 255 255 / 8%);
+    --surface-hover: rgb(255 255 255 / 7%);
+    --input-bg: rgb(0 0 0 / 30%);
+    --input-border: rgb(255 255 255 / 12%);
+    --shadow-sm: 0 1px 3px rgb(0 0 0 / 30%);
+    --shadow: 0 4px 16px rgb(0 0 0 / 40%);
+    --shadow-lg: 0 24px 60px rgb(0 0 0 / 60%);
+  }
+}
+
+/* ── Reset & Base ───────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--page-bg);
+  color: var(--text);
+  font-size: var(--text-base);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Canvas: 1024×768 Window ────────────────────────────────────────── */
+#app {
+  width: var(--canvas-width);
+  height: var(--canvas-height);
+  max-width: var(--canvas-width);
+  max-height: var(--canvas-height);
+  margin: 0;
+  padding: 0;
+  background: var(--window-bg);
+  backdrop-filter: blur(30px) saturate(1.8);
+  -webkit-backdrop-filter: blur(30px) saturate(1.8);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+header {
+  flex-shrink: 0;
+  padding: 14px var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+
+  /* No border — cleaner look in both loaded and unloaded states */
+}
+
+header h1 {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-container {
+  position: relative;
+}
+
+.status {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-style: normal;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 400px;
+  cursor: default;
+}
+
+/* ── Custom Tooltip (unified) ──────────────────────────────────────── */
+
+/* Single floating div created by js/ui/tooltips.js and positioned via JS.
+   Replaces all native title tooltips with a styled card. */
+.custom-tooltip {
+  z-index: 10000;
+  padding: 8px 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--text);
+  white-space: pre-line;
+  overflow-wrap: break-word;
+  max-width: 480px;
+  max-height: 360px;
+  overflow-y: auto;
+  pointer-events: none;
+}
+
+/* ── Toolbar ────────────────────────────────────────────────────────── */
+.toolbar {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  padding: 0 var(--space-6) 14px;
+  background: transparent;
+}
+
+/* When not loaded, hide the toolbar entirely. The landing page (with
+   either the Open button or the dropzone, capability-branched in
+   setupLandingBrowse) is shown instead. */
+.toolbar:not(.loaded) {
+  display: none;
+}
+
+/* Close button — only visible when a save is loaded.
+   Same appearance as Save/Export buttons. Right-aligned via margin-left:auto. */
+#btnClose {
+  display: none;
+  margin-left: auto;
+}
+
+.toolbar.loaded #btnClose {
+  display: inline-flex;
+}
+
+/* Slot dropdown — fixed width so long error text in disabled options
+   doesn't expand the select and break the toolbar layout. */
+#saveSlot {
+  width: 50px;
+}
+
+/* Slot section label — position relative for dirty-dot positioning */
+#slotSection {
+  position: relative;
+}
+
+/* When not loaded, hide the entire content area */
+#contentArea:not(.loaded) {
+  display: none;
+}
+
+/* Content area: two-column layout (character left, editor right) */
+#contentArea {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Character panel — left sidebar, same styling as right side */
+#charPanel {
+  flex: 0 0 256px;
+  overflow: hidden;
+  margin: 0;
+
+  /* No border-right here — separator is on content only, so tabs look merged */
+}
+
+/* Character tab content — rounded card, no top border (merges with tab) */
+#charPanel > .tab-content {
+  padding: var(--space-6);
+  border: 1px solid var(--card-border);
+  border-top: none;
+  border-radius: var(--radius-xl);
+  margin: 0;
+}
+
+/* Sidebar grids — 2-column: text (max-content, right-aligned) + input (1fr)
+   Uses display:contents on labels so text+input participate in parent grid,
+   giving all rows the same column width (sized to the longest label text). */
+#charPanel .grid:not(.hair-color-grid) {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  text-align: right;
+}
+
+#charPanel .grid:not(.hair-color-grid) > label {
+  display: contents;
+  white-space: nowrap;
+}
+
+#charPanel .grid:not(.hair-color-grid) > label > input,
+#charPanel .grid:not(.hair-color-grid) > label > select {
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+}
+
+/* Override global min-width on selects in sidebar */
+#charPanel .grid:not(.hair-color-grid) > label > select.hairstyle-select {
+  min-width: 0;
+}
+
+/* All fieldsets in sidebar — borderless, aligned with parent field edges */
+#charPanel fieldset,
+#charPanel fieldset fieldset {
+  border: none;
+  padding: 0;
+  margin: 4px 0 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Separator line above and below "Archdemon Sealed" in World tab */
+.world-section-separator {
+  margin-bottom: 4px;
+}
+
+.world-section-separator::before {
+  content: '';
+  display: block;
+  height: 1px;
+  background: var(--separator);
+  margin: 20px 0;
+}
+
+.world-section-separator::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background: var(--separator);
+  margin: 20px 0;
+}
+
+/* Separator line between Character fields and Hair section */
+#charPanel > .tab-content[data-tab="character"] > .grid {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+#charPanel > .tab-content[data-tab="character"] > .grid::after {
+  content: '';
+  grid-column: 1 / 3;
+  width: 100%;
+  height: 1px;
+  background: var(--separator);
+  margin: 14px 0 16px;
+}
+
+#charPanel fieldset:last-child {
+  margin-bottom: 0;
+}
+
+#charPanel legend,
+#charPanel fieldset legend,
+#charPanel fieldset fieldset legend {
+  padding: 0 0 4px;
+}
+
+/* Nested grids (e.g., World Tendency) — already handled by parent grid rule above.
+   Just ensure inputs in fieldset grids fill their column (except hair-color). */
+#charPanel fieldset .grid:not(.hair-color-grid) > label > input {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Hair row in sidebar — stack vertically so dropdown aligns with other inputs */
+#charPanel .hair-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+}
+
+/* Hair Style label — max-content column sized to label text (single label, no waste) */
+#charPanel .hair-row > label {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+#charPanel .hair-row > label > select {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Hair color fieldset — full width in sidebar */
+#charPanel .hair-row > fieldset {
+  width: 100%;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────── */
+button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-h);
+  padding: 0 14px;
+  background: var(--card-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--text-base);
+  font-family: var(--font);
+  font-weight: 400;
+  transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+  white-space: nowrap;
+}
+
+button:hover:not(:disabled) {
+  background: var(--surface-hover);
+}
+
+button:active:not(:disabled) {
+  background: var(--surface-1);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Keyboard focus ring — outline never collides with active-tab box-shadow */
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Primary button — Apple blue (Open button) */
+button#btnOpen {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
+  font-weight: 500;
+}
+
+button#btnOpen:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+button#btnOpen:active:not(:disabled) {
+  background: var(--accent-pressed);
+}
+
+/* Encryption toggle — macOS-style sliding switch.
+   No surrounding (transparent background/border by default).
+   .mismatch class adds a very light red tint when the output mode
+   differs from the source save's encryption state. */
+button#btnToggleEncrypt {
+  width: auto;
+  min-width: 0;
+  height: auto;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  font-weight: 400;
+  letter-spacing: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  border-color: transparent;
+  transition: opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+button#btnToggleEncrypt:disabled {
+  opacity: 0.25;
+}
+
+button#btnToggleEncrypt.mismatch {
+  background: rgb(var(--danger-rgb) / 8%);
+  border-color: rgb(var(--danger-rgb) / 15%);
+}
+
+/* Track (the rounded background the thumb slides on) */
+button#btnToggleEncrypt .toggle-switch-track {
+  position: relative;
+  width: 28px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--input-border);
+  transition: background 0.2s ease;
+  flex-shrink: 0;
+}
+
+/* Thumb (the sliding circle) */
+button#btnToggleEncrypt .toggle-switch-thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 30%);
+  transition: left 0.2s ease;
+}
+
+/* ON state — surface-hover background, thumb slides right */
+button#btnToggleEncrypt[aria-checked="true"] .toggle-switch-track {
+  background: var(--surface-hover);
+  border-color: var(--input-border);
+}
+
+button#btnToggleEncrypt[aria-checked="true"] .toggle-switch-thumb {
+  left: 13px;
+}
+
+button#btnToggleEncrypt:hover:not(:disabled) .toggle-switch-track {
+  background: var(--surface-hover);
+}
+
+button#btnToggleEncrypt[aria-checked="true"]:hover:not(:disabled) .toggle-switch-track {
+  background: var(--surface-hover);
+}
+
+/* Label text (ENC / DEC) — same font as button text.
+   Fixed min-width prevents layout shift when toggling between
+   "ENC" (narrower E) and "DEC" (wider D). */
+button#btnToggleEncrypt .toggle-switch-label {
+  font-size: var(--text-base);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--text);
+  white-space: nowrap;
+  min-width: 28px;
+  text-align: center;
+}
+
+/* SVG icon sizing inside buttons */
+button svg,
+.icon svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentcolor;
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+button svg {
+  flex-shrink: 0;
+}
+
+/* Folder icon in Open button — nudge down for better alignment */
+button#btnOpen svg {
+  position: relative;
+  top: 1px;
+}
+
+/* Open button when placed on the landing page (canWriteInPlace() === true).
+   The landing page centers it; make it visually prominent. */
+#landingPage > #btnOpen {
+  min-width: 140px;
+  justify-content: center;
+}
+
+/* Icon span wrapper */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Labels ─────────────────────────────────────────────────────────── */
+label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+label.checkbox {
+  white-space: normal;
+  color: var(--text);
+  cursor: pointer;
+}
+
+label.checkbox input[type="checkbox"] {
+  margin: 0;
+}
+
+/* ── Inputs & Selects ───────────────────────────────────────────────── */
+input,
+select {
+  height: var(--control-h-sm);
+  padding: 0 8px;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-family: var(--font);
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+input:focus-visible,
+select:focus-visible {
+  outline: none;
+  border-color: var(--input-focus);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+input[type="number"] {
+  width: 80px;
+}
+
+input[type="text"] {
+  min-width: 80px;
+}
+
+input[readonly] {
+  opacity: 0.6;
+  cursor: default;
+  background: var(--surface-0);
+}
+
+select.weapon-select,
+select.armor-select,
+select.ring-select,
+select.item-select,
+select.hairstyle-select {
+  min-width: 180px;
+}
+
+/* Disabled options in dropdown popups (e.g. already-owned consumables).
+   Uses a strong solid color (no opacity) so the contrast with normal
+   options is unmistakable.  Works in Chrome (Blink); WebKitGTK uses
+   native greyed-out rendering for its own distinct appearance. */
+option:disabled {
+  color: var(--option-disabled);
+}
+
+/* ── Main Editor Area ───────────────────────────────────────────────── */
+main#editor {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ── Tabs (Segmented Control Style) ─────────────────────────────────── */
+.tab-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  padding: var(--space-3) var(--space-6);
+  flex-shrink: 0;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 16px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  font-family: var(--font);
+  opacity: 0.6;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  cursor: pointer;
+  transition: opacity 0.12s ease, background 0.12s ease;
+}
+
+.tab:hover {
+  opacity: 0.85;
+  background: var(--surface-hover);
+}
+
+.tab.active {
+  opacity: 1;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--card-border);
+}
+
+/* Top-level tabs — classic tab strip look */
+.tab-group.top-level > .tabs {
+  gap: 0;
+  padding: 0 var(--space-6);
+  position: relative;
+}
+
+/* Left sidebar tabs — single row, flush tab strip.
+   All tabs size to their text content, matching the right-side tab strip. */
+#charPanel > .tabs {
+  display: flex;
+  justify-content: start;
+  gap: 0;  /* flush tab strip — no gap between tabs */
+}
+
+/* No ::after line — content merges directly with active tab */
+
+.tab-group.top-level > .tabs > .tab {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  padding: 0 18px;
+  height: 34px;
+  border: 1px solid transparent;  /* no outline — background alone signals inactive */
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  opacity: 1;
+  background: var(--surface-1);  /* darker fill distinguishes inactive tabs */
+  box-shadow: none;
+  position: relative;
+  z-index: 0;
+}
+
+/* Active tab — merges flush with content below */
+.tab-group.top-level > .tabs > .tab.active {
+  opacity: 1;
+  background: var(--card-bg);
+  border-color: var(--card-border);
+  z-index: 1;
+  box-shadow: none;
+}
+
+.tab-group.top-level > .tabs > .tab:not(.active):hover {
+  background: var(--surface-2);  /* darker tier on hover */
+}
+
+/* Nested sub-tabs — classic tab strip merged with content */
+.tab-group:not(.top-level) > .tabs {
+  gap: 0;
+  padding-bottom: 0;
+  position: relative;
+  z-index: 2;  /* Tabs sit above content so active tab covers content's top border */
+}
+
+.tab-group:not(.top-level) > .tabs > .tab {
+  font-size: var(--text-xs);
+  padding: 0 12px;
+  height: 28px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  opacity: 0.55;
+  background: transparent;
+  box-shadow: none;
+  position: relative;
+  z-index: 1;
+}
+
+.tab-group:not(.top-level) > .tabs > .tab.active {
+  opacity: 1;
+  background: transparent;  /* Blends with content — border alone distinguishes it */
+  border: 1px solid var(--card-border);
+  border-bottom: none;
+  box-shadow: none;
+  z-index: 3;
+}
+
+.tab-group:not(.top-level) > .tabs > .tab:not(.active):hover {
+  opacity: 0.8;
+  background: var(--surface-hover);
+}
+
+/* ── Scrollable Tab Content ─────────────────────────────────────────── */
+.tab-content {
+  flex: 1;
+  overflow: hidden auto;
+  padding: var(--space-5) var(--space-6);
+}
+
+/* Top-level tab content — card background, no top border (merges with tab) */
+.tab-group.top-level > .tab-content {
+  padding: var(--space-5) var(--space-6);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-top: none;
+  border-radius: var(--radius-xl);
+  margin: 0;
+}
+
+/* Top-level tab content containing a sub-tab container — becomes a flex
+   column so the sub-tab content scrolls internally while the action bar
+   stays pinned at the bottom.  Replaces the default block + overflow:auto
+   behavior of .tab-content.
+
+   Note: :has(> …) requires Safari 15.4+, Chrome 105+, Firefox 121+.
+   All Tauri/WebView2/WebKitGTK targets meet this baseline; if this CSS
+   is ever served to older browsers, these rules silently no-op. */
+.tab-group.top-level > .tab-content:has(> .sub-tab-container) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: var(--space-3);  /* slightly tighter than the default 16px */
+}
+
+.tab-group.top-level > .tab-content:has(> .sub-tab-table-body) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: var(--space-6);
+}
+
+.tab-group:not(.top-level) > .tab-content {
+  padding: var(--space-4) var(--space-5);
+  background: transparent;  /* Inherits parent card-bg — no double-tint with th */
+  border: 1px solid var(--card-border);
+  border-top: none;
+  border-radius: var(--radius-xl);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+ /* Fixed slots row above the scrollable table (Spells tab).
+    No longer wraps a header table — inventory/deposit tabs now use a
+    single merged table inside .sub-tab-table-body. */
+ .sub-tab-table-header {
+   flex-shrink: 0;
+ }
+
+/* Spells tab header — slot row spacing.
+   More gap between Spell Slots and Miracle Slots, and a slight left
+   indent so the labels aren't flush against the card edge. */
+.sub-tab-table-header .grid {
+  gap: var(--space-3) 28px;
+  padding-left: var(--space-4);
+}
+
+/* Spells tab header — separator between slot row and table header.
+   More breathing room than the default 8px equipment-separator. */
+.sub-tab-table-header .equipment-separator {
+  margin: 16px 0;
+}
+
+/* Scrollable table body — fills remaining height, scrolls internally.
+   Only the <tbody> rows scroll; the header stays fixed above. */
+.sub-tab-table-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Shared custom scrollbars (tab-content + scrollable table bodies) */
+.tab-content,
+.sub-tab-table-body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-2) transparent;
+}
+
+.tab-content::-webkit-scrollbar,
+.sub-tab-table-body::-webkit-scrollbar {
+  width: var(--space-3);
+}
+
+.tab-content::-webkit-scrollbar-track,
+.sub-tab-table-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tab-content::-webkit-scrollbar-thumb,
+.sub-tab-table-body::-webkit-scrollbar-thumb {
+  background: var(--surface-2);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.tab-content::-webkit-scrollbar-thumb:hover,
+.sub-tab-table-body::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+}
+
+.sub-tab-table-body .grid-table {
+  margin-top: 0;
+}
+
+/* Sub-tab container — wraps the sub-tab group and action bar.
+   Fills the parent top-level tab-content so the sub-tab content area
+   scrolls internally while the action bar stays fixed at the bottom. */
+.sub-tab-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Sub-tab actions bar — holds per-category Add buttons + right-aligned
+   warning span.  Flex row so the warning sits on the same line. */
+.sub-tab-actions {
+  flex-shrink: 0;
+  padding-top: 8px;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Inventory Warning ──────────────────────────────────────────────── */
+
+/* Right-aligned truncated warning on the same row as the Add button.
+   Shows only the beginning of the message; full text in tooltip on hover. */
+.inv-warning {
+  margin-left: auto;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-base);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--text-muted);
+  cursor: default;
+  padding-right: 4px;
+  align-self: flex-end;
+  padding-bottom: 2px;
+}
+
+/* ── Fieldsets / Cards (macOS Grouped Style) ────────────────────────── */
+fieldset {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  padding: 12px 16px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+legend {
+  font-weight: 600;
+  color: var(--text);
+  font-size: var(--text-base);
+  padding: 0 4px;
+  letter-spacing: -0.01em;
+}
+
+/* Nested sub-sections — no distinct background (same as parent) */
+fieldset fieldset {
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  margin: 6px 0 8px;
+  box-shadow: none;
+}
+
+fieldset fieldset legend {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  letter-spacing: 0.03em;
+}
+
+fieldset fieldset fieldset {
+  border-color: var(--card-border);
+  background: var(--surface-0);
+}
+
+/* ── Grid Layouts ───────────────────────────────────────────────────── */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) 14px;
+}
+
+/* Stats — 5-column grid (VIT | INT | END | STR | DEX | Magic | Faith | Luck
+   wrap to a 2nd row), right-aligned labels.
+   Uses display:contents on labels so label-text + input become direct
+   children of a 10-track parent grid.  Each column is a pair of tracks:
+   auto-sized label text (max-content, right-aligned to a shared edge
+   within that column) + an equal-width input track (1fr).  This packs
+   columns to the left and maximises input width without overflow.
+   Column gap is 8px (matching the Char. tab) — applies both within each
+   label (text→input) and between columns. */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, max-content 1fr);
+  gap: var(--space-3);
+  align-items: center;
+  text-align: right;
+  justify-content: start;
+}
+
+.stats-grid > label {
+  display: contents;
+  white-space: nowrap;
+}
+
+.stats-grid > label > input {
+  min-width: 0;
+  width: calc(100% - 12px);
+  text-align: left;
+}
+
+/* Vitals — 3-column grid (HP | MP | Stamina), right-aligned labels.
+   Uses display:contents on labels so label-text + input become direct
+   children of a 6-track parent grid.  Each column is a pair of tracks:
+   auto-sized label text (max-content, right-aligned to a shared edge
+   within that column) + an equal-width input track (1fr).  This packs
+   the three columns to the left (justify-content: start) and maximises
+   input width without overflowing the ~696px fieldset. */
+.vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, max-content 1fr);
+  gap: var(--space-3);
+  align-items: center;
+  text-align: right;
+  justify-content: start;
+}
+
+.vitals-grid > label {
+  display: contents;
+  white-space: nowrap;
+}
+
+.vitals-grid > label > input {
+  min-width: 0;
+  width: calc(100% - 12px);
+  text-align: left;
+}
+
+/* Souls row — three label+input pairs spread across the full width with
+   generous spacing.  Each input is a fixed width (~50% of the old 1fr track)
+   so the textboxes are shorter and breathing room between pairs is larger. */
+.stats-souls {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.stats-souls > label {
+  display: grid;
+  grid-template-columns: max-content 90px;
+  align-items: center;
+  gap: var(--space-2);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.stats-souls > label > input {
+  min-width: 0;
+  width: 90px;
+  text-align: left;
+}
+
+.world-name {
+  font-style: italic;
+  color: var(--text-muted);
+  min-width: 150px;
+  font-size: var(--text-sm);
+}
+
+/* Warp tab — separator line above world name display */
+.warp-world-name-container::before {
+  content: '';
+  display: block;
+  height: 1px;
+  background: var(--separator);
+  margin: 20px 0;
+}
+
+.warp-world-name {
+  display: block;
+  font-size: var(--text-md);
+  font-weight: 400;
+  font-style: normal;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* Equipment — 3-column grid (Hands | Projectiles/Rings | Armor), right-aligned
+   labels.  Uses display:contents on labels so label-text + value span become
+   direct children of a 6-track parent grid.  Each column is a pair of tracks:
+   auto-sized label text (max-content, right-aligned to a shared edge within
+   that column) + an equal-width value track (1fr).  This packs columns to the
+   left, maximises value span width, and makes all three columns' spans equal
+   width (previously they differed because each had a different fixed label
+   column). */
+.equipment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, max-content 1fr);
+  gap: var(--space-3);
+  align-items: center;
+  text-align: right;
+  justify-content: start;
+}
+
+.equipment-grid > label {
+  display: contents;
+  white-space: nowrap;
+}
+
+/* Horizontal separator between the upper equipment grid and the Quick
+   Slots grid.  A direct child of <fieldset> (sits between the two grids). */
+.equipment-separator {
+  height: 1px;
+  background: var(--separator);
+  margin: 8px 0;
+  padding: 0;
+}
+
+/* Read-only equipment value spans — styled like disabled inputs for visual
+    consistency with the read-only Vitals row above. */
+.equipment-grid > label > .eq-text {
+  min-width: 0;
+  width: calc(100% - 12px);
+  height: var(--control-h-sm);
+  padding: 0 8px;
+  background: var(--surface-0);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-family: var(--font);
+  line-height: var(--control-h-sm);
+  text-align: left; /* override parent label's right-align */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.7;
+}
+
+/* ── Tables ─────────────────────────────────────────────────────────── */
+.grid-table {
+  width: auto;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 8px;
+}
+
+.grid-table th,
+.grid-table td {
+  border: none;
+  padding: 4px 6px;
+  text-align: left;
+}
+
+.grid-table th {
+  background: var(--card-bg);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 6px 6px 6px 15px;
+  border-bottom: 1px solid var(--separator);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.grid-table th:first-child {
+  border-radius: var(--radius-sm) 0 0 0;
+}
+
+.grid-table th:last-child {
+  border-radius: 0 var(--radius-sm) 0 0;
+}
+
+/* Rings — read-only two-column boxed text list */
+.ring-items {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3) var(--space-5);
+}
+
+.ring-item {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  padding: 4px 8px;
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-sm);
+  background: var(--input-bg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ring-info {
+  font-size: var(--text-base);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-top: 24px;
+  cursor: default;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.grid-table tbody tr {
+  transition: background 0.08s ease;
+}
+
+.grid-table tbody tr:hover {
+  background: var(--accent-dim);
+}
+
+/* Font must match SELECT_FONT in js/ui/core/controls.js so the canvas-based
+   width measurement produces accurate dropdown sizes. */
+.grid-table select {
+  width: auto;
+  min-width: unset;
+  height: 28px;
+}
+
+.grid-table input {
+  width: 60px;
+  height: 28px;
+}
+
+/* ── Row Action Buttons ─────────────────────────────────────────────── */
+.row-add {
+  height: 28px;
+  padding: 0 12px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin-top: 8px;
+  color: var(--accent);
+  background: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+.row-add:hover:not(:disabled) {
+  background: var(--accent-dim);
+  border-color: var(--accent-glow);
+}
+
+.row-del {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-color: transparent;
+  opacity: 0.4;
+}
+
+.row-del:hover:not(:disabled) {
+  opacity: 1;
+  background: rgb(var(--danger-rgb) / 10%);
+  border-color: rgb(var(--danger-rgb) / 20%);
+  color: var(--danger-text);
+}
+
+.row-del svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ── Dirty / Soft-Delete Row State Indicators ──────────────────────── */
+
+/* Dirty dot — always present in the DOM (opacity-toggled, no jitter).
+   Positioned at the vertically-centered right edge of tab buttons and
+   top-right corner of the slot section. */
+.dirty-dot {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--warning);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+/* Top-level tab buttons — dirty dot vertically centered on the right edge. */
+.tab-group.top-level > .tabs > .tab .dirty-dot {
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+}
+
+/* Sub-tab dirty dot — vertically centered on the right edge
+   within the shorter 28px sub-tab height. */
+.tab-group:not(.top-level) > .tabs > .tab .dirty-dot {
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+}
+
+/* Show the dot when the parent has .dirty class */
+.tab.dirty > .dirty-dot,
+#slotSection.dirty > .dirty-dot {
+  opacity: 1;
+}
+
+/* Changed existing field — orange left-border on the input itself.
+   Applies to scalar inputs/selects in the Build/Character/World tabs. */
+input.dirty,
+select.dirty {
+  border-left: 3px solid var(--warning);
+
+  /* Compensate padding so the input doesn't shift when the border appears */
+  padding-left: 5px;
+}
+
+/* Soft-deleted existing row — greyed out + line-through on the name cell.
+   Inputs are disabled (pointer-events: none) so the row is read-only. */
+.grid-table tbody tr.row-deleted {
+  opacity: 0.45;
+}
+
+.grid-table tbody tr.row-deleted > td:first-child {
+  text-decoration: line-through;
+}
+
+.grid-table tbody tr.row-deleted input,
+.grid-table tbody tr.row-deleted select {
+  pointer-events: none;
+}
+
+/* Restore button (shown on soft-deleted rows) — active accent color */
+.row-del.row-restore {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.row-del.row-restore:hover:not(:disabled) {
+  background: var(--accent-dim);
+  border-color: var(--accent-glow);
+  color: var(--accent);
+}
+
+/* New (inserted) row — green left border to distinguish from changed rows.
+   No orange dot — new items are not "dirty", they're additions.
+   Target td:first-child instead of tr because WebKitGTK (Tauri on Linux)
+   does not reliably paint box-shadow on <tr> elements. */
+.grid-table tbody tr.row-added > td:first-child {
+  box-shadow: inset 3px 0 0 var(--success);
+}
+
+/* ── Count-hidden cells (non-counted item types) ───────────────────── */
+
+/* Hidden count cells are kept in the DOM for write-back fidelity but
+   rendered as zero-width so they don't occupy a visible column. */
+.grid-table td.count-hidden {
+  display: none;
+}
+
+/* ── Instructions Banner ────────────────────────────────────────────── */
+.instructions {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-glow);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* ── Hair Row ───────────────────────────────────────────────────────── */
+.hair-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) 14px;
+}
+
+/* Hair color sample swatch */
+.color-sample {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-sm);
+  background: rgb(128 128 128);  /* default gray */
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* Hair Color fieldset legend — match the label style of "Hair Style" */
+.hair-row > fieldset > legend {
+  font-weight: 400;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  padding: 0;
+  letter-spacing: 0;
+}
+
+/* RGB inputs — text column (max-content, right-aligned) + input (70px) + color sample */
+.hair-color-grid {
+  display: grid;
+  grid-template-columns: max-content 70px auto;
+  align-items: center;
+  gap: var(--space-1) var(--space-4);
+  text-align: right;
+}
+
+.hair-color-grid > label {
+  display: contents;
+  white-space: nowrap;
+}
+
+.hair-color-grid > label > input {
+  width: 70px;
+  min-width: 0;
+}
+
+.hair-color-grid > .color-sample {
+  grid-column: 3;
+  grid-row: 1 / 4;
+  margin-left: 20px;
+}
+
+/* ── NPC State Dropdowns ────────────────────────────────────────────── */
+
+/* Uses the same .grid layout as other sidebar sections (max-content 1fr).
+   Name spans and selects are direct grid children (not wrapped in labels). */
+.npc-name {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.npc-state-grid > .npc-state-select {
+  width: 100%;
+  min-width: 0;
+}
+
+/* ── Checkbox Styling ───────────────────────────────────────────────── */
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  background: var(--input-bg);
+  cursor: pointer;
+  position: relative;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+input[type="checkbox"]:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* ── Hidden ─────────────────────────────────────────────────────────── */
+[hidden] {
+  display: none !important;
+}
+
+/* ── Responsive fallback (smaller screens) ──────────────────────────── */
+@media (width <= 1040px), (height <= 800px) {
+  #app {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+  }
+}
+
+/* ── Backdrop-filter fallback ───────────────────────────────────────── */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  #app {
+    background: var(--window-bg);
+  }
+}
+
+/* ── Landing Page (initial drop zone) ──────────────────────────────── */
+.landing-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.landing-dropzone {
+  border: 3px dashed var(--accent);
+  border-radius: var(--radius-lg);
+  padding: 60px 80px;
+  text-align: center;
+  background: var(--accent-dim);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.landing-dropzone.drag-active {
+  background: var(--accent-glow);
+  border-color: var(--accent-hover);
+}
+
+.landing-icon {
+  margin-bottom: 20px;
+}
+
+.landing-icon svg {
+  width: 72px;
+  height: 72px;
+  color: var(--accent);
+  opacity: 0.8;
+}
+
+.landing-dropzone h2 {
+  margin: 0 0 12px;
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.landing-hint {
+  margin: 0 0 4px;
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+}
+
+.landing-hint-sub {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.landing-browse {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: var(--text-sm);
+}
+
+.landing-browse:hover {
+  color: var(--accent-hover);
+}
+
+/* ── Drag-and-Drop Overlay ─────────────────────────────────────────── */
+.drop-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 113 227 / 10%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.drop-overlay-content {
+  border: 3px dashed var(--accent);
+  border-radius: var(--radius-lg);
+  padding: 60px 80px;
+  background: var(--card-bg);
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.drop-overlay-icon {
+  margin-bottom: 16px;
+}
+
+.drop-overlay-icon svg {
+  width: 64px;
+  height: 64px;
+  color: var(--accent);
+}
+
+.drop-overlay-text {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* ── Build Tab Info Line ───────────────────────────────────────────── */
+.build-info {
+  font-size: var(--text-base);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 24px;
+  margin-left: auto;
+  max-width: 350px;
+  cursor: default;
+}
+
+/* ── Custom Modal Dialogs ──────────────────────────────────────────── */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 40%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: modal-fade-in 0.12s ease-out;
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  min-width: 320px;
+  max-width: 460px;
+  padding: var(--space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  animation: modal-scale-in 0.12s ease-out;
+}
+
+@keyframes modal-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modal-title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.modal-message {
+  font-size: var(--text-md);
+  line-height: 1.4;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: 4px;
+}
+
+.modal-btn-primary,
+.modal-btn-secondary {
+  height: var(--control-h);
+  padding: 0 20px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-md);
+  font-weight: 500;
+  font-family: var(--font);
+  cursor: pointer;
+  border: 1px solid var(--input-border);
+  background: var(--card-bg);
+  color: var(--text);
+  transition: background 0.1s ease, border-color 0.1s ease;
+}
+
+.modal-btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--text-on-accent);
+}
+
+.modal-btn-primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.modal-btn-primary:active {
+  background: var(--accent-pressed);
+}
+
+.modal-btn-secondary:hover {
+  background: var(--surface-hover);
+}
+
+.modal-btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+}
+
+.modal-btn-danger:hover {
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
+}
+
+/* ── Reduced Motion ─────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

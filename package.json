@@ -1,0 +1,51 @@
+{
+  "name": "demonsave-ps3",
+  "version": "1.0.0",
+  "description": "Browser-based Demon's Souls PS3 save editor",
+  "license": "MIT",
+  "type": "module",
+  "main": "js/ui/app.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:savefile": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/des-savefile",
+    "test:ui": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/ui",
+    "test:ps3-lib": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/lib/ps3-save-lib",
+    "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.integration.config.js",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "test:db": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/des-db",
+    "pretest:db": "node tools/gen-des-db-index.mjs",
+    "gen:db-index": "node tools/gen-des-db-index.mjs",
+    "gen:icon": "node tools/gen-icon.mjs",
+    "lint:css": "stylelint css/**/*.css",
+    "lint:js": "eslint js/ tests/ tools/ integration-tests/",
+    "lint:types": "tsc --project jsconfig.json --noEmit",
+    "lint": "npm run lint:css && npm run lint:js && npm run lint:types",
+    "format": "prettier --write \"js/**/*.js\" \"tests/**/*.js\" \"tools/**/*.mjs\" \"integration-tests/**/*.js\" *.js",
+    "format:check": "prettier --check \"js/**/*.js\" \"tests/**/*.js\" \"tools/**/*.mjs\" \"integration-tests/**/*.js\" *.js",
+    "serve:dev": "node tools/serve-dev.mjs",
+    "build:frontend": "node tools/build-frontend.mjs",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:dev:wsl": "WEBKIT_DISABLE_COMPOSITING_MODE=1 LIBGL_ALWAYS_SOFTWARE=1 tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:icon": "tauri icon"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tauri-apps/cli": "^2",
+    "@types/node": "^26.1.2",
+    "esbuild": "^0.28.1",
+    "eslint": "^10.7.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "prettier": "^3.9.6",
+    "stylelint": "^17.14.0",
+    "stylelint-config-standard": "^40.0.0",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@noble/ciphers": "^2.2.0",
+    "@noble/hashes": "^2.2.0",
+    "fflate": "^0.8.3"
+  }
+}

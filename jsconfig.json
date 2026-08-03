@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "allowJs": true,
+    "strict": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "lib": ["ESNext", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "target": "ESNext",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node"],
+    "maxNodeModuleJsDepth": 0
+  },
+  "include": [
+    "js/des-db/**/*",
+    "js/des-savefile/**/*",
+    "js/lib/ps3-save-lib/**/*",
+    "js/lib/tauri-bridge.js",
+    "tools/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "src-tauri",
+    "rpcs3-mcp-server",
+    "tests",
+    "integration-tests",
+    "js/ui"
+  ]
+}

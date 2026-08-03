@@ -1,0 +1,18 @@
+{
+  "name": "rpcs3-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for interacting with RPCS3's GDB Remote Serial Protocol debugger",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "rpcs3-mcp-server": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
+  }
+}

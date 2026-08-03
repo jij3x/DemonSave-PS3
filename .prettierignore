@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# AI assistant working files
+.kilo/
+.clinerules/
+
+# Build output
+dist/
+
+# Test coverage
+coverage/
+
+# Separate projects
+src-tauri/
+rpcs3-mcp-server/
+
+# Generated files
+package-lock.json

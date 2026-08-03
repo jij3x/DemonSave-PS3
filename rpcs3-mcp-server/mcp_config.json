@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "rpcs3-debugger": {
+      "command": "node",
+      "args": ["/home/jianxiong/git_repos/Woody/rpcs3-mcp-server/src/index.js"],
+      "env": {
+        "RPCS3_GDB_HOST": "172.21.0.1",
+        "RPCS3_GDB_PORT": "22345"
+      }
+    }
+  }
+}
