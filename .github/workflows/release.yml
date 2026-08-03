@@ -33,6 +33,11 @@ on:
 permissions:
   contents: write
 
+# Avoid races between overlapping tag pushes (and cancel stale main pushes).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # ──────────────────────────────────────────────────────────────────
   # Build Tauri app for each platform / bundle group in parallel
@@ -225,55 +230,5 @@ jobs:
           #   browser-…, linux-installer-…, linux-portable-…, macos-…, windows-…
           files: release-assets/*
 
-  # ──────────────────────────────────────────────────────────────────
-  # CI verification on every branch push (no release artifacts)
-  # ──────────────────────────────────────────────────────────────────
-  test:
-    runs-on: ubuntu-22.04
-    if: startsWith(github.ref, 'refs/heads/')
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Install Node.js
-        uses: actions/setup-node@v5
-        with:
-          node-version: 24
-
-      - name: Install Rust (stable)
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install Linux system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            build-essential \
-            curl \
-            wget \
-            file \
-            libxdo-dev \
-            libssl-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev
-
-      - name: Install npm dependencies
-        run: npm ci || npm install
-
-      - name: Lint (CSS + JS + type check)
-        run: npm run lint
-
-      - name: Format check
-        run: npm run format:check
-
-      - name: Run unit tests
-        run: npm test
-
-      - name: Run Rust unit tests
-        run: cargo test --manifest-path src-tauri/Cargo.toml
-
-      - name: Run integration tests
-        run: npm run test:integration
-
-      - name: Coverage gate
-        run: npm run test:coverage
+  # NOTE: Lint, tests, and the coverage gate live in ci.yml (the "CI"
+  # workflow). This file only handles cross-platform builds and releases.

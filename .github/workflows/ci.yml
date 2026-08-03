@@ -1,0 +1,80 @@
+# Continuous Integration — runs on every push to main/master and every PR.
+#
+# This workflow owns all quality gates (lint, format, unit + integration tests,
+# Rust tests, coverage). It is the source of the `test` status check that branch
+# protection requires before a pull request can be merged.
+#
+# The cross-platform build/release pipeline lives in release.yml and is
+# intentionally NOT triggered on pull requests (it's expensive and already
+# covered there on push to main and on tags).
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+# Cancel superseded runs on the same ref so force-pushes and rapid PR updates
+# don't burn CI minutes on stale commits.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev
+
+      - name: Install npm dependencies
+        run: npm ci || npm install
+
+      - name: Lint (CSS + JS + type check)
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run Rust unit tests
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
+      - name: Run integration tests
+        run: npm run test:integration
+
+      - name: Coverage gate
+        run: npm run test:coverage
