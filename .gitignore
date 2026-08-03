@@ -1,0 +1,27 @@
+# Editor / IDE
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Tauri / Rust build artifacts
+src-tauri/target/
+src-tauri/gen/
+
+# temp
+tmp/
+
+# Test coverage
+coverage/
+
+# AI assistant working files
+.clinerules/
+.kilo/
+plans/
