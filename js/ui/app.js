@@ -20,7 +20,7 @@
  *   3. Write/download all files at once
  */
 
-import {
+timport {
   openSave,
   writeSaveData,
   exportEncryptedSave,
