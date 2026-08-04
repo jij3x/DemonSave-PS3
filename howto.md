@@ -285,14 +285,31 @@ Output directory: `src-tauri/target/release/bundle/`
 | `npx tauri build --bundles deb` | `.deb` | a few MB | Relies on system WebKitGTK |
 | `npx tauri build --bundles rpm` | `.rpm` | a few MB | Pure-Rust RPM bundler — no Fedora host needed |
 | `npx tauri build --bundles deb,rpm` | both | a few MB each | Native installers |
-| `npx tauri build --bundles appimage` | `.AppImage` | ~77 MB | Self-contained; bundles the webview stack |
+| `npx tauri build --no-bundle` | Raw binary | a few MB | Portable; needs system WebKitGTK |
 | `npm run tauri:build` | all of the above | varies | Default: builds every format |
 
-> The `.deb` / `.rpm` packages are small because they depend on the
-> system-installed WebKitGTK webview. The `.AppImage` is large because
-> it bundles the entire webview stack for portability across distros.
-> RPM bundling works on Ubuntu — Tauri v2's RPM bundler is pure Rust
-> (the `rpm` crate) and does not require `rpmbuild` or a Fedora host.
+The **portable** raw binary is also produced at:
+
+```
+src-tauri/target/release/demonsave-ps3
+```
+
+> The `.deb` / `.rpm` / raw binary are small because they depend on
+> the system-installed WebKitGTK webview. RPM bundling works on
+> Ubuntu — Tauri v2's RPM bundler is pure Rust (the `rpm` crate) and
+> does not require `rpmbuild` or a Fedora host.
+
+#### Runtime dependencies for the portable binary
+
+The `.deb` / `.rpm` installers declare their dependencies, so
+`dpkg`/`rpm` pulls the required libraries automatically. The **raw
+portable binary** does not — if it fails to launch, install the
+runtime libraries manually:
+
+```bash
+sudo apt-get install -y libwebkit2gtk-4.1-0 libssl3 \
+  libayatana-appindicator3-1 librsvg2-2
+```
 
 ---
 
@@ -305,7 +322,7 @@ Output directory: `src-tauri/target/release/bundle/`
 
 | Command | Output | Location |
 |---|---|---|
-| `npx tauri build --bundles nsis` | NSIS installer `.exe` | `bundle/nsis/` |
+| `npx tauri build --no-bundle` | Portable binary only (no installer) | `target/release/` |
 | `npm run tauri:build` | NSIS installer `.exe` + portable binary | `bundle/nsis/` + `target/release/` |
 
 The **portable** raw executable is also produced at:
@@ -316,6 +333,7 @@ src-tauri/target/release/demonsave-ps3.exe
 
 This is the standalone `.exe` with no installer wrapper.
 
+> **CI releases ship the NSIS installer and portable `.exe`.**
 > Build in a native Windows environment (PowerShell, CMD, or Git
 > Bash). Building from WSL2 produces a Linux binary, not a Windows
 > one.
@@ -330,8 +348,39 @@ Output directory: `src-tauri/target/release/bundle/`
 
 | Command | Output | Location |
 |---|---|---|
+| `npx tauri build --bundles app` | `.app` bundle | `bundle/macos/` |
 | `npx tauri build --bundles dmg` | `.dmg` disk image | `bundle/dmg/` |
 | `npm run tauri:build` | `.dmg` + `.app` | `bundle/dmg/` + `bundle/macos/` |
+
+> **CI releases ship a zipped `.app` and `.dmg` (Apple Silicon /
+> M1-M3 only).** The `.app` is a directory — the release workflow
+> zips it with `ditto -c -k --keepParent` so it can be attached to
+> the GitHub Release. `macos-latest` = ARM64, so Intel Macs are not
+> supported by the published build.
+
+#### macOS Gatekeeper ("unidentified developer") warning
+
+The CI builds are **not code-signed or notarized**. On first launch,
+macOS Gatekeeper will block the app with one of:
+
+- *"`DemonSave-PS3` cannot be opened because the developer cannot be
+  verified."*
+- *"`DemonSave-PS3` is damaged and can't be opened."* (quarantine
+  attribute on some macOS versions)
+
+**Workaround (pick one):**
+
+1. **Right-click → Open** — Right-click (or ⌘-click) the `.app` and
+   select "Open", then click "Open" in the confirmation dialog. This
+   only needs to be done once.
+2. **System Settings** — Attempt to open the app once (let it be
+   blocked), then go to *System Settings → Privacy & Security* and
+   click "Open Anyway".
+3. **Terminal (`xattr`)** — Strip the quarantine attribute entirely:
+
+   ```bash
+   xattr -cr /Applications/DemonSave-PS3.app
+   ```
 
 > For distribution outside of the App Store, you'll need to
 > code-sign and notarize the `.app` / `.dmg` with your Apple
@@ -469,10 +518,10 @@ git push origin v1.0.0
 | Job | Runner | Output | Release asset prefix |
 |---|---|---|---|
 | Tauri (Linux installers) | `ubuntu-22.04` | `.deb`, `.rpm` | `linux-installer-*` |
-| Tauri (Linux portable) | `ubuntu-22.04` | `.AppImage` | `linux-portable-*` |
+| Tauri (Linux portable) | `ubuntu-22.04` | `.tar.gz` (compressed binary) | `linux-portable-*` |
 | Tauri (Windows) | `windows-latest` | NSIS `.exe` + portable `.exe` | `windows-*` |
-| Tauri (macOS) | `macos-latest` | `.dmg` | `macos-*` |
-| Browser ZIP | `ubuntu-22.04` | `demonsave_ps3_html.zip` + `.sha256` | `browser-*` |
+| Tauri (macOS) | `macos-latest` | Zipped `.app` + `.dmg` (Apple Silicon only) | `macos-*` |
+| Browser ZIP | `ubuntu-22.04` | `demonsave_ps3_html.zip` | `browser-*` |
 | Release | `ubuntu-22.04` | Draft GitHub Release | (collects all prefixed assets) |
 
 A dedicated `release` job downloads all staged assets and attaches
@@ -493,11 +542,11 @@ Where every build output lands:
 | Browser raw files | `dist/demonsave_ps3_html/{index.html,css/styles.css,js/app.bundle.js}` |
 | Tauri frontend | `dist/` (index.html, css/, js/, vendor/) |
 | Tauri — Linux `.deb` / `.rpm` | `src-tauri/target/release/bundle/deb/`, `src-tauri/target/release/bundle/rpm/` |
-| Tauri — Linux `.AppImage` | `src-tauri/target/release/bundle/appimage/` |
+| Tauri — Linux raw binary | `src-tauri/target/release/demonsave-ps3` |
 | Tauri — Windows NSIS | `src-tauri/target/release/bundle/nsis/*.exe` |
 | Tauri — Windows portable | `src-tauri/target/release/demonsave-ps3.exe` |
-| Tauri — macOS `.dmg` | `src-tauri/target/release/bundle/dmg/*.dmg` |
 | Tauri — macOS `.app` | `src-tauri/target/release/bundle/macos/*.app` |
+| Tauri — macOS `.dmg` | `src-tauri/target/release/bundle/dmg/*.dmg` |
 | Generated DB index | `js/des-db/idx-upgrade-ref.js` |
 | Test coverage | `coverage/` (if generated) |
 

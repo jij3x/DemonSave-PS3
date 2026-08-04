@@ -1,6 +1,6 @@
 # RPCS3 MCP Server
 
-An MCP (Model Context Protocol) server that provides full control over RPCS3's external debugger via the GDB Remote Serial Protocol. This allows AI assistants (like Claude) to debug PS3 games running in RPCS3.
+An MCP (Model Context Protocol) server that provides full control over RPCS3's external debugger via the GDB Remote Serial Protocol. This allows AI assistants (like GLM 5.2) to debug PS3 games running in RPCS3.
 
 ## Features
 
@@ -33,7 +33,7 @@ npm install
 
 ### 3. Configure MCP Client
 
-Add to your MCP client configuration (e.g., `.mcp.json` or Claude Desktop config):
+Add to your MCP client configuration (e.g., `.mcp.json`):
 
 ```json
 {
@@ -145,11 +145,10 @@ PPU (PowerPC 64-bit) registers can be referenced by name:
 
 ## How It Works
 
-```
-┌─────────────┐     MCP (stdio)      ┌──────────────────┐     TCP (GDB RSP)     ┌─────────┐
-│  AI Client  │ ◄──────────────────► │  MCP Server       │ ◄──────────────────► │  RPCS3  │
-│  (Claude)   │                      │  (this project)   │   127.0.0.1:2345     │  GDB    │
-└─────────────┘                      └──────────────────┘                       └─────────┘
+```mermaid
+flowchart LR
+    A["AI Client<br/>(GLM 5.2)"] <--->|MCP stdio| B["MCP Server<br/>(this project)"]
+    B <--->|TCP GDB RSP<br/>127.0.0.1:2345| C["RPCS3<br/>GDB Server"]
 ```
 
 The MCP server:
