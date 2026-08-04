@@ -33,6 +33,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@tauri-apps/cli": "^2",
+    "@types/jest": "^30.0.0",
     "@types/node": "^26.1.2",
     "esbuild": "^0.28.1",
     "eslint": "^10.7.0",

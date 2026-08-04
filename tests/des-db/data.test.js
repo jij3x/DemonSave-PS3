@@ -1,5 +1,4 @@
-/**
- * Tests for the des-db read-only game data module.
+/** * Tests for the des-db read-only game data module.
  */
 import * as db from '../../js/des-db/index.js';
 import weaponsData from '../../js/des-db/weapons.js';
@@ -60,8 +59,8 @@ describe('des-db: getItemIdsByCategory / getItemNamesByCategory', () => {
   });
 
   test('invalid category throws', () => {
-    expect(() => db.getItemIdsByCategory('invalid')).toThrow('Unknown category');
-    expect(() => db.getItemNamesByCategory('invalid')).toThrow('Unknown category');
+    expect(() => db.getItemIdsByCategory(/** @type {never} */ ('invalid'))).toThrow('Unknown category');
+    expect(() => db.getItemNamesByCategory(/** @type {never} */ ('invalid'))).toThrow('Unknown category');
   });
 });
 
@@ -83,7 +82,7 @@ describe('des-db: getItem', () => {
   });
 
   test('throws for unknown category', () => {
-    expect(() => db.getItem('invalid', '0x2710')).toThrow('Unknown category: invalid');
+    expect(() => db.getItem(/** @type {never} */ ('invalid'), '0x2710')).toThrow('Unknown category: invalid');
   });
 
   test('item objects are frozen', () => {
@@ -112,7 +111,7 @@ describe('des-db: hasItem', () => {
   });
 
   test('returns false for unknown category', () => {
-    expect(db.hasItem('invalid', '0x2710')).toBe(false);
+    expect(db.hasItem(/** @type {never} */ ('invalid'), '0x2710')).toBe(false);
   });
 });
 
@@ -159,7 +158,7 @@ describe('des-db: getItemDurability', () => {
     ['ring', 'rings', '0x64'], // Ring of Great Strength — type 8
     ['goods', 'goods', '0x6'], // Execution Grounds Key — type 12
   ])('throws for non-durability type (%s)', (_label, cat, id) => {
-    expect(() => db.getItemDurability(cat, id)).toThrow(
+    expect(() => db.getItemDurability(/** @type {never} */ (cat), id)).toThrow(
       'expected Weapon (1), Shield (2), Bow (3), Armor (5), or Casting Tool (6)',
     );
   });
@@ -190,14 +189,14 @@ describe('des-db: getWeaponItemByUpgradeRef', () => {
 
   test('throws on non-array input', () => {
     expect(() => db.getWeaponItemByUpgradeRef(null)).toThrow('Invalid upgrade_ref');
-    expect(() => db.getWeaponItemByUpgradeRef('1:1:0')).toThrow('Invalid upgrade_ref');
+    expect(() => db.getWeaponItemByUpgradeRef(/** @type {never} */ ('1:1:0'))).toThrow('Invalid upgrade_ref');
     expect(() => db.getWeaponItemByUpgradeRef(undefined)).toThrow('Invalid upgrade_ref');
   });
 
   test('throws on truncated array (fewer than 3 elements)', () => {
     // Input must be a 3-element array; shorter arrays are rejected.
-    expect(() => db.getWeaponItemByUpgradeRef([77])).toThrow('Invalid upgrade_ref');
-    expect(() => db.getWeaponItemByUpgradeRef([77, null])).toThrow('Invalid upgrade_ref');
+    expect(() => db.getWeaponItemByUpgradeRef(/** @type {never} */ ([77]))).toThrow('Invalid upgrade_ref');
+    expect(() => db.getWeaponItemByUpgradeRef(/** @type {never} */ ([77, null]))).toThrow('Invalid upgrade_ref');
   });
 
   test('throws on unknown ref', () => {
@@ -668,27 +667,27 @@ describe('des-db: hex-key capitalization', () => {
 
 describe('des-db: prototype pollution resistance', () => {
   test('getWorldName throws for prototype keys', () => {
-    expect(() => db.getWorldName('__proto__')).toThrow('Unknown world');
-    expect(() => db.getWorldName('constructor')).toThrow('Unknown world');
-    expect(() => db.getWorldName('toString')).toThrow('Unknown world');
+    expect(() => db.getWorldName(/** @type {never} */ ('__proto__'))).toThrow('Unknown world');
+    expect(() => db.getWorldName(/** @type {never} */ ('constructor'))).toThrow('Unknown world');
+    expect(() => db.getWorldName(/** @type {never} */ ('toString'))).toThrow('Unknown world');
   });
 
   test('getUpgradePathDef throws for prototype keys', () => {
-    expect(() => db.getUpgradePathDef('__proto__')).toThrow('Unknown upgrade path id');
-    expect(() => db.getUpgradePathDef('constructor')).toThrow('Unknown upgrade path id');
-    expect(() => db.getUpgradePathDef('toString')).toThrow('Unknown upgrade path id');
+    expect(() => db.getUpgradePathDef(/** @type {never} */ ('__proto__'))).toThrow('Unknown upgrade path id');
+    expect(() => db.getUpgradePathDef(/** @type {never} */ ('constructor'))).toThrow('Unknown upgrade path id');
+    expect(() => db.getUpgradePathDef(/** @type {never} */ ('toString'))).toThrow('Unknown upgrade path id');
   });
 
   test('getBaseWeapon throws for prototype keys', () => {
-    expect(() => db.getBaseWeapon('__proto__')).toThrow('Invalid base weapon id');
-    expect(() => db.getBaseWeapon('constructor')).toThrow('Invalid base weapon id');
-    expect(() => db.getBaseWeapon('toString')).toThrow('Invalid base weapon id');
+    expect(() => db.getBaseWeapon(/** @type {never} */ ('__proto__'))).toThrow('Invalid base weapon id');
+    expect(() => db.getBaseWeapon(/** @type {never} */ ('constructor'))).toThrow('Invalid base weapon id');
+    expect(() => db.getBaseWeapon(/** @type {never} */ ('toString'))).toThrow('Invalid base weapon id');
   });
 
   test('hasBaseWeapon returns false for prototype keys', () => {
-    expect(db.hasBaseWeapon('__proto__')).toBe(false);
-    expect(db.hasBaseWeapon('constructor')).toBe(false);
-    expect(db.hasBaseWeapon('toString')).toBe(false);
+    expect(db.hasBaseWeapon(/** @type {never} */ ('__proto__'))).toBe(false);
+    expect(db.hasBaseWeapon(/** @type {never} */ ('constructor'))).toBe(false);
+    expect(db.hasBaseWeapon(/** @type {never} */ ('toString'))).toBe(false);
   });
 });
 
@@ -782,7 +781,9 @@ describe('des-db: _resolveWeaponDurability edge cases', () => {
 
   test('returns null when base weapon has no durability field', () => {
     const item = { upgrade_ref: [1, 1, 0] };
-    const baseWeapons = { 1: { name: 'Test' } }; // no durability
+    const baseWeapons = /** @type {Record<string, { durability?: number }>} */ (
+      /** @type {unknown} */ ({ 1: { name: 'Test' } })
+    ); // no durability
     expect(db._resolveWeaponDurability(item, baseWeapons)).toBeNull();
   });
 
@@ -794,7 +795,7 @@ describe('des-db: _resolveWeaponDurability edge cases', () => {
 
   test('returns null when durability is not a number', () => {
     const item = { upgrade_ref: [1, 1, 0] };
-    const baseWeapons = { 1: { durability: 'broken' } };
+    const baseWeapons = { 1: { durability: /** @type {never} */ ('broken') } };
     expect(db._resolveWeaponDurability(item, baseWeapons)).toBeNull();
   });
 

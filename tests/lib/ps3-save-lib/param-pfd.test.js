@@ -819,7 +819,7 @@ describe('parseParamPfd corrupt-header guards', () => {
   });
 
   test('throws on non-Uint8Array input', () => {
-    expect(() => parseParamPfd('bad')).toThrow(TypeError);
+    expect(() => parseParamPfd(/** @type {never} */ ('bad'))).toThrow(TypeError);
   });
 
   test('throws on numReserved too large', () => {
@@ -878,14 +878,14 @@ describe('decryptFile with force=true', () => {
 
   test('throws on non-Uint8Array input', () => {
     const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
-    expect(() => decryptFile('bad', 'USER.DAT', pfd, true)).toThrow(TypeError);
+    expect(() => decryptFile(/** @type {never} */ ('bad'), 'USER.DAT', pfd, true)).toThrow(TypeError);
   });
 });
 
 describe('encryptFile additional coverage', () => {
   test('throws on non-Uint8Array input', () => {
     const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
-    expect(() => encryptFile('bad', 'USER.DAT', pfd, true)).toThrow(TypeError);
+    expect(() => encryptFile(/** @type {never} */ ('bad'), 'USER.DAT', pfd, true)).toThrow(TypeError);
   });
 });
 
@@ -1068,7 +1068,7 @@ describe('getBucketChainHash: null and corrupt chains', () => {
 
     const result = validateParamPfdDetailed(data, pfd);
     expect(result.valid).toBe(false);
-    expect(result.failures.some((f) => f.reason === 'no valid bucket chain')).toBe(true);
+    expect(result.failures.some((f) => /** @type {any} */ (f).reason === 'no valid bucket chain')).toBe(true);
   });
 
   test('validAllParamHashes with fix=true throws on orphaned entry', () => {
@@ -1339,7 +1339,7 @@ describe('validateParamPfdDetailed: specific failure types', () => {
 
     const result = validateParamPfdDetailed(fileData, pfd);
     expect(result.valid).toBe(false);
-    expect(result.failures.some((f) => f.hashType === 'topHash')).toBe(true);
+    expect(result.failures.some((f) => /** @type {any} */ (f).hashType === 'topHash')).toBe(true);
   });
 
   test('returns failure for missing file data', () => {
@@ -1349,7 +1349,7 @@ describe('validateParamPfdDetailed: specific failure types', () => {
 
     const result = validateParamPfdDetailed(fileData, pfd);
     expect(result.valid).toBe(false);
-    expect(result.failures.some((f) => f.reason.includes('not found'))).toBe(true);
+    expect(result.failures.some((f) => /** @type {any} */ (f).reason.includes('not found'))).toBe(true);
   });
 });
 

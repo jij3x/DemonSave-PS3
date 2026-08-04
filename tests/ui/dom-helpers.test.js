@@ -5,7 +5,9 @@
  * refresh, targeted equipment refresh, and shared table-cell builders.
  */
 
-const { jest } = await import('@jest/globals');
+export {};
+
+import { jest } from "@jest/globals";
 
 const {
   $,

@@ -29,7 +29,7 @@ describe('tooltips', () => {
     document.querySelectorAll('body > *:not(.custom-tooltip)').forEach((el) => el.remove());
 
     // Reset tooltip to hidden state
-    const tip = document.querySelector('.custom-tooltip');
+    const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
     if (tip) {
       tip.style.display = 'none';
       tip.style.visibility = '';
@@ -48,7 +48,7 @@ describe('tooltips', () => {
 
   describe('initTooltips', () => {
     test('the tooltip element exists after init', () => {
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip).not.toBeNull();
       expect(tip.style.position).toBe('fixed');
       expect(tip.style.display).toBe('none');
@@ -74,7 +74,7 @@ describe('tooltips', () => {
 
       // Before the delay, tooltip is hidden
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('none');
 
       // After the delay, tooltip appears
@@ -102,7 +102,7 @@ describe('tooltips', () => {
       // Show the tooltip first
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       jest.advanceTimersByTime(500);
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('block');
 
       // Mouseout — starts hide timer
@@ -135,7 +135,7 @@ describe('tooltips', () => {
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('none');
     });
 
@@ -160,7 +160,7 @@ describe('tooltips', () => {
       );
       jest.advanceTimersByTime(200);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('block');
     });
 
@@ -180,7 +180,7 @@ describe('tooltips', () => {
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       jest.advanceTimersByTime(200);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('block');
     });
   });
@@ -201,7 +201,7 @@ describe('tooltips', () => {
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('none');
     });
 
@@ -217,7 +217,7 @@ describe('tooltips', () => {
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('block');
       expect(tip.textContent).toBe('Overflow tip');
     });
@@ -237,7 +237,7 @@ describe('tooltips', () => {
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('block');
 
       // Press Escape
@@ -257,7 +257,7 @@ describe('tooltips', () => {
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('none');
     });
   });
@@ -279,7 +279,7 @@ describe('tooltips', () => {
       el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('none');
     });
 
@@ -298,7 +298,7 @@ describe('tooltips', () => {
 
       // Mousedown on a non-tooltip element — should NOT hide
       other.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('block');
     });
   });
@@ -317,7 +317,7 @@ describe('tooltips', () => {
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('block');
 
       // Simulate a scroll event
@@ -344,7 +344,7 @@ describe('tooltips', () => {
       // so the tooltip still appears after the delay.
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('block');
     });
   });
@@ -376,7 +376,7 @@ describe('tooltips', () => {
       label.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('block');
       // The tooltip should have been positioned (left/top are set)
       expect(tip.style.left).not.toBe('0px');
@@ -401,7 +401,7 @@ describe('tooltips', () => {
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('block');
     });
   });
@@ -426,7 +426,7 @@ describe('tooltips', () => {
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('block');
     });
 
@@ -454,7 +454,7 @@ describe('tooltips', () => {
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       expect(tip.style.display).toBe('block');
     });
   });
@@ -472,7 +472,7 @@ describe('tooltips', () => {
       el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
       jest.advanceTimersByTime(500);
 
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       // Empty text → showTooltip calls hideTooltip
       expect(tip.style.display).toBe('none');
     });
@@ -505,7 +505,7 @@ describe('tooltips', () => {
 
       // Mock the tooltip element to have a non-zero height so the
       // vertical positioning logic has real values to work with.
-      const tip = document.querySelector('.custom-tooltip');
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
       Object.defineProperty(tip, 'offsetHeight', { value: 40, configurable: true });
       Object.defineProperty(tip, 'getBoundingClientRect', {
         value: () => ({ left: 0, top: 0, right: 200, bottom: 40, width: 200, height: 40 }),

@@ -1,11 +1,14 @@
 /**
  * Tests for model sanitization and merge logic.
  */
+
 import { sanitizeModel, mergeModel } from '../../js/des-savefile/model.js';
 
 // Helper: create a full model (as reader.readSave would produce)
+/** @returns {import('../../js/des-savefile/model.js').FullModel} */
 function makeFullModel() {
-  return {
+  return /** @type {import('../../js/des-savefile/model.js').FullModel} */ (
+    /** @type {unknown} */ ({
     world: 1,
     block: 2,
     x: 100.5,
@@ -108,7 +111,7 @@ function makeFullModel() {
     clearCount: 3,
     charTendency: 50.0,
     nexusTendency: -20.0,
-  };
+    }));
 }
 
 describe('sanitizeModel', () => {
@@ -319,12 +322,14 @@ describe('mergeModel', () => {
     const { model: sanitized } = sanitizeModel(full);
 
     // Add a new deposit item
-    sanitized.deposit.push({
-      _ref: '',
-      category: 'weapons',
-      itemId: 0x10000005,
-      count: 1,
-    });
+    sanitized.deposit.push(
+      /** @type {any} */ ({
+        _ref: '',
+        category: 'weapons',
+        itemId: 0x10000005,
+        count: 1,
+      }),
+    );
 
     const merged = mergeModel(full, sanitized);
     const newD = merged.deposit[merged.deposit.length - 1];
@@ -369,12 +374,14 @@ describe('mergeModel', () => {
     const full = makeFullModel();
     const { model: sanitized } = sanitizeModel(full);
 
-    sanitized.deposit.push({
-      _ref: '',
-      category: 'goods',
-      itemId: 0x40000003,
-      count: 50,
-    });
+    sanitized.deposit.push(
+      /** @type {any} */ ({
+        _ref: '',
+        category: 'goods',
+        itemId: 0x40000003,
+        count: 50,
+      }),
+    );
 
     const merged = mergeModel(full, sanitized);
     const newD = merged.deposit[merged.deposit.length - 1];
@@ -471,7 +478,7 @@ describe('sanitizeModel: branch coverage', () => {
   test('sanitizes deposit items without flags array', () => {
     const full = makeFullModel();
     full.deposit[0].flags = undefined;
-    full.deposit[1].flags = 'not-an-array';
+    full.deposit[1].flags = /** @type {never} */ ('not-an-array');
     const { model: sanitized } = sanitizeModel(full);
     // Should get default flags array
     expect(sanitized.deposit[0].flags).toEqual([0, 0, 0, 0, 0, 0, 0]);
@@ -521,13 +528,15 @@ describe('mergeModel: branch coverage', () => {
     const full = makeFullModel();
     const { model: sanitized } = sanitizeModel(full);
     // Add an item without _ref
-    sanitized.weapons.push({
-      itemId: 0x99999999,
-      count: 1,
-      misc1: 0,
-      misc2: 0x01000000,
-      durability: 100,
-    });
+    sanitized.weapons.push(
+      /** @type {any} */ ({
+        itemId: 0x99999999,
+        count: 1,
+        misc1: 0,
+        misc2: 0x01000000,
+        durability: 100,
+      }),
+    );
     const merged = mergeModel(full, sanitized);
     const newW = merged.weapons[merged.weapons.length - 1];
     expect(newW._slot).toBeUndefined();

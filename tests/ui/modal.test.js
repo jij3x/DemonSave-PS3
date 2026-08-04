@@ -4,6 +4,8 @@
  * Unit tests for the custom modal dialog module.
  */
 
+export {};
+
 const { showConfirm, showAlert } = await import('../../js/ui/widgets/modal.js');
 
 describe('modal — showConfirm', () => {
@@ -12,7 +14,7 @@ describe('modal — showConfirm', () => {
     const overlay = document.querySelector('.modal-overlay');
     expect(overlay).not.toBeNull();
 
-    const confirmBtn = overlay.querySelector('.modal-btn-primary');
+    const confirmBtn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary'));
     confirmBtn.click();
 
     await expect(promise).resolves.toBe(true);
@@ -25,7 +27,7 @@ describe('modal — showConfirm', () => {
     const promise = showConfirm('Discard changes?');
     const overlay = document.querySelector('.modal-overlay');
 
-    const cancelBtn = overlay.querySelector('.modal-btn-secondary');
+    const cancelBtn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-secondary'));
     cancelBtn.click();
 
     await expect(promise).resolves.toBe(false);
@@ -62,7 +64,7 @@ describe('modal — showConfirm', () => {
     expect(buttons[1].textContent).toBe('Delete');
 
     // Clean up
-    overlay.querySelector('.modal-btn-primary').click();
+    /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary')).click();
     await promise;
   });
 
@@ -72,14 +74,14 @@ describe('modal — showConfirm', () => {
 
     expect(overlay.querySelector('.modal-btn-danger')).not.toBeNull();
 
-    overlay.querySelector('.modal-btn-primary').click();
+    /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary')).click();
     await promise;
   });
 
   test('does not resolve twice (double-click safety)', async () => {
     const promise = showConfirm('Confirm?');
     const overlay = document.querySelector('.modal-overlay');
-    const confirmBtn = overlay.querySelector('.modal-btn-primary');
+    const confirmBtn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary'));
 
     confirmBtn.click();
     confirmBtn.click(); // second click should be a no-op
@@ -96,7 +98,7 @@ describe('modal — showAlert', () => {
     const overlay = document.querySelector('.modal-overlay');
     expect(overlay).not.toBeNull();
 
-    const okBtn = overlay.querySelector('.modal-btn-primary');
+    const okBtn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary'));
     okBtn.click();
 
     await promise;
@@ -125,7 +127,7 @@ describe('modal — showAlert', () => {
 
     expect(overlay.querySelector('.modal-title').textContent).toBe('Something went wrong');
 
-    overlay.querySelector('.modal-btn-primary').click();
+    /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary')).click();
     await promise;
   });
 
@@ -150,7 +152,7 @@ describe('modal — accessibility', () => {
     expect(dialog.getAttribute('role')).toBe('dialog');
     expect(dialog.getAttribute('aria-modal')).toBe('true');
 
-    dialog.querySelector('.modal-btn-primary').click();
+    /** @type {HTMLElement} */ (dialog.querySelector('.modal-btn-primary')).click();
     await promise;
   });
 
@@ -163,7 +165,9 @@ describe('modal — accessibility', () => {
 
     expect(titleId).toBe(titleEl.id);
 
-    titleEl.nextElementSibling.nextElementSibling.querySelector('button').click();
+    /** @type {HTMLElement} */ (
+      titleEl.nextElementSibling.nextElementSibling.querySelector('button')
+    ).click();
     await promise;
   });
 });
@@ -263,7 +267,7 @@ describe('modal — overlay click', () => {
     expect(document.querySelector('.modal-overlay')).not.toBeNull();
 
     // Clean up
-    overlay.querySelector('.modal-btn-primary').click();
+    /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary')).click();
     await promise;
   });
 
@@ -276,7 +280,7 @@ describe('modal — overlay click', () => {
     // Dialog should still be open — showConfirm never registers overlay-click
     expect(document.querySelector('.modal-overlay')).not.toBeNull();
 
-    overlay.querySelector('.modal-btn-primary').click();
+    /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary')).click();
     await promise;
   });
 });
@@ -286,7 +290,7 @@ describe('modal — custom options', () => {
     const promise = showAlert('Message', { okText: 'Got it' });
     const overlay = document.querySelector('.modal-overlay');
 
-    const btn = overlay.querySelector('.modal-btn-primary');
+    const btn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary'));
     expect(btn.textContent).toBe('Got it');
 
     btn.click();
@@ -299,7 +303,7 @@ describe('modal — custom options', () => {
 
     expect(overlay.querySelector('.modal-title').textContent).toBe('Info');
 
-    overlay.querySelector('.modal-btn-primary').click();
+    /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary')).click();
     await promise;
   });
 });
@@ -317,7 +321,7 @@ describe('modal — focus restoration', () => {
     const overlay = document.querySelector('.modal-overlay');
 
     // Close the dialog
-    overlay.querySelector('.modal-btn-primary').click();
+    /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary')).click();
     await promise;
 
     // Focus should be restored to the trigger element
@@ -329,7 +333,9 @@ describe('modal — focus restoration', () => {
     // fires. We just verify the primary button gets focused.
     const promise = showConfirm('Auto-focus test?');
     const overlay = document.querySelector('.modal-overlay');
-    const primaryBtn = overlay.querySelector('.modal-btn-primary');
+    const primaryBtn = /** @type {HTMLElement} */ (
+      overlay.querySelector('.modal-btn-primary')
+    );
 
     // Wait for rAF to fire (jsdom queues it as a microtask)
     await new Promise((resolve) => requestAnimationFrame(resolve));

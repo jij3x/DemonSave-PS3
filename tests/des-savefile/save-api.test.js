@@ -615,9 +615,9 @@ describe('reloadSlotModels', () => {
     expect(slots[0].model).toBeDefined();
     expect(slots[0].model.vit).toBe(99);
     expect(slots[0].model.name).toBe('Hero');
-    expect(slots[0].display).toBeDefined();
-    expect(slots[0].display.equipmentPointers).toBeDefined();
-    expect(slots[0].display.invIdxByRef).toBeDefined();
+    expect(/** @type {any} */ (slots[0]).display).toBeDefined();
+    expect(/** @type {any} */ (slots[0]).display.equipmentPointers).toBeDefined();
+    expect(/** @type {any} */ (slots[0]).display.invIdxByRef).toBeDefined();
   });
 
   test('reloadSlotModels with onProgress callback', async () => {
@@ -741,9 +741,9 @@ describe('regression: repeated saves without reload (new items)', () => {
     // We need to re-collect the model from the session for this test.
     // In practice the UI always calls reloadSlotModels, but this test
     // verifies the session state is correct even without it.
-    const { model, display } = slots[0];
+    const { model, display } = /** @type {any} */ (slots[0]);
     slots[0].model = model; // model is the same reference from openSave
-    slots[0].display = display;
+    /** @type {any} */ (slots[0]).display = display;
 
     const result2 = await writeSaveData(slots, [], profileNumber);
     const model2 = readSave(result2.filesToWrite.get('USER.DAT'));

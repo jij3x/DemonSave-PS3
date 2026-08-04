@@ -320,13 +320,13 @@ describe('findEntry', () => {
   });
 
   test('returns null when entry not found', () => {
-    const mgr = { pfd: { entries: [{ fileName: 'USER.DAT' }] } };
+    const mgr = /** @type {any} */ ({ pfd: { entries: [{ fileName: 'USER.DAT' }] } });
     expect(findEntry(mgr, 'MISSING.BIN')).toBe(null);
   });
 
   test('finds entry by name (case-insensitive)', () => {
     const entry = { fileName: 'USER.DAT' };
-    const mgr = { pfd: { entries: [entry] } };
+    const mgr = /** @type {any} */ ({ pfd: { entries: [entry] } });
     expect(findEntry(mgr, 'user.dat')).toBe(entry);
   });
 

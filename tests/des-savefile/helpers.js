@@ -13,7 +13,7 @@ export const BUF_SIZE = 0x22000;
 
 /** Create a zeroed buffer with only SANITY_CHECK set (valid empty save). */
 export function makeBlankSave() {
-  const buf = new Uint8Array(BUF_SIZE);
+  const buf = new Uint8Array(new ArrayBuffer(BUF_SIZE));
   wInt32BE(buf, O.SANITY_CHECK, 1);
   return buf;
 }

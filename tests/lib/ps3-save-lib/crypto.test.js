@@ -302,7 +302,7 @@ describe('CTR-like edge cases', () => {
     // 1M+1 blocks = just over the 0x100000 limit
     const hugeSize = 0x100001 * 16;
     // Don't actually allocate — just test the guard
-    const fakeData = { length: hugeSize };
+    const fakeData = /** @type {Uint8Array} */ (/** @type {unknown} */ ({ length: hugeSize }));
     expect(() => ctrEncrypt(key, fakeData, hugeSize)).toThrow(/sanity limit/);
   });
 });

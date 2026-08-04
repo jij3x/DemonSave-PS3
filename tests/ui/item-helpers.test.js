@@ -96,7 +96,7 @@ describe('item-helpers', () => {
     });
 
     test('returns 0 for spells', () => {
-      expect(lookupMaxDurability('spells', SPELL_IDS[0])).toBe(0);
+      expect(lookupMaxDurability(/** @type {never} */ ('spells'), SPELL_IDS[0])).toBe(0);
     });
 
     test('returns 200 for unknown weapon ID (catch fallback)', () => {
@@ -125,11 +125,11 @@ describe('item-helpers', () => {
       // Find an item with a direct note in any category
       let found = false;
       for (const cat of ['armor', 'rings', 'goods', 'spells', 'weapons']) {
-        const ids = db.getItemIdsByCategory(cat);
+        const ids = db.getItemIdsByCategory(/** @type {never} */ (cat));
         for (const id of ids) {
-          const item = db.getItem(cat, id);
+          const item = db.getItem(/** @type {never} */ (cat), id);
           if (item.note) {
-            const result = getItemNote(cat, id);
+            const result = getItemNote(/** @type {never} */ (cat), id);
             expect(result).toBe(item.note);
             found = true;
             break;
