@@ -200,7 +200,7 @@ export function populateForm(m, display, profileNum) {
  * @returns {number} clamped numeric value (0 if empty/invalid)
  */
 function getNumClamped(id) {
-  const el = document.getElementById(id);
+  const el = /** @type {HTMLInputElement} */ (document.getElementById(id));
   if (!el) return 0;
   const raw = parseFloat(el.value);
   if (isNaN(raw)) return 0;
@@ -225,7 +225,7 @@ function getNumClamped(id) {
  * is validated as 32 hex chars (or empty).  Returns null if validation
  * fails — the caller should check for null and abort the save.
  *
- * @returns {(import('../des-savefile/model.js').SanitizedModel|null)}
+ * @returns {(import('../../des-savefile/model.js').SanitizedModel|null)}
  *   The collected model, or null if validation failed.
  */
 export function collectForm() {
@@ -377,11 +377,13 @@ export function setupDurabilitySync() {
     if (!category) return;
 
     const newItemId = parseInt(sel.value, 10) || 0;
-    const maxDur = lookupMaxDurability(category, newItemId);
+    const maxDur = lookupMaxDurability(/** @type {any} */ (category), newItemId);
 
     // Update the durability input in the same row (if visible).
     // For non-durability types the value is stored in tr.dataset instead.
-    const durInput = tr.querySelector('.inv-durability') || tr.querySelector('.inv-dep-durability');
+    const durInput =
+      /** @type {HTMLInputElement|null} */ (tr.querySelector('.inv-durability')) ||
+      /** @type {HTMLInputElement|null} */ (tr.querySelector('.inv-dep-durability'));
     if (durInput) {
       durInput.value = String(maxDur);
     } else {
@@ -448,6 +450,6 @@ export function setupSelectTooltipSync() {
     const itemId = parseInt(sel.value, 10) || 0;
     if (!itemId) return;
 
-    updateSelectTooltip(sel, getItemNote(category, itemId));
+    updateSelectTooltip(sel, getItemNote(/** @type {any} */ (category), itemId));
   });
 }

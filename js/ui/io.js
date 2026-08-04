@@ -84,7 +84,10 @@ export async function openDirectoryViaFSAccess() {
   }
 
   // Chromium path — File System Access API
-  const dirHandle = await window.showDirectoryPicker();
+  const dirHandle =
+    await /** @type {{ showDirectoryPicker: () => Promise<FileSystemDirectoryHandle> }} */ (
+      /** @type {unknown} */ (window)
+    ).showDirectoryPicker();
 
   // Collect all file handles first, then read them in parallel
   const fileHandles = [];
@@ -186,7 +189,7 @@ function readFileEntry(entry) {
  */
 async function traverseEntry(entry, path, map) {
   if (entry.isFile) {
-    const bytes = await readFileEntry(entry);
+    const bytes = await readFileEntry(/** @type {FileSystemFileEntry} */ (entry));
     // Defense-in-depth: cap total bytes across all files in the folder
     let total = 0;
     for (const { bytes: b } of map.values()) total += b.length;
@@ -198,7 +201,7 @@ async function traverseEntry(entry, path, map) {
     const fullName = path + entry.name;
     map.set(fullName.toLowerCase(), { name: entry.name, bytes });
   } else if (entry.isDirectory) {
-    const reader = entry.createReader();
+    const reader = /** @type {FileSystemDirectoryEntry} */ (entry).createReader();
     const entries = await readAllEntries(reader);
     const newPath = path + entry.name + '/';
     await Promise.all(entries.map((e) => traverseEntry(e, newPath, map)));
@@ -239,8 +242,9 @@ export async function readFilesFromDataTransfer(items) {
   // Prefer the first directory entry; fall back to reading all file entries
   const dirEntry = entries.find((e) => e.isDirectory);
   if (dirEntry) {
-    dirName = dirEntry.name;
-    const reader = dirEntry.createReader();
+    const directoryEntry = /** @type {FileSystemDirectoryEntry} */ (dirEntry);
+    dirName = directoryEntry.name;
+    const reader = directoryEntry.createReader();
     const childEntries = await readAllEntries(reader);
     await Promise.all(childEntries.map((e) => traverseEntry(e, '', map)));
   } else {
@@ -328,6 +332,7 @@ export async function deleteFilesFromDirectory(dirHandle, fileNames) {
  * @returns {Record<string, Uint8Array>}
  */
 function filesToObject(files) {
+  /** @type {Record<string, Uint8Array>} */
   const obj = {};
   for (const [name, data] of files) {
     obj[name] = data;
@@ -378,7 +383,9 @@ if (typeof window !== 'undefined') {
 
 export async function downloadFilesAsZip(files, zipName = 'des_save.zip') {
   const zipBytes = await buildZipAsync(files);
-  const blob = new Blob([zipBytes], { type: 'application/zip' });
+  const blob = new Blob([/** @type {BlobPart} */ (/** @type {unknown} */ (zipBytes))], {
+    type: 'application/zip',
+  });
   const url = URL.createObjectURL(blob);
   activeBlobUrls.add(url);
   const a = document.createElement('a');
@@ -438,7 +445,9 @@ export async function pickZipFile(suggestedName = 'des_save.zip') {
   }
 
   // Chromium path
-  return await window.showSaveFilePicker({
+  return await /** @type {{ showSaveFilePicker: (opts: object) => Promise<FileSystemFileHandle> }} */ (
+    /** @type {unknown} */ (window)
+  ).showSaveFilePicker({
     suggestedName,
     types: [
       {

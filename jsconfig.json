@@ -19,6 +19,7 @@
     "js/des-savefile/**/*",
     "js/lib/ps3-save-lib/**/*",
     "js/lib/tauri-bridge.js",
+    "js/ui/**/*",
     "tools/**/*"
   ],
   "exclude": [
@@ -26,7 +27,6 @@
     "src-tauri",
     "rpcs3-mcp-server",
     "tests",
-    "integration-tests",
-    "js/ui"
+    "integration-tests"
   ]
 }
