@@ -130,12 +130,18 @@ jobs:
           mkdir -p release-assets
 
           # Copy every bundle artifact with a group prefix.
-          find src-tauri/target/release/bundle -type f \
-            \( -name '*.deb' -o -name '*.rpm' -o -name '*.exe' -o -name '*.dmg' \) -print0 |
-            while IFS= read -r -d '' f; do
-              base="$(basename "$f")"
-              cp "$f" "release-assets/${{ matrix.asset-prefix }}-$base"
-            done
+          # Guard: `--no-bundle` builds (e.g. linux-portable) skip the
+          # bundler entirely and never create bundle/, so find would fail
+          # under `set -e`. Skip the copy block in that case — the raw
+          # binary / .exe / .app blocks below handle the non-bundled output.
+          if [ -d src-tauri/target/release/bundle ]; then
+            find src-tauri/target/release/bundle -type f \
+              \( -name '*.deb' -o -name '*.rpm' -o -name '*.exe' -o -name '*.dmg' \) -print0 |
+              while IFS= read -r -d '' f; do
+                base="$(basename "$f")"
+                cp "$f" "release-assets/${{ matrix.asset-prefix }}-$base"
+              done
+          fi
 
           # Linux also produces a portable raw binary outside bundle/.
           # Compress as .tar.gz to shrink the download and preserve the
