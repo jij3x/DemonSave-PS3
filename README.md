@@ -9,6 +9,8 @@ everything so the save still loads on real hardware. It runs entirely in the
 browser, or as a native desktop app via Tauri, with no backend and no native
 dependencies.
 
+![alt text](image.png)
+
 That's the *what*. The *why* is a little more fun.
 
 ---
