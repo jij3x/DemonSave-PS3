@@ -11,6 +11,36 @@
 
 import { jest } from '@jest/globals';
 
+/**
+ * Typed getElementById — returns any to avoid HTMLElement|null narrowing
+ * errors on .value/.checked/.textContent access throughout this test suite.
+ * @param {string} id
+ * @returns {any}
+ */
+function byId(id) {
+  return document.getElementById(id);
+}
+
+/**
+ * Typed querySelector — returns any to avoid Element|null narrowing errors
+ * on .value/.dataset/.click access throughout this test suite.
+ * @param {string} sel
+ * @returns {any}
+ */
+function qs(sel) {
+  return document.querySelector(sel);
+}
+
+/**
+ * Typed querySelectorAll — returns any[] to avoid Element type narrowing
+ * errors when accessing .dataset/.value/.disabled on indexed elements.
+ * @param {string} sel
+ * @returns {any[]}
+ */
+function qsa(sel) {
+  return /** @type {any[]} */ (/** @type {unknown} */ (document.querySelectorAll(sel)));
+}
+
 // ---------------------------------------------------------------------------
 // Mock des-db: small dataset that mimics the real API shape
 // ---------------------------------------------------------------------------
@@ -477,14 +507,14 @@ function focusLazySelect(sel) {
 }
 
 function resetForm() {
-  document.querySelectorAll('input').forEach((el) => {
+  qsa('input').forEach((el) => {
     if (el.type === 'checkbox') el.checked = false;
     else el.value = '';
   });
-  document.querySelectorAll('select').forEach((el) => {
+  qsa('select').forEach((el) => {
     el.selectedIndex = 0;
   });
-  document.querySelectorAll('tbody').forEach((el) => {
+  qsa('tbody').forEach((el) => {
     el.innerHTML = '';
   });
 }
@@ -493,6 +523,7 @@ function resetForm() {
 // Test model
 // ---------------------------------------------------------------------------
 
+/** @returns {any} */
 function makeSanitizedModel() {
   return {
     world: 1,
@@ -675,9 +706,9 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      expect(document.getElementById('vit').value).toBe('50');
-      expect(document.getElementById('souls').value).toBe('99999');
-      expect(document.getElementById('name').value).toBe('TestChar');
+      expect(byId('vit').value).toBe('50');
+      expect(byId('souls').value).toBe('99999');
+      expect(byId('name').value).toBe('TestChar');
 
       const collected = collectForm();
       expect(collected.vit).toBe(50);
@@ -689,15 +720,15 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      expect(document.getElementById('currHP').value).toBe('580');
-      expect(document.getElementById('currMaxHP').value).toBe('600');
-      expect(document.getElementById('maxHP').value).toBe('600');
-      expect(document.getElementById('currMP').value).toBe('35');
-      expect(document.getElementById('currMaxMP').value).toBe('40');
-      expect(document.getElementById('maxMP').value).toBe('40');
-      expect(document.getElementById('currStam').value).toBe('110');
-      expect(document.getElementById('currMaxStam').value).toBe('120');
-      expect(document.getElementById('maxStam').value).toBe('120');
+      expect(byId('currHP').value).toBe('580');
+      expect(byId('currMaxHP').value).toBe('600');
+      expect(byId('maxHP').value).toBe('600');
+      expect(byId('currMP').value).toBe('35');
+      expect(byId('currMaxMP').value).toBe('40');
+      expect(byId('maxMP').value).toBe('40');
+      expect(byId('currStam').value).toBe('110');
+      expect(byId('currMaxStam').value).toBe('120');
+      expect(byId('maxStam').value).toBe('120');
 
       const collected = collectForm();
       expect(collected.currHP).toBe(580);
@@ -714,15 +745,15 @@ describe('UI events', () => {
     test('profile number is set', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
-      expect(document.getElementById('profileNum').value).toBe('42');
+      expect(byId('profileNum').value).toBe('42');
     });
 
     test('tendency round-trip', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      expect(document.getElementById('charTendency').value).toBe('50');
-      expect(document.getElementById('nexusTendency').value).toBe('-20');
+      expect(byId('charTendency').value).toBe('50');
+      expect(byId('nexusTendency').value).toBe('-20');
 
       const collected = collectForm();
       expect(collected.charTendency).toBe(50);
@@ -733,9 +764,9 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      expect(document.getElementById('sageFreke').value).toBe('friendly');
-      expect(document.getElementById('thomas').value).toBe('friendly');
-      expect(document.getElementById('boldwin').value).toBe('hostile');
+      expect(byId('sageFreke').value).toBe('friendly');
+      expect(byId('thomas').value).toBe('friendly');
+      expect(byId('boldwin').value).toBe('hostile');
 
       const collected = collectForm();
       expect(collected.sageFreke.friendly).toBe(true);
@@ -745,7 +776,7 @@ describe('UI events', () => {
     test('archSealed checkbox round-trip', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
-      expect(document.getElementById('archSealed').checked).toBe(true);
+      expect(byId('archSealed').checked).toBe(true);
 
       const collected = collectForm();
       expect(collected.archSealed).toBe(true);
@@ -756,11 +787,11 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // Span should display the item name from the mock DB
-      expect(document.getElementById('leftHand1').textContent).toBe('Weapon 5');
-      expect(document.getElementById('rightHand1').textContent).toBe('Weapon 10');
+      expect(byId('leftHand1').textContent).toBe('Weapon 5');
+      expect(byId('rightHand1').textContent).toBe('Weapon 10');
 
       // Raw ID stored in data-id for write-back
-      expect(document.getElementById('leftHand1').dataset.id).toBe(String(WEAPON_IDS[5]));
+      expect(byId('leftHand1').dataset.id).toBe(String(WEAPON_IDS[5]));
 
       const collected = collectForm();
       expect(collected.leftHand1).toBe(WEAPON_IDS[5]);
@@ -775,7 +806,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // Span should show "(none)" and store 0xFFFFFFFF in data-id
-      const boltsSpan = document.getElementById('bolts');
+      const boltsSpan = byId('bolts');
       expect(boltsSpan.textContent).toBe('(none)');
       expect(boltsSpan.dataset.id).toBe(String(0xffffffff));
 
@@ -790,7 +821,7 @@ describe('UI events', () => {
 
       populateForm(model, null, 42);
 
-      const ring2Span = document.getElementById('ring2');
+      const ring2Span = byId('ring2');
       expect(ring2Span.textContent).toBe('Unknown (0x00ABCDEF)');
       expect(ring2Span.dataset.id).toBe(String(0x00abcdef));
 
@@ -804,7 +835,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const rows = document.querySelectorAll('table.inv-table[data-category="weapons"] tbody tr');
+      const rows = qsa('table.inv-table[data-category="weapons"] tbody tr');
       expect(rows.length).toBe(1);
 
       // _ref should be stored as data-ref attribute
@@ -816,13 +847,13 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       expect(
-        document.querySelectorAll('table.inv-table[data-category="armor"] tbody tr').length,
+        qsa('table.inv-table[data-category="armor"] tbody tr').length,
       ).toBe(1);
       expect(
-        document.querySelectorAll('table.inv-table[data-category="rings"] tbody tr').length,
+        qsa('table.inv-table[data-category="rings"] tbody tr').length,
       ).toBe(1);
       expect(
-        document.querySelectorAll('table.inv-table[data-category="goods"] tbody tr').length,
+        qsa('table.inv-table[data-category="goods"] tbody tr').length,
       ).toBe(1);
     });
 
@@ -830,7 +861,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const ringRows = document.querySelectorAll('table.inv-table[data-category="rings"] tbody tr');
+      const ringRows = qsa('table.inv-table[data-category="rings"] tbody tr');
       expect(ringRows.length).toBe(1);
       // Should have editable inputs (not read-only text)
       expect(ringRows[0].querySelector('select')).toBeTruthy();
@@ -921,10 +952,10 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const weaponRows = document.querySelectorAll(
+      const weaponRows = qsa(
         'table.dep-table[data-category="weapons"] tbody tr',
       );
-      const goodsRows = document.querySelectorAll(
+      const goodsRows = qsa(
         'table.dep-table[data-category="goods"] tbody tr',
       );
 
@@ -978,7 +1009,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       expect(row.dataset.existing).toBe('true');
     });
 
@@ -986,7 +1017,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       expect(row.dataset.deleted).toBeUndefined();
 
       // Click the delete button
@@ -1008,7 +1039,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // Soft-delete the weapon row
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       row.querySelector('.row-del').click();
 
       const collected = collectForm();
@@ -1019,7 +1050,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const delBtn = row.querySelector('.row-del');
 
       // Delete
@@ -1037,7 +1068,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const delBtn = row.querySelector('.row-del');
 
       // Delete then undelete
@@ -1053,7 +1084,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('#spellsTableBody tbody tr');
+      const row = qs('#spellsTableBody tbody tr');
       expect(row.dataset.existing).toBe('true');
 
       row.querySelector('.row-del').click();
@@ -1067,7 +1098,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="weapons"] tbody tr');
+      const row = qs('table.dep-table[data-category="weapons"] tbody tr');
       expect(row.dataset.existing).toBe('true');
 
       row.querySelector('.row-del').click();
@@ -1097,7 +1128,7 @@ describe('UI events', () => {
 
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const select = row.querySelector('select');
       const unknownOpt = select.querySelector(
         `option[value="0x99999999"], option[value="2576980377"]`,
@@ -1113,7 +1144,7 @@ describe('UI events', () => {
 
       populateForm(model, null, 42);
 
-      const row = document.querySelector('#spellsTableBody tbody tr');
+      const row = qs('#spellsTableBody tbody tr');
       const select = row.querySelector('select.spell-name');
       expect(select.value).toBe(String(0xaaaaaaaa));
     });
@@ -1126,7 +1157,7 @@ describe('UI events', () => {
 
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="armor"] tbody tr');
+      const row = qs('table.dep-table[data-category="armor"] tbody tr');
       const select = row.querySelector('select.dep-name');
       expect(select.value).toBe(String(0xbbbbbbbb));
     });
@@ -1137,7 +1168,7 @@ describe('UI events', () => {
       document.body.appendChild(btn);
       setupAddRowButtons();
 
-      const tbody = document.querySelector('table.dep-table[data-category="weapons"] tbody');
+      const tbody = qs('table.dep-table[data-category="weapons"] tbody');
       btn.click();
 
       expect(tbody.lastElementChild.querySelector('.dep-name').value).toBe('');
@@ -1150,7 +1181,7 @@ describe('UI events', () => {
       document.body.appendChild(btn);
       setupAddRowButtons();
 
-      const tbody = document.querySelector('table.dep-table[data-category="armor"] tbody');
+      const tbody = qs('table.dep-table[data-category="armor"] tbody');
       btn.click();
 
       expect(tbody.lastElementChild.querySelector('.dep-name').value).toBe('');
@@ -1163,7 +1194,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // Corrupt the flags data attribute on the deposit row
-      const row = document.querySelector('table.dep-table[data-category="weapons"] tbody tr');
+      const row = qs('table.dep-table[data-category="weapons"] tbody tr');
       row.dataset.flags = 'not-valid-json';
 
       const collected = collectForm();
@@ -1174,7 +1205,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="weapons"] tbody tr');
+      const row = qs('table.dep-table[data-category="weapons"] tbody tr');
       const durInput = row.querySelector('.inv-dep-durability');
       durInput.value = '';
 
@@ -1204,7 +1235,7 @@ describe('UI events', () => {
       model.sageFreke = { friendly: false, hostile: false, dead: true };
       populateForm(model, null, 42);
 
-      expect(document.getElementById('sageFreke').value).toBe('dead');
+      expect(byId('sageFreke').value).toBe('dead');
     });
 
     test('sageFreke hostile state', () => {
@@ -1212,7 +1243,7 @@ describe('UI events', () => {
       model.sageFreke = { friendly: false, hostile: true, dead: false };
       populateForm(model, null, 42);
 
-      expect(document.getElementById('sageFreke').value).toBe('hostile');
+      expect(byId('sageFreke').value).toBe('hostile');
     });
 
     test('sageFreke empty state (all false)', () => {
@@ -1220,7 +1251,7 @@ describe('UI events', () => {
       model.sageFreke = { friendly: false, hostile: false, dead: false };
       populateForm(model, null, 42);
 
-      expect(document.getElementById('sageFreke').value).toBe('');
+      expect(byId('sageFreke').value).toBe('');
     });
 
     test('thomas dead state', () => {
@@ -1228,7 +1259,7 @@ describe('UI events', () => {
       model.thomas = { friendly: false, hostile: false, dead: true };
       populateForm(model, null, 42);
 
-      expect(document.getElementById('thomas').value).toBe('dead');
+      expect(byId('thomas').value).toBe('dead');
     });
 
     test('thomas hostile state', () => {
@@ -1236,7 +1267,7 @@ describe('UI events', () => {
       model.thomas = { friendly: false, hostile: true, dead: false };
       populateForm(model, null, 42);
 
-      expect(document.getElementById('thomas').value).toBe('hostile');
+      expect(byId('thomas').value).toBe('hostile');
     });
 
     test('thomas empty state (all false)', () => {
@@ -1244,7 +1275,7 @@ describe('UI events', () => {
       model.thomas = { friendly: false, hostile: false, dead: false };
       populateForm(model, null, 42);
 
-      expect(document.getElementById('thomas').value).toBe('');
+      expect(byId('thomas').value).toBe('');
     });
 
     test('boldwin dead state', () => {
@@ -1252,7 +1283,7 @@ describe('UI events', () => {
       model.boldwin = { friendly: false, hostile: false, dead: true };
       populateForm(model, null, 42);
 
-      expect(document.getElementById('boldwin').value).toBe('dead');
+      expect(byId('boldwin').value).toBe('dead');
     });
 
     test('boldwin friendly state', () => {
@@ -1260,7 +1291,7 @@ describe('UI events', () => {
       model.boldwin = { friendly: true, hostile: false, dead: false };
       populateForm(model, null, 42);
 
-      expect(document.getElementById('boldwin').value).toBe('friendly');
+      expect(byId('boldwin').value).toBe('friendly');
     });
 
     test('boldwin empty state (all false)', () => {
@@ -1268,7 +1299,7 @@ describe('UI events', () => {
       model.boldwin = { friendly: false, hostile: false, dead: false };
       populateForm(model, null, 42);
 
-      expect(document.getElementById('boldwin').value).toBe('');
+      expect(byId('boldwin').value).toBe('');
     });
 
     test('NPC objects undefined → select set to empty', () => {
@@ -1278,9 +1309,9 @@ describe('UI events', () => {
       delete model.boldwin;
       populateForm(model, null, 42);
 
-      expect(document.getElementById('sageFreke').value).toBe('');
-      expect(document.getElementById('thomas').value).toBe('');
-      expect(document.getElementById('boldwin').value).toBe('');
+      expect(byId('sageFreke').value).toBe('');
+      expect(byId('thomas').value).toBe('');
+      expect(byId('boldwin').value).toBe('');
     });
   });
 
@@ -1290,7 +1321,7 @@ describe('UI events', () => {
       model.spells = [{ itemId: SPELL_IDS[0], misc1: 0, misc2: 0 }];
       populateForm(model, null, 42);
 
-      const row = document.querySelector('#spellsTableBody tbody tr');
+      const row = qs('#spellsTableBody tbody tr');
       const statusSel = row.querySelector('.spell-status');
       expect(statusSel.value).toBe('0');
     });
@@ -1330,7 +1361,7 @@ describe('UI events', () => {
       model.goods = [];
       populateForm(model, null, 42);
 
-      expect(document.querySelectorAll('table.inv-table tbody tr').length).toBe(0);
+      expect(qsa('table.inv-table tbody tr').length).toBe(0);
     });
 
     test('empty spells array renders no rows', () => {
@@ -1338,7 +1369,7 @@ describe('UI events', () => {
       model.spells = [];
       populateForm(model, null, 42);
 
-      expect(document.querySelectorAll('#spellsTableBody tbody tr').length).toBe(0);
+      expect(qsa('#spellsTableBody tbody tr').length).toBe(0);
     });
 
     test('empty deposit array renders no rows', () => {
@@ -1346,7 +1377,7 @@ describe('UI events', () => {
       model.deposit = [];
       populateForm(model, null, 42);
 
-      expect(document.querySelectorAll('table.dep-table tbody tr').length).toBe(0);
+      expect(qsa('table.dep-table tbody tr').length).toBe(0);
     });
   });
 
@@ -1371,7 +1402,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // Add a fake row to weapons table with the hidden misc1 attribute
-      const tbody = document.querySelector('table.inv-table[data-category="weapons"] tbody');
+      const tbody = qs('table.inv-table[data-category="weapons"] tbody');
       const tr = document.createElement('tr');
       tr.dataset.ref = 'inv:fake';
       tr.dataset.misc1 = '9999';
@@ -1381,7 +1412,7 @@ describe('UI events', () => {
       const sel = document.createElement('select');
       sel.className = 'inv-name';
       const opt = document.createElement('option');
-      opt.value = WEAPON_IDS[0];
+      opt.value = String(WEAPON_IDS[0]);
       opt.textContent = 'Weapon 0';
       sel.appendChild(opt);
       tdName.appendChild(sel);
@@ -1421,7 +1452,7 @@ describe('UI events', () => {
       document.body.appendChild(btn);
       setupAddRowButtons();
 
-      const tbody = document.querySelector(
+      const tbody = qs(
         'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody',
       );
       btn.click();
@@ -1451,7 +1482,7 @@ describe('UI events', () => {
       document.body.appendChild(btn);
       setupAddRowButtons();
 
-      const tbody = document.querySelector(
+      const tbody = qs(
         'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody',
       );
       btn.click();
@@ -1474,7 +1505,7 @@ describe('UI events', () => {
       document.body.appendChild(btn);
       setupAddRowButtons();
 
-      const tbody = document.querySelector(
+      const tbody = qs(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody',
       );
       const initial = tbody.querySelectorAll('tr').length;
@@ -1492,7 +1523,7 @@ describe('UI events', () => {
       document.body.appendChild(btn);
       setupAddRowButtons();
 
-      const tbody = document.querySelector('table.inv-table[data-category="rings"] tbody');
+      const tbody = qs('table.inv-table[data-category="rings"] tbody');
       const initial = tbody.querySelectorAll('tr').length;
 
       btn.click();
@@ -1507,7 +1538,7 @@ describe('UI events', () => {
 
     // Helper: get or create the spell add button (reuses existing listener)
     function getSpellAddBtn() {
-      let btn = document.getElementById('addSpell');
+      let btn = byId('addSpell');
       if (!btn) {
         btn = document.createElement('button');
         btn.id = 'addSpell';
@@ -1520,7 +1551,7 @@ describe('UI events', () => {
     test('new spell row has empty placeholder selected', () => {
       const btn = getSpellAddBtn();
 
-      const tbody = document.querySelector('#spellsTableBody tbody');
+      const tbody = qs('#spellsTableBody tbody');
       btn.click();
 
       expect(tbody.lastElementChild.querySelector('.spell-name').value).toBe('');
@@ -1538,7 +1569,7 @@ describe('UI events', () => {
     test('spell add button gates while one row is unselected', () => {
       const btn = getSpellAddBtn();
 
-      const tbody = document.querySelector('#spellsTableBody tbody');
+      const tbody = qs('#spellsTableBody tbody');
       const initial = tbody.querySelectorAll('tr').length;
 
       btn.click();
@@ -1554,7 +1585,7 @@ describe('UI events', () => {
       document.body.appendChild(btn);
       setupAddRowButtons();
 
-      const tbody = document.querySelector('table.dep-table[data-category="weapons"] tbody');
+      const tbody = qs('table.dep-table[data-category="weapons"] tbody');
       btn.click();
 
       expect(tbody.lastElementChild.querySelector('.dep-name').value).toBe('');
@@ -1580,7 +1611,7 @@ describe('UI events', () => {
       document.body.appendChild(btn);
       setupAddRowButtons();
 
-      const tbody = document.querySelector('table.dep-table[data-category="goods"] tbody');
+      const tbody = qs('table.dep-table[data-category="goods"] tbody');
       const initial = tbody.querySelectorAll('tr').length;
 
       btn.click();
@@ -1594,7 +1625,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const countInput = row.querySelector('.inv-count');
       const origCount = countInput.value;
 
@@ -1610,7 +1641,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const countInput = row.querySelector('.inv-count');
       const origCount = countInput.value;
 
@@ -1626,7 +1657,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const countInput = row.querySelector('.inv-count');
       countInput.value = '999';
       countInput.classList.add('dirty');
@@ -1641,7 +1672,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const nameSel = row.querySelector('.inv-name');
       const origValue = nameSel.value;
 
@@ -1661,11 +1692,11 @@ describe('UI events', () => {
       setupEquipmentSync();
 
       // The model has leftHand1 = WEAPON_IDS[5]
-      const lh1 = document.getElementById('leftHand1');
+      const lh1 = byId('leftHand1');
       expect(lh1.dataset.id).toBe(String(WEAPON_IDS[5]));
 
       // Change the weapon row from WEAPON_IDS[5] to WEAPON_IDS[6] (same type 2/Shield)
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const sel = row.querySelector('.inv-name');
       // Populate lazy options before selecting a different item
       focusLazySelect(sel);
@@ -1681,11 +1712,11 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const lh1 = document.getElementById('leftHand1');
+      const lh1 = byId('leftHand1');
       expect(lh1.textContent).toBe('Weapon 5');
 
       // Soft-delete the weapon row (it's the only weapon, itemId=WEAPON_IDS[5])
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       row.querySelector('.row-del').click();
       refreshEquipmentDisplay.flush();
 
@@ -1698,8 +1729,8 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, makeDisplay(), 42);
 
-      const lh1 = document.getElementById('leftHand1');
-      const delBtn = document.querySelector(
+      const lh1 = byId('leftHand1');
+      const delBtn = qs(
         'table.inv-table[data-category="weapons"] tbody tr .row-del',
       );
 
@@ -1718,10 +1749,10 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const lh1 = document.getElementById('leftHand1');
+      const lh1 = byId('leftHand1');
       expect(lh1.dataset.origId).toBe(String(WEAPON_IDS[5]));
 
-      const ring1 = document.getElementById('ring1');
+      const ring1 = byId('ring1');
       expect(ring1.dataset.origId).toBe(String(RING_IDS[0]));
     });
 
@@ -1730,11 +1761,11 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupEquipmentSync();
 
-      const lh1 = document.getElementById('leftHand1');
+      const lh1 = byId('leftHand1');
       const originalId = lh1.dataset.id;
 
       // Change the armor row (not equipped in LH1)
-      const armorRow = document.querySelector('table.inv-table[data-category="armor"] tbody tr');
+      const armorRow = qs('table.inv-table[data-category="armor"] tbody tr');
       const sel = armorRow.querySelector('.inv-name');
       sel.value = String(ARMOR_IDS[0]);
       sel.dispatchEvent(new Event('change', { bubbles: true }));
@@ -1764,11 +1795,11 @@ describe('UI events', () => {
     setupEquipmentSync();
 
     // ring1 = RING_IDS[0] in the model
-    const ring1 = document.getElementById('ring1');
+    const ring1 = byId('ring1');
     expect(ring1.textContent).toBe('Ring 0');
 
     // Change the ring in inventory from RING_IDS[0] to RING_IDS[1]
-    const row = document.querySelector('table.inv-table[data-category="rings"] tbody tr');
+    const row = qs('table.inv-table[data-category="rings"] tbody tr');
     const sel = row.querySelector('.inv-name');
     // Populate lazy options before selecting a different item
     focusLazySelect(sel);
@@ -1798,7 +1829,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const sel = document.querySelector(
+      const sel = qs(
         'table.inv-table[data-category="weapons"] tbody tr .inv-name',
       );
       // Should have only 1 option (the currently selected item)
@@ -1811,7 +1842,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const sel = document.querySelector(
+      const sel = qs(
         'table.inv-table[data-category="weapons"] tbody tr .inv-name',
       );
       expect(sel.querySelectorAll('option').length).toBe(1);
@@ -1829,7 +1860,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="weapons"] tbody tr');
+      const row = qs('table.dep-table[data-category="weapons"] tbody tr');
       // Decomposed rows have data-decomposed="true"
       expect(row.dataset.decomposed).toBe('true');
       // Should have base weapon, path, and level selects
@@ -1860,7 +1891,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // The crossbow should be routed to the Bow (type 3) deposit table
-      const row = document.querySelector(
+      const row = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="3"] tbody tr',
       );
       expect(row).toBeTruthy();
@@ -1900,7 +1931,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const sel = document.querySelector(
+      const sel = qs(
         'table.dep-table[data-category="goods"] tbody tr .dep-name',
       );
       expect(sel.querySelectorAll('option').length).toBe(1);
@@ -1911,7 +1942,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const sel = document.querySelector(
+      const sel = qs(
         'table.dep-table[data-category="goods"] tbody tr .dep-name',
       );
       focusLazySelect(sel);
@@ -1926,7 +1957,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const sel = document.querySelector('#spellsTableBody tbody tr .spell-name');
+      const sel = qs('#spellsTableBody tbody tr .spell-name');
       expect(sel.querySelectorAll('option').length).toBe(1);
       expect(sel.value).toBe(String(SPELL_IDS[6]));
     });
@@ -1935,7 +1966,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const sel = document.querySelector('#spellsTableBody tbody tr .spell-name');
+      const sel = qs('#spellsTableBody tbody tr .spell-name');
       focusLazySelect(sel);
 
       expect(sel.querySelectorAll('option').length).toBe(MOCK_SIZE);
@@ -1956,7 +1987,7 @@ describe('UI events', () => {
       ];
       populateForm(model, null, 42);
 
-      const sel = document.querySelector(
+      const sel = qs(
         'table.inv-table[data-category="weapons"] tbody tr .inv-name',
       );
       // Before focus: 1 option (the unknown item)
@@ -1975,7 +2006,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const sel = document.querySelector(
+      const sel = qs(
         'table.inv-table[data-category="weapons"] tbody tr .inv-name',
       );
       focusLazySelect(sel);
@@ -2002,7 +2033,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const durInput = row.querySelector('.inv-durability');
       expect(durInput.value).toBe('300'); // initial weapon durability
 
@@ -2022,7 +2053,7 @@ describe('UI events', () => {
       model.weapons[0].durability = 150;
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const durInput = row.querySelector('.inv-durability');
       expect(durInput.value).toBe('150');
 
@@ -2041,7 +2072,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="armor"] tbody tr');
+      const row = qs('table.inv-table[data-category="armor"] tbody tr');
       const durInput = row.querySelector('.inv-durability');
       expect(durInput.value).toBe('200');
 
@@ -2059,7 +2090,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="rings"] tbody tr');
+      const row = qs('table.inv-table[data-category="rings"] tbody tr');
 
       // Rings have no durability input — value stored in dataset
       expect(row.querySelector('.inv-durability')).toBeNull();
@@ -2078,7 +2109,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="goods"] tbody tr');
+      const row = qs('table.inv-table[data-category="goods"] tbody tr');
 
       // Goods have no durability input — value stored in dataset
       expect(row.querySelector('.inv-durability')).toBeNull();
@@ -2099,7 +2130,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="weapons"] tbody tr');
+      const row = qs('table.dep-table[data-category="weapons"] tbody tr');
       const durInput = row.querySelector('.inv-dep-durability');
       expect(durInput.value).toBe('300');
 
@@ -2116,7 +2147,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="goods"] tbody tr');
+      const row = qs('table.dep-table[data-category="goods"] tbody tr');
 
       // Goods have no durability input — value stored in dataset
       expect(row.querySelector('.inv-dep-durability')).toBeNull();
@@ -2149,7 +2180,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // weapon-1 table should have visible durability input
-      const row = document.querySelector(
+      const row = qs(
         'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
       );
       expect(row).toBeTruthy();
@@ -2160,7 +2191,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector(
+      const row = qs(
         'table.inv-table[data-category="weapons"][data-weapon-type="4"] tbody tr',
       );
       if (row) {
@@ -2173,7 +2204,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="armor"] tbody tr');
+      const row = qs('table.inv-table[data-category="armor"] tbody tr');
       expect(row).toBeTruthy();
       expect(row.querySelector('.inv-durability')).toBeTruthy();
     });
@@ -2182,7 +2213,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="rings"] tbody tr');
+      const row = qs('table.inv-table[data-category="rings"] tbody tr');
       expect(row).toBeTruthy();
       expect(row.querySelector('.inv-durability')).toBeNull();
       expect(row.dataset.durability).toBeDefined();
@@ -2192,7 +2223,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="goods"] tbody tr');
+      const row = qs('table.inv-table[data-category="goods"] tbody tr');
       expect(row).toBeTruthy();
       expect(row.querySelector('.inv-durability')).toBeNull();
       expect(row.dataset.durability).toBeDefined();
@@ -2202,7 +2233,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="rings"] tbody tr');
+      const row = qs('table.dep-table[data-category="rings"] tbody tr');
       if (row) {
         expect(row.querySelector('.inv-dep-durability')).toBeNull();
         expect(row.dataset.durability).toBeDefined();
@@ -2213,7 +2244,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="goods"] tbody tr');
+      const row = qs('table.dep-table[data-category="goods"] tbody tr');
       expect(row).toBeTruthy();
       expect(row.querySelector('.inv-dep-durability')).toBeNull();
       expect(row.dataset.durability).toBeDefined();
@@ -2229,7 +2260,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // Verify the dataset holds the value
-      const row = document.querySelector('table.inv-table[data-category="goods"] tbody tr');
+      const row = qs('table.inv-table[data-category="goods"] tbody tr');
       expect(row).toBeTruthy();
       expect(row.dataset.durability).toBe('42');
 
@@ -2249,7 +2280,7 @@ describe('UI events', () => {
 
       // The model's weapon is WEAPON_IDS[5] which is type 2 (Shield).
       // All non-Ammo weapon types hide the count column.
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       expect(row).toBeTruthy();
       const countTd = row.querySelector('.inv-count')?.closest('td');
       expect(countTd).toBeTruthy();
@@ -2260,7 +2291,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="armor"] tbody tr');
+      const row = qs('table.inv-table[data-category="armor"] tbody tr');
       const countTd = row.querySelector('.inv-count')?.closest('td');
       expect(countTd.classList.contains('count-hidden')).toBe(true);
 
@@ -2273,7 +2304,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="rings"] tbody tr');
+      const row = qs('table.inv-table[data-category="rings"] tbody tr');
       const countTd = row.querySelector('.inv-count')?.closest('td');
       expect(countTd.classList.contains('count-hidden')).toBe(true);
     });
@@ -2282,7 +2313,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector(
+      const row = qs(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
       );
       const countTd = row.querySelector('.inv-count')?.closest('td');
@@ -2294,7 +2325,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector(
+      const row = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
       );
       const countTd = row.querySelector('.dep-count')?.closest('td');
@@ -2306,7 +2337,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="goods"] tbody tr');
+      const row = qs('table.dep-table[data-category="goods"] tbody tr');
       const countTd = row.querySelector('.dep-count')?.closest('td');
       expect(countTd).toBeTruthy();
       expect(countTd.classList.contains('count-hidden')).toBe(false);
@@ -2336,7 +2367,7 @@ describe('UI events', () => {
       ];
       populateForm(model, null, 42);
 
-      const rows = document.querySelectorAll(
+      const rows = qsa(
         'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
       );
       expect(rows.length).toBe(2);
@@ -2351,7 +2382,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector(
+      const row = qs(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
       );
       const countInp = row.querySelector('.inv-count');
@@ -2368,7 +2399,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector(
+      const row = qs(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
       );
       const countInp = row.querySelector('.inv-count');
@@ -2381,7 +2412,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="goods"] tbody tr');
+      const row = qs('table.dep-table[data-category="goods"] tbody tr');
       const countInp = row.querySelector('.dep-count');
       countInp.value = '1000';
       countInp.dispatchEvent(new Event('input', { bubbles: true }));
@@ -2405,7 +2436,7 @@ describe('UI events', () => {
 
       // Focus the existing goods select to lazy-load it, then check that
       // ITEM_IDS[0] is selectable (it's the current row's own item).
-      const sel = document.querySelector(
+      const sel = qs(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr .inv-name',
       );
       focusLazySelect(sel);
@@ -2423,7 +2454,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const rows = document.querySelectorAll(
+      const rows = qsa(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
       );
       expect(rows.length).toBe(2);
@@ -2456,7 +2487,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // Soft-delete the existing goods row
-      const row = document.querySelector(
+      const row = qs(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
       );
       row.querySelector('.row-del').click();
@@ -2471,7 +2502,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const rows = document.querySelectorAll(
+      const rows = qsa(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
       );
       const newSel = rows[rows.length - 1].querySelector('.inv-name');
@@ -2509,7 +2540,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // Step 1: Change R1 from ITEM_IDS[0] to ITEM_IDS[1]
-      const r1 = document.querySelector(
+      const r1 = qs(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
       );
       const r1Sel = r1.querySelector('.inv-name');
@@ -2526,7 +2557,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const rows = document.querySelectorAll(
+      const rows = qsa(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
       );
       expect(rows.length).toBe(2);
@@ -2546,7 +2577,7 @@ describe('UI events', () => {
       expect(r1.dataset.deleted).toBeUndefined();
 
       // R2 should be removed from the DOM
-      const remainingRows = document.querySelectorAll(
+      const remainingRows = qsa(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
       );
       expect(remainingRows.length).toBe(1);
@@ -2586,7 +2617,7 @@ describe('UI events', () => {
       ];
       populateForm(model, null, 42);
 
-      const rows = document.querySelectorAll(
+      const rows = qsa(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
       );
       const r1 = rows[0]; // ITEM_IDS[0]
@@ -2635,7 +2666,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const row = document.querySelector(
+      const row = qs(
         'table.inv-table[data-category="weapons"][data-weapon-type="4"] tbody tr',
       );
       expect(row).toBeTruthy();
@@ -2661,7 +2692,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const row = document.querySelector(
+      const row = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="4"] tbody tr',
       );
       expect(row).toBeTruthy();
@@ -2681,7 +2712,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupDepositWeaponSync();
 
-      const row = document.querySelector(
+      const row = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
       );
       expect(row).toBeTruthy();
@@ -2732,7 +2763,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupDepositWeaponSync();
 
-      const row = document.querySelector(
+      const row = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
       );
       const pathSel = row.querySelector('.dep-path');
@@ -2763,7 +2794,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupDepositWeaponSync();
 
-      const row = document.querySelector(
+      const row = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
       );
       const levelSel = row.querySelector('.dep-level');
@@ -2800,7 +2831,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupDepositWeaponSync();
 
-      const row = document.querySelector(
+      const row = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
       );
       const baseSel = row.querySelector('.dep-base-weapon');
@@ -2828,7 +2859,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupDepositWeaponSync();
 
-      const row = document.querySelector(
+      const row = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
       );
       const baseSel = row.querySelector('.dep-base-weapon');
@@ -2860,7 +2891,7 @@ describe('UI events', () => {
       document.body.appendChild(addBtn);
       setupAddRowButtons();
 
-      const tbody = document.querySelector(
+      const tbody = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody',
       );
       const initialCount = tbody.querySelectorAll('tr').length;
@@ -2900,7 +2931,7 @@ describe('UI events', () => {
       document.body.appendChild(addBtn);
       setupAddRowButtons();
 
-      const tbody = document.querySelector(
+      const tbody = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="2"] tbody',
       );
       const initialCount = tbody.querySelectorAll('tr').length;
@@ -2919,7 +2950,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupSelectTooltipSync();
 
-      const row = document.querySelector(
+      const row = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
       );
       const baseSel = row.querySelector('.dep-base-weapon');
@@ -2956,7 +2987,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const newRow = document.querySelector(
+      const newRow = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr:last-child',
       );
       const baseSel = newRow.querySelector('.dep-base-weapon');
@@ -2973,7 +3004,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupSelectTooltipSync();
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const sel = row.querySelector('.inv-name');
 
       // Focus to lazy-load options first
@@ -2993,7 +3024,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupSelectTooltipSync();
 
-      const row = document.querySelector('#spellsTableBody tbody tr');
+      const row = qs('#spellsTableBody tbody tr');
       const sel = row.querySelector('.spell-name');
 
       // Focus to lazy-load options
@@ -3021,7 +3052,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const tbody = document.querySelector(
+      const tbody = qs(
         'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody',
       );
       const newSel = tbody.lastElementChild.querySelector('.inv-name');
@@ -3053,7 +3084,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // WEAPON_IDS[0] is type 1 (Weapon) → should appear in weapon-type-1 table
-      const row = document.querySelector(
+      const row = qs(
         'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
       );
       expect(row).toBeTruthy();
@@ -3076,7 +3107,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // ITEM_IDS[0] is type 9 (Ore) → should appear in goods-type-9 table
-      const row = document.querySelector(
+      const row = qs(
         'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
       );
       expect(row).toBeTruthy();
@@ -3088,7 +3119,7 @@ describe('UI events', () => {
       model.deposit = [{ category: 'weapons', itemId: WEAPON_IDS[0], count: 1, durability: 300 }];
       populateForm(model, null, 42);
 
-      const row = document.querySelector(
+      const row = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
       );
       expect(row).toBeTruthy();
@@ -3099,7 +3130,7 @@ describe('UI events', () => {
       model.deposit = [{ category: 'goods', itemId: ITEM_IDS[0], count: 5, durability: 0 }];
       populateForm(model, null, 42);
 
-      const row = document.querySelector(
+      const row = qs(
         'table.dep-table[data-category="goods"][data-goods-type="9"] tbody tr',
       );
       expect(row).toBeTruthy();
@@ -3132,7 +3163,7 @@ describe('UI events', () => {
       model.deposit = [{ category: 'armor', itemId: ARMOR_IDS[0], count: 1, durability: 200 }];
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="armor"] tbody tr');
+      const row = qs('table.dep-table[data-category="armor"] tbody tr');
       expect(row).toBeTruthy();
       const durInput = row.querySelector('.inv-dep-durability');
       expect(durInput).toBeTruthy();
@@ -3144,7 +3175,7 @@ describe('UI events', () => {
       model.deposit = [{ category: 'rings', itemId: RING_IDS[0], count: 1, durability: 0 }];
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="rings"] tbody tr');
+      const row = qs('table.dep-table[data-category="rings"] tbody tr');
       expect(row).toBeTruthy();
       expect(row.querySelector('.inv-dep-durability')).toBeNull();
       expect(row.dataset.durability).toBeDefined();
@@ -3154,7 +3185,7 @@ describe('UI events', () => {
   describe('form-render edge cases', () => {
     test('hair color sample updates on all three channel inputs', () => {
       // Remove any leftover sample divs from prior tests
-      document.querySelectorAll('#hairColorSample').forEach((el) => el.remove());
+      qsa('#hairColorSample').forEach((el) => el.remove());
       const sample = document.createElement('div');
       sample.id = 'hairColorSample';
       document.body.appendChild(sample);
@@ -3162,16 +3193,16 @@ describe('UI events', () => {
       setupHairColorSample();
 
       // Test green channel
-      document.getElementById('hairR').value = '0';
-      document.getElementById('hairG').value = '1.0';
-      document.getElementById('hairB').value = '0';
-      document.getElementById('hairG').dispatchEvent(new Event('input'));
+      byId('hairR').value = '0';
+      byId('hairG').value = '1.0';
+      byId('hairB').value = '0';
+      byId('hairG').dispatchEvent(new Event('input'));
       expect(sample.style.background).toBe('rgb(0, 255, 0)');
 
       // Test blue channel
-      document.getElementById('hairG').value = '0';
-      document.getElementById('hairB').value = '1.0';
-      document.getElementById('hairB').dispatchEvent(new Event('input'));
+      byId('hairG').value = '0';
+      byId('hairB').value = '1.0';
+      byId('hairB').dispatchEvent(new Event('input'));
       expect(sample.style.background).toBe('rgb(0, 0, 255)');
     });
 
@@ -3181,20 +3212,20 @@ describe('UI events', () => {
       populateForm(model, display, 42);
 
       // Equipment pointers should be stored on the spans
-      const lh1 = document.getElementById('leftHand1');
+      const lh1 = byId('leftHand1');
       expect(lh1.dataset.roIdx1).toBe('0');
-      expect(document.getElementById('rightHand1').dataset.roIdx1).toBe('100');
+      expect(byId('rightHand1').dataset.roIdx1).toBe('100');
     });
 
     test('populateForm with undefined display does not crash', () => {
       const model = makeSanitizedModel();
       // Clear stale roIdx1 from prior tests
-      document.getElementById('leftHand1').removeAttribute('data-ro-idx1');
+      byId('leftHand1').removeAttribute('data-ro-idx1');
       populateForm(model, undefined, 42);
       // Should complete without errors
-      expect(document.getElementById('vit').value).toBe('50');
+      expect(byId('vit').value).toBe('50');
       // No equipment pointers set when display is undefined
-      expect(document.getElementById('leftHand1').dataset.roIdx1).toBeUndefined();
+      expect(byId('leftHand1').dataset.roIdx1).toBeUndefined();
     });
 
     test('deposit add button respects max entries limit', () => {
@@ -3216,7 +3247,7 @@ describe('UI events', () => {
       // Add one row
       btn.click();
       expect(
-        document.querySelectorAll('table.dep-table[data-category="armor"] tbody tr').length,
+        qsa('table.dep-table[data-category="armor"] tbody tr').length,
       ).toBe(1);
     });
   });
@@ -3230,7 +3261,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const type1Table = document.querySelector(
+      const type1Table = qs(
         'table.inv-table[data-category="weapons"][data-weapon-type="1"]',
       );
       type1Table.remove();
@@ -3252,7 +3283,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const type10Table = document.querySelector(
+      const type10Table = qs(
         'table.inv-table[data-category="goods"][data-goods-type="10"]',
       );
       if (type10Table) type10Table.remove();
@@ -3274,7 +3305,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const depType1 = document.querySelector(
+      const depType1 = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="1"]',
       );
       if (depType1) depType1.remove();
@@ -3287,7 +3318,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const depType9 = document.querySelector(
+      const depType9 = qs(
         'table.dep-table[data-category="goods"][data-goods-type="9"]',
       );
       if (depType9) depType9.remove();
@@ -3303,7 +3334,7 @@ describe('UI events', () => {
       model.spells = [{ itemId: undefined, status: 1, misc1: 5, misc2: 0 }];
       populateForm(model, null, 42);
 
-      const row = document.querySelector('#spellsTableBody tbody tr');
+      const row = qs('#spellsTableBody tbody tr');
       expect(row).toBeTruthy();
       // No option should be appended (itemId is undefined)
       const sel = row.querySelector('.spell-name');
@@ -3315,7 +3346,7 @@ describe('UI events', () => {
       model.spells = [{ itemId: 0, status: 0, misc1: 0, misc2: 0 }];
       populateForm(model, null, 42);
 
-      const row = document.querySelector('#spellsTableBody tbody tr');
+      const row = qs('#spellsTableBody tbody tr');
       expect(row).toBeTruthy();
       const sel = row.querySelector('.spell-name');
       expect(sel.querySelectorAll('option').length).toBe(0);
@@ -3326,7 +3357,7 @@ describe('UI events', () => {
       model.spells = [{ itemId: SPELL_IDS[0], status: 'invalid', misc1: 0, misc2: 0 }];
       populateForm(model, null, 42);
 
-      const row = document.querySelector('#spellsTableBody tbody tr');
+      const row = qs('#spellsTableBody tbody tr');
       const statusSel = row.querySelector('.spell-status');
       expect(statusSel.value).toBe('0');
     });
@@ -3336,7 +3367,7 @@ describe('UI events', () => {
       model.spells = [{ itemId: SPELL_IDS[0], status: 2, misc1: 10, misc2: 42 }];
       populateForm(model, null, 42);
 
-      const row = document.querySelector('#spellsTableBody tbody tr');
+      const row = qs('#spellsTableBody tbody tr');
       expect(row.dataset.misc2).toBe('42');
     });
 
@@ -3345,7 +3376,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       const btn =
-        document.getElementById('addSpell') ||
+        byId('addSpell') ||
         (() => {
           const b = document.createElement('button');
           b.id = 'addSpell';
@@ -3355,10 +3386,10 @@ describe('UI events', () => {
         })();
 
       // Clear existing spells first
-      document.querySelector('#spellsTableBody tbody').innerHTML = '';
+      qs('#spellsTableBody tbody').innerHTML = '';
       btn.click();
 
-      const row = document.querySelector('#spellsTableBody tbody tr');
+      const row = qs('#spellsTableBody tbody tr');
       expect(row.dataset.existing).toBe('false');
       expect(row.classList.contains('row-added')).toBe(true);
       const sel = row.querySelector('.spell-name');
@@ -3372,7 +3403,7 @@ describe('UI events', () => {
     test('placeholder selection (empty value) is skipped', () => {
       // Prior tests may have removed the type-1 table. Re-create if needed.
       if (
-        !document.querySelector('table.inv-table[data-category="weapons"][data-weapon-type="1"]')
+        !qs('table.inv-table[data-category="weapons"][data-weapon-type="1"]')
       ) {
         const table = document.createElement('table');
         table.className = 'grid-table inv-table';
@@ -3391,7 +3422,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       btn.click();
 
-      const tbody = document.querySelector(
+      const tbody = qs(
         'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody',
       );
       expect(tbody).toBeTruthy();
@@ -3407,7 +3438,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.inv-table[data-category="weapons"] tbody tr');
+      const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       row.dataset.deleted = 'true';
 
       const sel = row.querySelector('.inv-name');
@@ -3425,7 +3456,7 @@ describe('UI events', () => {
       model.deposit = [{ category: 'armor', itemId: 0xdeadbeef, count: 1, durability: 200 }];
       populateForm(model, null, 42);
 
-      const row = document.querySelector('table.dep-table[data-category="armor"] tbody tr');
+      const row = qs('table.dep-table[data-category="armor"] tbody tr');
       const sel = row.querySelector('.dep-name');
       expect(sel.value).toBe(String(0xdeadbeef));
     });
@@ -3435,7 +3466,7 @@ describe('UI events', () => {
       model.deposit = [{ category: 'weapons', itemId: CROSSBOW_ID, count: 1, durability: 300 }];
       populateForm(model, null, 42);
 
-      const row = document.querySelector(
+      const row = qs(
         'table.dep-table[data-category="weapons"][data-weapon-type="3"] tbody tr',
       );
       expect(row).toBeTruthy();
@@ -3485,7 +3516,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // Set an invalid accountId
-      document.getElementById('accountId').value = 'invalid';
+      byId('accountId').value = 'invalid';
 
       const result = collectForm();
       expect(result).toBeNull();
@@ -3495,7 +3526,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      document.getElementById('accountId').value = 'ABCDEF';
+      byId('accountId').value = 'ABCDEF';
 
       const result = collectForm();
       expect(result).toBeNull();
@@ -3505,7 +3536,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      document.getElementById('accountId').value = '';
+      byId('accountId').value = '';
 
       const result = collectForm();
       expect(result).not.toBeNull();
@@ -3517,7 +3548,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       const validHex = '0123456789abcdef0123456789abcdef';
-      document.getElementById('accountId').value = validHex;
+      byId('accountId').value = validHex;
 
       const result = collectForm();
       expect(result).not.toBeNull();
@@ -3529,7 +3560,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       const validHex = '0123456789abcdef0123456789abcdef';
-      document.getElementById('accountId').value = '  ' + validHex + '  ';
+      byId('accountId').value = '  ' + validHex + '  ';
 
       const result = collectForm();
       expect(result).not.toBeNull();
@@ -3540,7 +3571,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      document.getElementById('name').value = 'A'.repeat(17);
+      byId('name').value = 'A'.repeat(17);
 
       const result = collectForm();
       expect(result).toBeNull();
@@ -3550,7 +3581,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      document.getElementById('name').value = 'Test\u0001Char';
+      byId('name').value = 'Test\u0001Char';
 
       const result = collectForm();
       expect(result).toBeNull();
@@ -3564,7 +3595,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const inp = document.getElementById('vit');
+      const inp = byId('vit');
       inp.min = '0';
       inp.max = '99';
       inp.value = '150';
@@ -3577,7 +3608,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const inp = document.getElementById('vit');
+      const inp = byId('vit');
       inp.min = '0';
       inp.max = '99';
       inp.value = '-5';
@@ -3590,7 +3621,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const inp = document.getElementById('profileNum');
+      const inp = byId('profileNum');
       inp.value = '300'; // above max=255
 
       // profileNum is in SKIP_CLAMP_IDS, so it passes through unclamped
@@ -3609,25 +3640,25 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const originalWorld = document.getElementById('world').value;
-      const warpSel = document.getElementById('warpLocation');
+      const originalWorld = byId('world').value;
+      const warpSel = byId('warpLocation');
       warpSel.value = 'not-a-number';
       warpSel.dispatchEvent(new Event('change', { bubbles: true }));
 
       // World/position fields should be unchanged (bounds check returned early)
-      expect(document.getElementById('world').value).toBe(originalWorld);
+      expect(byId('world').value).toBe(originalWorld);
     });
 
     test('warp change with out-of-bounds index does not update position fields', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const originalWorld = document.getElementById('world').value;
-      const warpSel = document.getElementById('warpLocation');
+      const originalWorld = byId('world').value;
+      const warpSel = byId('warpLocation');
       warpSel.value = '999';
       warpSel.dispatchEvent(new Event('change', { bubbles: true }));
 
-      expect(document.getElementById('world').value).toBe(originalWorld);
+      expect(byId('world').value).toBe(originalWorld);
     });
   });
 
@@ -3639,11 +3670,11 @@ describe('UI events', () => {
     test('calling updateWorldName with invalid world clears text (catch branch)', () => {
       // Set a valid world first
       updateWorldName(1);
-      expect(document.getElementById('worldName').textContent).toBe('Boletaria');
+      expect(byId('worldName').textContent).toBe('Boletaria');
 
       // Invalid world — triggers getWorldName throw → catch sets ''
       updateWorldName(99);
-      expect(document.getElementById('worldName').textContent).toBe('');
+      expect(byId('worldName').textContent).toBe('');
     });
   });
 
@@ -3655,13 +3686,18 @@ describe('UI events', () => {
   describe('makeInventoryRow unknown category', () => {
     test('throws for unsupported category', () => {
       expect(() =>
-        makeInventoryRow('unknownCategory', {
-          itemId: 1,
-          count: 1,
-          misc1: 0,
-          durability: 0,
-          misc2: 0,
-        }),
+        makeInventoryRow(
+          /** @type {never} */ ('unknownCategory'),
+          {
+            itemId: 1,
+            count: 1,
+            misc1: 0,
+            durability: 0,
+            misc2: 0,
+          },
+          null,
+          undefined,
+        ),
       ).toThrow(/unsupported category/);
     });
   });

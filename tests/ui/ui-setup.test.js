@@ -8,6 +8,8 @@
  * data and weapon/goods type definitions.
  */
 
+export {};
+
 const { setupHairColorSample, setupWarpAndWorld, setupTabs, setupAddRowButtons } =
   await import('../../js/ui/form/ui-setup.js');
 const { populateCombos } = await import('../../js/ui/core/controls.js');
@@ -38,9 +40,9 @@ describe('ui-setup', () => {
 
       setupHairColorSample();
 
-      document.getElementById('hairR').value = '1.0';
-      document.getElementById('hairG').value = '0.0';
-      document.getElementById('hairB').value = '0.0';
+      /** @type {HTMLInputElement} */ (document.getElementById('hairR')).value = '1.0';
+      /** @type {HTMLInputElement} */ (document.getElementById('hairG')).value = '0.0';
+      /** @type {HTMLInputElement} */ (document.getElementById('hairB')).value = '0.0';
       document.getElementById('hairR').dispatchEvent(new Event('input'));
 
       expect(sample.style.background).toBe('rgb(255, 0, 0)');
@@ -94,7 +96,7 @@ describe('ui-setup', () => {
       warpSel.value = '1';
       warpSel.dispatchEvent(new Event('change'));
 
-      expect(document.getElementById('world').value).toBeTruthy();
+      expect(/** @type {HTMLInputElement} */ (document.getElementById('world')).value).toBeTruthy();
       expect(document.getElementById('worldName').textContent).toBeTruthy();
     });
 
@@ -105,7 +107,7 @@ describe('ui-setup', () => {
       setupWarpAndWorld();
 
       // Set to a valid world number and dispatch input event
-      document.getElementById('world').value = '1';
+      /** @type {HTMLInputElement} */ (document.getElementById('world')).value = '1';
       document.getElementById('world').dispatchEvent(new Event('input'));
 
       // worldName should be updated (either to the world name or empty if invalid)
@@ -123,14 +125,14 @@ describe('ui-setup', () => {
       const { warpSel } = buildWarpDOM();
       populateCombos();
 
-      document.getElementById('world').value = '42';
+      /** @type {HTMLInputElement} */ (document.getElementById('world')).value = '42';
 
       setupWarpAndWorld();
 
       warpSel.value = '999';
       warpSel.dispatchEvent(new Event('change'));
 
-      expect(document.getElementById('world').value).toBe('42');
+      expect(/** @type {HTMLInputElement} */ (document.getElementById('world')).value).toBe('42');
     });
 
     test('unknown world name shows empty string', () => {
@@ -139,7 +141,7 @@ describe('ui-setup', () => {
 
       setupWarpAndWorld();
 
-      document.getElementById('world').value = '999';
+      /** @type {HTMLInputElement} */ (document.getElementById('world')).value = '999';
       document.getElementById('world').dispatchEvent(new Event('input'));
 
       expect(document.getElementById('worldName').textContent).toBe('');

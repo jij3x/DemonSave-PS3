@@ -25,8 +25,8 @@ describe('event-dispatcher', () => {
     test('receives change events dispatched on document', () => {
       const calls = [];
       registerChangeHandler((e) => {
-        if (e.target.dataset?.[SENTINEL] === 'change') {
-          calls.push(e.target.value);
+        if (/** @type {HTMLElement} */ (e.target).dataset?.[SENTINEL] === 'change') {
+          calls.push(/** @type {HTMLInputElement} */ (e.target).value);
         }
       });
 
@@ -75,8 +75,8 @@ describe('event-dispatcher', () => {
     test('receives input events dispatched on document', () => {
       const calls = [];
       registerInputHandler((e) => {
-        if (e.target.dataset?.[SENTINEL] === 'input') {
-          calls.push(e.target.value);
+        if (/** @type {HTMLElement} */ (e.target).dataset?.[SENTINEL] === 'input') {
+          calls.push(/** @type {HTMLInputElement} */ (e.target).value);
         }
       });
 
@@ -136,7 +136,7 @@ describe('event-dispatcher', () => {
       const marker = '__change_only__';
       const myCalls = [];
       registerChangeHandler((e) => {
-        if (e.target.dataset?.[SENTINEL] === marker) {
+        if (/** @type {HTMLElement} */ (e.target).dataset?.[SENTINEL] === marker) {
           myCalls.push('fired');
         }
       });
@@ -153,7 +153,7 @@ describe('event-dispatcher', () => {
       const marker = '__input_only__';
       const myCalls = [];
       registerInputHandler((e) => {
-        if (e.target.dataset?.[SENTINEL] === marker) {
+        if (/** @type {HTMLElement} */ (e.target).dataset?.[SENTINEL] === marker) {
           myCalls.push('fired');
         }
       });

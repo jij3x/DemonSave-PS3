@@ -5,6 +5,8 @@
  * validateName() helper.
  */
 
+export {};
+
 const {
   NONE_ID,
   DEFAULT_MISC2,

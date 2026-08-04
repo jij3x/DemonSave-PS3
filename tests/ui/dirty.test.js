@@ -1745,7 +1745,7 @@ describe('dirty tracking', () => {
 
       // Change values
       for (const id of ['profileNum', 'warpLocation', 'saveSlot']) {
-        const el = document.getElementById(id);
+        const el = /** @type {HTMLInputElement} */ (document.getElementById(id));
         el.value = '99';
         el.dispatchEvent(new Event('input', { bubbles: true }));
         el.dispatchEvent(new Event('change', { bubbles: true }));

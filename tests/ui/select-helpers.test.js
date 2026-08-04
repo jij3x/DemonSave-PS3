@@ -118,7 +118,9 @@ describe('select-helpers', () => {
 
       ensureSelectPopulated(sel);
 
-      const placeholder = sel.querySelector('option[value=""]');
+      const placeholder = /** @type {HTMLOptionElement} */ (
+        sel.querySelector('option[value=""]')
+      );
       expect(placeholder).toBeTruthy();
       expect(placeholder.disabled).toBe(true);
     });
