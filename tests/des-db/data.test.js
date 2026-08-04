@@ -59,8 +59,12 @@ describe('des-db: getItemIdsByCategory / getItemNamesByCategory', () => {
   });
 
   test('invalid category throws', () => {
-    expect(() => db.getItemIdsByCategory(/** @type {never} */ ('invalid'))).toThrow('Unknown category');
-    expect(() => db.getItemNamesByCategory(/** @type {never} */ ('invalid'))).toThrow('Unknown category');
+    expect(() => db.getItemIdsByCategory(/** @type {never} */ ('invalid'))).toThrow(
+      'Unknown category',
+    );
+    expect(() => db.getItemNamesByCategory(/** @type {never} */ ('invalid'))).toThrow(
+      'Unknown category',
+    );
   });
 });
 
@@ -82,7 +86,9 @@ describe('des-db: getItem', () => {
   });
 
   test('throws for unknown category', () => {
-    expect(() => db.getItem(/** @type {never} */ ('invalid'), '0x2710')).toThrow('Unknown category: invalid');
+    expect(() => db.getItem(/** @type {never} */ ('invalid'), '0x2710')).toThrow(
+      'Unknown category: invalid',
+    );
   });
 
   test('item objects are frozen', () => {
@@ -189,14 +195,20 @@ describe('des-db: getWeaponItemByUpgradeRef', () => {
 
   test('throws on non-array input', () => {
     expect(() => db.getWeaponItemByUpgradeRef(null)).toThrow('Invalid upgrade_ref');
-    expect(() => db.getWeaponItemByUpgradeRef(/** @type {never} */ ('1:1:0'))).toThrow('Invalid upgrade_ref');
+    expect(() => db.getWeaponItemByUpgradeRef(/** @type {never} */ ('1:1:0'))).toThrow(
+      'Invalid upgrade_ref',
+    );
     expect(() => db.getWeaponItemByUpgradeRef(undefined)).toThrow('Invalid upgrade_ref');
   });
 
   test('throws on truncated array (fewer than 3 elements)', () => {
     // Input must be a 3-element array; shorter arrays are rejected.
-    expect(() => db.getWeaponItemByUpgradeRef(/** @type {never} */ ([77]))).toThrow('Invalid upgrade_ref');
-    expect(() => db.getWeaponItemByUpgradeRef(/** @type {never} */ ([77, null]))).toThrow('Invalid upgrade_ref');
+    expect(() => db.getWeaponItemByUpgradeRef(/** @type {never} */ ([77]))).toThrow(
+      'Invalid upgrade_ref',
+    );
+    expect(() => db.getWeaponItemByUpgradeRef(/** @type {never} */ ([77, null]))).toThrow(
+      'Invalid upgrade_ref',
+    );
   });
 
   test('throws on unknown ref', () => {
@@ -673,15 +685,27 @@ describe('des-db: prototype pollution resistance', () => {
   });
 
   test('getUpgradePathDef throws for prototype keys', () => {
-    expect(() => db.getUpgradePathDef(/** @type {never} */ ('__proto__'))).toThrow('Unknown upgrade path id');
-    expect(() => db.getUpgradePathDef(/** @type {never} */ ('constructor'))).toThrow('Unknown upgrade path id');
-    expect(() => db.getUpgradePathDef(/** @type {never} */ ('toString'))).toThrow('Unknown upgrade path id');
+    expect(() => db.getUpgradePathDef(/** @type {never} */ ('__proto__'))).toThrow(
+      'Unknown upgrade path id',
+    );
+    expect(() => db.getUpgradePathDef(/** @type {never} */ ('constructor'))).toThrow(
+      'Unknown upgrade path id',
+    );
+    expect(() => db.getUpgradePathDef(/** @type {never} */ ('toString'))).toThrow(
+      'Unknown upgrade path id',
+    );
   });
 
   test('getBaseWeapon throws for prototype keys', () => {
-    expect(() => db.getBaseWeapon(/** @type {never} */ ('__proto__'))).toThrow('Invalid base weapon id');
-    expect(() => db.getBaseWeapon(/** @type {never} */ ('constructor'))).toThrow('Invalid base weapon id');
-    expect(() => db.getBaseWeapon(/** @type {never} */ ('toString'))).toThrow('Invalid base weapon id');
+    expect(() => db.getBaseWeapon(/** @type {never} */ ('__proto__'))).toThrow(
+      'Invalid base weapon id',
+    );
+    expect(() => db.getBaseWeapon(/** @type {never} */ ('constructor'))).toThrow(
+      'Invalid base weapon id',
+    );
+    expect(() => db.getBaseWeapon(/** @type {never} */ ('toString'))).toThrow(
+      'Invalid base weapon id',
+    );
   });
 
   test('hasBaseWeapon returns false for prototype keys', () => {
