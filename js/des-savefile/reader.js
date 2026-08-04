@@ -14,6 +14,7 @@ import {
   rUniStr,
   oneByteAnd,
 } from '../lib/ps3-save-lib/index.js';
+import { assertBounds, assertBelow } from './bounds.js';
 
 /**
  * Parse the primary USER.DAT into a form model.
@@ -187,17 +188,15 @@ export function readSave(bytes) {
       // Unreachable in practice: the totalSlotsScanned > INV_SLOTS guard
       // above fires first (at scan #2049, before the ~2056th scan needed
       // to reach DURABILITY_BASE). Kept as a belt-and-suspenders defense.
-      /* istanbul ignore next -- unreachable: INV_SLOTS guard fires first */
-      if (O.INV_TYPE_BASE + offset >= O.DURABILITY_BASE) {
-        throw new Error('Unexpected data, file may be encrypted or corrupt?');
-      }
+      assertBelow(
+        O.INV_TYPE_BASE + offset,
+        O.DURABILITY_BASE,
+        'Unexpected data, file may be encrypted or corrupt?',
+      );
       // Bounds-check: prevent runaway loops on corrupt/encrypted data.
       // Also unreachable for buffers >= MIN_SAVE_SIZE (the top-level guard
       // ensures this) — the INV_SLOTS cap fires well before the buffer end.
-      /* istanbul ignore next -- unreachable: INV_SLOTS guard fires first */
-      if (O.INV_TYPE_BASE + offset + O.INV_STRIDE > bytes.length) {
-        throw new Error('Unexpected data, file may be encrypted or corrupt?');
-      }
+      assertBounds(bytes, O.INV_TYPE_BASE + offset, O.INV_STRIDE);
       type = rInt32BE(bytes, O.INV_TYPE_BASE + offset);
     }
 
@@ -269,10 +268,7 @@ export function readSave(bytes) {
     // Unreachable for buffers >= MIN_SAVE_SIZE (guaranteed by the top-level
     // guard): the deposit region (0x14BE8..0x1EBF4+0x14=0x1EC08) fits well
     // within 0x20000. Kept as a belt-and-suspenders defense.
-    /* istanbul ignore next -- unreachable: MIN_SAVE_SIZE guard ensures fit */
-    if (base + O.DEPOSIT_STRIDE > bytes.length) {
-      throw new Error('Unexpected data, file may be encrypted or corrupt?');
-    }
+    assertBounds(bytes, base, O.DEPOSIT_STRIDE);
     const type = bytes[base + 4];
     if (type === 0xff) continue;
     if (type !== 0x00 && type !== 0x10 && type !== 0x20 && type !== 0x40) continue;
@@ -334,10 +330,7 @@ export function readSave(bytes) {
     // Unreachable for buffers >= MIN_SAVE_SIZE (guaranteed by the top-level
     // guard): spellCount is capped at 0x200 early on, so the spell region
     // (0x143EC..0x143EC+0x200*0x10=0x163EC) fits well within 0x20000.
-    /* istanbul ignore next -- unreachable: MIN_SAVE_SIZE guard + spellCount cap */
-    if (base + O.SPELL_STRIDE > bytes.length) {
-      throw new Error('Unexpected data, file may be encrypted or corrupt?');
-    }
+    assertBounds(bytes, base, O.SPELL_STRIDE);
     const status = rUInt32BE(bytes, base + O.SPELL_STATUS_OFFSET);
     const id = rUInt32BE(bytes, base + O.SPELL_ID_OFFSET);
     const misc1 = rUInt32BE(bytes, base + O.SPELL_MISC1_OFFSET);
