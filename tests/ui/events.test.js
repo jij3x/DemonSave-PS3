@@ -846,15 +846,9 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      expect(
-        qsa('table.inv-table[data-category="armor"] tbody tr').length,
-      ).toBe(1);
-      expect(
-        qsa('table.inv-table[data-category="rings"] tbody tr').length,
-      ).toBe(1);
-      expect(
-        qsa('table.inv-table[data-category="goods"] tbody tr').length,
-      ).toBe(1);
+      expect(qsa('table.inv-table[data-category="armor"] tbody tr').length).toBe(1);
+      expect(qsa('table.inv-table[data-category="rings"] tbody tr').length).toBe(1);
+      expect(qsa('table.inv-table[data-category="goods"] tbody tr').length).toBe(1);
     });
 
     test('rings render as editable table rows', () => {
@@ -952,12 +946,8 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const weaponRows = qsa(
-        'table.dep-table[data-category="weapons"] tbody tr',
-      );
-      const goodsRows = qsa(
-        'table.dep-table[data-category="goods"] tbody tr',
-      );
+      const weaponRows = qsa('table.dep-table[data-category="weapons"] tbody tr');
+      const goodsRows = qsa('table.dep-table[data-category="goods"] tbody tr');
 
       expect(weaponRows.length).toBe(1);
       expect(goodsRows.length).toBe(1);
@@ -1452,9 +1442,7 @@ describe('UI events', () => {
       document.body.appendChild(btn);
       setupAddRowButtons();
 
-      const tbody = qs(
-        'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody',
-      );
+      const tbody = qs('table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody');
       btn.click();
 
       const sel = tbody.lastElementChild.querySelector('.inv-name');
@@ -1482,9 +1470,7 @@ describe('UI events', () => {
       document.body.appendChild(btn);
       setupAddRowButtons();
 
-      const tbody = qs(
-        'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody',
-      );
+      const tbody = qs('table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody');
       btn.click();
 
       const sel = tbody.lastElementChild.querySelector('.inv-name');
@@ -1505,9 +1491,7 @@ describe('UI events', () => {
       document.body.appendChild(btn);
       setupAddRowButtons();
 
-      const tbody = qs(
-        'table.inv-table[data-category="goods"][data-goods-type="9"] tbody',
-      );
+      const tbody = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody');
       const initial = tbody.querySelectorAll('tr').length;
 
       btn.click();
@@ -1730,9 +1714,7 @@ describe('UI events', () => {
       populateForm(model, makeDisplay(), 42);
 
       const lh1 = byId('leftHand1');
-      const delBtn = qs(
-        'table.inv-table[data-category="weapons"] tbody tr .row-del',
-      );
+      const delBtn = qs('table.inv-table[data-category="weapons"] tbody tr .row-del');
 
       // Delete then undelete
       delBtn.click();
@@ -1829,9 +1811,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const sel = qs(
-        'table.inv-table[data-category="weapons"] tbody tr .inv-name',
-      );
+      const sel = qs('table.inv-table[data-category="weapons"] tbody tr .inv-name');
       // Should have only 1 option (the currently selected item)
       expect(sel.querySelectorAll('option').length).toBe(1);
       // Value should still be correct
@@ -1842,9 +1822,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const sel = qs(
-        'table.inv-table[data-category="weapons"] tbody tr .inv-name',
-      );
+      const sel = qs('table.inv-table[data-category="weapons"] tbody tr .inv-name');
       expect(sel.querySelectorAll('option').length).toBe(1);
 
       focusLazySelect(sel);
@@ -1891,9 +1869,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // The crossbow should be routed to the Bow (type 3) deposit table
-      const row = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="3"] tbody tr',
-      );
+      const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="3"] tbody tr');
       expect(row).toBeTruthy();
 
       // It IS a decomposed row (same layout as upgradable weapons)
@@ -1931,9 +1907,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const sel = qs(
-        'table.dep-table[data-category="goods"] tbody tr .dep-name',
-      );
+      const sel = qs('table.dep-table[data-category="goods"] tbody tr .dep-name');
       expect(sel.querySelectorAll('option').length).toBe(1);
       expect(sel.value).toBe(String(ITEM_IDS[2]));
     });
@@ -1942,9 +1916,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const sel = qs(
-        'table.dep-table[data-category="goods"] tbody tr .dep-name',
-      );
+      const sel = qs('table.dep-table[data-category="goods"] tbody tr .dep-name');
       focusLazySelect(sel);
 
       // ITEM_IDS[2] is mock item index 2, which maps to type 9 (Ore).
@@ -1987,9 +1959,7 @@ describe('UI events', () => {
       ];
       populateForm(model, null, 42);
 
-      const sel = qs(
-        'table.inv-table[data-category="weapons"] tbody tr .inv-name',
-      );
+      const sel = qs('table.inv-table[data-category="weapons"] tbody tr .inv-name');
       // Before focus: 1 option (the unknown item)
       expect(sel.querySelectorAll('option').length).toBe(1);
 
@@ -2006,9 +1976,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const sel = qs(
-        'table.inv-table[data-category="weapons"] tbody tr .inv-name',
-      );
+      const sel = qs('table.inv-table[data-category="weapons"] tbody tr .inv-name');
       focusLazySelect(sel);
       focusLazySelect(sel);
 
@@ -2180,9 +2148,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // weapon-1 table should have visible durability input
-      const row = qs(
-        'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
-      );
+      const row = qs('table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       expect(row).toBeTruthy();
       expect(row.querySelector('.inv-durability')).toBeTruthy();
     });
@@ -2191,9 +2157,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = qs(
-        'table.inv-table[data-category="weapons"][data-weapon-type="4"] tbody tr',
-      );
+      const row = qs('table.inv-table[data-category="weapons"][data-weapon-type="4"] tbody tr');
       if (row) {
         expect(row.querySelector('.inv-durability')).toBeNull();
         expect(row.dataset.durability).toBeDefined();
@@ -2313,9 +2277,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = qs(
-        'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
-      );
+      const row = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       const countTd = row.querySelector('.inv-count')?.closest('td');
       expect(countTd).toBeTruthy();
       expect(countTd.classList.contains('count-hidden')).toBe(false);
@@ -2325,9 +2287,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
-      );
+      const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       const countTd = row.querySelector('.dep-count')?.closest('td');
       expect(countTd).toBeTruthy();
       expect(countTd.classList.contains('count-hidden')).toBe(true);
@@ -2367,9 +2327,7 @@ describe('UI events', () => {
       ];
       populateForm(model, null, 42);
 
-      const rows = qsa(
-        'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
-      );
+      const rows = qsa('table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       expect(rows.length).toBe(2);
 
       const collected = collectForm();
@@ -2382,9 +2340,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = qs(
-        'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
-      );
+      const row = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       const countInp = row.querySelector('.inv-count');
       countInp.value = '0';
       countInp.dispatchEvent(new Event('input', { bubbles: true }));
@@ -2399,9 +2355,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const row = qs(
-        'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
-      );
+      const row = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       const countInp = row.querySelector('.inv-count');
       countInp.value = '100';
       countInp.dispatchEvent(new Event('input', { bubbles: true }));
@@ -2454,9 +2408,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const rows = qsa(
-        'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
-      );
+      const rows = qsa('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       expect(rows.length).toBe(2);
 
       const newSel = rows[1].querySelector('.inv-name');
@@ -2487,9 +2439,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // Soft-delete the existing goods row
-      const row = qs(
-        'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
-      );
+      const row = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       row.querySelector('.row-del').click();
       expect(row.dataset.deleted).toBe('true');
 
@@ -2502,9 +2452,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const rows = qsa(
-        'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
-      );
+      const rows = qsa('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       const newSel = rows[rows.length - 1].querySelector('.inv-name');
       focusLazySelect(newSel);
 
@@ -2540,9 +2488,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // Step 1: Change R1 from ITEM_IDS[0] to ITEM_IDS[1]
-      const r1 = qs(
-        'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
-      );
+      const r1 = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       const r1Sel = r1.querySelector('.inv-name');
       focusLazySelect(r1Sel);
       r1Sel.value = String(ITEM_IDS[1]);
@@ -2557,9 +2503,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const rows = qsa(
-        'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
-      );
+      const rows = qsa('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       expect(rows.length).toBe(2);
 
       const r2Sel = rows[1].querySelector('.inv-name');
@@ -2617,9 +2561,7 @@ describe('UI events', () => {
       ];
       populateForm(model, null, 42);
 
-      const rows = qsa(
-        'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
-      );
+      const rows = qsa('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       const r1 = rows[0]; // ITEM_IDS[0]
       const r2 = rows[1]; // ITEM_IDS[2]
 
@@ -2666,9 +2608,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const row = qs(
-        'table.inv-table[data-category="weapons"][data-weapon-type="4"] tbody tr',
-      );
+      const row = qs('table.inv-table[data-category="weapons"][data-weapon-type="4"] tbody tr');
       expect(row).toBeTruthy();
       // The count cell must NOT be hidden — Ammo is a counted type.
       const countCell = row.querySelector('td.count-hidden');
@@ -2692,9 +2632,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const row = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="4"] tbody tr',
-      );
+      const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="4"] tbody tr');
       expect(row).toBeTruthy();
       // The count cell must NOT be hidden — Ammo is a counted type.
       const countCell = row.querySelector('td.count-hidden');
@@ -2712,9 +2650,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupDepositWeaponSync();
 
-      const row = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
-      );
+      const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       expect(row).toBeTruthy();
       expect(row.dataset.decomposed).toBe('true');
 
@@ -2763,9 +2699,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupDepositWeaponSync();
 
-      const row = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
-      );
+      const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       const pathSel = row.querySelector('.dep-path');
       const levelSel = row.querySelector('.dep-level');
 
@@ -2794,9 +2728,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupDepositWeaponSync();
 
-      const row = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
-      );
+      const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       const levelSel = row.querySelector('.dep-level');
       const hiddenInput = row.querySelector('.dep-item-id');
 
@@ -2831,9 +2763,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupDepositWeaponSync();
 
-      const row = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
-      );
+      const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       const baseSel = row.querySelector('.dep-base-weapon');
       const durInput = row.querySelector('.inv-dep-durability');
 
@@ -2859,9 +2789,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupDepositWeaponSync();
 
-      const row = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
-      );
+      const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       const baseSel = row.querySelector('.dep-base-weapon');
       const _pathSel = row.querySelector('.dep-path');
       const _levelSel = row.querySelector('.dep-level');
@@ -2891,9 +2819,7 @@ describe('UI events', () => {
       document.body.appendChild(addBtn);
       setupAddRowButtons();
 
-      const tbody = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody',
-      );
+      const tbody = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody');
       const initialCount = tbody.querySelectorAll('tr').length;
 
       addBtn.click();
@@ -2931,9 +2857,7 @@ describe('UI events', () => {
       document.body.appendChild(addBtn);
       setupAddRowButtons();
 
-      const tbody = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="2"] tbody',
-      );
+      const tbody = qs('table.dep-table[data-category="weapons"][data-weapon-type="2"] tbody');
       const initialCount = tbody.querySelectorAll('tr').length;
 
       addBtn.click();
@@ -2950,9 +2874,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
       setupSelectTooltipSync();
 
-      const row = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
-      );
+      const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       const baseSel = row.querySelector('.dep-base-weapon');
 
       // Change to a different base weapon (should have a note in mock DB)
@@ -3052,9 +2974,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       addBtn.click();
 
-      const tbody = qs(
-        'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody',
-      );
+      const tbody = qs('table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody');
       const newSel = tbody.lastElementChild.querySelector('.inv-name');
       expect(newSel.value).toBe('');
 
@@ -3084,9 +3004,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // WEAPON_IDS[0] is type 1 (Weapon) → should appear in weapon-type-1 table
-      const row = qs(
-        'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
-      );
+      const row = qs('table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       expect(row).toBeTruthy();
       expect(row.dataset.ref).toBe('inv:0');
     });
@@ -3107,9 +3025,7 @@ describe('UI events', () => {
       populateForm(model, null, 42);
 
       // ITEM_IDS[0] is type 9 (Ore) → should appear in goods-type-9 table
-      const row = qs(
-        'table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr',
-      );
+      const row = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       expect(row).toBeTruthy();
     });
 
@@ -3119,9 +3035,7 @@ describe('UI events', () => {
       model.deposit = [{ category: 'weapons', itemId: WEAPON_IDS[0], count: 1, durability: 300 }];
       populateForm(model, null, 42);
 
-      const row = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr',
-      );
+      const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       expect(row).toBeTruthy();
     });
 
@@ -3130,9 +3044,7 @@ describe('UI events', () => {
       model.deposit = [{ category: 'goods', itemId: ITEM_IDS[0], count: 5, durability: 0 }];
       populateForm(model, null, 42);
 
-      const row = qs(
-        'table.dep-table[data-category="goods"][data-goods-type="9"] tbody tr',
-      );
+      const row = qs('table.dep-table[data-category="goods"][data-goods-type="9"] tbody tr');
       expect(row).toBeTruthy();
     });
 
@@ -3246,9 +3158,7 @@ describe('UI events', () => {
 
       // Add one row
       btn.click();
-      expect(
-        qsa('table.dep-table[data-category="armor"] tbody tr').length,
-      ).toBe(1);
+      expect(qsa('table.dep-table[data-category="armor"] tbody tr').length).toBe(1);
     });
   });
 
@@ -3261,9 +3171,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const type1Table = qs(
-        'table.inv-table[data-category="weapons"][data-weapon-type="1"]',
-      );
+      const type1Table = qs('table.inv-table[data-category="weapons"][data-weapon-type="1"]');
       type1Table.remove();
 
       model.weapons = [
@@ -3283,9 +3191,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const type10Table = qs(
-        'table.inv-table[data-category="goods"][data-goods-type="10"]',
-      );
+      const type10Table = qs('table.inv-table[data-category="goods"][data-goods-type="10"]');
       if (type10Table) type10Table.remove();
 
       model.goods = [
@@ -3305,9 +3211,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const depType1 = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="1"]',
-      );
+      const depType1 = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"]');
       if (depType1) depType1.remove();
 
       model.deposit = [{ category: 'weapons', itemId: WEAPON_IDS[0], count: 1, durability: 300 }];
@@ -3318,9 +3222,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, 42);
 
-      const depType9 = qs(
-        'table.dep-table[data-category="goods"][data-goods-type="9"]',
-      );
+      const depType9 = qs('table.dep-table[data-category="goods"][data-goods-type="9"]');
       if (depType9) depType9.remove();
 
       model.deposit = [{ category: 'goods', itemId: ITEM_IDS[0], count: 5, durability: 0 }];
@@ -3402,9 +3304,7 @@ describe('UI events', () => {
   describe('setupDurabilitySync edge cases', () => {
     test('placeholder selection (empty value) is skipped', () => {
       // Prior tests may have removed the type-1 table. Re-create if needed.
-      if (
-        !qs('table.inv-table[data-category="weapons"][data-weapon-type="1"]')
-      ) {
+      if (!qs('table.inv-table[data-category="weapons"][data-weapon-type="1"]')) {
         const table = document.createElement('table');
         table.className = 'grid-table inv-table';
         table.dataset.category = 'weapons';
@@ -3422,9 +3322,7 @@ describe('UI events', () => {
       setupAddRowButtons();
       btn.click();
 
-      const tbody = qs(
-        'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody',
-      );
+      const tbody = qs('table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody');
       expect(tbody).toBeTruthy();
       const newRow = tbody.lastElementChild;
       const sel = newRow.querySelector('.inv-name');
@@ -3466,9 +3364,7 @@ describe('UI events', () => {
       model.deposit = [{ category: 'weapons', itemId: CROSSBOW_ID, count: 1, durability: 300 }];
       populateForm(model, null, 42);
 
-      const row = qs(
-        'table.dep-table[data-category="weapons"][data-weapon-type="3"] tbody tr',
-      );
+      const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="3"] tbody tr');
       expect(row).toBeTruthy();
       expect(row.dataset.decomposed).toBe('true');
       // The crossbow base weapon should be selected

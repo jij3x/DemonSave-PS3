@@ -7,7 +7,7 @@
 
 export {};
 
-import { jest } from "@jest/globals";
+import { jest } from '@jest/globals';
 
 const {
   $,
