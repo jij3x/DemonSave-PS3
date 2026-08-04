@@ -23,7 +23,7 @@ export default {
     '!js/des-db/rel-types.js',
     '!js/des-db/rel-upgrades.js',
     '!js/des-db/idx-upgrade-ref.js',
-    '!js/lib/tauri-bridge.js', // thin IPC shim, untestable in Node
+    // tauri-bridge is now covered by tests/lib/tauri-bridge.test.js
     '!js/lib/ps3-save-lib/index.js', // barrel re-export — no logic
     '!js/ui/events.js', // barrel re-export — no logic
     // Browser-only UI infrastructure — partially covered by jsdom unit tests.
