@@ -24,9 +24,9 @@ describe('fromHex', () => {
     expect(fromHex('').length).toBe(0);
   });
   test('throws on non-string input', () => {
-    expect(() => fromHex(123)).toThrow(TypeError);
-    expect(() => fromHex(null)).toThrow(TypeError);
-    expect(() => fromHex(undefined)).toThrow(TypeError);
+    expect(() => fromHex(/** @type {never} */ (123))).toThrow(TypeError);
+    expect(() => fromHex(/** @type {never} */ (null))).toThrow(TypeError);
+    expect(() => fromHex(/** @type {never} */ (undefined))).toThrow(TypeError);
   });
 });
 

@@ -13,6 +13,9 @@
 import { jest } from '@jest/globals';
 import { TextEncoder } from 'node:util';
 
+/** Browser window cast to allow Chromium File System Access API properties. */
+const w = /** @type {any} */ (window);
+
 // Mock tauri-bridge — default to NOT Tauri
 jest.unstable_mockModule('../../js/lib/tauri-bridge.js', () => ({
   __esModule: true,
@@ -69,7 +72,7 @@ describe('capability detection', () => {
     });
 
     test('returns true when showDirectoryPicker is available in a secure context', () => {
-      window.showDirectoryPicker = jest.fn();
+      w.showDirectoryPicker = jest.fn();
       Object.defineProperty(window, 'isSecureContext', {
         value: true,
         configurable: true,
@@ -77,7 +80,7 @@ describe('capability detection', () => {
       });
       expect(canWriteInPlace()).toBe(true);
 
-      delete window.showDirectoryPicker;
+      delete w.showDirectoryPicker;
       Object.defineProperty(window, 'isSecureContext', {
         value: false,
         configurable: true,
@@ -92,7 +95,7 @@ describe('capability detection', () => {
     });
 
     test('returns true when showSaveFilePicker is available in a secure context', () => {
-      window.showSaveFilePicker = jest.fn();
+      w.showSaveFilePicker = jest.fn();
       Object.defineProperty(window, 'isSecureContext', {
         value: true,
         configurable: true,
@@ -100,7 +103,7 @@ describe('capability detection', () => {
       });
       expect(canChooseSaveLocation()).toBe(true);
 
-      delete window.showSaveFilePicker;
+      delete w.showSaveFilePicker;
       Object.defineProperty(window, 'isSecureContext', {
         value: false,
         configurable: true,
@@ -227,7 +230,7 @@ describe('readFilesFromDataTransfer', () => {
       },
     ];
 
-    const { files } = await readFilesFromDataTransfer(items);
+    const { files } = await readFilesFromDataTransfer(/** @type {any} */ (items));
     expect(files.size).toBe(1);
     expect(files.has('test.bin')).toBe(true);
   });
@@ -297,7 +300,7 @@ describe('writeFilesToDirectory', () => {
   });
 
   test('delegates to Tauri IPC when handle has __tauriDirPath', async () => {
-    const tauriModule = await import('../../js/lib/tauri-bridge.js');
+    const tauriModule = /** @type {any} */ (await import('../../js/lib/tauri-bridge.js'));
     tauriModule.tauriWriteFiles.mockResolvedValue(undefined);
 
     const dirHandle = { __tauriDirPath: '/path/to/save' };
@@ -351,7 +354,7 @@ describe('deleteFilesFromDirectory', () => {
   });
 
   test('delegates to Tauri IPC when handle has __tauriDirPath', async () => {
-    const tauriModule = await import('../../js/lib/tauri-bridge.js');
+    const tauriModule = /** @type {any} */ (await import('../../js/lib/tauri-bridge.js'));
     tauriModule.tauriDeleteFiles.mockResolvedValue(undefined);
 
     const dirHandle = { __tauriDirPath: '/path/to/save' };
@@ -382,10 +385,10 @@ describe('downloadFilesAsZip', () => {
   test('creates an anchor with download attribute and clicks it', async () => {
     const files = new Map([['test.txt', new TextEncoder().encode('hello')]]);
 
-    let clickedAnchor = null;
+    let clickedAnchor = /** @type {any} */ (null);
     // Save reference to real createElement before spying
     const realCreate = document.createElement;
-    jest.spyOn(document, 'createElement').mockImplementation((tag) => {
+    const spy = jest.spyOn(document, 'createElement').mockImplementation((tag) => {
       const el = realCreate.call(document, tag);
       if (tag === 'a') {
         el.click = () => {
@@ -400,15 +403,15 @@ describe('downloadFilesAsZip', () => {
     expect(clickedAnchor).not.toBeNull();
     expect(clickedAnchor.download).toBe('my-save.zip');
 
-    document.createElement.mockRestore();
+    spy.mockRestore();
   });
 
   test('uses default name "des_save.zip" when no name provided', async () => {
     const files = new Map([['a.txt', new Uint8Array([1])]]);
 
-    let clickedAnchor = null;
+    let clickedAnchor = /** @type {any} */ (null);
     const realCreate = document.createElement;
-    jest.spyOn(document, 'createElement').mockImplementation((tag) => {
+    const spy = jest.spyOn(document, 'createElement').mockImplementation((tag) => {
       const el = realCreate.call(document, tag);
       if (tag === 'a') {
         el.click = () => {
@@ -422,7 +425,7 @@ describe('downloadFilesAsZip', () => {
 
     expect(clickedAnchor.download).toBe('des_save.zip');
 
-    document.createElement.mockRestore();
+    spy.mockRestore();
   });
 
   test('produces a valid ZIP archive', async () => {
@@ -430,7 +433,7 @@ describe('downloadFilesAsZip', () => {
     const files = new Map([['data.bin', content]]);
 
     // Mock createObjectURL to capture the blob
-    let capturedBlob = null;
+    let capturedBlob = /** @type {any} */ (null);
     const origCreate = URL.createObjectURL;
     URL.createObjectURL = (blob) => {
       capturedBlob = blob;
@@ -438,7 +441,7 @@ describe('downloadFilesAsZip', () => {
     };
 
     const realCreate = document.createElement;
-    jest.spyOn(document, 'createElement').mockImplementation((tag) => {
+    const spy = jest.spyOn(document, 'createElement').mockImplementation((tag) => {
       const el = realCreate.call(document, tag);
       if (tag === 'a') el.click = () => {};
       return el;
@@ -451,7 +454,7 @@ describe('downloadFilesAsZip', () => {
     expect(capturedBlob.type).toBe('application/zip');
 
     URL.createObjectURL = origCreate;
-    document.createElement.mockRestore();
+    spy.mockRestore();
   });
 });
 
@@ -462,26 +465,28 @@ describe('downloadFilesAsZip', () => {
 describe('pickZipFile', () => {
   test('uses showSaveFilePicker when available', async () => {
     const mockHandle = { name: 'chosen.zip' };
-    window.showSaveFilePicker = jest.fn().mockResolvedValue(mockHandle);
+    w.showSaveFilePicker = jest.fn();
+    w.showSaveFilePicker.mockResolvedValue(mockHandle);
 
     const handle = await pickZipFile('my-save.zip');
     expect(handle).toBe(mockHandle);
-    expect(window.showSaveFilePicker).toHaveBeenCalledWith(
+    expect(w.showSaveFilePicker).toHaveBeenCalledWith(
       expect.objectContaining({ suggestedName: 'my-save.zip' }),
     );
 
-    delete window.showSaveFilePicker;
+    delete w.showSaveFilePicker;
   });
 
   test('passes ZIP MIME type to showSaveFilePicker', async () => {
     const mockHandle = { name: 'out.zip' };
-    window.showSaveFilePicker = jest.fn().mockResolvedValue(mockHandle);
+    w.showSaveFilePicker = jest.fn();
+    w.showSaveFilePicker.mockResolvedValue(mockHandle);
 
     await pickZipFile('out.zip');
-    const args = window.showSaveFilePicker.mock.calls[0][0];
+    const args = w.showSaveFilePicker.mock.calls[0][0];
     expect(args.types[0].accept).toEqual({ 'application/zip': ['.zip'] });
 
-    delete window.showSaveFilePicker;
+    delete w.showSaveFilePicker;
   });
 
   test('throws when showSaveFilePicker is not available (caller checks canChooseSaveLocation)', async () => {
@@ -523,7 +528,7 @@ describe('writeZipToHandle', () => {
   });
 
   test('delegates to Tauri IPC when handle has __tauriPath', async () => {
-    const tauriModule = await import('../../js/lib/tauri-bridge.js');
+    const tauriModule = /** @type {any} */ (await import('../../js/lib/tauri-bridge.js'));
     tauriModule.tauriWriteBytesToPath.mockResolvedValue(undefined);
 
     const handle = { __tauriPath: '/output/save.zip' };
@@ -585,7 +590,8 @@ describe('openDirectoryViaFSAccess (Chromium)', () => {
 
     const mockDirHandle = makeMockDirHandle(mockFileEntries);
 
-    window.showDirectoryPicker = jest.fn().mockResolvedValue(mockDirHandle);
+    w.showDirectoryPicker = jest.fn();
+    w.showDirectoryPicker.mockResolvedValue(mockDirHandle);
     Object.defineProperty(window, 'isSecureContext', {
       value: true,
       configurable: true,
@@ -599,7 +605,7 @@ describe('openDirectoryViaFSAccess (Chromium)', () => {
     expect(files.has('param.sfo')).toBe(true);
     expect(files.has('user.dat')).toBe(true);
 
-    delete window.showDirectoryPicker;
+    delete w.showDirectoryPicker;
     Object.defineProperty(window, 'isSecureContext', {
       value: false,
       configurable: true,
@@ -608,9 +614,10 @@ describe('openDirectoryViaFSAccess (Chromium)', () => {
   });
 
   test('throws AbortError-like when showDirectoryPicker throws AbortError', async () => {
-    window.showDirectoryPicker = jest
-      .fn()
-      .mockRejectedValue(Object.assign(new Error('User cancelled'), { name: 'AbortError' }));
+    w.showDirectoryPicker = jest.fn();
+    w.showDirectoryPicker.mockRejectedValue(
+      Object.assign(new Error('User cancelled'), { name: 'AbortError' }),
+    );
     Object.defineProperty(window, 'isSecureContext', {
       value: true,
       configurable: true,
@@ -619,7 +626,7 @@ describe('openDirectoryViaFSAccess (Chromium)', () => {
 
     await expect(openDirectoryViaFSAccess()).rejects.toThrow('User cancelled');
 
-    delete window.showDirectoryPicker;
+    delete w.showDirectoryPicker;
     Object.defineProperty(window, 'isSecureContext', {
       value: false,
       configurable: true,
@@ -644,7 +651,8 @@ describe('openDirectoryViaFSAccess (Chromium)', () => {
 
     const mockDirHandle = makeMockDirHandle(mockFileEntries);
 
-    window.showDirectoryPicker = jest.fn().mockResolvedValue(mockDirHandle);
+    w.showDirectoryPicker = jest.fn();
+    w.showDirectoryPicker.mockResolvedValue(mockDirHandle);
     Object.defineProperty(window, 'isSecureContext', {
       value: true,
       configurable: true,
@@ -653,7 +661,7 @@ describe('openDirectoryViaFSAccess (Chromium)', () => {
 
     await expect(openDirectoryViaFSAccess()).rejects.toThrow(/too large/i);
 
-    delete window.showDirectoryPicker;
+    delete w.showDirectoryPicker;
     Object.defineProperty(window, 'isSecureContext', {
       value: false,
       configurable: true,

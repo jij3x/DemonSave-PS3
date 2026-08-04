@@ -11,12 +11,20 @@
  *   3. Writer edge cases — inventory, spells, deposit, misc fields
  *   4. Secondary file writer
  */
-import { readSave } from '../../js/des-savefile/reader.js';
+import { readSave as _readSave } from '../../js/des-savefile/reader.js';
 import {
-  writeSave,
-  writeSaveInPlace,
-  writeSecondaryFileInPlace,
+  writeSave as _writeSave,
+  writeSaveInPlace as _writeSaveInPlace,
+  writeSecondaryFileInPlace as _writeSecondaryFileInPlace,
 } from '../../js/des-savefile/writer.js';
+
+// Cast to any: avoids Uint8Array<ArrayBufferLike> vs <ArrayBuffer> generic
+// friction and allows intentional bad-type model mutations in tests.
+const readSave = /** @type {any} */ (_readSave);
+const writeSave = /** @type {any} */ (_writeSave);
+const writeSaveInPlace = /** @type {any} */ (_writeSaveInPlace);
+const writeSecondaryFileInPlace = /** @type {any} */ (_writeSecondaryFileInPlace);
+
 import {
   rInt32BE,
   rUInt32BE,

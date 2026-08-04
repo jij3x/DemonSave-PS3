@@ -11,7 +11,7 @@
     "target": "ESNext",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["node"],
+    "types": ["node", "jest"],
     "maxNodeModuleJsDepth": 0
   },
   "include": [
@@ -20,13 +20,13 @@
     "js/lib/ps3-save-lib/**/*",
     "js/lib/tauri-bridge.js",
     "js/ui/**/*",
+    "tests/**/*",
     "tools/**/*"
   ],
   "exclude": [
     "node_modules",
     "src-tauri",
     "rpcs3-mcp-server",
-    "tests",
     "integration-tests"
   ]
 }

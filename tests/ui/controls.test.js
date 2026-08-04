@@ -7,6 +7,8 @@
  * getCategoryData (all branches), getSpellData, and SPELL_STATUS_NAMES.
  */
 
+export {};
+
 const {
   populateCombos,
   getCategoryData,
@@ -94,9 +96,15 @@ describe('controls', () => {
 
       populateCombos();
 
-      expect(document.getElementById('hairstyle').options.length).toBe(HAIRSTYLE_IDS.length);
-      expect(document.getElementById('startClass').options.length).toBe(START_CLASSES.length);
-      expect(document.getElementById('warpLocation').options.length).toBe(WARPS.length);
+      expect(
+        /** @type {HTMLSelectElement} */ (document.getElementById('hairstyle')).options.length,
+      ).toBe(HAIRSTYLE_IDS.length);
+      expect(
+        /** @type {HTMLSelectElement} */ (document.getElementById('startClass')).options.length,
+      ).toBe(START_CLASSES.length);
+      expect(
+        /** @type {HTMLSelectElement} */ (document.getElementById('warpLocation')).options.length,
+      ).toBe(WARPS.length);
     });
   });
 
@@ -127,7 +135,7 @@ describe('controls', () => {
     });
 
     test('returns empty arrays for unknown category (default branch)', () => {
-      const result = getCategoryData('unknown');
+      const result = getCategoryData(/** @type {never} */ ('unknown'));
       expect(result.ids).toEqual([]);
       expect(result.names).toEqual([]);
     });
@@ -383,7 +391,7 @@ describe('controls', () => {
     });
 
     test('unknown category defaults to true', () => {
-      expect(isDurabilityVisible('unknown', null)).toBe(true);
+      expect(isDurabilityVisible(/** @type {never} */ ('unknown'), null)).toBe(true);
     });
   });
 
@@ -415,7 +423,7 @@ describe('controls', () => {
     });
 
     test('unknown category defaults to true', () => {
-      expect(isCountVisible('unknown', null)).toBe(true);
+      expect(isCountVisible(/** @type {never} */ ('unknown'), null)).toBe(true);
     });
   });
 

@@ -18,7 +18,7 @@ import {
 
 /**
  * Build a minimal synthetic PARAM.SFO buffer for testing.
- * @param {object[]} entries - [{name, value, dataFmt}]
+ * @param {{name: string, value: string, dataFmt: number}[]} entries - [{name, value, dataFmt}]
  * @returns {Uint8Array}
  */
 function buildSfo(entries) {
@@ -334,7 +334,7 @@ describe('parseParamSfo: edge cases', () => {
   });
 
   test('throws on non-Uint8Array input', () => {
-    expect(() => parseParamSfo('not-a-buffer')).toThrow(TypeError);
+    expect(() => parseParamSfo(/** @type {never} */ ('not-a-buffer'))).toThrow(TypeError);
   });
 
   test('handles unknown data format (returns empty string)', () => {
@@ -377,11 +377,11 @@ describe('findParamDataOffset guards', () => {
   });
 
   test('getSfoAttribute throws on non-Uint8Array', () => {
-    expect(() => getSfoAttribute('bad')).toThrow(TypeError);
+    expect(() => getSfoAttribute(/** @type {never} */ ('bad'))).toThrow(TypeError);
   });
 
   test('removeCopyProtection throws on non-Uint8Array', () => {
-    expect(() => removeCopyProtection(123)).toThrow(TypeError);
+    expect(() => removeCopyProtection(/** @type {never} */ (123))).toThrow(TypeError);
   });
 
   test('writeSfoAccountId throws on too-long hex', () => {
