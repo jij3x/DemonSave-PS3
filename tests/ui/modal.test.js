@@ -333,9 +333,7 @@ describe('modal — focus restoration', () => {
     // fires. We just verify the primary button gets focused.
     const promise = showConfirm('Auto-focus test?');
     const overlay = document.querySelector('.modal-overlay');
-    const primaryBtn = /** @type {HTMLElement} */ (
-      overlay.querySelector('.modal-btn-primary')
-    );
+    const primaryBtn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary'));
 
     // Wait for rAF to fire (jsdom queues it as a microtask)
     await new Promise((resolve) => requestAnimationFrame(resolve));
