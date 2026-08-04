@@ -56,7 +56,7 @@ export function setupWarpAndWorld() {
   if (!warpLocation) return;
 
   warpLocation.addEventListener('change', (e) => {
-    const idx = parseInt(e.target.value, 10);
+    const idx = parseInt(/** @type {HTMLSelectElement} */ (e.target).value, 10);
     if (isNaN(idx) || idx < 0 || idx >= WARPS.length) return;
     const area = WARPS[idx];
     setVal('world', area.world);
@@ -71,7 +71,7 @@ export function setupWarpAndWorld() {
   const worldInput = $('world');
   if (worldInput) {
     worldInput.addEventListener('input', (e) => {
-      updateWorldName(parseInt(e.target.value, 10));
+      updateWorldName(parseInt(/** @type {HTMLInputElement} */ (e.target).value, 10));
     });
   }
 }
@@ -81,84 +81,88 @@ export function setupWarpAndWorld() {
 /* ------------------------------------------------------------------ */
 
 export function setupTabs() {
-  document.querySelectorAll('.tab-group').forEach((group) => {
-    // Use :scope to select only direct children — avoids interference between
-    // nested tab-groups (e.g. top-level tabs vs inventory sub-tabs).
-    const tabs = group.querySelectorAll(':scope > .tabs > .tab');
-    const contents = group.querySelectorAll(':scope > .tab-content');
+  /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.tab-group')).forEach(
+    (group) => {
+      // Use :scope to select only direct children — avoids interference between
+      // nested tab-groups (e.g. top-level tabs vs inventory sub-tabs).
+      const tabs = group.querySelectorAll(':scope > .tabs > .tab');
+      const contents = group.querySelectorAll(':scope > .tab-content');
 
-    // Ensure ARIA tablist role on the tab container (for raw HTML tab groups
-    // that don't use tabButton()). Already set by tabButton() in others.
-    const tabsContainer = group.querySelector(':scope > .tabs');
-    if (tabsContainer && !tabsContainer.getAttribute('role')) {
-      tabsContainer.setAttribute('role', 'tablist');
-    }
-
-    // Ensure tab/tabpanel roles + dynamic ARIA attributes on all tabs and
-    // content panels (catches raw HTML in charPanel + invCategoryTab).
-    tabs.forEach((tab) => {
-      if (!tab.getAttribute('role')) tab.setAttribute('role', 'tab');
-    });
-    contents.forEach((c) => {
-      if (!c.getAttribute('role')) c.setAttribute('role', 'tabpanel');
-    });
-
-    // Sub-tab groups are wrapped in .sub-tab-container, which also holds a
-    // .sub-tab-actions bar with per-category add buttons.  When switching
-    // sub-tabs, show the add button for the newly active category.
-    const actionsContainer = group.parentElement?.querySelector(':scope > .sub-tab-actions');
-
-    /**
-     * Activate a tab by index, updating aria-selected, tabindex, and
-     * content visibility.
-     */
-    function activateTab(tabIndex) {
-      tabs.forEach((t, i) => {
-        const isActive = i === tabIndex;
-        t.classList.toggle('active', isActive);
-        // ARIA: update selected state and roving tabindex
-        t.setAttribute('aria-selected', String(isActive));
-        t.tabIndex = isActive ? 0 : -1;
-      });
-      const target = tabs[tabIndex]?.dataset.tab;
-      contents.forEach((c) => {
-        c.hidden = c.dataset.tab !== target;
-      });
-      // Sync add buttons with the active sub-tab (matched by data-tab)
-      if (actionsContainer) {
-        actionsContainer.querySelectorAll('button').forEach((btn) => {
-          btn.hidden = btn.dataset.tab !== target;
-        });
+      // Ensure ARIA tablist role on the tab container (for raw HTML tab groups
+      // that don't use tabButton()). Already set by tabButton() in others.
+      const tabsContainer = group.querySelector(':scope > .tabs');
+      if (tabsContainer && !tabsContainer.getAttribute('role')) {
+        tabsContainer.setAttribute('role', 'tablist');
       }
-      // Move focus to the newly activated tab
-      tabs[tabIndex]?.focus();
-    }
 
-    tabs.forEach((tab, index) => {
-      tab.addEventListener('click', () => activateTab(index));
-
-      // Arrow-key navigation between tabs (WAI-ARIA Authoring Practices)
-      tab.addEventListener('keydown', (e) => {
-        const tabCount = tabs.length;
-        let newIndex = null;
-
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-          newIndex = (index + 1) % tabCount;
-        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-          newIndex = (index - 1 + tabCount) % tabCount;
-        } else if (e.key === 'Home') {
-          newIndex = 0;
-        } else if (e.key === 'End') {
-          newIndex = tabCount - 1;
-        }
-
-        if (newIndex !== null) {
-          e.preventDefault();
-          activateTab(newIndex);
-        }
+      // Ensure tab/tabpanel roles + dynamic ARIA attributes on all tabs and
+      // content panels (catches raw HTML in charPanel + invCategoryTab).
+      tabs.forEach((tab) => {
+        if (!tab.getAttribute('role')) tab.setAttribute('role', 'tab');
       });
-    });
-  });
+      contents.forEach((c) => {
+        if (!c.getAttribute('role')) c.setAttribute('role', 'tabpanel');
+      });
+
+      // Sub-tab groups are wrapped in .sub-tab-container, which also holds a
+      // .sub-tab-actions bar with per-category add buttons.  When switching
+      // sub-tabs, show the add button for the newly active category.
+      const actionsContainer = group.parentElement?.querySelector(':scope > .sub-tab-actions');
+
+      /**
+       * Activate a tab by index, updating aria-selected, tabindex, and
+       * content visibility.
+       */
+      function activateTab(tabIndex) {
+        tabs.forEach((t, i) => {
+          const isActive = i === tabIndex;
+          t.classList.toggle('active', isActive);
+          // ARIA: update selected state and roving tabindex
+          t.setAttribute('aria-selected', String(isActive));
+          /** @type {HTMLElement} */ (t).tabIndex = isActive ? 0 : -1;
+        });
+        const target = /** @type {HTMLElement} */ (tabs[tabIndex])?.dataset.tab;
+        contents.forEach((c) => {
+          /** @type {HTMLElement} */ (c).hidden =
+            /** @type {HTMLElement} */ (c).dataset.tab !== target;
+        });
+        // Sync add buttons with the active sub-tab (matched by data-tab)
+        if (actionsContainer) {
+          actionsContainer.querySelectorAll('button').forEach((btn) => {
+            btn.hidden = btn.dataset.tab !== target;
+          });
+        }
+        // Move focus to the newly activated tab
+        /** @type {HTMLElement} */ (tabs[tabIndex])?.focus();
+      }
+
+      tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => activateTab(index));
+
+        // Arrow-key navigation between tabs (WAI-ARIA Authoring Practices)
+        tab.addEventListener('keydown', (e) => {
+          const tabCount = tabs.length;
+          let newIndex = null;
+
+          const ke = /** @type {KeyboardEvent} */ (e);
+          if (ke.key === 'ArrowRight' || ke.key === 'ArrowDown') {
+            newIndex = (index + 1) % tabCount;
+          } else if (ke.key === 'ArrowLeft' || ke.key === 'ArrowUp') {
+            newIndex = (index - 1 + tabCount) % tabCount;
+          } else if (ke.key === 'Home') {
+            newIndex = 0;
+          } else if (ke.key === 'End') {
+            newIndex = tabCount - 1;
+          }
+
+          if (newIndex !== null) {
+            e.preventDefault();
+            activateTab(newIndex);
+          }
+        });
+      });
+    },
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -172,7 +176,7 @@ export function setupTabs() {
 function scrollTableBodyToBottom(tbody) {
   const scrollBody = tbody.closest('.sub-tab-table-body');
   if (scrollBody) {
-    scrollBody.scrollTop = scrollBody.scrollHeight;
+    /** @type {HTMLElement} */ (scrollBody).scrollTop = scrollBody.scrollHeight;
   }
 }
 
@@ -181,7 +185,7 @@ export function setupAddRowButtons() {
   setupDeferredRowAdded();
 
   // Inventory add buttons
-  document.querySelectorAll('.inv-add').forEach((btn) => {
+  /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.inv-add')).forEach((btn) => {
     btn.addEventListener('click', () => {
       const category = btn.dataset.category;
 
@@ -206,7 +210,7 @@ export function setupAddRowButtons() {
         defaultItemId = typeIds[0] ?? 0;
       } else {
         tbody = document.querySelector(`table.inv-table[data-category="${category}"] tbody`);
-        const { ids: invIds } = getCategoryData(category);
+        const { ids: invIds } = getCategoryData(/** @type {any} */ (category));
         defaultItemId = invIds[0] ?? 0;
       }
       if (!tbody) return;
@@ -214,16 +218,16 @@ export function setupAddRowButtons() {
       // Gate: don't add another row while an unselected one exists.
       for (const tr of tbody.querySelectorAll('tr')) {
         if (tr.dataset.deleted === 'true') continue;
-        if (!tr.querySelector('.inv-name')?.value) {
+        if (!(/** @type {HTMLSelectElement|null} */ (tr.querySelector('.inv-name'))?.value)) {
           // Reveal the pending unselected row before bailing out, so the
           // user is always brought to the actionable row on Add.
-          scrollTableBodyToBottom(tbody);
+          scrollTableBodyToBottom(/** @type {HTMLElement} */ (tbody));
           return;
         }
       }
       // Look up max durability from des-db for weapons/armor.
       // Falls back to 200 if not found (or for non-durability categories).
-      const durability = lookupMaxDurability(category, defaultItemId);
+      const durability = lookupMaxDurability(/** @type {any} */ (category), defaultItemId);
       const rec = {
         _ref: '',
         itemId: undefined,
@@ -232,38 +236,46 @@ export function setupAddRowButtons() {
         durability,
         misc2: 0x01000000,
       };
-      const newTr = makeInventoryRow(category, rec, typeId);
+      const newTr = makeInventoryRow(
+        /** @type {any} */ (category),
+        rec,
+        /** @type {any} */ (typeId),
+        undefined,
+      );
       tbody.appendChild(newTr);
       // onRowAdded deferred until user selects an item (change listener)
-      scrollTableBodyToBottom(tbody);
+      scrollTableBodyToBottom(/** @type {HTMLElement} */ (tbody));
     });
   });
 
   // Spell add button
   $('addSpell')?.addEventListener('click', () => {
     const tbody = document.querySelector('#spellsTableBody tbody');
+    if (!tbody) return;
 
     // Gate: don't add another row while an unselected one exists.
     for (const tr of tbody.querySelectorAll('tr')) {
       if (tr.dataset.deleted === 'true') continue;
-      if (!tr.querySelector('.spell-name')?.value) {
-        scrollTableBodyToBottom(tbody);
+      if (!(/** @type {HTMLSelectElement|null} */ (tr.querySelector('.spell-name'))?.value)) {
+        scrollTableBodyToBottom(/** @type {HTMLElement} */ (tbody));
         return;
       }
     }
 
     const newSpellTr = makeSpellRow({ itemId: undefined, status: 0, misc1: 0, misc2: 0 }, false);
     tbody.appendChild(newSpellTr);
+    void tbody;
     // onRowAdded deferred until user selects a spell (change listener)
-    scrollTableBodyToBottom(tbody);
+    scrollTableBodyToBottom(/** @type {HTMLElement} */ (tbody));
   });
 
   // Deposit add buttons (per category / per type)
-  document.querySelectorAll('.dep-add').forEach((btn) => {
+  /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.dep-add')).forEach((btn) => {
     btn.addEventListener('click', () => {
       const category = btn.dataset.category;
 
       // Count existing (non-deleted) deposit rows across ALL tables to enforce limit
+      // (category is already typed as string from dataset)
       const DEPOSIT_MAX_ENTRIES = getLimits().depositMaxEntries;
 
       let totalCount = 0;
@@ -300,7 +312,7 @@ export function setupAddRowButtons() {
         const { ids: typeIds } = getGoodsTypeData(Number(typeId));
         defaultItemId = typeIds[0] ?? 0;
       } else {
-        const { ids: depIds } = getCategoryData(category);
+        const { ids: depIds } = getCategoryData(/** @type {any} */ (category));
         defaultItemId = depIds[0] ?? 0;
         tbody = document.querySelector(`table.dep-table[data-category="${category}"] tbody`);
       }
@@ -308,8 +320,8 @@ export function setupAddRowButtons() {
       // Gate: don't add another row while an unselected one exists.
       for (const tr of tbody.querySelectorAll('tr')) {
         if (tr.dataset.deleted === 'true') continue;
-        if (!tr.querySelector('.dep-name')?.value) {
-          scrollTableBodyToBottom(tbody);
+        if (!(/** @type {HTMLSelectElement|null} */ (tr.querySelector('.dep-name'))?.value)) {
+          scrollTableBodyToBottom(/** @type {HTMLElement} */ (tbody));
           return;
         }
       }
@@ -344,9 +356,9 @@ export function setupAddRowButtons() {
         );
         tbody.appendChild(newDepTr);
       } else {
-        const defaultDurability = lookupMaxDurability(category, defaultItemId);
+        const defaultDurability = lookupMaxDurability(/** @type {any} */ (category), defaultItemId);
         const newDepTr = makeDepositRow(
-          category,
+          /** @type {any} */ (category),
           {
             itemId: undefined,
             count: 1,
@@ -358,7 +370,7 @@ export function setupAddRowButtons() {
         tbody.appendChild(newDepTr);
       }
       // onRowAdded deferred until user selects an item (change listener)
-      scrollTableBodyToBottom(tbody);
+      scrollTableBodyToBottom(/** @type {HTMLElement} */ (tbody));
     });
   });
 }

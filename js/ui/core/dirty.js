@@ -134,6 +134,32 @@ class DirtyNode {
 }
 
 // ---------------------------------------------------------------------------
+// DOM query helpers (typed wrappers for compound selectors)
+// ---------------------------------------------------------------------------
+
+/**
+ * Query for all editable elements (inputs + selects) within a root.
+ * @param {ParentNode} root
+ * @returns {NodeListOf<HTMLInputElement | HTMLSelectElement>}
+ */
+function queryEditables(root) {
+  return /** @type {NodeListOf<HTMLInputElement | HTMLSelectElement>} */ (
+    root.querySelectorAll('input, select')
+  );
+}
+
+/**
+ * Query for all table rows in grid tables.
+ * @param {ParentNode} root
+ * @returns {NodeListOf<HTMLTableRowElement>}
+ */
+function queryGridRows(root) {
+  return /** @type {NodeListOf<HTMLTableRowElement>} */ (
+    root.querySelectorAll('.grid-table tbody tr')
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Tree construction
 // ---------------------------------------------------------------------------
 
@@ -146,8 +172,12 @@ class DirtyNode {
  * @param {string} prefix           key prefix (e.g. 'editor:inventory')
  */
 function processTabGroup(tabGroupEl, parentNode, prefix) {
-  const tabButtons = tabGroupEl.querySelectorAll(':scope > .tabs > .tab');
-  const tabContents = tabGroupEl.querySelectorAll(':scope > .tab-content');
+  const tabButtons = /** @type {NodeListOf<HTMLElement>} */ (
+    tabGroupEl.querySelectorAll(':scope > .tabs > .tab')
+  );
+  const tabContents = /** @type {NodeListOf<HTMLElement>} */ (
+    tabGroupEl.querySelectorAll(':scope > .tab-content')
+  );
 
   // Build data-tab → button map
   const buttonMap = new Map();
@@ -171,7 +201,9 @@ function processTabGroup(tabGroupEl, parentNode, prefix) {
     contentToNode.set(content, node);
 
     // Recurse into nested sub-tab groups (inside .sub-tab-container)
-    const nestedGroups = content.querySelectorAll(':scope > .sub-tab-container > .tab-group');
+    const nestedGroups = /** @type {NodeListOf<HTMLElement>} */ (
+      content.querySelectorAll(':scope > .sub-tab-container > .tab-group')
+    );
     for (const nestedGroup of nestedGroups) {
       processTabGroup(nestedGroup, node, nodeKey);
     }
@@ -193,7 +225,9 @@ export function buildDirtyTree() {
   }
 
   // Right panel (main#editor > .tab-group.top-level)
-  const editorGroup = document.querySelector('main#editor > .tab-group');
+  const editorGroup = /** @type {HTMLElement|null} */ (
+    document.querySelector('main#editor > .tab-group')
+  );
   if (editorGroup) {
     processTabGroup(editorGroup, dirtyRoot, 'editor');
   }
@@ -284,7 +318,7 @@ export function isElementDirty(el) {
 export function captureBaseline() {
   const root = document.getElementById('app') || document.body;
 
-  for (const el of root.querySelectorAll('input, select')) {
+  for (const el of queryEditables(root)) {
     if (SKIP_IDS.has(el.id)) continue;
     if (el.disabled) continue; // skip disabled (e.g. in deleted rows)
 
@@ -364,7 +398,7 @@ export function resetAndCaptureBaseline() {
   root.querySelectorAll('.row-dirty').forEach((el) => el.classList.remove('row-dirty'));
 
   // Single walk: set data-orig baseline, mark clean, and strip .dirty
-  for (const el of root.querySelectorAll('input, select')) {
+  for (const el of queryEditables(root)) {
     if (SKIP_IDS.has(el.id)) continue;
     if (el.disabled) continue; // skip disabled (e.g. in deleted rows)
 
@@ -462,12 +496,12 @@ export function recomputeDirty() {
   const root = document.getElementById('app') || document.body;
 
   // Clear element dirty state
-  for (const el of root.querySelectorAll('input, select')) {
+  for (const el of queryEditables(root)) {
     elementDirty.set(el, false);
   }
 
   // --- Scalars (inputs/selects NOT inside table rows) ---
-  for (const el of root.querySelectorAll('input, select')) {
+  for (const el of queryEditables(root)) {
     if (SKIP_IDS.has(el.id)) continue;
     if (el.dataset.orig === undefined) continue;
     if (el.closest('tr')) continue; // handled in row loop
@@ -484,7 +518,7 @@ export function recomputeDirty() {
   }
 
   // --- Table rows ---
-  for (const tr of root.querySelectorAll('.grid-table tbody tr')) {
+  for (const tr of queryGridRows(root)) {
     // New rows: skip per-cell dirty (tracked at row level)
     if (tr.dataset.existing === 'false') continue;
 
@@ -501,7 +535,7 @@ export function recomputeDirty() {
 
     // Existing rows: check each cell
     let cellCount = 0;
-    for (const el of tr.querySelectorAll('input, select')) {
+    for (const el of queryEditables(tr)) {
       if (el.dataset.orig === undefined) continue;
       const dirty = isElementDirty(el);
       el.classList.toggle('dirty', dirty);
@@ -582,7 +616,7 @@ export function onRowSoftDeleted(tr) {
 
   // Clear per-cell dirty contributions (cells were reverted to baseline)
   let dirtyCellCount = 0;
-  for (const el of tr.querySelectorAll('input, select')) {
+  for (const el of queryEditables(tr)) {
     if (elementDirty.get(el)) {
       elementDirty.set(el, false);
       el.classList.remove('dirty');
@@ -639,23 +673,25 @@ export function hasUnsavedChanges() {
   // Fallback: scan-based check (if tree not built)
   const root = document.getElementById('app') || document.body;
 
-  for (const el of root.querySelectorAll('input, select')) {
+  for (const el of queryEditables(root)) {
     if (SKIP_IDS.has(el.id)) continue;
     if (el.dataset.orig === undefined) continue;
     if (isElementDirty(el)) return true;
   }
 
-  for (const tr of root.querySelectorAll('.grid-table tbody tr')) {
+  for (const tr of queryGridRows(root)) {
     // New rows with a selected item count as unsaved changes.
     // New rows with no selection (placeholder still active) are not yet
     // committed and do not count.
     if (tr.dataset.existing === 'false') {
-      const sel = tr.querySelector('.inv-name, .dep-name, .spell-name');
+      const sel = /** @type {HTMLSelectElement|null} */ (
+        tr.querySelector('.inv-name, .dep-name, .spell-name')
+      );
       if (sel?.value) return true;
       continue;
     }
     if (tr.dataset.deleted === 'true') return true;
-    for (const el of tr.querySelectorAll('input, select')) {
+    for (const el of queryEditables(tr)) {
       if (el.dataset.orig !== undefined && isElementDirty(el)) return true;
     }
   }

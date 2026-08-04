@@ -189,7 +189,7 @@ export function initTooltips() {
   // Use mouseover/mouseout with delegation so dynamically added elements
   // (e.g. table rows, form updates) also get tooltips.
   document.addEventListener('mouseover', (e) => {
-    const target = e.target.closest('[data-tooltip]');
+    const target = /** @type {Element} */ (e.target).closest('[data-tooltip]');
     if (!target) return;
 
     clearTimeout(hideTimer);
@@ -202,16 +202,16 @@ export function initTooltips() {
       if (target.hasAttribute('data-tooltip-if-truncated')) {
         if (target.scrollWidth <= target.clientWidth) return;
       }
-      showTooltip(target);
+      showTooltip(/** @type {HTMLElement} */ (target));
     }, SHOW_DELAY);
   });
 
   document.addEventListener('mouseout', (e) => {
-    const target = e.target.closest('[data-tooltip]');
+    const target = /** @type {Element} */ (e.target).closest('[data-tooltip]');
     if (!target) return;
 
     // Check if we're moving to a child of the same tooltip target
-    const related = e.relatedTarget;
+    const related = /** @type {Node} */ (e.relatedTarget);
     if (related && target.contains(related)) return;
 
     clearTimeout(showTimer);
@@ -231,7 +231,7 @@ export function initTooltips() {
   // Hide on mousedown — when the user clicks (e.g. a button), dismiss
   // the tooltip immediately since they've taken the action.
   document.addEventListener('mousedown', (e) => {
-    if (e.target.closest('[data-tooltip]')) {
+    if (/** @type {Element} */ (e.target).closest('[data-tooltip]')) {
       clearTimeout(showTimer);
       hideTooltip();
     }

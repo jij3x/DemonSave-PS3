@@ -59,7 +59,7 @@ export function makeSpellRow(sp, isExisting = true) {
     const idx = findItemIndex(ids, sp.itemId);
     if (idx >= 0) {
       const opt = document.createElement('option');
-      opt.value = ids[idx];
+      opt.value = String(ids[idx]);
       opt.textContent = names[idx];
       opt.selected = true;
       sel.appendChild(opt);
@@ -90,7 +90,7 @@ export function makeSpellRow(sp, isExisting = true) {
   statusSel.className = 'spell-status';
   for (let i = 0; i < SPELL_STATUS_NAMES.length; i++) {
     const opt = document.createElement('option');
-    opt.value = i;
+    opt.value = String(i);
     opt.textContent = SPELL_STATUS_NAMES[i];
     if (i === (typeof sp.status === 'number' ? sp.status : 0)) opt.selected = true;
     statusSel.appendChild(opt);
@@ -130,12 +130,19 @@ export function collectSpells() {
     if (tr.dataset.deleted === 'true') continue;
 
     // Skip unselected new rows (placeholder still active)
-    if (!tr.querySelector('.spell-name')?.value) continue;
+    const spellNameSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.spell-name'));
+    if (!spellNameSel?.value) continue;
 
+    const spellStatusSel = /** @type {HTMLSelectElement|null} */ (
+      tr.querySelector('.spell-status')
+    );
+    const spellMisc1Inp = /** @type {HTMLInputElement|null} */ (
+      tr.querySelector('.inv-spell-misc1')
+    );
     spells.push({
-      itemId: parseInt(tr.querySelector('.spell-name')?.value, 10) || 0,
-      status: parseInt(tr.querySelector('.spell-status')?.value, 10) || 0,
-      misc1: parseInt(tr.querySelector('.inv-spell-misc1')?.value, 10) || 0,
+      itemId: parseInt(spellNameSel?.value ?? '', 10) || 0,
+      status: parseInt(spellStatusSel?.value ?? '', 10) || 0,
+      misc1: parseInt(spellMisc1Inp?.value ?? '', 10) || 0,
       misc2: parseInt(tr.dataset.misc2, 10) || 0,
     });
   }

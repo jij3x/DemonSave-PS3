@@ -170,7 +170,7 @@ export function makeDepositRow(category, rec, isExisting = true, typeIdHint = nu
     const idx = findItemIndex(ids, rec.itemId);
     if (idx >= 0) {
       const opt = document.createElement('option');
-      opt.value = ids[idx];
+      opt.value = String(ids[idx]);
       opt.textContent = names[idx];
       opt.selected = true;
       itemSel.appendChild(opt);
@@ -408,9 +408,9 @@ export function makeDepositWeaponRow(typeId, rec, isExisting = true) {
  * @returns {number|null}  resolved itemId, or null if not found
  */
 function recomposeDepositWeaponItemId(tr) {
-  const baseSel = tr.querySelector('.dep-base-weapon');
-  const pathSel = tr.querySelector('.dep-path');
-  const levelSel = tr.querySelector('.dep-level');
+  const baseSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.dep-base-weapon'));
+  const pathSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.dep-path'));
+  const levelSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.dep-level'));
   if (!baseSel || !pathSel || !levelSel) return null;
   if (!baseSel.value) return null; // placeholder still active
 
@@ -421,7 +421,7 @@ function recomposeDepositWeaponItemId(tr) {
   const level = levelSel.value ? parseInt(levelSel.value, 10) : null;
 
   const itemId = resolveItemIdFromRef(baseId, pathId, level);
-  const hiddenInput = tr.querySelector('.dep-item-id');
+  const hiddenInput = /** @type {HTMLInputElement|null} */ (tr.querySelector('.dep-item-id'));
   if (hiddenInput && itemId != null) {
     hiddenInput.value = String(itemId);
   }
@@ -451,8 +451,8 @@ export function setupDepositWeaponSync() {
     if (sel.classList.contains('dep-base-weapon')) {
       if (!sel.value) return; // placeholder
       const baseId = parseInt(sel.value, 10);
-      const pathSel = tr.querySelector('.dep-path');
-      const levelSel = tr.querySelector('.dep-level');
+      const pathSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.dep-path'));
+      const levelSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.dep-level'));
 
       // Repopulate paths for the new base weapon
       populatePathSelect(pathSel, baseId, null);
@@ -485,7 +485,9 @@ export function setupDepositWeaponSync() {
       // Update durability
       if (itemId != null) {
         const maxDur = lookupMaxDurability('weapons', itemId);
-        const durInput = tr.querySelector('.inv-dep-durability');
+        const durInput = /** @type {HTMLInputElement|null} */ (
+          tr.querySelector('.inv-dep-durability')
+        );
         if (durInput) durInput.value = String(maxDur);
       }
       return;
@@ -493,7 +495,7 @@ export function setupDepositWeaponSync() {
 
     // Path changed
     if (sel.classList.contains('dep-path')) {
-      const levelSel = tr.querySelector('.dep-level');
+      const levelSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.dep-level'));
       const pathId = parseInt(sel.value, 10);
       populateLevelSelect(levelSel, pathId, null);
 
@@ -543,7 +545,7 @@ export function collectDeposit() {
         if (tr.dataset.deleted === 'true') continue;
 
         // Cache the dep-name select per row to avoid repeated querySelector calls
-        const nameSel = tr.querySelector('.dep-name');
+        const nameSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.dep-name'));
         // Skip unselected new rows (placeholder still active)
         if (!nameSel?.value) continue;
 
@@ -551,15 +553,19 @@ export function collectDeposit() {
         let itemId;
         if (tr.dataset.decomposed === 'true') {
           recomposeDepositWeaponItemId(tr);
-          const hiddenInput = tr.querySelector('.dep-item-id');
+          const hiddenInput = /** @type {HTMLInputElement|null} */ (
+            tr.querySelector('.dep-item-id')
+          );
           itemId = parseInt(hiddenInput?.value, 10) || 0;
         } else {
           itemId = parseInt(nameSel.value, 10) || 0;
         }
 
         // Cache DOM lookups per row to avoid repeated querySelector calls
-        const countInput = tr.querySelector('.dep-count');
-        const durInput = tr.querySelector('.inv-dep-durability');
+        const countInput = /** @type {HTMLInputElement|null} */ (tr.querySelector('.dep-count'));
+        const durInput = /** @type {HTMLInputElement|null} */ (
+          tr.querySelector('.inv-dep-durability')
+        );
         const count = parseCountValue(countInput, COUNT_LIMITS.deposit.min);
         const durVal = parseInt(durInput?.value ?? tr.dataset.durability, 10);
 

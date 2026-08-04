@@ -189,9 +189,13 @@ function fillSelect(sel, ids, names) {
  */
 export function populateCombos() {
   // Hairstyle is the only equipment select still present (in Character tab)
-  fillSelect(document.getElementById('hairstyle'), HAIRSTYLE_IDS, HAIRSTYLE_NAMES);
   fillSelect(
-    document.getElementById('startClass'),
+    /** @type {HTMLSelectElement} */ (document.getElementById('hairstyle')),
+    HAIRSTYLE_IDS,
+    HAIRSTYLE_NAMES,
+  );
+  fillSelect(
+    /** @type {HTMLSelectElement} */ (document.getElementById('startClass')),
     START_CLASS_NAMES.map((_, i) => i),
     START_CLASS_NAMES,
   );
