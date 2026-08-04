@@ -262,47 +262,15 @@ jobs:
           body: |
             ## Install
 
-            ### Windows
-            Download the NSIS installer (`windows-*.exe`) and run it, or use
-            the portable `.exe` directly (no install needed).
+            See [`howto.md`](https://github.com/jij3x/DemonSave-PS3/blob/main/howto.md)
+            for full per-platform install instructions.
 
-            ### Linux
-            - **Installer:** Download the `.deb` or `.rpm` and install with
-              your package manager (`dpkg -i`, `rpm -i`).
-            - **Portable:** Download `linux-portable-*.tar.gz`, extract, then
-              `chmod +x demonsave-ps3 && ./demonsave-ps3`.
+            - **Windows** — NSIS installer or portable `.exe`.
+            - **Linux** — `.deb` / `.rpm`, or portable `.tar.gz` (needs system WebKitGTK).
+            - **macOS (Apple Silicon)** — `.dmg` or zipped `.app`.
 
-            > ⚠️ **The portable binary requires system WebKitGTK libraries.**
-            > Unlike the `.deb`/`.rpm` (which pull dependencies
-            > automatically), the raw binary does not bundle them. If it
-            > fails to launch, install the runtime libraries:
-            >
-            > ```bash
-            > sudo apt-get install -y libwebkit2gtk-4.1-0 libssl3 \
-            >   libayatana-appindicator3-1 librsvg2-2
-            > ```
-
-            ### macOS (Apple Silicon only)
-            Download the `.dmg`, open it, and drag `DemonSave-PS3.app` to
-            `Applications/`. Alternatively, unzip the `macos-*.zip` and drag
-            the `.app` to `Applications/`.
-
-            > ⚠️ **The macOS app is not code-signed or notarized.**
-            > On first launch macOS Gatekeeper will block it with an
-            > "unidentified developer" or "app is damaged" warning.
-            > Workaround (pick one):
-            >
-            > 1. **Right-click → Open:** Right-click (or ⌘-click) the app
-            >    and select "Open", then confirm in the dialog. Only needed once.
-            > 2. **System Settings:** Open the app once (let it be blocked),
-            >    then go to *System Settings → Privacy & Security* and click
-            >    "Open Anyway".
-            > 3. **Terminal:** Run `xattr -cr /Applications/DemonSave-PS3.app`
-            >    to strip the quarantine attribute entirely.
-
-            ### Browser (no install)
-            Download `browser-demonsave_ps3_html.zip`, extract, and open
-            `index.html` in any browser. Works fully offline.
+            > ⚠️ **macOS: app is unsigned.** On first launch, right-click → **Open**
+            > (or `xattr -cr /Applications/DemonSave-PS3.app`). Details in `howto.md`.
 
   # NOTE: Lint, tests, and the coverage gate live in ci.yml (the "CI"
   # workflow). This file only handles cross-platform builds and releases.
