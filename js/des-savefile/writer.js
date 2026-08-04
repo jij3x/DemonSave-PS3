@@ -33,6 +33,7 @@ import {
   wUInt16BE,
   wUInt32BE,
 } from '../lib/ps3-save-lib/index.js';
+import { assertBounds } from './bounds.js';
 
 // ---------------------------------------------------------------------------
 // Coercion + range validation helpers
@@ -584,8 +585,7 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
     // Unreachable for buffers >= MIN_SAVE_SIZE (guaranteed by the top-level
     // guard): the deposit region (0x14BE8..0x1EBF4+0x14=0x1EC08) fits well
     // within 0x20000. Kept as a belt-and-suspenders defense.
-    /* istanbul ignore next -- unreachable: MIN_SAVE_SIZE guard ensures fit */
-    if (b + O.DEPOSIT_STRIDE > bytes.length) break;
+    assertBounds(bytes, b, O.DEPOSIT_STRIDE);
     bytes.set(EMPTY_DEPOSIT, b);
   }
 
