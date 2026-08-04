@@ -152,6 +152,15 @@ jobs:
               -C src-tauri/target/release demonsave-ps3
           fi
 
+          # Linux also produces a portable raw binary outside bundle/.
+          # Compress as .tar.gz to shrink the download and preserve the
+          # executable permission bit on extraction.
+          if [ -f src-tauri/target/release/demonsave-ps3 ]; then
+            tar -czf \
+              "release-assets/${{ matrix.asset-prefix }}-demonsave-ps3.tar.gz" \
+              -C src-tauri/target/release demonsave-ps3
+          fi
+
           # Windows also produces a portable raw .exe outside bundle/.
           if [ -f src-tauri/target/release/demonsave-ps3.exe ]; then
             cp src-tauri/target/release/demonsave-ps3.exe \
