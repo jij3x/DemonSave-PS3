@@ -143,10 +143,18 @@ jobs:
               done
           fi
 
-          # Linux also produces a portable raw binary outside bundle/.
+          # Linux portable: the raw binary outside bundle/ is the primary
+          # artifact for the `linux-portable` matrix entry (`--no-bundle`).
           # Compress as .tar.gz to shrink the download and preserve the
           # executable permission bit on extraction.
-          if [ -f src-tauri/target/release/demonsave-ps3 ]; then
+          #
+          # NOTE: `tauri build` also emits this raw binary for every other
+          # matrix entry (deb,rpm / nsis / app,dmg), so the file-existence
+          # check alone would over-fire and stage duplicate .tar.gz assets
+          # under the linux-installer / windows / macos prefixes. Gate on
+          # the prefix to stage it only for linux-portable.
+          if [ "${{ matrix.asset-prefix }}" = "linux-portable" ] && \
+             [ -f src-tauri/target/release/demonsave-ps3 ]; then
             tar -czf \
               "release-assets/${{ matrix.asset-prefix }}-demonsave-ps3.tar.gz" \
               -C src-tauri/target/release demonsave-ps3
