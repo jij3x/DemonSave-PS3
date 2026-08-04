@@ -78,8 +78,9 @@ export function $(id) {
 export function setVal(id, val) {
   const el = $(id);
   if (!el) return;
-  if (el.type === 'checkbox') el.checked = !!val;
-  else el.value = String(val);
+  const input = /** @type {HTMLInputElement} */ (el);
+  if (input.type === 'checkbox') input.checked = !!val;
+  else input.value = String(val);
 }
 
 /**
@@ -90,8 +91,9 @@ export function setVal(id, val) {
 export function getVal(id) {
   const el = $(id);
   if (!el) return undefined;
-  if (el.type === 'checkbox') return el.checked;
-  return el.value;
+  const input = /** @type {HTMLInputElement} */ (el);
+  if (input.type === 'checkbox') return input.checked;
+  return input.value;
 }
 
 /**
@@ -159,8 +161,8 @@ export function setEquipmentText(id, val, category, resetOrig = false) {
   let text;
   if (raw === 0xffffffff) {
     text = '(none)';
-  } else if (db.hasItem(category, raw)) {
-    text = db.getItem(category, raw).name;
+  } else if (db.hasItem(/** @type {any} */ (category), raw)) {
+    text = db.getItem(/** @type {any} */ (category), raw).name;
   } else {
     text = formatUnknownItem(raw);
   }
@@ -243,10 +245,12 @@ refreshEquipmentDisplay.cancel = function cancel() {
  * @returns {boolean}
  */
 function isItemStillInInventory(itemId, idx1) {
-  const invRows = document.querySelectorAll('table.inv-table tbody tr');
+  const invRows = /** @type {NodeListOf<HTMLElement>} */ (
+    document.querySelectorAll('table.inv-table tbody tr')
+  );
   for (const tr of invRows) {
     if (tr.dataset.deleted === 'true') continue;
-    const sel = tr.querySelector('.inv-name');
+    const sel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.inv-name'));
     if (!sel || sel.value !== itemId) continue;
     if (!idx1) return true; // ID-only match
     if (sel.dataset.roIdx1 === idx1) return true; // pair match
@@ -328,10 +332,12 @@ function _refreshEquipmentDisplayNow() {
   const inventoryIds = new Set(); // itemId-only (fallback for rows without idx1)
   // Weapons now span multiple per-type tables, so use querySelectorAll
   // for all categories to scan every table uniformly.
-  const invRows = document.querySelectorAll('table.inv-table tbody tr');
+  const invRows = /** @type {NodeListOf<HTMLElement>} */ (
+    document.querySelectorAll('table.inv-table tbody tr')
+  );
   for (const tr of invRows) {
     if (tr.dataset.deleted === 'true') continue;
-    const sel = tr.querySelector('.inv-name');
+    const sel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.inv-name'));
     if (!sel || !sel.value) continue; // skip placeholder rows
     inventoryIds.add(sel.value);
     const idx1 = sel.dataset.roIdx1;
@@ -449,7 +455,7 @@ export function makeCountCell(cls, val, visible) {
   const td = document.createElement('td');
   const inp = document.createElement('input');
   inp.type = 'number';
-  inp.value = val ?? 0;
+  inp.value = String(val ?? 0);
   inp.className = cls;
   td.appendChild(inp);
   if (!visible) {
@@ -484,7 +490,7 @@ export function makeNumCell(cls, val) {
   const td = document.createElement('td');
   const inp = document.createElement('input');
   inp.type = 'number';
-  inp.value = val ?? 0;
+  inp.value = String(val ?? 0);
   inp.className = cls;
   td.appendChild(inp);
   return td;

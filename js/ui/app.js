@@ -123,7 +123,7 @@ function updateSlotDirtyDot() {
   // Update option text: append * for dirty slots
   const sel = document.getElementById('saveSlot');
   if (!sel) return;
-  for (const opt of sel.options) {
+  for (const opt of /** @type {HTMLSelectElement} */ (sel).options) {
     const index = parseInt(opt.value, 10);
     if (isNaN(index)) continue; // skip failed-slot options (value='')
     const isDirty = state.slots[index]?.dirty || false;
@@ -245,7 +245,7 @@ function renderSlot(index) {
   populateForm(model, display, state.profileNumber);
 
   // Update dropdown to reflect active slot
-  document.getElementById('saveSlot').value = String(index);
+  /** @type {HTMLSelectElement} */ (document.getElementById('saveSlot')).value = String(index);
 
   // Update slot dirty dot for the newly selected slot
   updateSlotDirtyDot();
@@ -255,18 +255,18 @@ function renderSlot(index) {
  * Enable/disable save/export buttons based on load state.
  */
 function updateSaveButtons() {
-  document.getElementById('btnToggleEncrypt').disabled = false;
+  /** @type {HTMLButtonElement} */ (document.getElementById('btnToggleEncrypt')).disabled = false;
   // Save (in-place overwrite) is available on Chromium-based browsers.
   // On other browsers, the button is hidden entirely.
   const saveBtn = document.getElementById('btnSave');
   if (!saveBtn) return;
   if (canWriteInPlace()) {
     saveBtn.hidden = false;
-    saveBtn.disabled = false;
+    /** @type {HTMLButtonElement} */ (saveBtn).disabled = false;
   } else {
     saveBtn.hidden = true;
   }
-  document.getElementById('btnExport').disabled = false;
+  /** @type {HTMLButtonElement} */ (document.getElementById('btnExport')).disabled = false;
 }
 
 /**
@@ -444,7 +444,7 @@ function setupLandingBrowse() {
 
   if (canWriteInPlace()) {
     // Open-button path: hide dropzone, show landing with centered Open button.
-    if (dropzone) dropzone.hidden = true;
+    if (dropzone) /** @type {HTMLElement} */ (dropzone).hidden = true;
     if (browseLink?.parentElement) browseLink.parentElement.hidden = true;
     // Move the Open button into the landing page (its click listener is
     // attached in setupOpenButton() and follows the element).
@@ -468,7 +468,7 @@ function setupLandingBrowse() {
         setStatus('Select your PS3 save folder…');
         const { dirHandle, files } = await openDirectoryViaFSAccess();
         state.dirHandle = dirHandle;
-        state.dirName = dirHandle?.name || '';
+        state.dirName = /** @type {any} */ (dirHandle)?.name || '';
         await handleOpen(files);
       } catch (err) {
         if (err.name === 'AbortError') {
@@ -502,7 +502,7 @@ function setupOpenButton() {
       setStatus('Select your PS3 save folder…');
       const { dirHandle, files } = await openDirectoryViaFSAccess();
       state.dirHandle = dirHandle;
-      state.dirName = dirHandle?.name || '';
+      state.dirName = /** @type {any} */ (dirHandle)?.name || '';
       await handleOpen(files);
     } catch (err) {
       if (err.name === 'AbortError') {
@@ -529,7 +529,7 @@ function setBusy(isBusy) {
   for (const id of ids) {
     const el = document.getElementById(id);
     if (!el) continue;
-    el.disabled = isBusy;
+    /** @type {HTMLButtonElement | HTMLSelectElement} */ (el).disabled = isBusy;
   }
 }
 
@@ -587,7 +587,7 @@ export async function initApp() {
 
   // Slot dropdown change — instant switch to the selected slot
   document.getElementById('saveSlot').addEventListener('change', (e) => {
-    const index = parseInt(e.target.value, 10);
+    const index = parseInt(/** @type {HTMLSelectElement} */ (e.target).value, 10);
     if (!isNaN(index)) {
       renderSlot(index);
     }
@@ -652,10 +652,10 @@ export async function initApp() {
     updateCloseButtonTooltip();
 
     // Disable buttons
-    document.getElementById('btnToggleEncrypt').disabled = true;
+    /** @type {HTMLButtonElement} */ (document.getElementById('btnToggleEncrypt')).disabled = true;
     const saveBtn = document.getElementById('btnSave');
-    if (saveBtn) saveBtn.disabled = true;
-    document.getElementById('btnExport').disabled = true;
+    if (saveBtn) /** @type {HTMLButtonElement} */ (saveBtn).disabled = true;
+    /** @type {HTMLButtonElement} */ (document.getElementById('btnExport')).disabled = true;
 
     setStatus(
       canWriteInPlace()
@@ -816,9 +816,13 @@ async function ensureDirHandle() {
   try {
     const { dirHandle, files } = await openDirectoryViaFSAccess();
     // Verify the folder matches by comparing the directory name
-    if (state.dirName && dirHandle.name && dirHandle.name !== state.dirName) {
+    if (
+      state.dirName &&
+      /** @type {any} */ (dirHandle).name &&
+      /** @type {any} */ (dirHandle).name !== state.dirName
+    ) {
       setStatus(
-        `Folder mismatch: selected "${dirHandle.name}" but the loaded save is "${state.dirName}". Save cancelled.`,
+        `Folder mismatch: selected "${/** @type {any} */ (dirHandle).name}" but the loaded save is "${state.dirName}". Save cancelled.`,
       );
       return false;
     }
@@ -867,7 +871,9 @@ async function handleOverwriteDecrypted() {
 
   setStatus('Collecting form data…');
   if (!commitCurrentSlot()) return; // abort on validation failure
-  const profileNumber = parseInt(document.getElementById('profileNum').value, 10) || 0;
+  const profileNumber =
+    parseInt(/** @type {HTMLInputElement} */ (document.getElementById('profileNum')).value, 10) ||
+    0;
 
   const { filesToWrite, filesToDelete } = await writeSaveData(
     state.slots,
@@ -1000,7 +1006,7 @@ function defaultZipName() {
  * Returns null if the browser doesn't support the API (caller falls back
  * to <a download>). Throws AbortError if the user cancels the dialog.
  *
- * @returns {Promise<FileSystemFileHandle|null>}
+ * @returns {Promise<object|null>}
  */
 async function pickExportDestination() {
   if (!canChooseSaveLocation()) return null;
@@ -1037,7 +1043,9 @@ async function handleExportDecrypted() {
 
   setStatus('Collecting form data…');
   if (!commitCurrentSlot()) return; // abort on validation failure
-  const profileNumber = parseInt(document.getElementById('profileNum').value, 10) || 0;
+  const profileNumber =
+    parseInt(/** @type {HTMLInputElement} */ (document.getElementById('profileNum')).value, 10) ||
+    0;
 
   const { filesToWrite } = await writeSaveData(
     state.slots,
@@ -1048,8 +1056,8 @@ async function handleExportDecrypted() {
 
   if (handle) {
     setStatus('Writing decrypted ZIP…');
-    await writeZipToHandle(handle, filesToWrite);
-    setStatus(`Decrypted save exported as ${handle.name}.`);
+    await writeZipToHandle(/** @type {any} */ (handle), filesToWrite);
+    setStatus(`Decrypted save exported as ${/** @type {any} */ (handle).name}.`);
   } else {
     setStatus('Building decrypted ZIP…');
     const zipName = defaultZipName();
@@ -1079,7 +1087,9 @@ async function handleOverwriteEncrypted() {
 
   setStatus('Collecting form data…');
   if (!commitCurrentSlot()) return; // abort on validation failure
-  const profileNumber = parseInt(document.getElementById('profileNum').value, 10) || 0;
+  const profileNumber =
+    parseInt(/** @type {HTMLInputElement} */ (document.getElementById('profileNum')).value, 10) ||
+    0;
 
   const { filesToWrite } = await exportEncryptedSave(
     state.slots,
@@ -1145,7 +1155,9 @@ async function handleExportEncrypted() {
 
   setStatus('Collecting form data…');
   if (!commitCurrentSlot()) return; // abort on validation failure
-  const profileNumber = parseInt(document.getElementById('profileNum').value, 10) || 0;
+  const profileNumber =
+    parseInt(/** @type {HTMLInputElement} */ (document.getElementById('profileNum')).value, 10) ||
+    0;
 
   const { filesToWrite } = await exportEncryptedSave(
     state.slots,
@@ -1156,8 +1168,8 @@ async function handleExportEncrypted() {
 
   if (handle) {
     setStatus('Writing encrypted ZIP…');
-    await writeZipToHandle(handle, filesToWrite);
-    setStatus(`Encrypted save exported as ${handle.name}.`);
+    await writeZipToHandle(/** @type {any} */ (handle), filesToWrite);
+    setStatus(`Encrypted save exported as ${/** @type {any} */ (handle).name}.`);
   } else {
     setStatus('Building encrypted ZIP…');
     const zipName = defaultZipName();

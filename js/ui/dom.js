@@ -22,7 +22,7 @@
  * @param {...(Node|string|null|undefined)} children
  * @returns {HTMLElement}
  */
-function el(tag, attrs, ...children) {
+function el(tag, attrs = {}, ...children) {
   const e = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs ?? {})) {
     if (k === 'className') e.className = v;
@@ -114,7 +114,9 @@ const COL_MIN_WIDTH_DELETE = 40; /* 28px button + 12px padding */
  * @returns {HTMLFieldSetElement}
  */
 function fieldset(legendText, ...children) {
-  return el('fieldset', {}, el('legend', { textContent: legendText }), ...children);
+  return /** @type {HTMLFieldSetElement} */ (
+    el('fieldset', {}, el('legend', { textContent: legendText }), ...children)
+  );
 }
 
 /**
@@ -132,17 +134,17 @@ function label(id, labelText, child, opts = {}) {
   if (opts.hidden) attrs.hidden = true;
   // Pass data-tooltip through so the unified tooltip system picks it up.
   if (opts['data-tooltip']) attrs['data-tooltip'] = opts['data-tooltip'];
-  return el('label', attrs, labelText, child);
+  return /** @type {HTMLLabelElement} */ (el('label', attrs, labelText, child));
 }
 
 /**
  * Create a `<input type="number">` element.
  * @param {string} id
- * @param {Record<string, any>} extraAttrs  additional attributes merged in
+ * @param {Record<string, any>} [extraAttrs]  additional attributes merged in
  * @returns {HTMLInputElement}
  */
-function numInput(id, extraAttrs) {
-  return el('input', { id, type: 'number', ...extraAttrs });
+function numInput(id, extraAttrs = {}) {
+  return /** @type {HTMLInputElement} */ (el('input', { id, type: 'number', ...extraAttrs }));
 }
 
 /**
@@ -155,7 +157,9 @@ function numInput(id, extraAttrs) {
  * @returns {HTMLSelectElement}
  */
 function selectInput(id, className, options, extraAttrs = {}) {
-  const s = el('select', { id, ...(className ? { className } : {}), ...extraAttrs });
+  const s = /** @type {HTMLSelectElement} */ (
+    el('select', { id, ...(className ? { className } : {}), ...extraAttrs })
+  );
   if (options) {
     for (const [val, text] of options) {
       s.appendChild(el('option', { value: String(val) }, text));
@@ -171,7 +175,9 @@ function selectInput(id, className, options, extraAttrs = {}) {
  * @returns {HTMLLabelElement}
  */
 function checkboxInput(id, labelText) {
-  return el('label', { className: 'checkbox' }, el('input', { id, type: 'checkbox' }), labelText);
+  return /** @type {HTMLLabelElement} */ (
+    el('label', { className: 'checkbox' }, el('input', { id, type: 'checkbox' }), labelText)
+  );
 }
 
 /**
@@ -183,20 +189,22 @@ function checkboxInput(id, labelText) {
  * @returns {HTMLButtonElement}
  */
 function tabButton(dataTab, text, active = false) {
-  return el(
-    'button',
-    {
-      type: 'button',
-      role: 'tab',
-      className: 'tab' + (active ? ' active' : ''),
-      'data-tab': dataTab,
-      'aria-selected': String(active),
-      'aria-controls': `tabpanel-${dataTab}`,
-      id: `tab-${dataTab}`,
-      tabindex: active ? '0' : '-1',
-    },
-    text,
-    el('span', { className: 'dirty-dot' }),
+  return /** @type {HTMLButtonElement} */ (
+    el(
+      'button',
+      {
+        type: 'button',
+        role: 'tab',
+        className: 'tab' + (active ? ' active' : ''),
+        'data-tab': dataTab,
+        'aria-selected': String(active),
+        'aria-controls': `tabpanel-${dataTab}`,
+        id: `tab-${dataTab}`,
+        tabindex: active ? '0' : '-1',
+      },
+      text,
+      el('span', { className: 'dirty-dot' }),
+    )
   );
 }
 
@@ -209,17 +217,19 @@ function tabButton(dataTab, text, active = false) {
  * @returns {HTMLDivElement}
  */
 function tabContent(dataTab, hidden = false, ...children) {
-  return el(
-    'div',
-    {
-      className: 'tab-content',
-      role: 'tabpanel',
-      'data-tab': dataTab,
-      id: `tabpanel-${dataTab}`,
-      'aria-labelledby': `tab-${dataTab}`,
-      hidden,
-    },
-    ...children,
+  return /** @type {HTMLDivElement} */ (
+    el(
+      'div',
+      {
+        className: 'tab-content',
+        role: 'tabpanel',
+        'data-tab': dataTab,
+        id: `tabpanel-${dataTab}`,
+        'aria-labelledby': `tab-${dataTab}`,
+        hidden,
+      },
+      ...children,
+    )
   );
 }
 
@@ -749,8 +759,12 @@ export function buildPage() {
       label(
         'slotSection',
         'Slot: ',
-        selectInput('saveSlot', null, null),
-        el('span', { className: 'dirty-dot' }),
+        el(
+          'div',
+          { className: 'slot-wrapper' },
+          selectInput('saveSlot', null, null),
+          el('span', { className: 'dirty-dot' }),
+        ),
         { hidden: true },
       ),
       label(
@@ -834,8 +848,8 @@ export function buildPage() {
           'genderLabel',
           'Gender: ',
           selectInput('gender', null, [
-            [0, 'Female'],
-            [1, 'Male'],
+            ['0', 'Female'],
+            ['1', 'Male'],
           ]),
         ),
         label('startClassLabel', 'Starting Class: ', selectInput('startClass', null, null)),

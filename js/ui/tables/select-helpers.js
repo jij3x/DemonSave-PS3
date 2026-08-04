@@ -160,7 +160,7 @@ export function ensureSelectPopulated(sel) {
     // select may not have been in the DOM during row creation).
     let weaponTypeId = sel.dataset.weaponType;
     if (!weaponTypeId) {
-      const parentTable = sel.closest('table[data-weapon-type]');
+      const parentTable = /** @type {HTMLElement|null} */ (sel.closest('table[data-weapon-type]'));
       weaponTypeId = parentTable?.dataset.weaponType;
     }
     if (weaponTypeId) {
@@ -176,7 +176,7 @@ export function ensureSelectPopulated(sel) {
     // Goods selects are type-filtered (same pattern as weapons).
     let goodsTypeId = sel.dataset.goodsType;
     if (!goodsTypeId) {
-      const parentTable = sel.closest('table[data-goods-type]');
+      const parentTable = /** @type {HTMLElement|null} */ (sel.closest('table[data-goods-type]'));
       goodsTypeId = parentTable?.dataset.goodsType;
     }
     if (goodsTypeId) {
@@ -185,7 +185,7 @@ export function ensureSelectPopulated(sel) {
       ({ ids, names } = getCategoryData('goods'));
     }
   } else {
-    ({ ids, names } = getCategoryData(sel.dataset.lazyCat));
+    ({ ids, names } = getCategoryData(/** @type {any} */ (sel.dataset.lazyCat)));
   }
 
   // Preserve current value and its display text (for unknown items).
@@ -201,7 +201,7 @@ export function ensureSelectPopulated(sel) {
   if (placeholder) sel.appendChild(placeholder);
   for (let i = 0; i < names.length; i++) {
     const opt = document.createElement('option');
-    opt.value = ids[i];
+    opt.value = String(ids[i]);
     opt.textContent = names[i];
     sel.appendChild(opt);
   }
@@ -242,7 +242,7 @@ export function getActiveItemIdsInTable(sel) {
   const usedIds = new Set();
   for (const tr of tbody.querySelectorAll('tr')) {
     // Find the item-name select in this row.
-    const rowSel = tr.querySelector('.inv-name, .dep-name');
+    const rowSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.inv-name, .dep-name'));
     if (!rowSel) continue;
     // Skip placeholder rows (no selection yet).
     if (!rowSel.value) continue;
@@ -268,7 +268,7 @@ export function getSelectCategoryAndType(sel) {
   // Check data-weapon-type on the select itself or its parent table.
   let rawType = sel.dataset.weaponType;
   if (!rawType) {
-    const tbl = sel.closest('table[data-weapon-type]');
+    const tbl = /** @type {HTMLElement|null} */ (sel.closest('table[data-weapon-type]'));
     rawType = tbl?.dataset.weaponType;
   }
   if (rawType) typeId = Number(rawType);
@@ -276,7 +276,7 @@ export function getSelectCategoryAndType(sel) {
   if (typeId === null || isNaN(typeId)) {
     rawType = sel.dataset.goodsType;
     if (!rawType) {
-      const tbl = sel.closest('table[data-goods-type]');
+      const tbl = /** @type {HTMLElement|null} */ (sel.closest('table[data-goods-type]'));
       rawType = tbl?.dataset.goodsType;
     }
     if (rawType) typeId = Number(rawType);
@@ -304,7 +304,7 @@ export function refreshFilteredOptions(sel) {
   // Only filter selects that belong to show-count types.
   const { category, typeId } = getSelectCategoryAndType(sel);
   if (category === null) return;
-  if (isCountVisible(category, typeId)) {
+  if (isCountVisible(/** @type {any} */ (category), typeId)) {
     const usedIds = getActiveItemIdsInTable(sel);
     for (const opt of sel.options) {
       // Never disable the placeholder (empty value) or the currently-selected option.
@@ -328,7 +328,9 @@ export function refreshFilteredOptions(sel) {
 export function refreshFilteredOptionsInTable(changedSel) {
   const tbody = changedSel.closest('tbody');
   if (!tbody) return;
-  for (const s of tbody.querySelectorAll('select.inv-name, select.dep-name')) {
+  for (const s of /** @type {NodeListOf<HTMLSelectElement>} */ (
+    tbody.querySelectorAll('select.inv-name, select.dep-name')
+  )) {
     if (s.dataset.lazyLoaded === 'true') {
       refreshFilteredOptions(s);
     }
@@ -356,13 +358,15 @@ export function refreshFilteredOptionsInTable(changedSel) {
  * @returns {boolean}  true if any rows were removed or soft-deleted
  */
 export function resolveDuplicateOnUndelete(undeletedTr) {
-  const sel = undeletedTr.querySelector('.inv-name, .dep-name');
+  const sel = /** @type {HTMLSelectElement|null} */ (
+    undeletedTr.querySelector('.inv-name, .dep-name')
+  );
   if (!sel || !sel.value) return false;
 
   // Only apply duplicate resolution for counted types
   const { category, typeId } = getSelectCategoryAndType(sel);
   if (category === null) return false;
-  if (!isCountVisible(category, typeId)) return false;
+  if (!isCountVisible(/** @type {any} */ (category), typeId)) return false;
 
   const itemId = sel.value;
   const tbody = undeletedTr.closest('tbody');
@@ -373,7 +377,9 @@ export function resolveDuplicateOnUndelete(undeletedTr) {
     if (otherTr === undeletedTr) continue;
     // Skip already-deleted rows
     if (otherTr.dataset.deleted === 'true') continue;
-    const otherSel = otherTr.querySelector('.inv-name, .dep-name');
+    const otherSel = /** @type {HTMLSelectElement|null} */ (
+      otherTr.querySelector('.inv-name, .dep-name')
+    );
     if (!otherSel || !otherSel.value) continue; // skip placeholder
     if (otherSel.value !== itemId) continue; // not a duplicate
 
@@ -461,7 +467,9 @@ function softDeleteRow(tr) {
   // Restore original values + clear dirty marks + disable.
   // The data-orig baseline is captured by captureBaseline() right
   // after populateForm(), so this reverts any pre-delete edits.
-  tr.querySelectorAll('input, select').forEach((el) => {
+  /** @type {NodeListOf<HTMLInputElement | HTMLSelectElement>} */ (
+    tr.querySelectorAll('input, select')
+  ).forEach((el) => {
     if (el.dataset.orig !== undefined) {
       if (el.type === 'checkbox') {
         el.checked = el.dataset.orig === 'true';
@@ -482,7 +490,7 @@ function softDeleteRow(tr) {
   // updated matching equipment spans to the new item.  Now that we've
   // reverted the inventory select to its original, we must also revert
   // those spans so refreshEquipmentDisplay() sees the correct state.
-  const _origSel = tr.querySelector('.inv-name');
+  const _origSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.inv-name'));
   const _origItemId = _origSel?.dataset.orig;
   const _origIdx1 = _origSel?.dataset.roIdx1;
   if (_origItemId) {
@@ -505,7 +513,7 @@ function softDeleteRow(tr) {
   onRowSoftDeleted(tr);
   // Sync equipment slots — use targeted refresh (only checks slots that
   // may show this item) instead of a full inventory scan.
-  const _delSel = tr.querySelector('.inv-name');
+  const _delSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.inv-name'));
   const _delItemId = _delSel?.dataset.orig || _delSel?.value;
   const _delIdx1 = _delSel?.dataset.roIdx1 || null;
   if (_delItemId) {
@@ -513,7 +521,9 @@ function softDeleteRow(tr) {
   }
   // Refresh sibling dropdowns — soft-deleted items stay hidden from
   // dropdowns (included in used-IDs set) so they can't be re-added.
-  const _deleteSel = tr.querySelector('.inv-name, .dep-name');
+  const _deleteSel = /** @type {HTMLSelectElement|null} */ (
+    tr.querySelector('.inv-name, .dep-name')
+  );
   if (_deleteSel) refreshFilteredOptionsInTable(_deleteSel);
 }
 
@@ -555,7 +565,7 @@ function setupRowDeleteHandler() {
   _rowDeleteHandlerInit = true;
 
   document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.row-del');
+    const btn = /** @type {Element} */ (e.target).closest('.row-del');
     if (!btn) return;
 
     const tr = btn.closest('tr');
@@ -580,14 +590,16 @@ function setupRowDeleteHandler() {
       btn.setAttribute('aria-label', 'Delete row');
       btn.replaceChildren(trashIconSvg());
       // Re-enable all editable elements in the row
-      tr.querySelectorAll('input, select').forEach((el) => {
+      /** @type {NodeListOf<HTMLInputElement | HTMLSelectElement>} */ (
+        tr.querySelectorAll('input, select')
+      ).forEach((el) => {
         el.disabled = false;
       });
       // Notify dirty tracker: row restored
       onRowUndeleted(tr);
       // Sync equipment slots — use targeted refresh for the undeleted item
       // instead of a full inventory scan.
-      const _undSel = tr.querySelector('.inv-name');
+      const _undSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.inv-name'));
       const _undItemId = _undSel?.dataset.orig || _undSel?.value;
       const _undIdx1 = _undSel?.dataset.roIdx1 || null;
       if (_undItemId) {
@@ -595,7 +607,9 @@ function setupRowDeleteHandler() {
       }
       // Refresh sibling dropdowns — the undeleted row's item is now "used"
       // again and should be hidden from other rows' dropdowns.
-      const _undeleteSel = tr.querySelector('.inv-name, .dep-name');
+      const _undeleteSel = /** @type {HTMLSelectElement|null} */ (
+        tr.querySelector('.inv-name, .dep-name')
+      );
       if (_undeleteSel) refreshFilteredOptionsInTable(_undeleteSel);
       // Resolve duplicates: soft-delete reverts the item select to its
       // original value. If another row was edited to the same item ID while

@@ -56,10 +56,10 @@ function setupModalLifecycle(overlay, dialog, onKey) {
     const last = focusable[focusable.length - 1];
     if (e.shiftKey && document.activeElement === first) {
       e.preventDefault();
-      last.focus();
+      /** @type {HTMLElement} */ (last).focus();
     } else if (!e.shiftKey && document.activeElement === last) {
       e.preventDefault();
-      first.focus();
+      /** @type {HTMLElement} */ (first).focus();
     }
   }
 
@@ -70,7 +70,7 @@ function setupModalLifecycle(overlay, dialog, onKey) {
   // Auto-focus primary button after a frame so DOM is settled
   requestAnimationFrame(() => {
     const primary = dialog.querySelector('.modal-btn-primary');
-    if (primary) primary.focus();
+    if (primary) /** @type {HTMLElement} */ (primary).focus();
   });
 
   // Return teardown function
@@ -79,8 +79,8 @@ function setupModalLifecycle(overlay, dialog, onKey) {
     document.removeEventListener('keydown', trapFocus);
     overlay.remove();
     // Restore focus to the element that was focused before opening.
-    if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
-      previouslyFocused.focus();
+    if (previouslyFocused && 'focus' in previouslyFocused) {
+      /** @type {HTMLElement} */ (previouslyFocused).focus();
     }
   };
 }

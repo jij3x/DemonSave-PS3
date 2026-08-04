@@ -197,7 +197,7 @@ export function makeInventoryRow(category, rec, typeIdHint = null, invIdxByRef) 
     const idx = findItemIndex(ids, rec.itemId);
     if (idx >= 0) {
       const opt = document.createElement('option');
-      opt.value = ids[idx];
+      opt.value = String(ids[idx]);
       opt.textContent = names[idx];
       opt.selected = true;
       sel.appendChild(opt);
@@ -296,25 +296,31 @@ export function collectInventory(category) {
       if (tr.dataset.deleted === 'true') continue;
 
       // Cache DOM lookups per row to avoid repeated querySelector calls
-      const nameSel = tr.querySelector('.inv-name');
+      const nameSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.inv-name'));
       // Skip unselected new rows (placeholder still active)
       if (!nameSel?.value) continue;
 
       // Cache DOM lookups per row to avoid repeated querySelector calls
       let misc1;
       if (layout.split) {
-        const hiInput = tr.querySelector(`.${layout.hiClass}`);
-        const loInput = tr.querySelector(`.${layout.loClass}`);
-        const hi = parseInt(hiInput?.value, 10) || 0;
-        const lo = parseInt(loInput?.value, 10) || 0;
+        const hiInput = /** @type {HTMLInputElement|null} */ (
+          tr.querySelector(`.${layout.hiClass}`)
+        );
+        const loInput = /** @type {HTMLInputElement|null} */ (
+          tr.querySelector(`.${layout.loClass}`)
+        );
+        const hi = parseInt(hiInput?.value ?? '', 10) || 0;
+        const lo = parseInt(loInput?.value ?? '', 10) || 0;
         misc1 = ((hi & 0xff) << 8) | (lo & 0xff);
       } else {
         // 'single' layout (rings/goods)
-        const misc1Input = tr.querySelector(`.${layout.singleClass}`);
-        misc1 = parseInt(misc1Input?.value, 10) || 0;
+        const misc1Input = /** @type {HTMLInputElement|null} */ (
+          tr.querySelector(`.${layout.singleClass}`)
+        );
+        misc1 = parseInt(misc1Input?.value ?? '', 10) || 0;
       }
-      const durInput = tr.querySelector('.inv-durability');
-      const countInput = tr.querySelector('.inv-count');
+      const durInput = /** @type {HTMLInputElement|null} */ (tr.querySelector('.inv-durability'));
+      const countInput = /** @type {HTMLInputElement|null} */ (tr.querySelector('.inv-count'));
       const rec = {
         _ref: tr.dataset.ref || '',
         itemId: parseInt(nameSel.value, 10) || 0,
