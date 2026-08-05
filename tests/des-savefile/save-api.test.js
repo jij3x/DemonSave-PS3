@@ -243,7 +243,7 @@ describe('openSave (multi-slot)', () => {
     expect(failedSlots[0].primaryFile).toBeTruthy();
 
     // Write with failedSlots — failed slot should be preserved
-    const { filesToWrite } = await writeSaveData(slots, failedSlots, 0);
+    const { filesToWrite } = await writeSaveData(slots, failedSlots, 0, '');
     const slot2Out = filesToWrite.get('01USER.DAT');
     expect(slot2Out).toBeDefined();
     expect(slot2Out[0x04]).toBe(0xcd); // marker preserved
@@ -258,14 +258,14 @@ describe('writeSaveData (unencrypted, single slot)', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
 
     // Open
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Modify slot 1
     slots[0].model.vit = 99;
     slots[0].model.souls = 500000;
 
     // Write
-    const { filesToWrite, encrypted } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite, encrypted } = await writeSaveData(slots, [], profileNumber, accountId);
 
     expect(encrypted).toBe(false);
     expect(filesToWrite.has('PARAM.SFO')).toBe(true);
@@ -284,7 +284,7 @@ describe('writeSaveData (unencrypted, single slot)', () => {
 
     const { slots } = await openSave(rawFiles);
 
-    const { filesToWrite } = await writeSaveData(slots, [], 200);
+    const { filesToWrite } = await writeSaveData(slots, [], 200, '');
 
     const sfoBytes = filesToWrite.get('PARAM.SFO');
     expect(sfoBytes[0x570]).toBe(200);
@@ -297,7 +297,7 @@ describe('writeSaveData (unencrypted, single slot)', () => {
     const { slots } = await openSave(rawFiles);
 
     // No modifications — just write back
-    const { filesToWrite } = await writeSaveData(slots, [], 0);
+    const { filesToWrite } = await writeSaveData(slots, [], 0, '');
 
     expect(filesToWrite.has('PARAM.SFO')).toBe(true);
     expect(filesToWrite.has('USER.DAT')).toBe(true);
@@ -318,7 +318,7 @@ describe('writeSaveData (multi-slot)', () => {
       return buf;
     });
 
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Modify both slots
     const slot1 = slots.find((s) => s.slot === 1);
@@ -326,7 +326,7 @@ describe('writeSaveData (multi-slot)', () => {
     slot1.model.vit = 111;
     slot2.model.vit = 222;
 
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
 
     // Both primary files should be present
     expect(filesToWrite.has('USER.DAT')).toBe(true);
@@ -346,7 +346,7 @@ describe('writeSaveData (multi-slot)', () => {
       return buf;
     });
 
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Set character names for each slot
     const slot1 = slots.find((s) => s.slot === 1);
@@ -354,7 +354,7 @@ describe('writeSaveData (multi-slot)', () => {
     slot1.model.name = 'Alice';
     slot2.model.name = 'Bob';
 
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
 
     // Secondary file should be present
     expect(filesToWrite.has('04USER.DAT')).toBe(true);
@@ -369,7 +369,7 @@ describe('writeSaveData (multi-slot)', () => {
       return buf;
     });
 
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Set distinct worlds for each slot
     const slot1 = slots.find((s) => s.slot === 1);
@@ -377,7 +377,7 @@ describe('writeSaveData (multi-slot)', () => {
     slot1.model.world = 5; // slot 0 in secondary (0-based)
     slot2.model.world = 7; // slot 1 in secondary (0-based)
 
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
 
     const secBytes = filesToWrite.get('04USER.DAT');
     expect(secBytes).toBeDefined();
@@ -398,9 +398,9 @@ describe('writeSaveData (inPlace mode)', () => {
   test('inPlace=true omits PARAM.SFO from output', async () => {
     const buf = makeBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, null, true);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId, null, true);
 
     // PARAM.SFO must NOT be in filesToWrite in inPlace mode
     expect(filesToWrite.has('PARAM.SFO')).toBe(false);
@@ -411,15 +411,15 @@ describe('writeSaveData (inPlace mode)', () => {
   test('inPlace=false includes PARAM.SFO in output', async () => {
     const buf = makeBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, null, false);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId, null, false);
 
     expect(filesToWrite.has('PARAM.SFO')).toBe(true);
   });
 
   test('writeSaveData throws on empty slots array', async () => {
-    await expect(writeSaveData([], [], 0)).rejects.toThrow('No save slots provided.');
+    await expect(writeSaveData([], [], 0, '')).rejects.toThrow('No save slots provided.');
   });
 
   test('writeSaveData includes assets in non-inPlace mode', async () => {
@@ -428,8 +428,8 @@ describe('writeSaveData (inPlace mode)', () => {
     // Add a fake asset file
     rawFiles.set('icon0.png', { name: 'ICON0.PNG', bytes: new Uint8Array([0x89, 0x50]) });
 
-    const { slots, profileNumber } = await openSave(rawFiles);
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
 
     // Asset should be included as-is
     expect(filesToWrite.has('ICON0.PNG')).toBe(true);
@@ -440,10 +440,9 @@ describe('writeSaveData (inPlace mode)', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots, profileNumber } = await openSave(rawFiles);
 
-    // Set accountId
-    slots[0].model.accountId = 'aabbccdd11223344aabbccdd11223344';
-
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber);
+    // Pass a new accountId
+    const newAccountId = 'aabbccdd11223344aabbccdd11223344';
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, newAccountId);
     expect(filesToWrite.has('PARAM.SFO')).toBe(true);
   });
 
@@ -459,7 +458,7 @@ describe('writeSaveData (inPlace mode)', () => {
     wInt32BE(slot2Buf, O.SANITY_CHECK, 0);
 
     const { slots, failedSlots } = await openSave(rawFiles);
-    const { filesToWrite } = await writeSaveData(slots, failedSlots, 0);
+    const { filesToWrite } = await writeSaveData(slots, failedSlots, 0, '');
 
     // Failed slot's primary file should be included
     expect(filesToWrite.has('01USER.DAT')).toBe(true);
@@ -517,7 +516,7 @@ describe('openSave: slot resolve-failure', () => {
 describe('exportEncryptedSave validation', () => {
   test('throws on empty slots array', async () => {
     const { exportEncryptedSave } = await import('../../js/des-savefile/save-api.js');
-    await expect(exportEncryptedSave([], [], 0)).rejects.toThrow('No save slots provided.');
+    await expect(exportEncryptedSave([], [], 0, '')).rejects.toThrow('No save slots provided.');
   });
 });
 
@@ -532,10 +531,10 @@ describe('save-api: writeSaveData inPlace + encrypted source branches', () => {
     // Add an asset file to exercise the inPlace asset skip branch
     rawFiles.set('icon0.png', { name: 'ICON0.PNG', bytes: new Uint8Array([0x89, 0x50]) });
     rawFiles.set('pic1.png', { name: 'PIC1.PNG', bytes: new Uint8Array([0x42]) });
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // inPlace=true on unencrypted source — assets are skipped
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, null, true);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId, null, true);
     // In inPlace mode, assets are NOT written (already on disk)
     expect(filesToWrite.has('ICON0.PNG')).toBe(false);
     expect(filesToWrite.has('PIC1.PNG')).toBe(false);
@@ -548,10 +547,10 @@ describe('save-api: writeSaveData inPlace + encrypted source branches', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
     // Add an asset file
     rawFiles.set('icon0.png', { name: 'ICON0.PNG', bytes: new Uint8Array([0x42]) });
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // non-inPlace — assets ARE included
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, null, false);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId, null, false);
     expect(filesToWrite.has('ICON0.PNG')).toBe(true);
   });
 });
@@ -561,11 +560,11 @@ describe('save-api: decryptAndMergeSlots cached bytes branch', () => {
     const buf = makeBlankSave();
     wInt32BE(buf, O.VIT, 30);
     const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Modify and write — should use cached bytes for unencrypted saves
     slots[0].model.vit = 99;
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
     expect(filesToWrite.has('USER.DAT')).toBe(true);
     const result = readSave(filesToWrite.get('USER.DAT'));
     expect(result.vit).toBe(99);
@@ -599,14 +598,14 @@ describe('reloadSlotModels', () => {
     const buf = makeBlankSave();
     wInt32BE(buf, O.VIT, 30);
     const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Modify model values
     slots[0].model.vit = 99;
     slots[0].model.name = 'Hero';
 
     // Write — this merges the model and updates session.fullModel
-    await writeSaveData(slots, [], profileNumber);
+    await writeSaveData(slots, [], profileNumber, accountId);
 
     // Reload — re-sanitizes from the updated fullModel
     reloadSlotModels(slots);
@@ -636,12 +635,12 @@ describe('reloadSlotModels', () => {
     const buf = makeBlankSave();
     wInt32BE(buf, O.VIT, 42);
     const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Modify and write
     slots[0].model.vit = 99;
     slots[0].model.souls = 77777;
-    await writeSaveData(slots, [], profileNumber);
+    await writeSaveData(slots, [], profileNumber, accountId);
 
     // Reload
     reloadSlotModels(slots);
@@ -679,7 +678,7 @@ describe('regression: repeated saves without reload (new items)', () => {
   test('add item → save → reload → save again: no duplication', async () => {
     const buf = makeInitializedBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Add a new weapon to the model (as the UI "Add" button would)
     slots[0].model.weapons.push({
@@ -692,7 +691,7 @@ describe('regression: repeated saves without reload (new items)', () => {
     });
 
     // Save #1
-    const result1 = await writeSaveData(slots, [], profileNumber);
+    const result1 = await writeSaveData(slots, [], profileNumber, accountId);
     const userBytes1 = result1.filesToWrite.get('USER.DAT');
     const model1 = readSave(userBytes1);
     expect(model1.weapons).toHaveLength(1);
@@ -705,7 +704,7 @@ describe('regression: repeated saves without reload (new items)', () => {
     expect(slots[0].model.weapons[0]._ref).toMatch(/^inv:\d+$/);
 
     // Save #2 — without reloading from disk
-    const result2 = await writeSaveData(slots, [], profileNumber);
+    const result2 = await writeSaveData(slots, [], profileNumber, accountId);
     const userBytes2 = result2.filesToWrite.get('USER.DAT');
     const model2 = readSave(userBytes2);
 
@@ -719,7 +718,7 @@ describe('regression: repeated saves without reload (new items)', () => {
     // so the second save uses the cached (already-written) bytes.
     const buf = makeInitializedBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Add a new weapon
     slots[0].model.weapons.push({
@@ -732,7 +731,7 @@ describe('regression: repeated saves without reload (new items)', () => {
     });
 
     // Save #1
-    const result1 = await writeSaveData(slots, [], profileNumber);
+    const result1 = await writeSaveData(slots, [], profileNumber, accountId);
     const model1 = readSave(result1.filesToWrite.get('USER.DAT'));
     expect(model1.weapons).toHaveLength(1);
 
@@ -745,7 +744,7 @@ describe('regression: repeated saves without reload (new items)', () => {
     slots[0].model = model; // model is the same reference from openSave
     /** @type {any} */ (slots[0]).display = display;
 
-    const result2 = await writeSaveData(slots, [], profileNumber);
+    const result2 = await writeSaveData(slots, [], profileNumber, accountId);
     const model2 = readSave(result2.filesToWrite.get('USER.DAT'));
     expect(model2.weapons).toHaveLength(1);
   });

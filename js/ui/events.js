@@ -32,6 +32,7 @@ export { setupDepositWeaponSync, setupCountAndDuplicateSync } from './tables/dep
 export {
   populateForm,
   collectForm,
+  collectFolderFields,
   setupDurabilitySync,
   setupSelectTooltipSync,
 } from './form/form-render.js';

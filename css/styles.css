@@ -30,6 +30,7 @@
 
   /* Status — dirty / added / danger indicators */
   --warning: #f0a020;
+  --warning-rgb: 240 160 32;
   --success: #28a745;
   --danger: #d70015;
   --danger-hover: #bf0010;
@@ -112,6 +113,7 @@
 
     /* Status — brightened for dark backgrounds */
     --warning: #ff9f0a;
+    --warning-rgb: 255 159 10;
     --success: #30d158;
     --danger: #ff453a;
     --danger-hover: #ff6961;
@@ -490,7 +492,7 @@ button#btnOpen:active:not(:disabled) {
 
 /* Encryption toggle — macOS-style sliding switch.
    No surrounding (transparent background/border by default).
-   .mismatch class adds a very light red tint when the output mode
+   .mismatch class adds a very light orange tint when the output mode
    differs from the source save's encryption state. */
 button#btnToggleEncrypt {
   width: auto;
@@ -514,8 +516,8 @@ button#btnToggleEncrypt:disabled {
 }
 
 button#btnToggleEncrypt.mismatch {
-  background: rgb(var(--danger-rgb) / 8%);
-  border-color: rgb(var(--danger-rgb) / 15%);
+  background: rgb(var(--warning-rgb) / 25%);
+  border-color: rgb(var(--warning-rgb) / 40%);
 }
 
 /* Track (the rounded background the thumb slides on) */

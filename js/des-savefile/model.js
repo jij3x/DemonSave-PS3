@@ -206,8 +206,11 @@
  *   rings: SanitizedInventoryItem[],
  *   goods: SanitizedInventoryItem[],
  *   deposit: SanitizedDepositItem[],
- *   accountId?: string,
  * }} SanitizedModel
+ *
+ * NOTE: `accountId` and `profileNumber` are folder-level PARAM.SFO fields.
+ * They are NOT part of the slot model — they are passed through the save-api
+ * layer as separate parameters alongside the slots.
  */
 
 /**
@@ -231,17 +234,12 @@
  * sanitized model + display-only data.  See the file header for details.
  *
  * @param {FullModel} fullModel  model from reader.readSave()
- * @param {string} [accountId]  PSN account ID from PARAM.SFO (optional)
  * @returns {{ model: SanitizedModel, display: DisplayData }}
  */
-export function sanitizeModel(fullModel, accountId) {
+export function sanitizeModel(fullModel) {
   const m = /** @type {Partial<import('./model.js').SanitizedModel>} */ (
     /** @type {unknown} */ ({ ...fullModel })
   );
-
-  // accountId comes from PARAM.SFO (not the full model).  Including it here
-  // keeps sanitizeModel as the single place that defines the UI model shape.
-  m.accountId = accountId;
 
   // Deep-copy NPC flag objects so UI mutations don't corrupt the original
   // fullModel (which must remain pristine for mergeModel _ref lookups).
@@ -356,19 +354,14 @@ export function sanitizeModel(fullModel, accountId) {
  * @returns {import('./model.js').FullModel} full model suitable for writer.writeSave()
  */
 export function mergeModel(originalFullModel, sanitizedModel, out) {
-  // Exclude UI-only fields that the writer never reads:
-  //   - accountId: handled separately by save-api.js (writeSfoAccountId)
-  //
+  // The sanitized model contains only slot-level fields — folder-level SFO
+  // fields (accountId, profileNumber) are no longer attached to the model.
   // Display-only fields (equipmentPointers, invIdxByRef) are in the separate
   // `display` object returned by sanitizeModel — they never appear on the
-  // sanitized model itself, so there's nothing to exclude here.
-  const excludeKeys = new Set(['accountId']);
-  /** @type {Partial<import('./model.js').FullModel>} */
-  const writerFields = {};
-  for (const [k, v] of Object.entries(sanitizedModel)) {
-    if (!excludeKeys.has(k)) writerFields[k] = v;
-  }
-  const m = /** @type {Partial<import('./model.js').FullModel>} */ ({ ...writerFields });
+  // sanitized model itself.
+  const m = /** @type {Partial<import('./model.js').FullModel>} */ (
+    /** @type {unknown} */ ({ ...sanitizedModel })
+  );
 
   // --- Build lookup map from original (inventory only) ---
   // Use Map to keep numeric slot keys type-safe.

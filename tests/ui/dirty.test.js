@@ -26,6 +26,8 @@ const {
   setDirtyCallback,
   resetAndCaptureBaseline,
   resetDirtyState,
+  setEncToggleDirty,
+  hasSlotChanges,
 } = await import('../../js/ui/core/dirty.js');
 
 describe('dirty tracking', () => {
@@ -157,12 +159,12 @@ describe('dirty tracking', () => {
       expect(cb.dataset.orig).toBe('true');
     });
 
-    test('skips profileNum, warpLocation, saveSlot', () => {
+    test('skips warpLocation, saveSlot', () => {
       const app = document.createElement('div');
       app.id = 'app';
       document.body.appendChild(app);
 
-      for (const id of ['profileNum', 'warpLocation', 'saveSlot']) {
+      for (const id of ['warpLocation', 'saveSlot']) {
         const el = document.createElement('input');
         el.id = id;
         el.value = '99';
@@ -171,10 +173,26 @@ describe('dirty tracking', () => {
 
       captureBaseline();
 
-      for (const id of ['profileNum', 'warpLocation', 'saveSlot']) {
+      for (const id of ['warpLocation', 'saveSlot']) {
         const el = document.getElementById(id);
         expect(el.dataset.orig).toBeUndefined();
       }
+    });
+
+    test('tracks profileNum (folder-level SFO field)', () => {
+      const app = document.createElement('div');
+      app.id = 'app';
+      document.body.appendChild(app);
+
+      const inp = document.createElement('input');
+      inp.id = 'profileNum';
+      inp.type = 'number';
+      inp.value = '5';
+      app.appendChild(inp);
+
+      captureBaseline();
+
+      expect(inp.dataset.orig).toBe('5');
     });
 
     test('skips disabled elements (e.g. in soft-deleted rows)', () => {
@@ -1732,7 +1750,7 @@ describe('dirty tracking', () => {
       app.id = 'app';
       document.body.appendChild(app);
 
-      for (const id of ['profileNum', 'warpLocation', 'saveSlot']) {
+      for (const id of ['warpLocation', 'saveSlot']) {
         const el = document.createElement('input');
         el.type = 'number';
         el.value = '0';
@@ -1744,7 +1762,7 @@ describe('dirty tracking', () => {
       setupDirtyListeners();
 
       // Change values
-      for (const id of ['profileNum', 'warpLocation', 'saveSlot']) {
+      for (const id of ['warpLocation', 'saveSlot']) {
         const el = /** @type {HTMLInputElement} */ (document.getElementById(id));
         el.value = '99';
         el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1754,7 +1772,7 @@ describe('dirty tracking', () => {
       jest.advanceTimersByTime(200);
 
       // SKIP_IDS elements should NOT be marked dirty
-      for (const id of ['profileNum', 'warpLocation', 'saveSlot']) {
+      for (const id of ['warpLocation', 'saveSlot']) {
         expect(document.getElementById(id).classList.contains('dirty')).toBe(false);
       }
     });
@@ -2201,12 +2219,12 @@ describe('dirty tracking', () => {
       expect(hasUnsavedChanges()).toBe(false);
     });
 
-    test('skips profileNum, warpLocation, saveSlot', () => {
+    test('skips warpLocation, saveSlot', () => {
       const app = document.createElement('div');
       app.id = 'app';
       document.body.appendChild(app);
 
-      for (const id of ['profileNum', 'warpLocation', 'saveSlot']) {
+      for (const id of ['warpLocation', 'saveSlot']) {
         const el = document.createElement('input');
         el.id = id;
         el.type = 'number';
@@ -2216,7 +2234,7 @@ describe('dirty tracking', () => {
 
       resetAndCaptureBaseline();
 
-      for (const id of ['profileNum', 'warpLocation', 'saveSlot']) {
+      for (const id of ['warpLocation', 'saveSlot']) {
         expect(document.getElementById(id).dataset.orig).toBeUndefined();
       }
     });
@@ -2438,6 +2456,237 @@ describe('dirty tracking', () => {
       recomputeDirty();
 
       expect(hasUnsavedChanges()).toBe(true);
+    });
+  });
+
+  // --- Enc/dec toggle dirty tracking tests ---
+
+  describe('setEncToggleDirty', () => {
+    let app;
+
+    beforeEach(() => {
+      app = document.createElement('div');
+      app.id = 'app';
+      document.body.appendChild(app);
+
+      // Build a minimal tab structure so tree exists
+      const charPanel = document.createElement('div');
+      charPanel.id = 'charPanel';
+      charPanel.className = 'tab-group top-level';
+      const tabsDiv = document.createElement('div');
+      tabsDiv.className = 'tabs';
+      const btn = document.createElement('button');
+      btn.className = 'tab';
+      btn.dataset.tab = 'test';
+      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
+      tabsDiv.appendChild(btn);
+      const content = document.createElement('div');
+      content.className = 'tab-content';
+      content.dataset.tab = 'test';
+      charPanel.appendChild(tabsDiv);
+      charPanel.appendChild(content);
+      app.appendChild(charPanel);
+
+      buildDirtyTree();
+      captureBaseline();
+    });
+
+    test('makes hasUnsavedChanges return true when set to dirty', () => {
+      expect(hasUnsavedChanges()).toBe(false);
+
+      setEncToggleDirty(true);
+
+      expect(hasUnsavedChanges()).toBe(true);
+    });
+
+    test('makes hasUnsavedChanges return false when set back to clean', () => {
+      setEncToggleDirty(true);
+      expect(hasUnsavedChanges()).toBe(true);
+
+      setEncToggleDirty(false);
+
+      expect(hasUnsavedChanges()).toBe(false);
+    });
+
+    test('is idempotent (double-true counted once)', () => {
+      setEncToggleDirty(true);
+      setEncToggleDirty(true); // no-op
+
+      setEncToggleDirty(false);
+
+      expect(hasUnsavedChanges()).toBe(false);
+    });
+
+    test('survives resetAndCaptureBaseline (slot switch scenario)', () => {
+      setEncToggleDirty(true);
+      expect(hasUnsavedChanges()).toBe(true);
+
+      // Simulate slot switch (calls resetAndCaptureBaseline internally)
+      resetAndCaptureBaseline();
+
+      // Enc toggle dirty should survive because it's app-level state
+      expect(hasUnsavedChanges()).toBe(true);
+    });
+
+    test('survives captureBaseline', () => {
+      setEncToggleDirty(true);
+      expect(hasUnsavedChanges()).toBe(true);
+
+      captureBaseline();
+
+      expect(hasUnsavedChanges()).toBe(true);
+    });
+
+    test('is cleared by resetDirtyState (close/teardown)', () => {
+      setEncToggleDirty(true);
+      expect(hasUnsavedChanges()).toBe(true);
+
+      resetDirtyState();
+
+      expect(hasUnsavedChanges()).toBe(false);
+    });
+
+    test('fires dirty callback on transition', () => {
+      const calls = [];
+      setDirtyCallback((isDirty) => calls.push(isDirty));
+
+      setEncToggleDirty(true);
+
+      expect(calls).toContain(true);
+    });
+  });
+
+  // --- hasSlotChanges tests ---
+
+  describe('hasSlotChanges', () => {
+    let app;
+    let content;
+
+    beforeEach(() => {
+      app = document.createElement('div');
+      app.id = 'app';
+      document.body.appendChild(app);
+
+      // Build a minimal tab structure so tree exists
+      const charPanel = document.createElement('div');
+      charPanel.id = 'charPanel';
+      charPanel.className = 'tab-group top-level';
+      const tabsDiv = document.createElement('div');
+      tabsDiv.className = 'tabs';
+      const btn = document.createElement('button');
+      btn.className = 'tab';
+      btn.dataset.tab = 'test';
+      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
+      tabsDiv.appendChild(btn);
+      content = document.createElement('div');
+      content.className = 'tab-content';
+      content.dataset.tab = 'test';
+      charPanel.appendChild(tabsDiv);
+      charPanel.appendChild(content);
+      app.appendChild(charPanel);
+
+      buildDirtyTree();
+      captureBaseline();
+    });
+
+    test('returns false when nothing is dirty', () => {
+      expect(hasSlotChanges()).toBe(false);
+    });
+
+    test('returns false when only toolbar fields (profileNum) are dirty', () => {
+      // profileNum is outside any tab-content → falls to toolbar node
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.id = 'profileNum';
+      inp.value = '5';
+      app.appendChild(inp);
+      captureBaseline();
+
+      inp.value = '99';
+      recomputeDirty();
+
+      expect(hasUnsavedChanges()).toBe(true); // total dirty
+      expect(hasSlotChanges()).toBe(false); // but no per-slot changes
+    });
+
+    test('returns false when only toolbar fields (accountId) are dirty', () => {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.id = 'accountId';
+      inp.value = 'old';
+      app.appendChild(inp);
+      captureBaseline();
+
+      inp.value = 'new';
+      recomputeDirty();
+
+      expect(hasUnsavedChanges()).toBe(true);
+      expect(hasSlotChanges()).toBe(false);
+    });
+
+    test('returns false when only enc toggle is dirty', () => {
+      setEncToggleDirty(true);
+
+      expect(hasUnsavedChanges()).toBe(true);
+      expect(hasSlotChanges()).toBe(false);
+    });
+
+    test('returns true when per-slot field (in tab-content) is dirty', () => {
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.value = '50';
+      content.appendChild(inp);
+      captureBaseline();
+
+      inp.value = '99';
+      recomputeDirty();
+
+      expect(hasSlotChanges()).toBe(true);
+    });
+
+    test('returns true when both toolbar and per-slot fields are dirty', () => {
+      // Toolbar field
+      const toolbarInp = document.createElement('input');
+      toolbarInp.type = 'number';
+      toolbarInp.id = 'profileNum';
+      toolbarInp.value = '5';
+      app.appendChild(toolbarInp);
+
+      // Per-slot field
+      const slotInp = document.createElement('input');
+      slotInp.type = 'number';
+      slotInp.value = '50';
+      content.appendChild(slotInp);
+
+      captureBaseline();
+
+      toolbarInp.value = '99';
+      slotInp.value = '99';
+      recomputeDirty();
+
+      expect(hasUnsavedChanges()).toBe(true);
+      expect(hasSlotChanges()).toBe(true);
+    });
+
+    test('returns false after reset when everything was dirty', () => {
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.value = '50';
+      content.appendChild(inp);
+      captureBaseline();
+
+      inp.value = '99';
+      recomputeDirty();
+      expect(hasSlotChanges()).toBe(true);
+
+      resetAndCaptureBaseline();
+
+      expect(hasSlotChanges()).toBe(false);
+    });
+
+    test('returns false when tree is not built (resetDirtyState)', () => {
+      resetDirtyState();
+      expect(hasSlotChanges()).toBe(false);
     });
   });
 });

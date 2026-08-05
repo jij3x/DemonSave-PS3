@@ -27,6 +27,15 @@ import { renderSpellTable, collectSpells } from '../tables/spell-table.js';
 import { renderDeposit, collectDeposit } from '../tables/deposit-table.js';
 
 /**
+ * Folder-level SFO fields shared across all slots.  These are NOT part of
+ * the slot model — they are stored in app state and passed to populateForm
+ * for DOM rendering, and collected via collectFolderFields for save.
+ * @typedef {Object} FolderFields
+ * @property {string} accountId      - PSN account ID (32 hex chars or empty)
+ * @property {number} profileNumber  - DeS profile number (0–255)
+ */
+
+/**
  * Numeric input IDs that should NOT be clamped to their min/max attributes
  * during collectForm().  These fields have no fixed upper bound in the
  * save format, or the HTML min/max is advisory only.
@@ -48,9 +57,9 @@ const SKIP_CLAMP_IDS = new Set([
  *
  * @param {Record<string, any>} m           the save model
  * @param {Record<string, any>|undefined} display  display-only data (equipment pointers, invIdxByRef)
- * @param {number} profileNum              SFO profile number
+ * @param {FolderFields} [folderFields]  SFO-level fields (accountId, profileNumber) for DOM rendering
  */
-export function populateForm(m, display, profileNum) {
+export function populateForm(m, display, folderFields) {
   // Cancel any pending debounced equipment refresh so a stale timer
   // (scheduled before a slot switch) doesn't scan the just-rendered DOM
   // and corrupt equipment spans based on outdated state.
@@ -63,8 +72,9 @@ export function populateForm(m, display, profileNum) {
   setVal('phantomType', m.phantomType);
   setVal('clearCount', m.clearCount);
   setVal('archSealed', m.archSealed);
-  setVal('profileNum', profileNum);
-  setVal('accountId', m.accountId || '');
+  // Folder-level SFO fields — rendered from folderFields, NOT from the model
+  setVal('profileNum', folderFields?.profileNumber ?? 0);
+  setVal('accountId', folderFields?.accountId || '');
 
   // Vitals
   setVal('currHP', m.currHP);
@@ -229,13 +239,6 @@ function getNumClamped(id) {
  *   The collected model, or null if validation failed.
  */
 export function collectForm() {
-  // --- Validate accountId: must be empty or 32 hex characters ---
-  const rawAccountId = getVal('accountId') || '';
-  const trimmedAccountId = rawAccountId.trim();
-  if (trimmedAccountId !== '' && !/^[0-9a-fA-F]{32}$/.test(trimmedAccountId)) {
-    return null;
-  }
-
   // --- Validate name: must be ≤16 chars with no control characters ---
   const nameResult = validateName(getVal('name'));
   if (!nameResult.valid) {
@@ -310,7 +313,6 @@ export function collectForm() {
     hairR: getNumClamped('hairR'),
     hairG: getNumClamped('hairG'),
     hairB: getNumClamped('hairB'),
-    accountId: trimmedAccountId,
     spells: collectSpells(),
 
     charTendency: getNumClamped('charTendency'),
@@ -345,6 +347,30 @@ export function collectForm() {
 /* ------------------------------------------------------------------ */
 /* Durability sync                                                     */
 /* ------------------------------------------------------------------ */
+
+/**
+ * Validate and collect folder-level SFO fields (accountId, profileNumber)
+ * from the DOM.
+ *
+ * These are NOT slot model fields — they live in app state and are passed
+ * separately to the save API.  accountId is validated as 32 hex chars (or
+ * empty).  Returns null if validation fails — the caller should check for
+ * null and abort the save.
+ *
+ * @returns {(FolderFields|null)}
+ */
+export function collectFolderFields() {
+  const rawAccountId = getVal('accountId') || '';
+  const trimmedAccountId = rawAccountId.trim();
+  if (trimmedAccountId !== '' && !/^[0-9a-fA-F]{32}$/.test(trimmedAccountId)) {
+    return null;
+  }
+
+  return {
+    accountId: trimmedAccountId,
+    profileNumber: getNumClamped('profileNum'),
+  };
+}
 
 /**
  * Attach a delegated change listener that syncs the durability input when

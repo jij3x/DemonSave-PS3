@@ -39,24 +39,24 @@ GLM 5.2, which people keep saying is good.
 
 ## Why plain JavaScript (and not a bit of TypeScript)?
 
-This one raised eyebrows, so it deserves an honest answer.
+Short answer: I wanted zero distance between the source and the thing the
+browser actually runs. This project loads straight from the repo via ES
+modules — no bundler, no compiler, no "trust me, the build matches the code."
+For software that does byte-exact crypto on your save data, debugging the file
+you can read beats debugging a transpiled impression of it. TypeScript doesn't
+forbid that model, but it ends the no-build property that makes it work.
 
-The deciding factor wasn't laziness — it was *contribution*. Plain ES modules
-mean no bundler, no compile step, no build pipeline to learn before you can
-read the code. You open a file, you read it, you change it. That's the whole
-loop. For a project meant to be approachable, that matters a lot.
+Type safety didn't vanish, though — there's a type checker in the lint step
+catching the obvious lies, just lighter than full `strict` TypeScript. So the
+safety net didn't disappear; it got thinner. I won't pretend JSDoc is as
+pleasant as an `interface`, because it isn't. That verbosity is the tax.
 
-The usual counter-argument is type safety. Fair — but in practice, the
-type-correctness work was already handled well enough by the AI that it
-stopped being a human maintenance burden. The safety net moved; it didn't
-disappear.
+Honest coda: if the project grew much bigger or a second contributor showed
+up, I'd probably reach for TypeScript. At this size, for one person, the
+no-build simplicity was worth the tax.
 
-There's also a personal footnote: I write C++ and Java for a living and had
-never started a JavaScript project of my own. I wanted to actually experience
-the language, not hide it behind another layer of tooling.
-
-> **Skipping TypeScript here was a deliberate choice — not a gap waiting to
-> be filled.**
+> **The source file is the running file. That one property is the whole reason
+> this is plain JavaScript.**
 
 ---
 
@@ -147,8 +147,8 @@ wrong. That's still the job. Frankly, it's the interesting part.
 | Model used | GLM 5.2 — 100% |
 | Tokens burned | ~2 billion |
 | Effort | ~3 weeks, part-time |
-| Source | ~14,600 lines of logic + ~19,000 lines of game data |
-| Tests | 1,221 passing, ~99% line coverage (~19,500 lines across 26 suites) + 94 integration tests (~3,700 lines across 4 suites) |
+| Source | ~15k lines of app logic + ~19k lines of game data |
+| Tests | >1,000 passing tests across 25+ suites with ~99% line coverage, plus 90+ integration tests |
 
 ---
 
@@ -180,12 +180,12 @@ fan-made tool for personal use.
 
 ---
 
-*A final confession, since we're being honest: this entire write-up — and
-every doc linked above — was drafted by an AI from a handful of bullet points I
-scribbled down. The project was AI-written. The write-up about the AI-written
-project is also AI-written. The docs explaining the AI-written project are,
-somehow, also AI-written. At this point I'm mostly here for the vibe checks
-and the snacks. If you spot a sentence that sounds suspiciously like a human
-wrote it — no, you didn't.*
+*A final confession: this entire write-up, and every doc linked above, was
+drafted by an AI from a handful of bullet points I scribbled down. So now we
+play the game you're already playing — is this very sentence the human tell,
+slipped in to prove someone was awake? No. The AI wrote that too. It's good at
+sounding human; I'm told I'm passable at it. The only verifiably human acts in
+this whole pipeline were sighing at a prompt and eating the snacks. If that's
+not authorship, I don't know what is.*
 
 *— Signed, a human who definitely reviewed this, Aug 1, 2026*

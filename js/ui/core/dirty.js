@@ -6,7 +6,7 @@
  *   ├── charPanel tabs (Char., World, Warp)
  *   ├── editor tabs (Build, Inventory, Spells, Deposit)
  *   │   └── sub-tabs (Weapon, Shield, …, Armor, Ring)
- *   └── toolbar (accountId — no tab indicator)
+ *   └── toolbar (profileNum, accountId — no tab indicator)
  *
  * Each user edit triggers O(1) inc/dec on ≤3 nodes. Only 0↔non-0
  * transitions toggle the CSS dirty dot on the corresponding tab button.
@@ -46,7 +46,6 @@ import { registerChangeHandler, registerInputHandler } from './event-dispatcher.
  * from dirty tracking.
  */
 const SKIP_IDS = new Set([
-  'profileNum', // folder-level SFO field
   'warpLocation', // tool that sets position fields, not a model field itself
   'saveSlot', // slot selector (navigation)
 ]);
@@ -75,6 +74,15 @@ const newRowContributesDirty = new WeakMap();
 
 /** Callback fired after each debounced dirty flush. */
 let onFormDirtyChange = null;
+
+/**
+ * Tracks whether the enc/dec toggle switch is in a dirty (mismatched) state.
+ *
+ * The toggle is a <button role="switch">, not an <input>/<select>, so it
+ * can't be tracked via the normal element-level machinery.  Instead,
+ * `setEncToggleDirty()` directly bumps the toolbar DirtyNode.
+ */
+let encToggleDirty = false;
 
 // ---------------------------------------------------------------------------
 // DirtyNode — tree node with count and CSS indicator
@@ -335,6 +343,9 @@ export function captureBaseline() {
 
   // Reset the dirty tree (all counts to 0, all indicators cleared)
   if (dirtyRoot) dirtyRoot.reset();
+
+  // Re-apply enc toggle dirty (app-level state survives baseline reset)
+  reapplyEncToggleDirty();
 }
 
 // ---------------------------------------------------------------------------
@@ -411,6 +422,9 @@ export function resetAndCaptureBaseline() {
     el.classList.remove('dirty');
     elementDirty.set(el, false);
   }
+
+  // Re-apply enc toggle dirty (app-level state survives baseline reset)
+  reapplyEncToggleDirty();
 }
 
 // ---------------------------------------------------------------------------
@@ -656,8 +670,68 @@ export function onRowUndeleted(tr) {
 }
 
 // ---------------------------------------------------------------------------
+// Enc/dec toggle dirty tracking
+// ---------------------------------------------------------------------------
+
+/**
+ * Set the dirty state of the enc/dec toggle switch.
+ *
+ * The toggle is a `<button role="switch">`, not an `<input>/<select>`,
+ * so it can't be tracked via the normal element-level machinery.  This
+ * function provides a dedicated API for app.js to report mismatch state.
+ *
+ * Bumps the toolbar DirtyNode ±1 on a true↔false transition and fires
+ * the dirty-change callback so the slot indicator stays in sync.
+ *
+ * @param {boolean} isDirty  whether the toggle is in a mismatched state
+ */
+export function setEncToggleDirty(isDirty) {
+  if (encToggleDirty === isDirty) return; // no transition
+  encToggleDirty = isDirty;
+  if (dirtyRoot) {
+    const toolbar = dirtyRoot.children.get('toolbar');
+    if (toolbar) toolbar.bump(isDirty ? 1 : -1);
+  }
+  notifyDirtyChange();
+}
+
+/**
+ * Re-apply the enc toggle dirty contribution after a tree reset.
+ *
+ * Called from `captureBaseline()` and `resetAndCaptureBaseline()` because
+ * those functions reset all tree counts to 0.  Since the enc toggle state
+ * is app-level (not per-slot), it must survive slot switches and save
+ * refreshes.
+ */
+function reapplyEncToggleDirty() {
+  if (encToggleDirty && dirtyRoot) {
+    const toolbar = dirtyRoot.children.get('toolbar');
+    if (toolbar) toolbar.bump(1);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Unsaved changes check
 // ---------------------------------------------------------------------------
+
+/**
+ * Check if there are per-slot changes (excluding toolbar/folder-level fields).
+ *
+ * The dirty tree has a toolbar child node for folder-level fields
+ * (profileNum, accountId, enc toggle).  This function checks whether the
+ * root count minus the toolbar count is > 0 — i.e. whether any per-slot
+ * model fields (stats, inventory, etc.) have changed.
+ *
+ * Used by app.js to avoid marking the current slot dirty when only
+ * folder-level toolbar fields changed.
+ *
+ * @returns {boolean}
+ */
+export function hasSlotChanges() {
+  if (!dirtyRoot) return false;
+  const toolbar = dirtyRoot.children.get('toolbar');
+  return dirtyRoot.count - (toolbar?.count || 0) > 0;
+}
 
 /**
  * Check if the current slot has any unsaved changes (scalars or rows).
@@ -755,6 +829,8 @@ export function resetDirtyState() {
   pendingElements = new Set();
   // Reset the tree (clears all counts + tab-button indicators)
   if (dirtyRoot) dirtyRoot.reset();
+  // Clear the enc toggle dirty flag (app-level teardown)
+  encToggleDirty = false;
   // Clear the callback so it doesn't fire during teardown
   onFormDirtyChange = null;
 }

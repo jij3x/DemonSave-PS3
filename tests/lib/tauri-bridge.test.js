@@ -333,8 +333,6 @@ describe('invoke guard (outside Tauri)', () => {
   test('IPC wrappers throw when not in Tauri environment', async () => {
     clearTauri();
 
-    await expect(tauriPickSavePath('test.zip')).rejects.toThrow(
-      /outside Tauri environment/,
-    );
+    await expect(tauriPickSavePath('test.zip')).rejects.toThrow(/outside Tauri environment/);
   });
 });
