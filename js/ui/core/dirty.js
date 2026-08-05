@@ -37,9 +37,7 @@
 
 import { registerChangeHandler, registerInputHandler } from './event-dispatcher.js';
 
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
+// --- Constants ---
 
 /**
  * Element IDs that are NOT per-slot model fields and should be excluded
@@ -50,9 +48,7 @@ const SKIP_IDS = new Set([
   'saveSlot', // slot selector (navigation)
 ]);
 
-// ---------------------------------------------------------------------------
-// Module state
-// ---------------------------------------------------------------------------
+// --- Module state ---
 
 /** Root of the dirty counter tree (slot-level). */
 let dirtyRoot = null;
@@ -84,9 +80,7 @@ let onFormDirtyChange = null;
  */
 let encToggleDirty = false;
 
-// ---------------------------------------------------------------------------
-// DirtyNode — tree node with count and CSS indicator
-// ---------------------------------------------------------------------------
+// --- DirtyNode — tree node with count and CSS indicator ---
 
 class DirtyNode {
   /**
@@ -141,9 +135,7 @@ class DirtyNode {
   }
 }
 
-// ---------------------------------------------------------------------------
-// DOM query helpers (typed wrappers for compound selectors)
-// ---------------------------------------------------------------------------
+// --- DOM query helpers (typed wrappers for compound selectors) ---
 
 /**
  * Query for all editable elements (inputs + selects) within a root.
@@ -167,9 +159,7 @@ function queryGridRows(root) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Tree construction
-// ---------------------------------------------------------------------------
+// --- Tree construction ---
 
 /**
  * Recursively process a tab-group, creating DirtyNodes for each tab
@@ -262,9 +252,7 @@ function getNodeForElement(el) {
   return dirtyRoot?.children.get('toolbar') || null;
 }
 
-// ---------------------------------------------------------------------------
-// Callback registration
-// ---------------------------------------------------------------------------
+// --- Callback registration ---
 
 /**
  * Register a callback fired after each debounced dirty flush.
@@ -276,9 +264,7 @@ export function setDirtyCallback(cb) {
   onFormDirtyChange = cb;
 }
 
-// ---------------------------------------------------------------------------
-// Element dirty checking
-// ---------------------------------------------------------------------------
+// --- Element dirty checking ---
 
 /**
  * Check if an editable element's current value differs from its baseline.
@@ -305,9 +291,7 @@ export function isElementDirty(el) {
   return el.value !== el.dataset.orig;
 }
 
-// ---------------------------------------------------------------------------
-// Baseline capture
-// ---------------------------------------------------------------------------
+// --- Baseline capture ---
 
 /**
  * Capture the current form state as the dirty-tracking baseline.
@@ -319,9 +303,10 @@ export function isElementDirty(el) {
  * Call AFTER `populateForm()` completes (so the DOM reflects the model)
  * and BEFORE the user starts editing.
  *
- * @internal Production code uses {@link resetAndCaptureBaseline} instead.
- *   This function is retained as a public test utility for granular
- *   baseline capture without clearing dirty marks.
+ * Production code uses {@link resetAndCaptureBaseline} (which combines
+ * clearing dirty marks and capturing the baseline in a single DOM walk).
+ * This function is kept as a standalone test utility for granular
+ * baseline capture without clearing dirty marks.
  */
 export function captureBaseline() {
   const root = document.getElementById('app') || document.body;
@@ -348,9 +333,7 @@ export function captureBaseline() {
   reapplyEncToggleDirty();
 }
 
-// ---------------------------------------------------------------------------
-// Dirty mark clearing
-// ---------------------------------------------------------------------------
+// --- Dirty mark clearing ---
 
 /**
  * Remove all dirty visual marks from the DOM and reset the tree.
@@ -361,8 +344,8 @@ export function captureBaseline() {
  * Does NOT remove `.row-added` or `.row-deleted` — those represent
  * structural state, not transient dirty marks.
  *
- * @internal Production code uses {@link resetAndCaptureBaseline} instead.
- *   This function is retained as a public test utility.
+ * Production code uses {@link resetAndCaptureBaseline} (which combines
+ * both operations).  This function is kept as a standalone test utility.
  */
 export function clearDirtyMarks() {
   const root = document.getElementById('app') || document.body;
@@ -427,9 +410,7 @@ export function resetAndCaptureBaseline() {
   reapplyEncToggleDirty();
 }
 
-// ---------------------------------------------------------------------------
-// Deleted row purging
-// ---------------------------------------------------------------------------
+// --- Deleted row purging ---
 
 /**
  * Physically remove all soft-deleted rows from the DOM.
@@ -444,9 +425,7 @@ export function purgeDeletedRows() {
     .forEach((tr) => tr.remove());
 }
 
-// ---------------------------------------------------------------------------
-// Per-element dirty update (O(1) per element)
-// ---------------------------------------------------------------------------
+// --- Per-element dirty update (O(1) per element) ---
 
 /**
  * Check a single element for a dirty-state transition and update the
@@ -487,9 +466,7 @@ function updateElementDirty(el) {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Full recompute (compatibility / fallback)
-// ---------------------------------------------------------------------------
+// --- Full recompute (compatibility / fallback) ---
 
 /**
  * Full-sync recomputation of all dirty marks.
@@ -498,10 +475,10 @@ function updateElementDirty(el) {
  * from scratch. This is O(n) and should only be used for initial sync,
  * debugging, or as a fallback.
  *
- * @internal Production code uses incremental O(1) dirty tracking via
- *   {@link setupDirtyListeners} and the DirtyNode tree.  This function
- *   is retained as a public test utility for verifying state after
- *   batch operations.
+ * Production code uses incremental O(1) dirty tracking via
+ * {@link setupDirtyListeners} and the DirtyNode tree.  This function
+ * is kept as a public test utility for verifying state after batch
+ * operations.
  */
 export function recomputeDirty() {
   // If tree exists, reset it; otherwise skip tree operations.
@@ -569,9 +546,7 @@ export function recomputeDirty() {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Row lifecycle hooks
-// ---------------------------------------------------------------------------
+// --- Row lifecycle hooks ---
 
 /**
  * Fire the dirty-change callback if registered.
@@ -669,9 +644,7 @@ export function onRowUndeleted(tr) {
   notifyDirtyChange();
 }
 
-// ---------------------------------------------------------------------------
-// Enc/dec toggle dirty tracking
-// ---------------------------------------------------------------------------
+// --- Enc/dec toggle dirty tracking ---
 
 /**
  * Set the dirty state of the enc/dec toggle switch.
@@ -710,9 +683,7 @@ function reapplyEncToggleDirty() {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Unsaved changes check
-// ---------------------------------------------------------------------------
+// --- Unsaved changes check ---
 
 /**
  * Check if there are per-slot changes (excluding toolbar/folder-level fields).
@@ -773,9 +744,7 @@ export function hasUnsavedChanges() {
   return false;
 }
 
-// ---------------------------------------------------------------------------
-// Debounced dirty listener setup
-// ---------------------------------------------------------------------------
+// --- Debounced dirty listener setup ---
 
 /** Elements changed since the last flush (collected for batch processing). */
 let pendingElements = new Set();

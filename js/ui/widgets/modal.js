@@ -22,9 +22,7 @@
 /** Monotonic counter for unique element IDs. */
 let modalIdCounter = 0;
 
-/* ------------------------------------------------------------------ */
-/* Shared modal lifecycle (focus trap, focus restore, auto-focus)      */
-/* ------------------------------------------------------------------ */
+/* --- Shared modal lifecycle (focus trap, focus restore, auto-focus) --- */
 
 /**
  * Set up the common modal lifecycle: focus trap, keydown listener
@@ -85,9 +83,7 @@ function setupModalLifecycle(overlay, dialog, onKey) {
   };
 }
 
-/* ------------------------------------------------------------------ */
-/* Public API                                                          */
-/* ------------------------------------------------------------------ */
+/* --- Public API --- */
 
 /**
  * Create and show a confirmation dialog (replaces window.confirm).
@@ -184,9 +180,7 @@ export function showAlert(message, opts = {}) {
   });
 }
 
-/* ------------------------------------------------------------------ */
-/* Internal DOM builders                                               */
-/* ------------------------------------------------------------------ */
+/* --- Internal DOM builders --- */
 
 /**
  * Build the semi-transparent full-screen overlay backdrop.

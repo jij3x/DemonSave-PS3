@@ -52,13 +52,12 @@ const DECOMPOSED_WEAPON_TYPES = new Set([1, 2, 3]);
  * (Base Weapon | Path | Level | Count | Durability | Del).  Non-upgradable
  * items (e.g. crossbows, whose base weapon has no upgrade paths) appear as
  * an extra option in the Base Weapon select; their Path and Level selects
- * stay empty.  If the user switches to an upgradable base weapon, Path and
- * Level populate normally.
+ * stay empty.
  *
  * @param {Array} records  [{category, itemId, count, unknown1, sortOrder, flags}]
  */
 export function renderDeposit(records) {
-  // Clear all deposit tables (weapons and goods span multiple per-type tables)
+  // Clear all deposit tables (weapons and goods span multiple per-type tables).
   const allTbodies = document.querySelectorAll('table.dep-table tbody');
   for (const tbody of allTbodies) tbody.innerHTML = '';
 
@@ -92,9 +91,9 @@ export function renderDeposit(records) {
     if (!tbody) continue;
 
     // Use decomposed weapon row for types 1/2/3 (Weapon/Shield/Bow).
-    // makeDepositWeaponRow handles both upgradable items (with valid
-    // upgrade paths) and non-upgradable items (e.g. crossbows whose base
-    // weapon has no upgrade paths — Path/Level selects stay empty).
+    // makeDepositWeaponRow handles both upgradable and non-upgradable
+    // items (e.g. crossbows whose base weapon has no upgrade paths —
+    // Path/Level selects stay empty).
     if (rec.category === 'weapons' && typeId && DECOMPOSED_WEAPON_TYPES.has(typeId)) {
       tbody.appendChild(makeDepositWeaponRow(typeId, rec, true));
     } else {
@@ -533,7 +532,7 @@ export function setupDepositWeaponSync() {
 export function collectDeposit() {
   const records = [];
   for (const category of ['weapons', 'armor', 'rings', 'goods']) {
-    // Weapons and goods span multiple per-type tables — collect from ALL of them.
+    // Weapons and goods span multiple per-type tables — collect from all of them.
     const tbodies =
       category === 'weapons' || category === 'goods'
         ? document.querySelectorAll(`table.dep-table[data-category="${category}"] tbody`)

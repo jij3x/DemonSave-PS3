@@ -1,19 +1,10 @@
 /**
  * events.js — Barrel entry point for the UI event layer.
  *
- * This module re-exports the public API from focused sub-modules so that
- * app.js and events.test.js can import from a single location:
+ * Re-exports the public API from focused sub-modules so that app.js and
+ * events.test.js can import from a single location:
  *
  *   import { populateForm, collectForm, ... } from './events.js';
- *
- * The actual implementations live in:
- *   - dom-helpers.js     — DOM accessors, equipment display, table-cell builders
- *   - select-helpers.js  — SVG icons, lazy-load dropdowns, row delete buttons
- *   - item-helpers.js    — Item/type lookups, durability, tooltips
- *   - inventory-table.js — Inventory table rendering + collection
- *   - spell-table.js     — Spell table rendering + collection
- *   - deposit-table.js   — Deposit table rendering + collection
- *   - form-render.js     — Form populate/collect + remaining UI setup
  */
 
 // Re-export dirty-listener setup

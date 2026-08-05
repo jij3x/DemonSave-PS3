@@ -14,10 +14,7 @@ import { jest } from '@jest/globals';
 
 const { el, icon, buildPage } = await import('../../js/ui/dom.js');
 
-// ---------------------------------------------------------------------------
-// el() helper
-// ---------------------------------------------------------------------------
-
+// --- el() helper ---
 describe('el()', () => {
   test('creates a simple element with tag name', () => {
     const div = el('div', {});
@@ -111,10 +108,7 @@ describe('el()', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// icon() helper
-// ---------------------------------------------------------------------------
-
+// --- icon() helper ---
 describe('icon()', () => {
   test('returns a span with icon class for valid icon name', () => {
     const result = icon('folderOpen');
@@ -153,10 +147,7 @@ describe('icon()', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// buildPage()
-// ---------------------------------------------------------------------------
-
+// --- buildPage() ---
 describe('buildPage()', () => {
   beforeEach(() => {
     document.body.innerHTML = '';

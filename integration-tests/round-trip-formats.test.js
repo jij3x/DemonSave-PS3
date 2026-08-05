@@ -72,13 +72,13 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createUnencryptedSaveFolder([1]);
     const onDisk = writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(onDisk);
+    const { slots, profileNumber, accountId } = await openSave(onDisk);
 
     slots[0].model.vit = 75;
     slots[0].model.souls = 50000;
     slots[0].model.name = 'Written';
 
-    const { filesToWrite, encrypted } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite, encrypted } = await writeSaveData(slots, [], profileNumber, accountId);
     expect(encrypted).toBe(false);
 
     const reopened = writeOutputToDisk(sb, filesToWrite);
@@ -102,13 +102,18 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createUnencryptedSaveFolder([1]);
     const onDisk = writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(onDisk);
+    const { slots, profileNumber, accountId } = await openSave(onDisk);
     expect(slots[0].session.encrypted).toBe(false);
 
     slots[0].model.vit = 88;
     slots[0].model.name = 'Encrypted';
 
-    const { filesToWrite, encrypted } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite, encrypted } = await exportEncryptedSave(
+      slots,
+      [],
+      profileNumber,
+      accountId,
+    );
     expect(encrypted).toBe(true);
     expect(filesToWrite.has('PARAM.PFD')).toBe(true);
 
@@ -133,7 +138,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createEncryptedSaveFolder([1]);
     const onDisk = writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber, encrypted } = await openSave(onDisk);
+    const { slots, profileNumber, accountId, encrypted } = await openSave(onDisk);
     expect(encrypted).toBe(true);
 
     slots[0].model.vit = 65;
@@ -143,7 +148,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
       filesToWrite,
       encrypted: outEnc,
       filesToDelete,
-    } = await writeSaveData(slots, [], profileNumber);
+    } = await writeSaveData(slots, [], profileNumber, accountId);
     expect(outEnc).toBe(false);
     expect(filesToDelete.has('PARAM.PFD')).toBe(true);
 
@@ -169,12 +174,17 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createEncryptedSaveFolder([1]);
     const onDisk = writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(onDisk);
+    const { slots, profileNumber, accountId } = await openSave(onDisk);
 
     slots[0].model.vit = 91;
     slots[0].model.name = 'ReEnc';
 
-    const { filesToWrite, encrypted } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite, encrypted } = await exportEncryptedSave(
+      slots,
+      [],
+      profileNumber,
+      accountId,
+    );
     expect(encrypted).toBe(true);
 
     const reopened = writeOutputToDisk(sb, filesToWrite);
@@ -253,14 +263,19 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
 
     const rawFiles1 = createUnencryptedSaveFolder([1]);
     writeToDisk(sb1, rawFiles1);
-    const { slots: s1, profileNumber: p1 } = await openSave(sb1.readFiles());
+    const { slots: s1, profileNumber: p1, accountId: a1 } = await openSave(sb1.readFiles());
 
     s1[0].model.vit = 70;
 
-    const { filesToWrite: encOut } = await exportEncryptedSave(s1, [], p1);
+    const { filesToWrite: encOut } = await exportEncryptedSave(s1, [], p1, a1);
     writeToDisk(sb2, toRawFilesFormat(encOut));
 
-    const { slots: s2, profileNumber: p2, encrypted: e2 } = await openSave(sb2.readFiles());
+    const {
+      slots: s2,
+      profileNumber: p2,
+      accountId: a2,
+      encrypted: e2,
+    } = await openSave(sb2.readFiles());
     expect(e2).toBe(true);
     expect(s2[0].model.vit).toBe(70);
 
@@ -270,7 +285,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
       filesToWrite: decOut,
       encrypted: decEnc,
       filesToDelete: decDel,
-    } = await writeSaveData(s2, [], p2);
+    } = await writeSaveData(s2, [], p2, a2);
 
     expect(decEnc).toBe(false);
     expect(decDel.has('PARAM.PFD')).toBe(true);
@@ -293,12 +308,17 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
 
     const rawFiles1 = createEncryptedSaveFolder([1]);
     writeToDisk(sb1, rawFiles1);
-    const { slots: s1, profileNumber: p1, encrypted: e1 } = await openSave(sb1.readFiles());
+    const {
+      slots: s1,
+      profileNumber: p1,
+      accountId: a1,
+      encrypted: e1,
+    } = await openSave(sb1.readFiles());
     expect(e1).toBe(true);
 
     s1[0].model.vit = 55;
 
-    const { filesToWrite: decOut, filesToDelete: decDel } = await writeSaveData(s1, [], p1);
+    const { filesToWrite: decOut, filesToDelete: decDel } = await writeSaveData(s1, [], p1, a1);
     // Write decrypted output (delete PFD from the target sandbox)
     const decRaw = toRawFilesFormat(decOut);
     for (const [, entry] of decRaw) {
@@ -308,13 +328,18 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
       for (const name of decDel) sb2.deleteFile(name);
     }
 
-    const { slots: s2, profileNumber: p2, encrypted: e2 } = await openSave(sb2.readFiles());
+    const {
+      slots: s2,
+      profileNumber: p2,
+      accountId: a2,
+      encrypted: e2,
+    } = await openSave(sb2.readFiles());
     expect(e2).toBe(false);
     expect(s2[0].model.vit).toBe(55);
 
     s2[0].model.vit = 65;
 
-    const { filesToWrite: encOut, encrypted: encEnc } = await exportEncryptedSave(s2, [], p2);
+    const { filesToWrite: encOut, encrypted: encEnc } = await exportEncryptedSave(s2, [], p2, a2);
     expect(encEnc).toBe(true);
 
     const sb3 = newSandbox('chain-eu-3');
@@ -334,18 +359,32 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createEncryptedSaveFolder([1]);
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
     expect(slots[0].session.encrypted).toBe(true);
 
     slots[0].model.vit = 60;
 
-    const { filesToWrite: decFiles } = await writeSaveData(slots, [], profileNumber, null, true);
+    const { filesToWrite: decFiles } = await writeSaveData(
+      slots,
+      [],
+      profileNumber,
+      accountId,
+      null,
+      true,
+    );
     await updateSessionAfterWrite(slots, decFiles, false);
 
     expect(slots[0].session.encrypted).toBe(false);
 
     slots[0].model.vit = 70;
-    const { filesToWrite: decFiles2 } = await writeSaveData(slots, [], profileNumber, null, true);
+    const { filesToWrite: decFiles2 } = await writeSaveData(
+      slots,
+      [],
+      profileNumber,
+      accountId,
+      null,
+      true,
+    );
     const userBytes = decFiles2.get('USER.DAT');
     const result = readSave(userBytes);
     expect(result.vit).toBe(70);
@@ -356,7 +395,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createUnencryptedSaveFolder([1]);
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
     expect(slots[0].session.encrypted).toBe(false);
 
     slots[0].model.vit = 44;
@@ -365,6 +404,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
       slots,
       [],
       profileNumber,
+      accountId,
       null,
       true,
     );
@@ -378,6 +418,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
       slots,
       [],
       profileNumber,
+      accountId,
       null,
       true,
     );
@@ -397,12 +438,12 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createEncryptedSaveFolder([1]);
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
-    const { filesToWrite: encOut } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite: encOut } = await exportEncryptedSave(slots, [], profileNumber, accountId);
     expect(encOut.has('USER.DAT')).toBe(true);
 
-    const { filesToWrite: decOut } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite: decOut } = await writeSaveData(slots, [], profileNumber, accountId);
     expect(decOut.has('USER.DAT')).toBe(true);
 
     const userBytes = decOut.get('USER.DAT');
@@ -419,12 +460,12 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createUnencryptedSaveFolder([1]);
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
     slots[0].model.vit = 33;
     slots[0].model.name = 'ZipExport';
 
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
 
     const zipObj = {};
     for (const [name, bytes] of filesToWrite) {
@@ -461,9 +502,9 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createUnencryptedSaveFolder([1], { assets: true });
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
 
     expect(filesToWrite.has('ICON0.PNG')).toBe(true);
     expect(filesToWrite.has('PIC1.PNG')).toBe(true);
@@ -477,9 +518,9 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createEncryptedSaveFolder([1], { assets: true });
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
 
     expect(filesToWrite.has('ICON0.PNG')).toBe(true);
     expect(filesToWrite.has('PIC1.PNG')).toBe(true);
@@ -494,9 +535,9 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createEncryptedSaveFolder([1]);
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
     const sb2 = newSandbox('enc-noop-2');
     // Delete any stale PFD from the fresh sandbox before writing
     const reopened = writeOutputToDisk(sb2, filesToWrite);
@@ -514,13 +555,13 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createEncryptedSaveFolder([1, 2]);
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
     expect(slots).toHaveLength(2);
 
     slots.find((s) => s.slot === 1).model.vit = 11;
     slots.find((s) => s.slot === 2).model.vit = 22;
 
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
 
     const sb2 = newSandbox('multi-enc-out');
     const reopened = writeOutputToDisk(sb2, filesToWrite);
@@ -540,9 +581,9 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createEncryptedSaveFolder([1]);
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
-    const { filesToDelete, encrypted } = await writeSaveData(slots, [], profileNumber);
+    const { filesToDelete, encrypted } = await writeSaveData(slots, [], profileNumber, accountId);
 
     expect(encrypted).toBe(false);
     expect(filesToDelete.has('PARAM.PFD')).toBe(true);
@@ -554,9 +595,9 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createUnencryptedSaveFolder([1]);
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
-    const { filesToDelete } = await writeSaveData(slots, [], profileNumber);
+    const { filesToDelete } = await writeSaveData(slots, [], profileNumber, accountId);
     expect(filesToDelete.size).toBe(0);
   });
 
@@ -569,9 +610,9 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createEncryptedSaveFolder([1]);
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
     expect(filesToWrite.has('PARAM.PFD')).toBe(false);
   });
 
@@ -580,9 +621,9 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const rawFiles = createUnencryptedSaveFolder([1]);
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
 
     expect(filesToWrite.has('PARAM.PFD')).toBe(true);
     const pfdBytes = filesToWrite.get('PARAM.PFD');

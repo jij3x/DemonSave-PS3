@@ -34,13 +34,14 @@ export default {
     // Each glob is checked independently — a file must satisfy every pattern
     // it matches.
     //
-    // Gate 1: UI — lower thresholds (jsdom-untestable canvas, FS Access API,
-    // Tauri IPC, and drag-and-drop paths drag coverage down).
+    // Gate 1: UI — moderately high thresholds.  The main drag is io.js
+    // (browser-only FS Access API + Tauri IPC paths, jsdom-untestable).
+    // All other UI files are at 92%+ lines.
     './js/ui/': {
-      lines: 80,
-      statements: 78,
-      branches: 70,
-      functions: 80,
+      lines: 90,
+      statements: 90,
+      branches: 80,
+      functions: 90,
     },
     // Gate 2: Core logic — strict thresholds (checked per-directory).
     './js/lib/': {

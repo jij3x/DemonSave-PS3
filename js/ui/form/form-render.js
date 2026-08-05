@@ -45,9 +45,7 @@ const SKIP_CLAMP_IDS = new Set([
   // position/tendency fields have no game-enforced bounds
 ]);
 
-/* ------------------------------------------------------------------ */
-/* Form model → DOM                                                    */
-/* ------------------------------------------------------------------ */
+/* --- Form model → DOM --- */
 
 /**
  * Populate the DOM form from a parsed save model.
@@ -195,9 +193,7 @@ export function populateForm(m, display, folderFields) {
   resetAndCaptureBaseline();
 }
 
-/* ------------------------------------------------------------------ */
-/* DOM → Form model                                                    */
-/* ------------------------------------------------------------------ */
+/* --- DOM → Form model --- */
 
 /**
  * Read a numeric input value, clamped to its HTML min/max attributes.
@@ -344,9 +340,7 @@ export function collectForm() {
   };
 }
 
-/* ------------------------------------------------------------------ */
-/* Durability sync                                                     */
-/* ------------------------------------------------------------------ */
+/* --- Folder-level SFO field collection --- */
 
 /**
  * Validate and collect folder-level SFO fields (accountId, profileNumber)
@@ -418,9 +412,7 @@ export function setupDurabilitySync() {
   });
 }
 
-/* ------------------------------------------------------------------ */
-/* Tooltip sync: update data-tooltip on item selection change          */
-/* ------------------------------------------------------------------ */
+/* --- Tooltip sync: update data-tooltip on item selection change --- */
 
 /**
  * Attach a delegated change listener that updates the note-based tooltip

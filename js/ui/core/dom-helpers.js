@@ -57,9 +57,7 @@ export const EQ_IDS = [
   'quickSlot5',
 ];
 
-/* ------------------------------------------------------------------ */
-/* Basic DOM accessors                                                 */
-/* ------------------------------------------------------------------ */
+/* --- Basic DOM accessors --- */
 
 /**
  * Shorthand for `document.getElementById(id)`.
@@ -122,9 +120,7 @@ export function getEqId(id) {
   return isNaN(raw) ? 0 : raw >>> 0;
 }
 
-/* ------------------------------------------------------------------ */
-/* Equipment display                                                   */
-/* ------------------------------------------------------------------ */
+/* --- Equipment display --- */
 
 /**
  * Set an equipment read-only text span to a raw item ID.
@@ -330,8 +326,7 @@ function _refreshEquipmentDisplayNow() {
   // numbers for comparison purposes.
   const inventoryPairs = new Set(); // "itemId|idx1" strings
   const inventoryIds = new Set(); // itemId-only (fallback for rows without idx1)
-  // Weapons now span multiple per-type tables, so use querySelectorAll
-  // for all categories to scan every table uniformly.
+  // Scan all inventory tables uniformly (weapons span multiple per-type tables).
   const invRows = /** @type {NodeListOf<HTMLElement>} */ (
     document.querySelectorAll('table.inv-table tbody tr')
   );
@@ -431,9 +426,7 @@ export function setupEquipmentSync() {
   });
 }
 
-/* ------------------------------------------------------------------ */
-/* Shared table-cell builders                                          */
-/* ------------------------------------------------------------------ */
+/* --- Shared table-cell builders --- */
 
 /**
  * Helper: create a <td> containing a number <input> for the count field.

@@ -1,9 +1,6 @@
 /**
  * ui-setup.js — Tab switching, warp/world, hair color, add-row buttons,
  * and deferred dirty tracking for new rows.
- *
- * Extracted from form-render.js to keep that module focused on
- * form population/collection + durability sync.
  */
 
 import { getWarps } from '../../des-db/index.js';
@@ -32,9 +29,7 @@ import { getLimits } from '../../des-savefile/save-api.js';
 import { showAlert } from '../widgets/modal.js';
 import { registerChangeHandler } from '../core/event-dispatcher.js';
 
-/* ------------------------------------------------------------------ */
-/* Hair color sample                                                   */
-/* ------------------------------------------------------------------ */
+/* --- Hair color sample --- */
 
 export function setupHairColorSample() {
   for (const id of ['hairR', 'hairG', 'hairB']) {
@@ -45,9 +40,7 @@ export function setupHairColorSample() {
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* Warp select / world name                                            */
-/* ------------------------------------------------------------------ */
+/* --- Warp select / world name --- */
 
 export function setupWarpAndWorld() {
   // Null-guard: if elements don't exist (e.g. buildPage not called),
@@ -76,9 +69,7 @@ export function setupWarpAndWorld() {
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* Tabs                                                                */
-/* ------------------------------------------------------------------ */
+/* --- Tabs --- */
 
 export function setupTabs() {
   /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.tab-group')).forEach(
@@ -165,9 +156,7 @@ export function setupTabs() {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Add-row buttons                                                     */
-/* ------------------------------------------------------------------ */
+/* --- Add-row buttons --- */
 
 /**
  * Scroll the scrollable table body container to the bottom.
@@ -375,9 +364,7 @@ export function setupAddRowButtons() {
   });
 }
 
-/* ------------------------------------------------------------------ */
-/* New-row dirty tracking: deferred onRowAdded                         */
-/* ------------------------------------------------------------------ */
+/* --- New-row dirty tracking: deferred onRowAdded --- */
 
 /**
  * Attach a delegated change listener that fires onRowAdded when a new

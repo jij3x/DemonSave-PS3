@@ -60,10 +60,7 @@ const {
   openDirectoryViaFSAccess,
 } = await import('../../js/ui/io.js');
 
-// ---------------------------------------------------------------------------
-// Capability detection
-// ---------------------------------------------------------------------------
-
+// --- Capability detection ---
 describe('capability detection', () => {
   describe('canWriteInPlace', () => {
     test('returns false when neither Tauri nor File System Access API is available', () => {
@@ -113,10 +110,7 @@ describe('capability detection', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// readFilesFromDataTransfer — drag-and-drop folder reading
-// ---------------------------------------------------------------------------
-
+// --- readFilesFromDataTransfer — drag-and-drop folder reading ---
 describe('readFilesFromDataTransfer', () => {
   /**
    * Build a mock DataTransferItemList simulating a dropped directory
@@ -268,10 +262,7 @@ describe('readFilesFromDataTransfer', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// writeFilesToDirectory — Chromium FileSystemDirectoryHandle path
-// ---------------------------------------------------------------------------
-
+// --- writeFilesToDirectory — Chromium FileSystemDirectoryHandle path ---
 describe('writeFilesToDirectory', () => {
   test('writes each file sequentially via FileSystemDirectoryHandle', async () => {
     const written = [];
@@ -312,10 +303,7 @@ describe('writeFilesToDirectory', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// deleteFilesFromDirectory
-// ---------------------------------------------------------------------------
-
+// --- deleteFilesFromDirectory ---
 describe('deleteFilesFromDirectory', () => {
   test('removes entries via FileSystemDirectoryHandle', async () => {
     const removed = [];
@@ -367,10 +355,7 @@ describe('deleteFilesFromDirectory', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// downloadFilesAsZip
-// ---------------------------------------------------------------------------
-
+// --- downloadFilesAsZip ---
 describe('downloadFilesAsZip', () => {
   beforeEach(() => {
     // jsdom doesn't have URL.createObjectURL — provide a mock
@@ -458,10 +443,7 @@ describe('downloadFilesAsZip', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// pickZipFile
-// ---------------------------------------------------------------------------
-
+// --- pickZipFile ---
 describe('pickZipFile', () => {
   test('uses showSaveFilePicker when available', async () => {
     const mockHandle = { name: 'chosen.zip' };
@@ -497,10 +479,7 @@ describe('pickZipFile', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// writeZipToHandle
-// ---------------------------------------------------------------------------
-
+// --- writeZipToHandle ---
 describe('writeZipToHandle', () => {
   test('writes ZIP bytes to a Chromium FileSystemFileHandle', async () => {
     const written = [];
@@ -543,10 +522,7 @@ describe('writeZipToHandle', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// openDirectoryViaFSAccess (Chromium path)
-// ---------------------------------------------------------------------------
-
+// --- openDirectoryViaFSAccess (Chromium path) ---
 /**
  * Create a mock FileSystemDirectoryHandle whose values() returns a proper
  * async iterable over the given entries.
@@ -669,6 +645,4 @@ describe('openDirectoryViaFSAccess (Chromium)', () => {
     });
   });
 });
-
-// ---------------------------------------------------------------------------
-// buildZipAsync tests are covered in zip.test.js
+// ---  tests are covered in zip.test.js

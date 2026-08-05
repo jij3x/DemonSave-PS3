@@ -39,10 +39,7 @@ describe('dom-helpers', () => {
     refreshEquipmentDisplay.cancel();
   });
 
-  // -------------------------------------------------------------------------
-  // Basic DOM accessors
-  // -------------------------------------------------------------------------
-
+  // --- Basic DOM accessors ---
   describe('$ accessor', () => {
     test('returns element by id', () => {
       const div = document.createElement('div');
@@ -187,10 +184,7 @@ describe('dom-helpers', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Equipment display
-  // -------------------------------------------------------------------------
-
+  // --- Equipment display ---
   describe('setEquipmentText', () => {
     test('is a no-op for missing element', () => {
       expect(() => setEquipmentText('missing', 100, 'weapons')).not.toThrow();
@@ -268,10 +262,7 @@ describe('dom-helpers', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Debounced refreshEquipmentDisplay
-  // -------------------------------------------------------------------------
-
+  // --- Debounced refreshEquipmentDisplay ---
   describe('refreshEquipmentDisplay (debounced)', () => {
     beforeAll(() => jest.useFakeTimers());
     afterAll(() => jest.useRealTimers());
@@ -402,10 +393,7 @@ describe('dom-helpers', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // refreshEquipmentForItems (targeted refresh)
-  // -------------------------------------------------------------------------
-
+  // --- refreshEquipmentForItems (targeted refresh) ---
   describe('refreshEquipmentForItems', () => {
     test('clears slot on delete when item no longer in inventory', () => {
       const span = document.createElement('span');
@@ -540,10 +528,7 @@ describe('dom-helpers', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // setupEquipmentSync
-  // -------------------------------------------------------------------------
-
+  // --- setupEquipmentSync ---
   describe('setupEquipmentSync', () => {
     test('updates equipment span when inventory item changes via change event', () => {
       const span = document.createElement('span');
@@ -640,10 +625,7 @@ describe('dom-helpers', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Table cell builders
-  // -------------------------------------------------------------------------
-
+  // --- Table cell builders ---
   describe('makeCountCell', () => {
     test('creates a td with a number input', () => {
       const td = makeCountCell('inv-count', 5, true);
@@ -713,10 +695,7 @@ describe('dom-helpers', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Constants
-  // -------------------------------------------------------------------------
-
+  // --- Constants ---
   describe('EQ_IDS and EQ_CATEGORY', () => {
     test('EQ_IDS has 17 equipment slots', () => {
       expect(EQ_IDS.length).toBe(17);

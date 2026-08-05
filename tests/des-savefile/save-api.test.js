@@ -571,23 +571,8 @@ describe('save-api: decryptAndMergeSlots cached bytes branch', () => {
   });
 });
 
-describe('save-api: updateSessionAfterWrite branch coverage', () => {
-  test('updateSessionAfterWrite with encrypted=false clears PFD from maps', async () => {
-    const { updateSessionAfterWrite } = await import('../../js/des-savefile/save-api.js');
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots } = await openSave(rawFiles);
-
-    const filesToWrite = new Map();
-    filesToWrite.set('USER.DAT', buf);
-    filesToWrite.set('PARAM.SFO', rawFiles.get('param.sfo').bytes);
-
-    await updateSessionAfterWrite(slots, filesToWrite, false);
-    // encrypted=false → manager.pfd should be null
-    expect(slots[0].session.manager.pfd).toBe(null);
-    expect(slots[0].session.encrypted).toBe(false);
-  });
-});
+// updateSessionAfterWrite encrypted→decrypted and decrypted→encrypted
+// transition tests are in save-api-encrypted.test.js (more thorough).
 
 /* ========================================================================
  * reloadSlotModels: re-sanitize models after save
@@ -652,12 +637,7 @@ describe('reloadSlotModels', () => {
 });
 
 /* ========================================================================
- * Regression: new inventory items must not duplicate on repeated saves
- *
- * Before the fix, writeSaveInPlace assigned _slot/idx1 on internal shallow
- * copies — those values never reached session.fullModel.  On the next save,
- * mergeModel treated new items as new again, placing them into a different
- * slot and leaving the original as an orphaned duplicate on disk.
+ * Repeated saves without reload (new items must not duplicate)
  * ==================================================================== */
 
 /**
@@ -674,7 +654,7 @@ function makeInitializedBlankSave() {
   return writeSave(buf, m);
 }
 
-describe('regression: repeated saves without reload (new items)', () => {
+describe('repeated saves without reload (new items)', () => {
   test('add item → save → reload → save again: no duplication', async () => {
     const buf = makeInitializedBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
@@ -747,5 +727,95 @@ describe('regression: repeated saves without reload (new items)', () => {
     const result2 = await writeSaveData(slots, [], profileNumber, accountId);
     const model2 = readSave(result2.filesToWrite.get('USER.DAT'));
     expect(model2.weapons).toHaveLength(1);
+  });
+});
+
+/* ========================================================================
+ * sfoBytes return value + accountId assertions
+ * ==================================================================== */
+
+describe('writeSaveData: sfoBytes return value', () => {
+  test('returns sfoBytes with patched profile number + accountId', async () => {
+    const buf = makeBlankSave();
+    const rawFiles = makeUnencryptedSaveFiles(buf);
+    const { slots } = await openSave(rawFiles);
+
+    const newAccountId = '0123456789abcdef0123456789abcdef';
+    const { sfoBytes } = await writeSaveData(slots, [], 123, newAccountId);
+
+    expect(sfoBytes).toBeInstanceOf(Uint8Array);
+    expect(sfoBytes[0x570]).toBe(123);
+    // Note: accountId write requires a real ACCOUNT_ID field in SFO;
+    // makeSfo() doesn't have one, so we only verify profile number here.
+    // accountId write is tested in param-sfo.test.js.
+  });
+
+  test('inPlace=true still returns sfoBytes even when not in filesToWrite', async () => {
+    const buf = makeBlankSave();
+    const rawFiles = makeUnencryptedSaveFiles(buf);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
+
+    const { filesToWrite, sfoBytes } = await writeSaveData(
+      slots,
+      [],
+      profileNumber,
+      accountId,
+      null,
+      true,
+    );
+
+    expect(filesToWrite.has('PARAM.SFO')).toBe(false);
+    expect(sfoBytes).toBeInstanceOf(Uint8Array);
+    expect(sfoBytes[0x570]).toBe(profileNumber);
+    // accountId write requires a real ACCOUNT_ID field in SFO; see
+    // param-sfo.test.js for accountId write verification.
+  });
+
+  test('writeSaveData accepts accountId param without error', async () => {
+    const buf = makeBlankSave();
+    const rawFiles = makeUnencryptedSaveFiles(buf);
+    const { slots, profileNumber } = await openSave(rawFiles);
+
+    const newAccountId = 'aabbccdd11223344aabbccdd11223344';
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, newAccountId);
+
+    expect(filesToWrite.has('PARAM.SFO')).toBe(true);
+    // accountId write verification requires a real ACCOUNT_ID field in SFO;
+    // see param-sfo.test.js for that.
+  });
+});
+
+describe('openSave: accountId return value', () => {
+  test('openSave returns accountId from PARAM.SFO', async () => {
+    const buf = makeBlankSave();
+    const rawFiles = makeUnencryptedSaveFiles(buf);
+    const { accountId } = await openSave(rawFiles);
+
+    // makeSfo() creates a minimal SFO without ACCOUNT_ID — getSfoAccountId
+    // returns '' when the field is absent.
+    expect(accountId).toBe('');
+  });
+});
+
+/* ========================================================================
+ * onProgress callback branches (typeof === 'function' true arms)
+ * ==================================================================== */
+
+describe('save-api: onProgress callback branches', () => {
+  test('openSave with onProgress callback invokes it', async () => {
+    const buf = makeBlankSave();
+    const rawFiles = makeUnencryptedSaveFiles(buf);
+    const messages = [];
+    await openSave(rawFiles, (msg) => messages.push(msg));
+    expect(messages.length).toBeGreaterThan(0);
+  });
+
+  test('writeSaveData with onProgress callback invokes it', async () => {
+    const buf = makeBlankSave();
+    const rawFiles = makeUnencryptedSaveFiles(buf);
+    const { slots } = await openSave(rawFiles);
+    const messages = [];
+    await writeSaveData(slots, [], 0, '', (msg) => messages.push(msg));
+    expect(messages.length).toBeGreaterThan(0);
   });
 });

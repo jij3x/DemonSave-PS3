@@ -41,10 +41,7 @@ function qsa(sel) {
   return /** @type {any[]} */ (/** @type {unknown} */ (document.querySelectorAll(sel)));
 }
 
-// ---------------------------------------------------------------------------
-// Mock des-db: small dataset that mimics the real API shape
-// ---------------------------------------------------------------------------
-
+// --- Mock des-db: small dataset that mimics the real API shape ---
 const MOCK_SIZE = 12;
 
 function makeIds(base) {
@@ -242,10 +239,7 @@ jest.unstable_mockModule('../../js/des-db/index.js', () => ({
   },
 }));
 
-// ---------------------------------------------------------------------------
-// Dynamic imports (must come AFTER mock setup)
-// ---------------------------------------------------------------------------
-
+// --- Dynamic imports (must come AFTER mock setup) ---
 const {
   populateForm,
   collectForm,
@@ -272,10 +266,7 @@ const ITEM_IDS = db.getItemIdsByCategory('goods');
 const SPELL_IDS = db.getItemIdsByCategory('spells');
 const HAIRSTYLE_IDS = db.getItemIdsByCategory('hairstyles');
 
-// ---------------------------------------------------------------------------
-// DOM setup
-// ---------------------------------------------------------------------------
-
+// --- DOM setup ---
 function buildDOM() {
   document.body.innerHTML = '';
 
@@ -520,10 +511,7 @@ function resetForm() {
   });
 }
 
-// ---------------------------------------------------------------------------
-// Test model
-// ---------------------------------------------------------------------------
-
+// --- Test model ---
 /** @returns {any} */
 function makeSanitizedModel() {
   return {
@@ -694,10 +682,7 @@ function makeDisplay() {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
+// --- Tests ---
 describe('UI events', () => {
   beforeAll(buildDOM);
   beforeEach(resetForm);
@@ -747,6 +732,13 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, { profileNumber: 42, accountId: '' });
       expect(byId('profileNum').value).toBe('42');
+    });
+
+    test('undefined folderFields defaults profileNum to 0 and accountId to empty', () => {
+      const model = makeSanitizedModel();
+      populateForm(model, null, undefined);
+      expect(byId('profileNum').value).toBe('0');
+      expect(byId('accountId').value).toBe('');
     });
 
     test('tendency round-trip', () => {
@@ -3529,10 +3521,7 @@ describe('UI events', () => {
     });
   });
 
-  // -----------------------------------------------------------------------
-  // Branch-coverage: warp bounds check (ui-setup.js line 60)
-  // -----------------------------------------------------------------------
-
+  // --- Branch-coverage: warp bounds check (ui-setup.js line 60) ---
   describe('warp change bounds check', () => {
     test('warp change with invalid index (NaN) does not update position fields', () => {
       const model = makeSanitizedModel();
@@ -3560,10 +3549,7 @@ describe('UI events', () => {
     });
   });
 
-  // -----------------------------------------------------------------------
-  // Branch-coverage: updateWorldName catch (form-helpers.js line 37)
-  // -----------------------------------------------------------------------
-
+  // --- Branch-coverage: updateWorldName catch (form-helpers.js line 37) ---
   describe('updateWorldName error handling', () => {
     test('calling updateWorldName with invalid world clears text (catch branch)', () => {
       // Set a valid world first
@@ -3576,11 +3562,7 @@ describe('UI events', () => {
     });
   });
 
-  // -----------------------------------------------------------------------
-  // Branch-coverage: makeInventoryRow throws for unknown category
-  // (inventory-table.js line 280)
-  // -----------------------------------------------------------------------
-
+  // --- Branch-coverage: makeInventoryRow throws for unknown category (inventory-table.js line 280) ---
   describe('makeInventoryRow unknown category', () => {
     test('throws for unsupported category', () => {
       expect(() =>

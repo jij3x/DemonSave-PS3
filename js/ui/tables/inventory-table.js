@@ -38,9 +38,8 @@ const MISC1_LAYOUT = {
 /**
  * Render inventory rows for a category.
  *
- * For weapons, records are distributed across multiple per-type tables
- * (Weapon, Shield, Bow, Ammo, Casting Tool) based on each item's type.
- * All other categories use a single table.
+ * Weapons and goods are distributed across multiple per-type tables
+ * based on each item's type.  All other categories use a single table.
  *
  * @param {'weapons'|'armor'|'rings'|'goods'} category
  * @param {Array} records
@@ -48,11 +47,11 @@ const MISC1_LAYOUT = {
  */
 export function renderInventory(category, records, invIdxByRef) {
   if (category === 'weapons') {
-    // Clear ALL weapon-type body tables
+    // Clear all weapon-type body tables.
     const tbodies = document.querySelectorAll('table.inv-table[data-category="weapons"] tbody');
     for (const tbody of tbodies) tbody.innerHTML = '';
 
-    // Distribute each record to its correct type table
+    // Distribute each record to its correct type table.
     for (const rec of records) {
       const typeId = getWeaponTypeId(rec.itemId);
       const tbody = document.querySelector(
@@ -72,11 +71,11 @@ export function renderInventory(category, records, invIdxByRef) {
   }
 
   if (category === 'goods') {
-    // Clear ALL goods-type body tables
+    // Clear all goods-type body tables.
     const tbodies = document.querySelectorAll('table.inv-table[data-category="goods"] tbody');
     for (const tbody of tbodies) tbody.innerHTML = '';
 
-    // Distribute each record to its correct type table
+    // Distribute each record to its correct type table.
     for (const rec of records) {
       const typeId = getGoodsTypeId(rec.itemId);
       const tbody = document.querySelector(
@@ -225,9 +224,9 @@ export function makeInventoryRow(category, rec, typeIdHint = null, invIdxByRef) 
   // Weapons & Armor: full editable row — [Count], Class, Class Idx, DUR, Del
   // (misc2 hidden from UI — preserved via dataset for round-trip;
   //  idx1/idx2 are NOT in the DOM — restored by mergeModel via _ref)
-  // Count is hidden for non-counted types (Weapon/Shield/Bow/Casting Tool/Armor);
-  // for those types the count is preserved losslessly via a hidden input so the
-  // writer still receives the original value (typically 1).
+  // Count is hidden for non-counted types (Weapon/Shield/Bow/Casting Tool/Armor).
+  // The count is preserved losslessly via a hidden input so the writer still
+  // receives the original value (typically 1).
   if (category === 'weapons' || category === 'armor') {
     tr.appendChild(makeCountCell('inv-count', rec.count, showCount));
     // Hidden field — preserved via dataset for round-trip fidelity
@@ -281,7 +280,7 @@ export function makeInventoryRow(category, rec, typeIdHint = null, invIdxByRef) 
  * @returns {Array}
  */
 export function collectInventory(category) {
-  // Weapons span multiple per-type tables — collect from ALL of them.
+  // Weapons and goods span multiple per-type tables — collect from all of them.
   // Other categories use a single table.
   const tbodies =
     category === 'weapons' || category === 'goods'
