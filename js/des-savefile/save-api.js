@@ -8,9 +8,9 @@
  * Crypto operations (decrypt/encrypt) run sequentially on the main thread.
  *
  * Multi-slot API (all slots loaded/saved together):
- *   openSave(rawFiles, onProgress) → { slots, failedSlots, profileNumber, encrypted }
- *   writeSaveData(slots, failedSlots, profileNumber, onProgress [, inPlace]) → { filesToWrite, encrypted, filesToDelete }
- *   exportEncryptedSave(slots, failedSlots, profileNumber, onProgress [, inPlace]) → { filesToWrite, encrypted }
+ *   openSave(rawFiles, onProgress) → { slots, failedSlots, profileNumber, accountId, encrypted }
+ *   writeSaveData(slots, failedSlots, profileNumber, accountId, onProgress [, inPlace]) → { filesToWrite, sfoBytes, encrypted, filesToDelete }
+ *   exportEncryptedSave(slots, failedSlots, profileNumber, accountId, onProgress [, inPlace]) → { filesToWrite, sfoBytes, encrypted }
  *   updateSessionAfterWrite(slots, filesToWrite, encrypted) → syncs in-memory state after in-place overwrite
  */
 
@@ -267,7 +267,7 @@ export function resolveSaveFiles(files, saveSlot) {
  * @param {Map<string, {name: string, bytes: Uint8Array}>} rawFiles
  *        Map of lowercase filename → {name, bytes}
  * @param {(msg: string) => void} [onProgress]
- * @returns {Promise<{slots: Array<{slot: number, session: SaveSession, model: import('./model.js').SanitizedModel}>, failedSlots: Array<{slot: number, error: string, primaryFile: string|null}>, profileNumber: number, encrypted: boolean}>}
+ * @returns {Promise<{slots: Array<{slot: number, session: SaveSession, model: import('./model.js').SanitizedModel}>, failedSlots: Array<{slot: number, error: string, primaryFile: string|null}>, profileNumber: number, accountId: string, encrypted: boolean}>}
  */
 export async function openSave(rawFiles, onProgress) {
   const log = typeof onProgress === 'function' ? onProgress : noop;
@@ -338,8 +338,10 @@ export async function openSave(rawFiles, onProgress) {
       log(`Parsing slot ${info.saveSlot}…`);
       const fullModel = readSave(result.result);
 
-      // Sanitize for UI (strip binary internals + attach accountId).
-      const { model, display } = sanitizeModel(fullModel, accountId);
+      // Sanitize for UI (strip binary internals).  Folder-level SFO fields
+      // (accountId, profileNumber) are returned separately — not attached
+      // to slot models.
+      const { model, display } = sanitizeModel(fullModel);
 
       // Build the opaque session object.
       const session = {
@@ -375,7 +377,7 @@ export async function openSave(rawFiles, onProgress) {
   const mode = manager.encrypted ? 'encrypted' : 'unencrypted';
   log(`Loaded ${slots.length} slot(s) (${mode}).`);
 
-  return { slots, failedSlots, profileNumber, encrypted: manager.encrypted };
+  return { slots, failedSlots, profileNumber, accountId, encrypted: manager.encrypted };
 }
 
 // ---------------------------------------------------------------------------
@@ -572,19 +574,19 @@ async function decryptAndMergeSlots(slots, failed, manager, rawFiles, log) {
  * @param {Array<{slot: number, session: SaveSession, model: import('./model.js').SanitizedModel}>} slots
  * @param {Array<{slot: number, error: string, primaryFile: string|null}>|undefined} failedSlots
  * @param {number} profileNumber  new profile number to write to SFO
+ * @param {string} accountId  new account ID to write to SFO (empty string = clear)
  * @param {(msg: string) => void} [onProgress]
  * @param {boolean} [inPlace=false]  if true, files are written directly to
- *   the save folder's original location.  When true, PARAM.SFO is
- *   intentionally NOT written to disk to avoid encryption-state ambiguity
- *   (see `knowledge/encrypted_export.md`).  Profile number and account ID
- *   changes are still applied to the in-memory `session.sfoBytes` and take
- *   effect on the next non-in-place write (Save As / Export).
- * @returns {Promise<{filesToWrite: Map<string, Uint8Array>, encrypted: boolean, filesToDelete: Set<string>}>}
+ *   the save folder's original location.  When true, PARAM.SFO is written
+ *   to disk only after PARAM.PFD has been deleted (see app.js), to avoid
+ *   encryption-state ambiguity (see `knowledge/encrypted_export.md`).
+ * @returns {Promise<{filesToWrite: Map<string, Uint8Array>, sfoBytes: Uint8Array, encrypted: boolean, filesToDelete: Set<string>}>}
  */
 export async function writeSaveData(
   slots,
   failedSlots,
   profileNumber,
+  accountId,
   onProgress,
   inPlace = false,
 ) {
@@ -603,23 +605,16 @@ export async function writeSaveData(
   log('Preparing save data…');
   const workSfo = firstSlot.session.sfoBytes.slice();
   writeProfileNumber(workSfo, profileNumber);
-  const accountId = firstSlot.model.accountId;
-  if (accountId !== undefined) {
-    writeSfoAccountId(workSfo, accountId);
-  }
+  writeSfoAccountId(workSfo, accountId);
 
   // 2. Decrypt + merge all slot primaries, failed slots, and secondary file.
   const { processedFiles } = await decryptAndMergeSlots(slots, failed, manager, rawFiles, log);
 
   // 3. Build filesToWrite map.
-  // In in-place mode, PARAM.SFO is intentionally NOT written to disk.
-  // The save folder may still contain PARAM.PFD at this point (it's queued
-  // for deletion via filesToDelete but not removed yet). If a patched SFO is
-  // written while PARAM.PFD is still present, the editor treats the save as
-  // "encrypted" on next open → double-decryption → data corruption.
-  // The SFO bytes are still patched in-memory (workSfo), so the changes
-  // take effect on the next non-in-place write (Save As / Export).
-  // This is BY DESIGN — see knowledge/encrypted_export.md §"In-Place Write".
+  // The patched SFO is returned as sfoBytes regardless of mode.  In non-in-place
+  // mode it's included in filesToWrite; in in-place mode the caller writes it
+  // to disk AFTER PARAM.PFD is deleted (to avoid SFO+PFD transitional state —
+  // see knowledge/encrypted_export.md).
   const filesToWrite = new Map();
   if (!inPlace) {
     filesToWrite.set('PARAM.SFO', workSfo);
@@ -669,7 +664,7 @@ export async function writeSaveData(
   }
 
   log('Save data ready (decrypted).');
-  return { filesToWrite, encrypted: false, filesToDelete };
+  return { filesToWrite, sfoBytes: workSfo, encrypted: false, filesToDelete };
 }
 
 // ---------------------------------------------------------------------------
@@ -693,13 +688,15 @@ export async function writeSaveData(
  * @param {Array<{slot: number, session: SaveSession, model: import('./model.js').SanitizedModel}>} slots
  * @param {Array<{slot: number, error: string, primaryFile: string|null}>|undefined} failedSlots
  * @param {number} profileNumber  new profile number to write to SFO
+ * @param {string} accountId  new account ID to write to SFO (empty string = clear)
  * @param {(msg: string) => void} [onProgress]
- * @returns {Promise<{filesToWrite: Map<string, Uint8Array>, encrypted: boolean}>}
+ * @returns {Promise<{filesToWrite: Map<string, Uint8Array>, sfoBytes: Uint8Array, encrypted: boolean}>}
  */
 export async function exportEncryptedSave(
   slots,
   failedSlots,
   profileNumber,
+  accountId,
   onProgress,
   inPlace = false,
 ) {
@@ -719,10 +716,7 @@ export async function exportEncryptedSave(
   const sfoBytes = firstSlot.session.sfoBytes.slice();
   writeProfileNumber(sfoBytes, profileNumber);
   removeCopyProtection(sfoBytes);
-  const accountId = firstSlot.model.accountId;
-  if (accountId !== undefined) {
-    writeSfoAccountId(sfoBytes, accountId);
-  }
+  writeSfoAccountId(sfoBytes, accountId);
 
   // 2. Decrypt + merge all slot primaries, failed slots, and secondary file.
   const { processedFiles } = await decryptAndMergeSlots(slots, failed, manager, rawFiles, log);
@@ -856,7 +850,7 @@ export async function exportEncryptedSave(
   }
 
   log('Encrypted export ready.');
-  return { filesToWrite, encrypted: true };
+  return { filesToWrite, sfoBytes, encrypted: true };
 }
 
 // ---------------------------------------------------------------------------
@@ -881,8 +875,7 @@ export function reloadSlotModels(slots, onProgress) {
 
   for (const slot of slots) {
     const { session } = slot;
-    const accountId = getSfoAccountId(session.sfoBytes);
-    const { model, display } = sanitizeModel(session.fullModel, accountId);
+    const { model, display } = sanitizeModel(session.fullModel);
     slot.model = model;
     slot.display = display;
   }

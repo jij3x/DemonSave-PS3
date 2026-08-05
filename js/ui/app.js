@@ -33,6 +33,7 @@ import { populateCombos } from './core/controls.js';
 import {
   populateForm,
   collectForm,
+  collectFolderFields,
   setupWarpAndWorld,
   setupTabs,
   setupAddRowButtons,
@@ -50,7 +51,9 @@ import {
   buildDirtyTree,
   setDirtyCallback,
   hasUnsavedChanges,
+  hasSlotChanges,
   resetDirtyState,
+  setEncToggleDirty,
 } from './core/dirty.js';
 import { showConfirm } from './widgets/modal.js';
 import {
@@ -82,6 +85,7 @@ function createInitialState() {
     failedSlots: [], // [{ slot, error }] for slots that failed to load
     currentSlot: 0, // index into slots array
     profileNumber: 0, // SFO profile number (folder-level)
+    accountId: '', // PSN account ID (folder-level, 32 hex chars or empty)
     sourceEncrypted: undefined, // original encryption state (never changes after load)
     encryptMode: false, // user toggle: true=encrypted output, false=decrypted output
     dirHandle: null, // FileSystemDirectoryHandle for write-back (Chromium)
@@ -130,17 +134,20 @@ function updateSlotDirtyDot() {
     const slotNum = String(state.slots[index]?.slot ?? '?');
     opt.textContent = isDirty ? `${slotNum}  *  ` : slotNum;
   }
+
+  // Sync Save button enabled/disabled state with the current slot's dirty flag
+  updateSaveButtonState();
 }
 
 /**
  * Dirty callback — fired after each debounced dirty flush.
  * Updates the current slot's dirty flag and slot dot indicator.
- *
- * @param {boolean} isDirty  whether the form currently has unsaved changes
  */
-function onDirtyChange(isDirty) {
+function onDirtyChange() {
   if (state.slots.length === 0) return;
-  state.slots[state.currentSlot].dirty = isDirty;
+  // Only mark slot dirty if per-slot fields changed (not folder-level
+  // toolbar fields like profileNum, accountId, or enc toggle).
+  state.slots[state.currentSlot].dirty = hasSlotChanges();
   updateSlotDirtyDot();
 }
 
@@ -176,6 +183,19 @@ function commitCurrentSlot() {
     return false;
   }
   state.slots[state.currentSlot].model = model;
+
+  // Collect folder-level SFO fields into app state (not slot model).
+  // These are shared across all slots and passed separately to save functions.
+  const folderFields = collectFolderFields();
+  if (folderFields === null) {
+    setStatus(
+      'Validation failed — Account ID must be 32 hex characters (0-9, A-F) or empty. ' +
+        'Save aborted. Please fix the field and try again.',
+    );
+    return false;
+  }
+  state.profileNumber = folderFields.profileNumber;
+  state.accountId = folderFields.accountId;
   return true;
 }
 
@@ -242,7 +262,7 @@ function renderSlot(index) {
   state.currentSlot = index;
 
   const { model, display } = state.slots[index];
-  populateForm(model, display, state.profileNumber);
+  populateForm(model, display, { profileNumber: state.profileNumber, accountId: state.accountId });
 
   // Update dropdown to reflect active slot
   /** @type {HTMLSelectElement} */ (document.getElementById('saveSlot')).value = String(index);
@@ -267,6 +287,28 @@ function updateSaveButtons() {
     saveBtn.hidden = true;
   }
   /** @type {HTMLButtonElement} */ (document.getElementById('btnExport')).disabled = false;
+
+  // Apply dirty-gated Save button state
+  updateSaveButtonState();
+}
+
+/**
+ * Update the Save button's disabled state based on the current slot's dirty
+ * flag and busy state.
+ *
+ * The Save button is only enabled when:
+ *   - The app is not busy (during async operations)
+ *   - The current slot has unsaved changes (dirty)
+ *   - The button is not hidden (Chromium-only feature)
+ *
+ * Export remains always enabled regardless of dirty state.
+ */
+function updateSaveButtonState() {
+  const saveBtn = document.getElementById('btnSave');
+  if (!saveBtn || saveBtn.hidden) return;
+  if (state.busy) return;
+  const isDirty = hasUnsavedChanges();
+  /** @type {HTMLButtonElement} */ (saveBtn).disabled = !isDirty;
 }
 
 /**
@@ -331,6 +373,10 @@ function updateEncryptToggle() {
   } else {
     btn.setAttribute('data-tooltip', baseTooltip);
   }
+
+  // Report mismatch state to the dirty tracker so the slot dirty dot
+  // and hasUnsavedChanges() reflect the enc toggle.
+  setEncToggleDirty(mismatch);
 }
 
 /**
@@ -531,6 +577,8 @@ function setBusy(isBusy) {
     if (!el) continue;
     /** @type {HTMLButtonElement | HTMLSelectElement} */ (el).disabled = isBusy;
   }
+  // After re-enabling buttons, respect dirty state for Save button
+  if (!isBusy) updateSaveButtonState();
 }
 
 /**
@@ -708,14 +756,15 @@ async function handleOpen(rawFiles) {
   setStatus('Opening save…');
 
   try {
-    const { slots, failedSlots, profileNumber, encrypted } = await openSave(rawFiles, (msg) =>
-      setStatus(msg),
-    );
+    const { slots, failedSlots, profileNumber, accountId, encrypted } = await openSave(rawFiles, (
+      msg,
+    ) => setStatus(msg));
 
     state.slots = slots;
     state.failedSlots = failedSlots;
     state.currentSlot = 0;
     state.profileNumber = profileNumber;
+    state.accountId = accountId;
     state.sourceEncrypted = encrypted; // Original state (never changes)
     state.encryptMode = encrypted; // Default toggle to match source
     state.loaded = false; // Will be set true after first render
@@ -871,14 +920,12 @@ async function handleOverwriteDecrypted() {
 
   setStatus('Collecting form data…');
   if (!commitCurrentSlot()) return; // abort on validation failure
-  const profileNumber =
-    parseInt(/** @type {HTMLInputElement} */ (document.getElementById('profileNum')).value, 10) ||
-    0;
 
-  const { filesToWrite, filesToDelete } = await writeSaveData(
+  const { filesToWrite, sfoBytes, filesToDelete } = await writeSaveData(
     state.slots,
     state.failedSlots,
-    profileNumber,
+    state.profileNumber,
+    state.accountId,
     (msg) => setStatus(msg),
     true, // inPlace: only write USER.DAT variants, skip unchanged files
   );
@@ -901,6 +948,18 @@ async function handleOverwriteDecrypted() {
         console.error('Post-write cleanup failed:', delErr);
         deleteErrMsg = delErr.message;
       }
+    }
+
+    // Write PARAM.SFO AFTER PARAM.PFD has been deleted (in-place decrypted
+    // mode).  Writing SFO while PFD still exists causes the editor to treat
+    // the save as encrypted on next open → double-decryption → corruption.
+    // In in-place mode, writeSaveData omits PARAM.SFO from filesToWrite
+    // but returns it separately as sfoBytes.
+    if (!filesToWrite.has('PARAM.SFO') && sfoBytes) {
+      const sfoWriteMap = new Map([['PARAM.SFO', sfoBytes]]);
+      await writeFilesToDirectory(state.dirHandle, sfoWriteMap);
+      // Add it to filesToWrite so updateSessionAfterWrite syncs session.sfoBytes
+      filesToWrite.set('PARAM.SFO', sfoBytes);
     }
 
     // If the delete failed, the on-disk state is ambiguous (decrypted
@@ -961,7 +1020,10 @@ function refreshAfterSave() {
     // Re-render the current slot from the fresh model.
     state.loaded = false;
     const { model, display } = state.slots[state.currentSlot];
-    populateForm(model, display, state.profileNumber);
+    populateForm(model, display, {
+      profileNumber: state.profileNumber,
+      accountId: state.accountId,
+    });
     state.loaded = true;
 
     // Clear all slot dirty flags — the save committed all changes to disk.
@@ -1043,14 +1105,12 @@ async function handleExportDecrypted() {
 
   setStatus('Collecting form data…');
   if (!commitCurrentSlot()) return; // abort on validation failure
-  const profileNumber =
-    parseInt(/** @type {HTMLInputElement} */ (document.getElementById('profileNum')).value, 10) ||
-    0;
 
   const { filesToWrite } = await writeSaveData(
     state.slots,
     state.failedSlots,
-    profileNumber,
+    state.profileNumber,
+    state.accountId,
     (msg) => setStatus(msg),
   );
 
@@ -1087,17 +1147,23 @@ async function handleOverwriteEncrypted() {
 
   setStatus('Collecting form data…');
   if (!commitCurrentSlot()) return; // abort on validation failure
-  const profileNumber =
-    parseInt(/** @type {HTMLInputElement} */ (document.getElementById('profileNum')).value, 10) ||
-    0;
 
-  const { filesToWrite } = await exportEncryptedSave(
+  const { filesToWrite, sfoBytes } = await exportEncryptedSave(
     state.slots,
     state.failedSlots,
-    profileNumber,
+    state.profileNumber,
+    state.accountId,
     (msg) => setStatus(msg),
     true, // inPlace: only write USER.DAT + PFD + SFO, skip assets
   );
+
+  // Sync the patched SFO into session state (encrypted in-place always
+  // includes PARAM.SFO in filesToWrite, but update it explicitly for safety)
+  if (sfoBytes) {
+    for (const slot of state.slots) {
+      slot.session.sfoBytes = sfoBytes;
+    }
+  }
 
   setStatus('Writing encrypted files…');
   try {
@@ -1155,14 +1221,12 @@ async function handleExportEncrypted() {
 
   setStatus('Collecting form data…');
   if (!commitCurrentSlot()) return; // abort on validation failure
-  const profileNumber =
-    parseInt(/** @type {HTMLInputElement} */ (document.getElementById('profileNum')).value, 10) ||
-    0;
 
   const { filesToWrite } = await exportEncryptedSave(
     state.slots,
     state.failedSlots,
-    profileNumber,
+    state.profileNumber,
+    state.accountId,
     (msg) => setStatus(msg),
   );
 

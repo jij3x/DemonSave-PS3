@@ -23,24 +23,43 @@ export default {
     '!js/des-db/rel-types.js',
     '!js/des-db/rel-upgrades.js',
     '!js/des-db/idx-upgrade-ref.js',
-    // tauri-bridge is now covered by tests/lib/tauri-bridge.test.js
-    '!js/lib/ps3-save-lib/index.js', // barrel re-export — no logic
-    '!js/ui/events.js', // barrel re-export — no logic
-    // Browser-only UI infrastructure — partially covered by jsdom unit tests.
-    // The remaining uncovered paths (real File System Access API, Tauri IPC,
-    // app orchestration) are exercised via integration tests.
-    '!js/ui/app.js', // entry point: orchestrates browser flows
-    '!js/ui/io.js', // browser FS Access API + Tauri IPC (jsdom-untestable)
+    // Barrel re-exports — no logic.
+    '!js/lib/ps3-save-lib/index.js',
+    '!js/ui/events.js',
+    // Entry point — orchestrates browser flows (jsdom-untestable).
+    '!js/ui/app.js',
   ],
   coverageThreshold: {
-    // Enforced only when --coverage is passed.  Covers all logic modules
-    // (save-api, reader, writer, model, crypto, endian, events, controls,
-    // dirty).  Browser-only I/O modules are excluded above.
-    global: {
-      lines: 90,
-      statements: 90,
-      branches: 85,
-      functions: 90,
+    // Per-path gates (enforced only when --coverage is passed).
+    // Each glob is checked independently — a file must satisfy every pattern
+    // it matches.
+    //
+    // Gate 1: UI — lower thresholds (jsdom-untestable canvas, FS Access API,
+    // Tauri IPC, and drag-and-drop paths drag coverage down).
+    './js/ui/': {
+      lines: 80,
+      statements: 78,
+      branches: 70,
+      functions: 80,
+    },
+    // Gate 2: Core logic — strict thresholds (checked per-directory).
+    './js/lib/': {
+      lines: 95,
+      statements: 95,
+      branches: 95,
+      functions: 95,
+    },
+    './js/des-db/': {
+      lines: 95,
+      statements: 95,
+      branches: 95,
+      functions: 95,
+    },
+    './js/des-savefile/': {
+      lines: 95,
+      statements: 95,
+      branches: 92,
+      functions: 95,
     },
   },
 };
