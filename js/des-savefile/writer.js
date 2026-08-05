@@ -261,7 +261,7 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
     // Validate as U16 here (matching writeDurability) to prevent partial
     // writes where the inventory record succeeds but the durability write
     // throws for the same idx1 value.
-    wUInt32BE(bytes, b + 0x0c, assertU16(rec.idx1)); // Idx1 (U16 in U32 slot)
+    wUInt32BE(bytes, b + 0x0c, assertU16(rec.idx1)); // Idx1 (validated as U16 to match durability table width)
     wUInt16BE(bytes, b + 0x10, assertU16(rec.misc1)); // Misc1/sortId (U16)
     wUInt16BE(bytes, b + 0x12, assertU16(rec.idx2)); // Idx2 (U16)
     wUInt32BE(bytes, b + 0x14, assertU32(rec.misc2)); // Misc2 (U32)
@@ -285,9 +285,8 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
   };
 
   // Update existing items in-place at their original _slot positions.
-  // Use a positive type check instead of a triple-negative — `null < 0`
-  // is false and `isNaN(null)` is false, so the old check would treat
-  // `_slot: null` as slot 0.  `typeof` check is unambiguous.
+  // A valid _slot is a non-negative integer; anything else (undefined,
+  // null, NaN) means the item is new and is placed later.
   for (const { rec, type, cat } of allItems) {
     if (typeof rec._slot !== 'number' || !Number.isInteger(rec._slot) || rec._slot < 0) continue;
     modelSlots.add(rec._slot);
@@ -370,11 +369,10 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
   // how many new items are added, instead of O(N × INV_SLOTS).
   //
   // idx1/idx2 assignment: the game's invariant is idx1 == idx2 == slot
-  // number (confirmed from real save binary analysis).  Every inventory
-  // item uses its physical slot position as its idx1.  This is critical
-  // for equipped-slot pointer resolution — the game's hotbar pointers
-  // reference inventory rows by idx1, and idx1 must match the slot for
-  // the equipped mark to display correctly.
+  // number. Every inventory item uses its physical slot position as its
+  // idx1. This is critical for equipped-slot pointer resolution — the
+  // game's hotbar pointers reference inventory rows by idx1, and idx1
+  // must match the slot for the equipped mark to display correctly.
   let nextFreeSlot = 0;
   for (const { rec, type, cat } of allItems) {
     if (typeof rec._slot === 'number' && Number.isInteger(rec._slot) && rec._slot >= 0) continue;
@@ -434,12 +432,8 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
    * HAIRSTYLE has no pointer; RESERVED (0x260) is padding, never touched.
    */
   // Build pointer lookup maps from allItems (all items now have idx1).
-  // The `typeof idx1 === 'number'` false branch is unreachable in practice:
   const idxByItemId = new Map(); // itemId  → first idx1 (Rule 2 fallback)
   const itemIdByIdx1 = new Map(); // idx1    → itemId    (Rules 0 & 1)
-  // writeInvFields (called above for every item) calls assertU16(rec.idx1)
-  // which throws on non-numeric values.  So every item that survives past
-  // this point is guaranteed to have a numeric idx1.
   for (const { rec: r } of allItems) {
     const idx1 = r.idx1;
     if (typeof idx1 === 'number') {
@@ -545,11 +539,8 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
     wUInt32BE(bytes, b + O.SPELL_MISC2_OFFSET, assertU32(sp.misc2));
   }
 
-  // Clear stale spell records beyond the new SPELL_COUNT.
-  // If the original save had more spells than the new model, the leftover
-  // records still contain old data. Zero them so no stale spells linger
-  // in the buffer. The game respects SPELL_COUNT, but this keeps the data
-  // clean — consistent with the deposit writer's full-blank approach.
+  // Clear stale spell records beyond the new SPELL_COUNT so no old data
+  // lingers in the buffer.
   if (oldSpellCount > m.spells.length) {
     const EMPTY_SPELL = new Uint8Array(O.SPELL_STRIDE); // all zeros
     for (let i = m.spells.length; i < oldSpellCount; i++) {
@@ -581,10 +572,7 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
   ]);
   for (let i = 0; i < O.DEPOSIT_MAX_ENTRIES; i++) {
     const b = O.DEPOSIT_BASE + i * O.DEPOSIT_STRIDE;
-    // Bounds-check: stop blanking if we reach the end of the buffer.
-    // Unreachable for buffers >= MIN_SAVE_SIZE (guaranteed by the top-level
-    // guard): the deposit region (0x14BE8..0x1EBF4+0x14=0x1EC08) fits well
-    // within 0x20000. Kept as a belt-and-suspenders defense.
+    // Bounds-check each deposit entry blank.
     assertBounds(bytes, b, O.DEPOSIT_STRIDE);
     bytes.set(EMPTY_DEPOSIT, b);
   }

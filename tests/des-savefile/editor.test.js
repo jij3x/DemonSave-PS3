@@ -48,42 +48,21 @@ const SPELL_IDS = db.getItemIdsByCategory('spells');
  * ==================================================================== */
 
 describe('reader: inventory parsing', () => {
-  test('reads weapon inventory item', () => {
+  // All four inventory categories follow the same parse pattern — only the
+  // type byte, item ID, and count differ.  One test.each covers them all.
+  test.each([
+    { type: 0x00000000, cat: 'weapons', id: WEAPON_IDS[2], count: 1 },
+    { type: 0x10000000, cat: 'armor', id: ARMOR_IDS[0], count: 1 },
+    { type: 0x20000000, cat: 'rings', id: RING_IDS[1], count: 1 },
+    { type: 0x40000000, cat: 'goods', id: ITEM_IDS[2], count: 50 },
+  ])('reads $cat inventory item', ({ type, cat, id, count }) => {
     let buf = makeBlankSave();
     wUInt32BE(buf, O.INV_COUNT, 1);
-    writeInvRecord(buf, 0, 0x00000000, WEAPON_IDS[2], 1, 0, 0x1016, 0, 0x01000000);
+    writeInvRecord(buf, 0, type, id, count, 0, 0, 0, 0x01000000);
     const m = readSave(buf);
-    expect(m.weapons).toHaveLength(1);
-    expect(m.weapons[0].itemId).toBe(WEAPON_IDS[2]);
-    expect(m.weapons[0].count).toBe(1);
-  });
-
-  test('reads armor inventory item', () => {
-    let buf = makeBlankSave();
-    wUInt32BE(buf, O.INV_COUNT, 1);
-    writeInvRecord(buf, 0, 0x10000000, ARMOR_IDS[0], 1, 0, 0, 0, 0x01000000);
-    const m = readSave(buf);
-    expect(m.armor).toHaveLength(1);
-    expect(m.armor[0].itemId).toBe(ARMOR_IDS[0]);
-  });
-
-  test('reads ring inventory item', () => {
-    let buf = makeBlankSave();
-    wUInt32BE(buf, O.INV_COUNT, 1);
-    writeInvRecord(buf, 0, 0x20000000, RING_IDS[1], 1, 0, 0, 0, 0x01000000);
-    const m = readSave(buf);
-    expect(m.rings).toHaveLength(1);
-    expect(m.rings[0].itemId).toBe(RING_IDS[1]);
-  });
-
-  test('reads goods inventory item', () => {
-    let buf = makeBlankSave();
-    wUInt32BE(buf, O.INV_COUNT, 1);
-    writeInvRecord(buf, 0, 0x40000000, ITEM_IDS[2], 50, 0, 0, 0, 0x01000000);
-    const m = readSave(buf);
-    expect(m.goods).toHaveLength(1);
-    expect(m.goods[0].itemId).toBe(ITEM_IDS[2]);
-    expect(m.goods[0].count).toBe(50);
+    expect(m[cat]).toHaveLength(1);
+    expect(m[cat][0].itemId).toBe(id);
+    expect(m[cat][0].count).toBe(count);
   });
 
   test('throws on unknown inventory type', () => {
@@ -328,34 +307,49 @@ describe('reader/writer idempotency', () => {
     expect(m2.nexusTendency).toBeCloseTo(-20.0, 1);
   });
 
-  test('arch sealed flag (inverted bit 6)', () => {
-    let buf = makeBlankSave();
-    // Set bit 6 initially (sealed = false)
-    buf[O.ARCH_SEALED] = 0x40;
-    let m = readSave(buf);
-    expect(m.archSealed).toBe(false);
-
-    m.archSealed = true;
-    buf = writeSave(buf, m);
-    expect((buf[O.ARCH_SEALED] & 0x40) === 0).toBe(true); // bit cleared = sealed
-
-    m = readSave(buf);
-    expect(m.archSealed).toBe(true);
-  });
-
-  test('NPC flags round-trip', () => {
+  // Both directions of the inverted bit 6 must round-trip:
+  //   sealed=true  → bit 6 CLEARED (0x40 absent)
+  //   sealed=false → bit 6 SET     (0x40 present)
+  test.each([
+    { label: 'sealed=true (bit cleared)', setTo: true, expectBitAbsent: true },
+    { label: 'sealed=false (bit set)', setTo: false, expectBitAbsent: false },
+  ])('arch sealed flag: $label', ({ setTo, expectBitAbsent }) => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m.sageFreke = { friendly: true, hostile: false, dead: true };
-    m.thomas = { friendly: true, hostile: false, dead: false };
-    m.boldwin = { friendly: false, hostile: true, dead: false };
+    m.archSealed = setTo;
+    buf = writeSave(buf, m);
+    expect((buf[O.ARCH_SEALED] & 0x40) === 0).toBe(expectBitAbsent);
+
+    const m2 = readSave(buf);
+    expect(m2.archSealed).toBe(setTo);
+  });
+
+  // NPC flags round-trip: two test cases cover both mixed and all-true
+  // combinations.  The all-true case also covers all bit-set arms.
+  test.each([
+    {
+      label: 'mixed values',
+      sageFreke: { friendly: true, hostile: false, dead: true },
+      thomas: { friendly: true, hostile: false, dead: false },
+      boldwin: { friendly: false, hostile: true, dead: false },
+    },
+    {
+      label: 'all true (all bit-set arms)',
+      sageFreke: { friendly: true, hostile: true, dead: true },
+      thomas: { friendly: true, hostile: true, dead: true },
+      boldwin: { friendly: true, hostile: true, dead: true },
+    },
+  ])('NPC flags round-trip: $label', ({ sageFreke, thomas, boldwin }) => {
+    let buf = makeBlankSave();
+    const m = readSave(buf);
+    m.sageFreke = sageFreke;
+    m.thomas = thomas;
+    m.boldwin = boldwin;
     buf = writeSave(buf, m);
     const m2 = readSave(buf);
-    expect(m2.sageFreke.friendly).toBe(true);
-    expect(m2.sageFreke.hostile).toBe(false);
-    expect(m2.sageFreke.dead).toBe(true);
-    expect(m2.thomas.friendly).toBe(true);
-    expect(m2.boldwin.hostile).toBe(true);
+    expect(m2.sageFreke).toEqual(sageFreke);
+    expect(m2.thomas).toEqual(thomas);
+    expect(m2.boldwin).toEqual(boldwin);
   });
 
   test('deposit (Thomas storage) round-trip', () => {
@@ -489,7 +483,7 @@ describe('writer: spell round-trip', () => {
 });
 
 /* ========================================================================
- * Writer: deposit edge cases (consolidated from former §3, §16, §20)
+ * Writer: deposit edge cases
  * ==================================================================== */
 
 describe('writer: deposit edge cases', () => {
@@ -710,7 +704,7 @@ describe('writer: deposit edge cases', () => {
 });
 
 /* ========================================================================
- * Writer: misc fields + val() edge cases (consolidated from former §3, §12)
+ * Writer: misc fields + val() edge cases
  * ==================================================================== */
 
 describe('writer: misc fields', () => {
@@ -1334,55 +1328,63 @@ describe('reader: deposit count early exit', () => {
 });
 
 /* ========================================================================
- * 10. Deposit sortOrder lo16 preservation
+ * 10. Deposit sortOrder: lo16 preservation + hi16 bit safety
  * ==================================================================== */
 
-describe('writer: deposit sortOrder lo16 preservation', () => {
-  test('non-zero sortOrder lo16 is preserved through write→read', () => {
+describe('writer: deposit sortOrder round-trip', () => {
+  // All four cases exercise the same sortIdDurPack write→read path:
+  //   - lo16 non-zero → preserved
+  //   - lo16 zero → falls back to slot index
+  //   - hi16 bit 15 set → unsigned `>>> 0` prevents sign issues
+  //   - hi16 0xFFFF → max value
+  test.each([
+    {
+      label: 'non-zero lo16 preserved',
+      sortOrder: 0x00100007,
+      expectHi16: 0x0010,
+      expectLo16: 0x0007,
+    },
+    {
+      label: 'zero lo16 falls back to slot index',
+      sortOrder: 0x00100000,
+      expectHi16: 0x0010,
+      expectLo16: 0,
+    },
+    {
+      label: 'sortId bit 15 set round-trips',
+      sortOrder: 0x80000001,
+      expectHi16: 0x8000,
+      expectLo16: 0x0001,
+    },
+    {
+      label: 'sortId=0xFFFF round-trips (max value)',
+      sortOrder: 0xffff0005,
+      expectHi16: 0xffff,
+      expectLo16: 0x0005,
+    },
+  ])('$label', ({ sortOrder, expectHi16, expectLo16 }) => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    // sortOrder: hi16=0x0010 (sortId), lo16=0x0007 (order index)
     m.deposit = [
       {
-        category: 'weapons',
-        itemId: WEAPON_IDS[2],
+        category: 'goods',
+        itemId: ITEM_IDS[2],
         count: 1,
-        durability: 300,
+        durability: 0,
         unknown1: 0,
-        sortOrder: 0x00100007,
-        flags: [0x21, 0, 0, 0, 0, 0x01, 0x2c],
+        sortOrder,
+        flags: [0x21, 0, 0, 0, 0, 0, 0],
       },
     ];
     buf = writeSave(buf, m);
     const m2 = readSave(buf);
-    // The lo16 (0x0007) should be preserved, not overwritten with slot index 0
-    expect(m2.deposit[0].sortOrder & 0xffff).toBe(0x0007);
-  });
-
-  test('zero sortOrder lo16 falls back to slot index', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    // sortOrder: hi16=0x0010, lo16=0x0000 (no order data)
-    m.deposit = [
-      {
-        category: 'weapons',
-        itemId: WEAPON_IDS[2],
-        count: 1,
-        durability: 300,
-        unknown1: 0,
-        sortOrder: 0x00100000,
-        flags: [0x21, 0, 0, 0, 0, 0x01, 0x2c],
-      },
-    ];
-    buf = writeSave(buf, m);
-    const m2 = readSave(buf);
-    // lo16=0 → falls back to slot index 0
-    expect(m2.deposit[0].sortOrder & 0xffff).toBe(0);
+    expect((m2.deposit[0].sortOrder >> 16) & 0xffff).toBe(expectHi16);
+    expect(m2.deposit[0].sortOrder & 0xffff).toBe(expectLo16);
   });
 });
 
 /* ========================================================================
- * 11. Inventory skip-loop iteration cap + reader bounds (consolidated)
+ * 11. Inventory skip-loop iteration cap + reader bounds
  * ==================================================================== */
 
 describe('reader: inventory scan cap + bounds', () => {
@@ -1510,7 +1512,7 @@ describe('writer: buffer guards', () => {
 });
 
 /* ========================================================================
- * 13. Inventory edge cases (consolidated from former §14, §20)
+ * 13. Inventory edge cases
  * ==================================================================== */
 
 describe('writer: inventory edge cases', () => {
@@ -1666,7 +1668,7 @@ describe('writer: inventory edge cases', () => {
 });
 
 /* ========================================================================
- * 14. Deleted slots (consolidated from former §14, §20)
+ * 14. Deleted slots
  * ==================================================================== */
 
 describe('writer: deletedSlots clearing', () => {
@@ -1820,32 +1822,9 @@ describe('reader: bounds checks', () => {
   });
 });
 
-/* ========================================================================
- * 17. NPC flags + archSealed true branches
- * ==================================================================== */
-
-describe('writer: NPC flags and archSealed', () => {
-  test('all NPC flags set to true writes all bit-set arms', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    m.sageFreke = { friendly: true, hostile: true, dead: true };
-    m.thomas = { friendly: true, hostile: true, dead: true };
-    m.boldwin = { friendly: true, hostile: true, dead: true };
-    m.archSealed = false;
-    buf = writeSave(buf, m);
-    const m2 = readSave(buf);
-    expect(m2.sageFreke.friendly).toBe(true);
-    expect(m2.sageFreke.hostile).toBe(true);
-    expect(m2.sageFreke.dead).toBe(true);
-    expect(m2.thomas.friendly).toBe(true);
-    expect(m2.thomas.hostile).toBe(true);
-    expect(m2.thomas.dead).toBe(true);
-    expect(m2.boldwin.friendly).toBe(true);
-    expect(m2.boldwin.hostile).toBe(true);
-    expect(m2.boldwin.dead).toBe(true);
-    expect(m2.archSealed).toBe(false);
-  });
-});
+// NPC flags all-true branch is now covered by the NPC flags round-trip
+// test.each (all-true case) in section 2 above.  archSealed is covered
+// by the dedicated archSealed test in section 2.
 
 /* ========================================================================
  * 18. Writer: null/undefined category arrays
@@ -1955,67 +1934,17 @@ describe('writer: idx1 = slot invariant for newly added items', () => {
   });
 });
 
-/* ========================================================================
- * Regression: deposit sortIdDurPack high-bit safety (#2)
- * ==================================================================== */
-
-describe('writer: deposit sortIdDurPack high-bit safety', () => {
-  test('deposit with sortId having bit 15 set round-trips correctly', () => {
-    // sortId=0x8000 has bit 15 set.  Without `>>> 0`, `(0x8000 << 16) | idx`
-    // could produce a negative intermediate value in JS's signed bitwise ops.
-    // After the fix, sortIdDurPack is always unsigned.
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    // sortOrder = 0x80000001 → sortId=0x8000, orderIdx=0x0001
-    m.deposit = [
-      {
-        category: 'goods',
-        itemId: ITEM_IDS[2],
-        count: 1,
-        durability: 0,
-        unknown1: 0,
-        sortOrder: 0x80000001,
-        flags: [0x21, 0, 0, 0, 0, 0, 0],
-      },
-    ];
-    buf = writeSave(buf, m);
-    const m2 = readSave(buf);
-    // sortId (hi16) should be 0x8000
-    expect((m2.deposit[0].sortOrder >> 16) & 0xffff).toBe(0x8000);
-    // orderIdx (lo16) should be 0x0001
-    expect(m2.deposit[0].sortOrder & 0xffff).toBe(0x0001);
-  });
-
-  test('deposit with sortId=0xFFFF round-trips (max value)', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    m.deposit = [
-      {
-        category: 'goods',
-        itemId: ITEM_IDS[2],
-        count: 1,
-        durability: 0,
-        unknown1: 0,
-        sortOrder: 0xffff0005,
-        flags: [0x21, 0, 0, 0, 0, 0, 0],
-      },
-    ];
-    buf = writeSave(buf, m);
-    const m2 = readSave(buf);
-    expect((m2.deposit[0].sortOrder >> 16) & 0xffff).toBe(0xffff);
-    expect(m2.deposit[0].sortOrder & 0xffff).toBe(0x0005);
-  });
-});
+// Deposit sortIdDurPack high-bit safety is now covered by the
+// deposit sortOrder round-trip test.each in section 10 above.
 
 /* ========================================================================
- * Regression: _slot null safety (#3)
+ * _slot null safety
  * ==================================================================== */
 
 describe('writer: _slot null safety', () => {
   test('inventory item with _slot=null is treated as new (not slot 0)', () => {
-    // The old check (=== undefined || < 0 || isNaN) would treat null as
-    // slot 0 because null < 0 is false and isNaN(null) is false.
-    // The new check (typeof !== 'number') correctly skips null.
+    // A null _slot must be treated as "new item", not slot 0.  The type
+    // check (typeof !== 'number') ensures null is correctly skipped.
     let buf = makeBlankSave();
     // Initialize inventory slots to 0xFFFFFFFF so new items can be placed
     const m0 = readSave(buf);
@@ -2042,7 +1971,7 @@ describe('writer: _slot null safety', () => {
 });
 
 /* ========================================================================
- * Regression: secondary file bounds check (#4)
+ * Secondary file bounds check
  * ==================================================================== */
 
 describe('writer: secondary file bounds check', () => {

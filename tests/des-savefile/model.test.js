@@ -116,95 +116,59 @@ function makeFullModel() {
 }
 
 describe('sanitizeModel', () => {
-  test('strips binary internals from inventory items', () => {
-    const full = makeFullModel();
-    const { model: sanitized } = sanitizeModel(full);
+  // All four inventory categories follow the same sanitize pattern: strip
+  // _slot/idx1/idx2, add _ref, preserve itemId/count/misc1/misc2/durability.
+  // A single test.each covers them all, plus misc1 round-trip.
+  test.each([
+    {
+      cat: 'weapons',
+      index: 0,
+      expectedRef: 'inv:0',
+      expectedMisc1: 0x0ffc,
+      expectedDurability: 300,
+    },
+    {
+      cat: 'armor',
+      index: 0,
+      expectedRef: 'inv:5',
+      expectedMisc1: 0x03f4,
+      expectedDurability: 200,
+    },
+    { cat: 'rings', index: 0, expectedRef: 'inv:10', expectedMisc1: 0x0013, expectedDurability: 0 },
+    { cat: 'goods', index: 0, expectedRef: 'inv:15', expectedMisc1: 0x0001, expectedDurability: 0 },
+  ])(
+    '$cat item: strips binary internals, adds _ref, preserves UI fields + misc1 round-trip',
+    ({ cat, index, expectedRef, expectedMisc1, expectedDurability }) => {
+      const full = makeFullModel();
+      const { model: sanitized } = sanitizeModel(full);
 
-    const w = sanitized.weapons[0];
-    expect(w._ref).toBe('inv:0');
-    expect(w.itemId).toBe(0x10000001);
-    expect(w.count).toBe(1);
-    expect(w.misc1).toBe(0x0ffc);
-    expect(w.durability).toBe(300);
-    expect(w.misc2).toBe(0x01000000);
-    // _slot, idx1, idx2 are all binary-internal — stripped from sanitized
-    expect(w).not.toHaveProperty('_slot');
-    expect(w).not.toHaveProperty('idx1');
-    expect(w).not.toHaveProperty('idx2');
-  });
+      const item = sanitized[cat][index];
+      expect(item._ref).toBe(expectedRef);
+      expect(item.misc1).toBe(expectedMisc1);
+      expect(item.durability).toBe(expectedDurability);
+      expect(item.misc2).toBe(0x01000000);
+      // _slot, idx1, idx2 are all binary-internal — stripped from sanitized
+      expect(item).not.toHaveProperty('_slot');
+      expect(item).not.toHaveProperty('idx1');
+      expect(item).not.toHaveProperty('idx2');
 
-  test('rings item exposes UI-visible fields with _ref', () => {
-    const full = makeFullModel();
-    const { model: sanitized } = sanitizeModel(full);
-
-    const r = sanitized.rings[0];
-    expect(r._ref).toBe('inv:10');
-    expect(r).not.toHaveProperty('_slot');
-    expect(r).not.toHaveProperty('idx1');
-    expect(r).not.toHaveProperty('idx2');
-    expect(r.misc2).toBe(0x01000000);
-  });
-
-  test('armor item exposes UI-visible fields with _ref', () => {
-    const full = makeFullModel();
-    const { model: sanitized } = sanitizeModel(full);
-
-    const a = sanitized.armor[0];
-    expect(a._ref).toBe('inv:5');
-    expect(a).not.toHaveProperty('_slot');
-    expect(a).not.toHaveProperty('idx1');
-    expect(a).not.toHaveProperty('idx2');
-    expect(a.misc2).toBe(0x01000000);
-  });
-
-  test('armor preserves misc1 (sortId) through sanitize→merge round-trip', () => {
-    const full = makeFullModel();
-    const { model: sanitized } = sanitizeModel(full);
-
-    // misc1 should be present and correct after sanitization
-    expect(sanitized.armor[0].misc1).toBe(0x03f4);
-
-    // Round-trip through merge — misc1 should survive
-    const merged = mergeModel(full, sanitized);
-    expect(merged.armor[0].misc1).toBe(0x03f4);
-  });
-
-  test('rings preserves misc1 (sortId) through sanitize→merge round-trip', () => {
-    const full = makeFullModel();
-    const { model: sanitized } = sanitizeModel(full);
-
-    // misc1 should be present and correct after sanitization
-    expect(sanitized.rings[0].misc1).toBe(0x0013);
-
-    // Round-trip through merge — misc1 should survive
-    const merged = mergeModel(full, sanitized);
-    expect(merged.rings[0].misc1).toBe(0x0013);
-  });
+      // misc1 round-trip: sanitize → merge preserves the value
+      const merged = mergeModel(full, sanitized);
+      expect(merged[cat][index].misc1).toBe(expectedMisc1);
+    },
+  );
 
   test('misc1 survives when modified in sanitized model', () => {
     const full = makeFullModel();
     const { model: sanitized } = sanitizeModel(full);
 
-    // Change misc1 on an armor item
+    // Change misc1 on an armor item and a ring
     sanitized.armor[0].misc1 = 0x07dc; // gauntlet sortId
     sanitized.rings[0].misc1 = 0x05;
 
     const merged = mergeModel(full, sanitized);
     expect(merged.armor[0].misc1).toBe(0x07dc);
     expect(merged.rings[0].misc1).toBe(0x05);
-  });
-
-  test('goods item exposes UI-visible fields with _ref', () => {
-    const full = makeFullModel();
-    const { model: sanitized } = sanitizeModel(full);
-
-    const g = sanitized.goods[0];
-    expect(g.misc1).toBe(0x0001);
-    expect(g._ref).toBe('inv:15');
-    expect(g).not.toHaveProperty('_slot');
-    expect(g).not.toHaveProperty('idx1');
-    expect(g).not.toHaveProperty('idx2');
-    expect(g.misc2).toBe(0x01000000);
   });
 
   test('deposit items carry binary fields (no _ref)', () => {
@@ -318,17 +282,21 @@ describe('mergeModel', () => {
     expect(d0.flags).toEqual([0x21, 0, 0, 0, 0, 0x01, 0x2c]);
   });
 
-  test('assigns structural defaults for new deposit items (no durability packing)', () => {
+  // Both weapons and goods new-deposit items get the same structural defaults
+  // from assignDepositDefaults — test them in one parameterized case.
+  test.each([
+    { category: 'weapons', itemId: 0x10000005, count: 1 },
+    { category: 'goods', itemId: 0x40000003, count: 50 },
+  ])('new deposit $category gets structural defaults', ({ category, itemId, count }) => {
     const full = makeFullModel();
     const { model: sanitized } = sanitizeModel(full);
 
-    // Add a new deposit item
     sanitized.deposit.push(
       /** @type {any} */ ({
         _ref: '',
-        category: 'weapons',
-        itemId: 0x10000005,
-        count: 1,
+        category,
+        itemId,
+        count,
       }),
     );
 
@@ -369,24 +337,6 @@ describe('mergeModel', () => {
     expect(merged.deposit[0].count).toBe(10);
     expect(merged.deposit[0].flags).toEqual([0x21, 0, 0, 0, 0, 0x01, 0x2c]);
     expect(merged.souls).toBe(500000);
-  });
-
-  test('new deposit goods get structural defaults (no durability)', () => {
-    const full = makeFullModel();
-    const { model: sanitized } = sanitizeModel(full);
-
-    sanitized.deposit.push(
-      /** @type {any} */ ({
-        _ref: '',
-        category: 'goods',
-        itemId: 0x40000003,
-        count: 50,
-      }),
-    );
-
-    const merged = mergeModel(full, sanitized);
-    const newD = merged.deposit[merged.deposit.length - 1];
-    expect(newD.flags).toEqual([0x21, 0, 0, 0, 0, 0, 0]);
   });
 
   // _ref is stripped from merged output so it doesn't flow through to the

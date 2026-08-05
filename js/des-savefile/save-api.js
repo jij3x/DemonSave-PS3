@@ -493,36 +493,16 @@ async function decryptAndMergeSlots(slots, failed, manager, rawFiles, log) {
       // For decrypted-on-demand buffers, this is the first mutation.
       const writtenBytes = writeSaveInPlace(userBytes, mergedModel, mergeOut.deletedSlots);
 
-      // Re-read the authoritative model from the just-written bytes.
-      //
-      // writeSaveInPlace assigns _slot/idx1/idx2 for new items on internal
-      // shallow copies — those assignments never reach mergedModel.  If we
-      // stored mergedModel as session.fullModel, new items would retain
-      // _slot=undefined, causing reloadSlotModels() to produce _ref tokens
-      // like "inv:undefined".  On the next save, mergeModel would treat
-      // those items as new again, duplicating them on disk.
-      //
-      // Re-reading from writtenBytes guarantees session.fullModel exactly
-      // matches the on-disk binary state, with correct _slot values for
-      // all items — including newly-added ones.
+      // Re-read the authoritative model from the just-written bytes so
+      // session.fullModel exactly matches the on-disk binary state.  This
+      // ensures newly-added items get their writer-assigned _slot/idx1/idx2
+      // values reflected in the session.
       const writtenModel = readSave(writtenBytes);
 
-      // Defer session state sync until ALL slots succeed.
-      //
-      // We collect updates in a pendingUpdates array and commit them after
-      // the items loop completes.  This ensures that if the operation fails
-      // partway (e.g. slot 3 throws during merge), no session state is
-      // mutated for the slots that were already processed — the caller can
-      // safely retry or abort without inconsistent in-memory state.
-      //
-      //   - Subsequent saves in the same session reuse the decrypted cache
-      //     (session.decryptedBytes) to avoid redundant AES-CBC decryption.
-      //   - New items assigned a physical _slot during this write would
-      //     drift back to _slot=undefined on the next save if the session
-      //     weren't updated, causing them to be placed into a different
-      //     slot and corrupting the inventory.
-      //   - The in-memory model is the source of truth for the UI; keeping
-      //     it in sync with the last-serialized bytes avoids confusion.
+      // Defer session state sync until ALL slots succeed.  If the operation
+      // fails partway (e.g. slot 3 throws during merge), no session state is
+      // mutated for already-processed slots — the caller can safely retry or
+      // abort without inconsistent in-memory state.
       pendingUpdates.push({ session, fullModel: writtenModel, decryptedBytes: writtenBytes });
 
       const origName = rawFiles.get(session.primaryFile.toLowerCase())?.name || session.primaryFile;
@@ -544,8 +524,6 @@ async function decryptAndMergeSlots(slots, failed, manager, rawFiles, log) {
   }
 
   // Commit all pending session updates now that every slot succeeded.
-  // Deferred from the items loop above so a mid-loop failure doesn't leave
-  // sessions in a half-updated state.
   for (const { session, fullModel, decryptedBytes } of pendingUpdates) {
     session.fullModel = fullModel;
     session.decryptedBytes = decryptedBytes;

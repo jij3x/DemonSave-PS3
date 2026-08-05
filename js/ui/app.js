@@ -756,9 +756,10 @@ async function handleOpen(rawFiles) {
   setStatus('Opening save…');
 
   try {
-    const { slots, failedSlots, profileNumber, accountId, encrypted } = await openSave(rawFiles, (
-      msg,
-    ) => setStatus(msg));
+    const { slots, failedSlots, profileNumber, accountId, encrypted } = await openSave(
+      rawFiles,
+      (msg) => setStatus(msg),
+    );
 
     state.slots = slots;
     state.failedSlots = failedSlots;
@@ -828,10 +829,6 @@ async function handleOpen(rawFiles) {
   }
 }
 
-/**
- * Handle overwriting the save folder with un-encrypted (decrypted) files.
- * Writes directly to disk via File System Access API (Chromium only).
- */
 /**
  * Compare two Uint8Array instances for byte-equality.
  *
@@ -905,6 +902,10 @@ async function ensureDirHandle() {
   }
 }
 
+/**
+ * Handle overwriting the save folder with un-encrypted (decrypted) files.
+ * Writes directly to disk via File System Access API (Chromium only).
+ */
 async function handleOverwriteDecrypted() {
   if (state.slots.length === 0) {
     setStatus('No save loaded.');

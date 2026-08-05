@@ -45,7 +45,7 @@ function el(tag, attrs = {}, ...children) {
   return e;
 }
 
-/* ── SVG line-art icons (monochrome, stroke = currentColor) ────────── */
+/* --- SVG line-art icons (monochrome, stroke = currentColor) --- */
 const ICONS = {
   folderOpen:
     '<path d="M3 7v10a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H12L10 6H4a1 1 0 0 0-1 1z"/>',
@@ -1213,8 +1213,8 @@ export function buildPage() {
   app.appendChild(contentArea);
 
   // ================================================================
-  // Landing Page + Drag-Drop Overlay
-  // ================================================================. Doubles as a visible drop zone.
+  // Landing Page + Drag-Drop Overlay (also visible drop zone)
+  // ================================================================
   app.appendChild(
     el(
       'div',

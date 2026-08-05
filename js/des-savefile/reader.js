@@ -181,21 +181,14 @@ export function readSave(bytes) {
       if (totalSlotsScanned > O.INV_SLOTS) {
         throw new Error('Unexpected data, file may be encrypted or corrupt?');
       }
-      // Region-boundary check. Prevent the inner loop from scanning past
-      // the inventory region into the durability table (DURABILITY_BASE+)
-      // and misinterpreting durability data as inventory records.
-      //
-      // Unreachable in practice: the totalSlotsScanned > INV_SLOTS guard
-      // above fires first (at scan #2049, before the ~2056th scan needed
-      // to reach DURABILITY_BASE). Kept as a belt-and-suspenders defense.
+      // Region-boundary check: prevent the inner loop from scanning past
+      // the inventory region into the durability table (DURABILITY_BASE+).
       assertBelow(
         O.INV_TYPE_BASE + offset,
         O.DURABILITY_BASE,
         'Unexpected data, file may be encrypted or corrupt?',
       );
-      // Bounds-check: prevent runaway loops on corrupt/encrypted data.
-      // Also unreachable for buffers >= MIN_SAVE_SIZE (the top-level guard
-      // ensures this) — the INV_SLOTS cap fires well before the buffer end.
+      // Bounds-check the record read.
       assertBounds(bytes, O.INV_TYPE_BASE + offset, O.INV_STRIDE);
       type = rInt32BE(bytes, O.INV_TYPE_BASE + offset);
     }
@@ -264,10 +257,7 @@ export function readSave(bytes) {
   let depositFound = 0;
   for (let i = 0; i < O.DEPOSIT_MAX_ENTRIES && depositFound < depositCount; i++) {
     const base = O.DEPOSIT_BASE + i * O.DEPOSIT_STRIDE;
-    // Bounds-check: prevent out-of-bounds reads on corrupt/encrypted data.
-    // Unreachable for buffers >= MIN_SAVE_SIZE (guaranteed by the top-level
-    // guard): the deposit region (0x14BE8..0x1EBF4+0x14=0x1EC08) fits well
-    // within 0x20000. Kept as a belt-and-suspenders defense.
+    // Bounds-check each deposit entry read.
     assertBounds(bytes, base, O.DEPOSIT_STRIDE);
     const type = bytes[base + 4];
     if (type === 0xff) continue;
@@ -326,10 +316,7 @@ export function readSave(bytes) {
   m.spells = [];
   for (let i = 0; i < spellCount; i++) {
     const base = O.SPELL_BASE + i * O.SPELL_STRIDE;
-    // Bounds-check: prevent out-of-bounds reads on corrupt/encrypted data.
-    // Unreachable for buffers >= MIN_SAVE_SIZE (guaranteed by the top-level
-    // guard): spellCount is capped at 0x200 early on, so the spell region
-    // (0x143EC..0x143EC+0x200*0x10=0x163EC) fits well within 0x20000.
+    // Bounds-check each spell record read.
     assertBounds(bytes, base, O.SPELL_STRIDE);
     const status = rUInt32BE(bytes, base + O.SPELL_STATUS_OFFSET);
     const id = rUInt32BE(bytes, base + O.SPELL_ID_OFFSET);

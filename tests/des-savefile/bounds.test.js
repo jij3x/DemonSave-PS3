@@ -1,9 +1,5 @@
 /**
- * Tests for defensive bounds-check helpers.
- *
- * These helpers exist to replace inline `if (…) throw` branches that were
- * previously annotated with `istanbul ignore`. By extracting the check into
- * a function, the defensive logic becomes independently testable.
+ * Tests for defensive bounds-check helpers (`assertBounds`, `assertBelow`).
  */
 import { assertBounds, assertBelow } from '../../js/des-savefile/bounds.js';
 

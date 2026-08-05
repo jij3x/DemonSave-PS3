@@ -26,9 +26,7 @@
  * read display-only data — it only receives the `model` half.
  */
 
-// ---------------------------------------------------------------------------
-// Type definitions (UI-facing model shape is defined here)
-// ---------------------------------------------------------------------------
+/* ---- Type definitions (UI-facing model shape is defined here) ---- */
 
 /**
  * UI-visible fields shared by full and sanitized inventory items.
@@ -225,9 +223,7 @@
  *   Used by the UI for deterministic equipment-inventory binding.
  */
 
-// ---------------------------------------------------------------------------
-// Sanitize: full model → UI model
-// ---------------------------------------------------------------------------
+/* ---- Sanitize: full model → UI model ---- */
 
 /**
  * Strip binary internals from a parsed model, producing the UI-facing
@@ -329,9 +325,7 @@ export function sanitizeModel(fullModel) {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Merge: UI model + original full model → full model for writer
-// ---------------------------------------------------------------------------
+/* ---- Merge: UI model + original full model → full model for writer ---- */
 
 /**
  * Restore binary internals for the writer — the inverse of sanitizeModel.

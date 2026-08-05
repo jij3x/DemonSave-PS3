@@ -1,9 +1,10 @@
 /**
  * Shared test helpers for des-savefile tests.
  *
- * Eliminates duplication of makeBlankSave, makeSfo, makeSecondary,
- * writeInvRecord, fillDepositEmpty, and save-file-map builders
- * across editor.test.js, save-api.test.js, and save-api-encrypted.test.js.
+ * Provides synthetic save buffer builders (makeBlankSave, makeSfo,
+ * makeSecondary), inventory/deposit record writers, and rawFiles map
+ * builders used across editor.test.js, save-api.test.js, and
+ * save-api-encrypted.test.js.
  */
 import { wInt32BE, wUInt32BE, wUInt16BE } from '../../js/lib/ps3-save-lib/index.js';
 import * as O from '../../js/des-savefile/offsets.js';

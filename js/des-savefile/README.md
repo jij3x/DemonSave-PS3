@@ -173,7 +173,7 @@ Inventory items carry three binary-internal fields:
 
 ### `SanitizedModel` (UI-facing)
 
-Produced by `sanitizeModel(fullModel, accountId).model`. The UI never sees binary internals:
+Produced by `sanitizeModel(fullModel).model`. The UI never sees binary internals:
 
 | Category | What changes |
 |---|---|
@@ -182,11 +182,12 @@ Produced by `sanitizeModel(fullModel, accountId).model`. The UI never sees binar
 | **Spells** | No binary internals — passed through as-is (shallow-copied). |
 | **NPC flags** | Deep-copied so UI mutations don't corrupt the original `fullModel` (which must remain pristine for merge). |
 | **Everything else** | Already UI-safe (stats, equipment, tendency). Shallow-copied. |
-| **`accountId`** | Attached from PARAM.SFO (not part of `FullModel`). |
+
+`accountId` and `profileNumber` are folder-level PARAM.SFO fields — they are NOT part of any slot model (`FullModel` or `SanitizedModel`). They are returned separately by `openSave()` and passed as standalone parameters to `writeSaveData()` / `exportEncryptedSave()`.
 
 ### `DisplayData` (display-only)
 
-Produced by `sanitizeModel(fullModel, accountId).display`. This data is for UI rendering
+Produced by `sanitizeModel(fullModel).display`. This data is for UI rendering
 only and **never flows back** through `collectForm()` → `mergeModel()` → `writeSave()`:
 
 | Field | Type | Purpose |
