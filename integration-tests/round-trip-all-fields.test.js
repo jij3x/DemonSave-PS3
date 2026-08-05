@@ -41,8 +41,8 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
   /**
    * Write the current slots to disk and re-open from disk.
    */
-  async function writeAndReopen(slots, profileNumber) {
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber);
+  async function writeAndReopen(slots, profileNumber, accountId = opened.accountId) {
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
     sandbox.writeFiles(filesToWrite);
     return await openSave(sandbox.readFiles());
   }
@@ -80,7 +80,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
 
   test('initial openSave reads profileNumber and accountId from SFO', () => {
     expect(opened.profileNumber).toBe(42);
-    expect(opened.slots[0].model.accountId).toBe('aabbccdd11223344aabbccdd11223344');
+    expect(opened.accountId).toBe('aabbccdd11223344aabbccdd11223344');
   });
 
   // -------------------------------------------------------------------
@@ -860,20 +860,24 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
   });
 
   test('accountId change round-trips through SFO', async () => {
-    const model = opened.slots[0].model;
-    model.accountId = '11223344556677889900aabbccddeeff';
+    const newAccountId = '11223344556677889900aabbccddeeff';
 
-    const { filesToWrite } = await writeSaveData(opened.slots, [], opened.profileNumber);
+    const { filesToWrite } = await writeSaveData(
+      opened.slots,
+      [],
+      opened.profileNumber,
+      newAccountId,
+    );
     sandbox.writeFiles(filesToWrite);
 
     // Read SFO from disk and verify accountId
     const sfoBytes = sandbox.readFile('PARAM.SFO');
     const readAcctId = getSfoAccountId(sfoBytes);
-    expect(readAcctId).toBe('11223344556677889900aabbccddeeff');
+    expect(readAcctId).toBe(newAccountId);
 
-    // Re-open and verify model has the accountId
-    const { slots } = await openSave(sandbox.readFiles());
-    expect(slots[0].model.accountId).toBe('11223344556677889900aabbccddeeff');
+    // Re-open and verify openSave returns the accountId
+    const { accountId } = await openSave(sandbox.readFiles());
+    expect(accountId).toBe(newAccountId);
   });
 
   // -------------------------------------------------------------------

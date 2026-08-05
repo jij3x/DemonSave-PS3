@@ -124,7 +124,7 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     });
     writeToDisk(sb1, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb1.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb1.readFiles());
 
     // Modify each slot distinctly
     slots.find((s) => s.slot === 1).model.vit = 111;
@@ -133,7 +133,7 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     slots.find((s) => s.slot === 1).model.name = 'Slot1Mod';
     slots.find((s) => s.slot === 3).model.souls = 999999;
 
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
 
     // Write to fresh sandbox and re-open
     const sb2 = newSandbox('real-mod-2');
@@ -207,7 +207,7 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     files.set('103user.dat', { name: '103USER.DAT', bytes: slot4Dat });
 
     writeToDisk(sb, files);
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
     // Modify slot 4
     const slot4 = slots.find((s) => s.slot === 4);
@@ -215,7 +215,7 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     slot4.model.name = 'StaleTest';
 
     // Export encrypted
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
 
     // Re-open
     const sb2 = newSandbox('stale-chain-out');
@@ -239,11 +239,11 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     const rawFiles = createRealisticSaveFolder([1, 2], { encrypted: true });
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
     // Export encrypted — this should decrypt all backup USER.DAT files
     // (including 2USER.DAT, 201USER.DAT) and re-encrypt them with the new PFD
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
 
     // All USER.DAT variants must be in the output
     const expectedFiles = [
@@ -299,7 +299,12 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     writeToDisk(sb1, rawFiles);
 
     // Step 1: Open encrypted
-    const { slots: s1, profileNumber: p1, encrypted: e1 } = await openSave(sb1.readFiles());
+    const {
+      slots: s1,
+      profileNumber: p1,
+      encrypted: e1,
+      accountId: a1,
+    } = await openSave(sb1.readFiles());
     expect(e1).toBe(true);
     expect(s1).toHaveLength(4);
 
@@ -310,7 +315,7 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     }
 
     // Step 2: Export encrypted
-    const { filesToWrite: encOut } = await exportEncryptedSave(s1, [], p1);
+    const { filesToWrite: encOut } = await exportEncryptedSave(s1, [], p1, a1);
 
     // Step 3: Write to disk and re-open
     const sb2 = newSandbox('full-chain-2');
@@ -341,14 +346,14 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     const rawFiles = createRealisticSaveFolder([1, 2, 3]);
     writeToDisk(sb, rawFiles);
 
-    const { slots, profileNumber } = await openSave(sb.readFiles());
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
     // Modify
     slots.find((s) => s.slot === 1).model.name = 'Alpha';
     slots.find((s) => s.slot === 2).model.name = 'Beta';
     slots.find((s) => s.slot === 3).model.name = 'Gamma';
 
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
     const reopened = writeOutputToDisk(sb, filesToWrite);
     const { slots: readSlots } = await openSave(reopened);
 

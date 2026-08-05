@@ -94,9 +94,8 @@ export const HELMET_PTR = 0x250;
 export const CHEST_PTR = 0x254;
 export const GAUNTLETS_PTR = 0x258;
 export const LEGGINGS_PTR = 0x25c;
-// RESERVED_PTR (0x260): padding/reserved slot (always 0xFFFFFFFF in real
-// saves).  Ring and quick-slot pointers start at 0x264.
-export const RESERVED_PTR = 0x260; // always 0xFFFFFFFF
+/** Padding/reserved slot — always 0xFFFFFFFF in real saves. Ring and quick-slot pointers start at 0x264. */
+export const RESERVED_PTR = 0x260;
 export const RING1_PTR = 0x264;
 export const RING2_PTR = 0x268;
 export const QUICK1_PTR = 0x26c;
@@ -105,16 +104,17 @@ export const QUICK3_PTR = 0x274;
 export const QUICK4_PTR = 0x278;
 export const QUICK5_PTR = 0x27c;
 
-// Active hand-slot selectors (NOT read/written by this editor).
-//
-//   0x280 (UInt32 BE): unknown — observed 0x00000001 in all saves examined;
-//     NOT the left-hand selector.
-//   0x284 (UInt32 BE): active LEFT hand slot  — 0 = LH1, 1 = LH2
-//   0x288 (UInt32 BE): active RIGHT hand slot — 0 = RH1, 1 = RH2
-//
-// Confirmed via binary diff: switching the held weapon changes only the low
-// byte of the relevant selector (0x287 for LH, 0x28b for RH).  All equipped
-// item IDs remain identical.
+/**
+ * Active hand-slot selectors (NOT read/written by this editor).
+ *
+ *   0x280 (UInt32 BE): unknown — always 0x00000001; NOT the left-hand selector.
+ *   0x284 (UInt32 BE): active LEFT hand slot  — 0 = LH1, 1 = LH2
+ *   0x288 (UInt32 BE): active RIGHT hand slot — 0 = RH1, 1 = RH2
+ *
+ * Switching the held weapon changes only the low byte of the relevant
+ * selector (0x287 for LH, 0x28b for RH); all equipped item IDs remain
+ * identical.
+ */
 export const ACTIVE_LH_SLOT = 0x284;
 export const ACTIVE_RH_SLOT = 0x288;
 
@@ -159,9 +159,8 @@ export const DURABILITY_BASE = 0x10364; // + Idx1 * 8
  * Determines which of the 5 quick slots is currently selected in the goods
  * hotbar.  Values: 0 = QUICK1, 1 = QUICK2, 2 = QUICK3, 3 = QUICK4, 4 = QUICK5.
  *
- * Confirmed via binary diff: switching the active quick item changes only the
- * low byte at 0x1035f (u32 at 0x1035c).  All quick slot item IDs and pointers
- * remain identical.
+ * Switching the active quick item changes only the low byte at 0x1035f
+ * (u32 at 0x1035c); all quick slot item IDs and pointers remain identical.
  */
 export const ACTIVE_QUICK_SLOT = 0x1035c;
 

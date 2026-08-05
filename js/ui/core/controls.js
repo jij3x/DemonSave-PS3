@@ -183,12 +183,12 @@ function fillSelect(sel, ids, names) {
 /**
  * Populate all combo boxes in the UI with their respective item lists.
  *
- * Equipment slots (LH/RH/arrows/bolts/armor/rings/quick slots) are now
+ * Equipment slots (LH/RH/arrows/bolts/armor/rings/quick slots) are
  * read-only text spans — they are NOT populated here.  Their display names
  * are resolved on the fly by populateForm() via db.getItem().
  */
 export function populateCombos() {
-  // Hairstyle is the only equipment select still present (in Character tab)
+  // Hairstyle is the only equipment select present (in Character tab).
   fillSelect(
     /** @type {HTMLSelectElement} */ (document.getElementById('hairstyle')),
     HAIRSTYLE_IDS,
@@ -354,9 +354,7 @@ export function getGoodsTypeData(typeId) {
   return GOODS_TYPE_DATA[typeId] || { ids: [], names: [] };
 }
 
-/* ------------------------------------------------------------------ */
-/* Deposit weapon decomposition: base weapon / path / level helpers    */
-/* ------------------------------------------------------------------ */
+/* --- Deposit weapon decomposition: base weapon / path / level helpers --- */
 
 /**
  * Pre-built per-type lists of base weapons.
@@ -457,9 +455,7 @@ export function resolveItemIdFromRef(baseId, pathId, level) {
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* Dropdown width computation (pre-computed at module load time)       */
-/* ------------------------------------------------------------------ */
+/* --- Dropdown width computation (pre-computed at module load time) --- */
 
 /**
  * Font used for canvas-based text measurement of select dropdown widths.

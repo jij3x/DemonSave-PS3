@@ -1,12 +1,9 @@
 /**
  * Defensive bounds-check helpers for savefile parsing/writing.
  *
- * These exist to eliminate `istanbul ignore` annotations at call sites:
- * instead of an inline `if (…) throw` branch (which is unreachable due to
- * upstream guards and therefore can't be covered), the check is delegated
- * to a function call. The function itself is independently unit-tested,
- * so the defensive logic is verified without needing to trigger it from
- * the caller's context.
+ * Each check is extracted into a named function so the defensive logic can
+ * be unit-tested independently, rather than living as inline branches at
+ * call sites.
  */
 
 /**

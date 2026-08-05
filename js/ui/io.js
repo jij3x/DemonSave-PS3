@@ -124,9 +124,7 @@ export async function openDirectoryViaFSAccess() {
   return { dirHandle, files };
 }
 
-/* ------------------------------------------------------------------ */
-/* Drag-and-drop folder reading (DataTransferItem.webkitGetAsEntry)    */
-/* ------------------------------------------------------------------ */
+/* --- Drag-and-drop folder reading (DataTransferItem.webkitGetAsEntry) --- */
 
 /**
  * Promisified version of FileSystemDirectoryReader.readEntries().
@@ -321,9 +319,7 @@ export async function deleteFilesFromDirectory(dirHandle, fileNames) {
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* ZIP Download (DEFLATE compression via fflate)                       */
-/* ------------------------------------------------------------------ */
+/* --- ZIP Download (DEFLATE compression via fflate) --- */
 
 /**
  * Convert a Map of filename → bytes into the plain object expected by fflate.
@@ -403,9 +399,7 @@ export async function downloadFilesAsZip(files, zipName = 'des_save.zip') {
   }, 10000);
 }
 
-/* ------------------------------------------------------------------ */
-/* Save As… via File System Access API (Chromium only)                  */
-/* ------------------------------------------------------------------ */
+/* --- Save As… via File System Access API (Chromium only) --- */
 
 /**
  * Check if a native "Save As" dialog (choose folder + filename) is

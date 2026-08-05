@@ -21,10 +21,7 @@ describe('ui-setup', () => {
     refreshEquipmentDisplay.cancel();
   });
 
-  // -------------------------------------------------------------------------
-  // setupHairColorSample
-  // -------------------------------------------------------------------------
-
+  // --- setupHairColorSample ---
   describe('setupHairColorSample', () => {
     test('input on hairR updates the color sample', () => {
       // Create the DOM elements
@@ -54,10 +51,7 @@ describe('ui-setup', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // setupWarpAndWorld
-  // -------------------------------------------------------------------------
-
+  // --- setupWarpAndWorld ---
   describe('setupWarpAndWorld', () => {
     // Helper: create all three selects that populateCombos() needs
     function buildWarpDOM() {
@@ -148,10 +142,7 @@ describe('ui-setup', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // setupTabs — including keyboard navigation
-  // -------------------------------------------------------------------------
-
+  // --- setupTabs — including keyboard navigation ---
   describe('setupTabs', () => {
     function buildTabGroup() {
       const group = document.createElement('div');
@@ -388,10 +379,7 @@ describe('ui-setup', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // setupAddRowButtons
-  // -------------------------------------------------------------------------
-
+  // --- setupAddRowButtons ---
   describe('setupAddRowButtons', () => {
     function buildAddButtonDOM() {
       // Create inventory tables and add buttons (matching dom.js structure)

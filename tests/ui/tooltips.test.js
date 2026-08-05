@@ -42,10 +42,7 @@ describe('tooltips', () => {
     jest.useRealTimers();
   });
 
-  // -------------------------------------------------------------------------
-  // initTooltips — double-init guard & tooltip element creation
-  // -------------------------------------------------------------------------
-
+  // --- initTooltips — double-init guard & tooltip element creation ---
   describe('initTooltips', () => {
     test('the tooltip element exists after init', () => {
       const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
@@ -62,10 +59,7 @@ describe('tooltips', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Show / hide via mouseover / mouseout
-  // -------------------------------------------------------------------------
-
+  // --- Show / hide via mouseover / mouseout ---
   describe('mouseover / mouseout delegation', () => {
     test('shows tooltip after SHOW_DELAY when hovering a [data-tooltip] element', () => {
       const el = document.createElement('button');
@@ -185,10 +179,7 @@ describe('tooltips', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Truncated-only tooltips (data-tooltip-if-truncated)
-  // -------------------------------------------------------------------------
-
+  // --- Truncated-only tooltips (data-tooltip-if-truncated) ---
   describe('data-tooltip-if-truncated', () => {
     test('suppresses tooltip when content is not overflowing', () => {
       const el = document.createElement('span');
@@ -223,10 +214,7 @@ describe('tooltips', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Escape key dismiss
-  // -------------------------------------------------------------------------
-
+  // --- Escape key dismiss ---
   describe('Escape key dismiss', () => {
     test('hides visible tooltip on Escape', () => {
       const el = document.createElement('button');
@@ -262,10 +250,7 @@ describe('tooltips', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Mousedown dismiss
-  // -------------------------------------------------------------------------
-
+  // --- Mousedown dismiss ---
   describe('mousedown dismiss', () => {
     test('hides tooltip and cancels show timer on mousedown on a tooltip target', () => {
       const el = document.createElement('button');
@@ -303,10 +288,7 @@ describe('tooltips', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Scroll hide
-  // -------------------------------------------------------------------------
-
+  // --- Scroll hide ---
   describe('scroll hide', () => {
     test('hides tooltip on scroll (capture phase)', () => {
       const el = document.createElement('button');
@@ -349,10 +331,7 @@ describe('tooltips', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // display:contents fallback positioning
-  // -------------------------------------------------------------------------
-
+  // --- display:contents fallback positioning ---
   describe('display:contents fallback', () => {
     test('falls back to child element rect when target has zero-size rect', () => {
       const label = document.createElement('label');
@@ -383,10 +362,7 @@ describe('tooltips', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // app bounds — fallback when no #app element exists
-  // -------------------------------------------------------------------------
-
+  // --- app bounds — fallback when no #app element exists ---
   describe('positioning without #app', () => {
     test('falls back to window dimensions when #app is absent', () => {
       const el = document.createElement('button');
@@ -406,10 +382,7 @@ describe('tooltips', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Vertical positioning — clamp to top/bottom edges
-  // -------------------------------------------------------------------------
-
+  // --- Vertical positioning — clamp to top/bottom edges ---
   describe('vertical positioning (flip and clamp)', () => {
     test('flips above when there is more space above than below', () => {
       // Target near the bottom of the viewport: more space above than below
@@ -459,10 +432,7 @@ describe('tooltips', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // Empty tooltip text
-  // -------------------------------------------------------------------------
-
+  // --- Empty tooltip text ---
   describe('empty data-tooltip', () => {
     test('hides tooltip when data-tooltip is empty', () => {
       const el = document.createElement('button');
@@ -478,10 +448,7 @@ describe('tooltips', () => {
     });
   });
 
-  // -------------------------------------------------------------------------
-  // "Place above" + clamp to top edge (branch coverage)
-  // -------------------------------------------------------------------------
-
+  // --- "Place above" + clamp to top edge (branch coverage) ---
   describe('place-above with top-edge clamp', () => {
     test('places tooltip above and clamps to app top when overflowing upward', () => {
       const app = document.createElement('div');

@@ -23,9 +23,7 @@ export function formatUnknownItem(id) {
   return `Unknown (0x${(id >>> 0).toString(16).toUpperCase().padStart(8, '0')})`;
 }
 
-/* ------------------------------------------------------------------ */
-/* O(1) item-index lookup (cached via WeakMap on frozen id arrays)     */
-/* ------------------------------------------------------------------ */
+/* --- O(1) item-index lookup (cached via WeakMap on frozen id arrays) --- */
 
 /**
  * Cache of id-array → Map<itemId, index>.

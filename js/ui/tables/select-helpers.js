@@ -19,9 +19,7 @@ import {
   refreshEquipmentForItems,
 } from '../core/dom-helpers.js';
 
-/* ------------------------------------------------------------------ */
-/* SVG icons                                                           */
-/* ------------------------------------------------------------------ */
+/* --- SVG icons --- */
 
 /**
  * Create a trash icon SVG element for row delete buttons.
@@ -102,9 +100,7 @@ export function dismissIconSvg() {
   return svg;
 }
 
-/* ------------------------------------------------------------------ */
-/* Placeholder + lazy-load dropdown population                          */
-/* ------------------------------------------------------------------ */
+/* --- Placeholder + lazy-load dropdown population --- */
 
 /**
  * Prepend a placeholder option to a <select> for new (user-inserted) rows.
@@ -220,9 +216,7 @@ export function ensureSelectPopulated(sel) {
   sel.value = currentValue;
 }
 
-/* ------------------------------------------------------------------ */
-/* Duplicate-prevention filtering                                      */
-/* ------------------------------------------------------------------ */
+/* --- Duplicate-prevention filtering --- */
 
 /**
  * Collect the set of item IDs already used by rows in the same table as
@@ -438,9 +432,7 @@ export function setupLazySelects() {
   root.addEventListener('focusin', handler);
 }
 
-/* ------------------------------------------------------------------ */
-/* Row delete / restore button                                         */
-/* ------------------------------------------------------------------ */
+/* --- Row delete / restore button --- */
 
 /**
  * Soft-delete an existing table row.
@@ -449,8 +441,8 @@ export function setupLazySelects() {
  * inputs, updates visual state (greyed out + restore icon), notifies the
  * dirty tracker, syncs equipment slots, and refreshes sibling dropdowns.
  *
- * Extracted from makeRowDeleteButton so it can be called directly by
- * resolveDuplicateOnUndelete (instead of simulating a DOM click).
+ * Called directly by resolveDuplicateOnUndelete to reuse the full
+ * soft-delete logic without simulating a DOM click.
  *
  * @param {HTMLTableRowElement} tr  the row to soft-delete
  */
@@ -546,6 +538,7 @@ function softDeleteRow(tr) {
  * @param {HTMLTableRowElement} tr  the row this button belongs to
  * @returns {HTMLButtonElement}
  */
+
 /**
  * Idempotent guard for the delegated row-delete click handler.
  * Set to true after the listener is attached to prevent duplicates.
@@ -554,8 +547,8 @@ let _rowDeleteHandlerInit = false;
 
 /**
  * Attach a single delegated click listener on `document` for all `.row-del`
- * buttons.  This replaces per-row closures (~200 for a typical save) with
- * a single handler that reads row context at event time.
+ * buttons.  A single handler reads row context at event time, instead of
+ * per-row closures (~200 for a typical save).
  *
  * Called lazily from `makeRowDeleteButton()` — the guard ensures the
  * listener is attached exactly once.

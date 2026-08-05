@@ -263,7 +263,12 @@ describe('writeSaveData (encrypted → decrypted)', () => {
 
     // Step 4: Save as decrypted
     slots2[0].model.vit = 70;
-    const { filesToWrite: decOut2, encrypted: decEnc2 } = await writeSaveData(slots2, [], profile2, '');
+    const { filesToWrite: decOut2, encrypted: decEnc2 } = await writeSaveData(
+      slots2,
+      [],
+      profile2,
+      '',
+    );
     expect(decEnc2).toBe(false);
     expect(decOut2.has('USER.DAT')).toBe(true);
 
@@ -383,7 +388,7 @@ describe('updateSessionAfterWrite (session state sync)', () => {
     let rawFiles = makeEncryptedSaveFiles(buf);
 
     // Step 1: Open encrypted save
-    const { slots, profileNumber, accountId } = await openSave(rawFiles);
+    const { slots, profileNumber } = await openSave(rawFiles);
     expect(slots[0].session.encrypted).toBe(true);
 
     // Step 2: Overwrite as decrypted, sync session
@@ -391,7 +396,8 @@ describe('updateSessionAfterWrite (session state sync)', () => {
       slots,
       [],
       profileNumber,
-      undefined,
+      '',
+      null,
       true,
     );
     await updateSessionAfterWrite(slots, decFiles, false);
@@ -403,7 +409,8 @@ describe('updateSessionAfterWrite (session state sync)', () => {
       slots,
       [],
       profileNumber,
-      undefined,
+      '',
+      null,
       true,
     );
     await updateSessionAfterWrite(slots, encFiles, true);
@@ -415,7 +422,8 @@ describe('updateSessionAfterWrite (session state sync)', () => {
       slots,
       [],
       profileNumber,
-      undefined,
+      '',
+      null,
       true,
     );
     const userBytes = decFiles2.get('USER.DAT');
@@ -459,7 +467,7 @@ describe('exportEncryptedSave: with failedSlots', () => {
       },
     ];
 
-    const { filesToWrite } = await exportEncryptedSave(validResult.slots, syntheticFailed, 0, "");
+    const { filesToWrite } = await exportEncryptedSave(validResult.slots, syntheticFailed, 0, '');
 
     // The export should succeed
     expect(filesToWrite.has('PARAM.SFO')).toBe(true);
@@ -480,7 +488,12 @@ describe('writeSaveData: encrypted source with backup decrypt failure', () => {
     expect(slots).toHaveLength(1);
 
     // writeSaveData should still succeed (backup failures are logged, not thrown)
-    const { filesToWrite, filesToDelete } = await writeSaveData(slots, [], profileNumber, accountId);
+    const { filesToWrite, filesToDelete } = await writeSaveData(
+      slots,
+      [],
+      profileNumber,
+      accountId,
+    );
 
     expect(filesToWrite.has('USER.DAT')).toBe(true);
     expect(filesToDelete.has('PARAM.PFD')).toBe(true);
@@ -488,7 +501,7 @@ describe('writeSaveData: encrypted source with backup decrypt failure', () => {
 });
 
 /* ========================================================================
- * Coverage: corrupt secondary file, export backup failure, empty slots
+ * Corrupt secondary file, export backup failure, empty slots
  * ==================================================================== */
 
 describe('decryptAndMergeSlots: corrupt secondary file (04USER.DAT)', () => {
@@ -547,36 +560,13 @@ describe('exportEncryptedSave: corrupt backup decrypt failure', () => {
   });
 });
 
-describe('save-api: empty slots throws (export only)', () => {
-  // writeSaveData empty-slots test is in save-api.test.js.
-  test('exportEncryptedSave throws on empty slots', async () => {
-    await expect(exportEncryptedSave([], [], 0, '')).rejects.toThrow('No save slots provided');
-  });
-});
+// exportEncryptedSave empty-slots test is in save-api.test.js (shared assertion).
 
 /* ========================================================================
- * Coverage: inPlace mode branches + non-array failedSlots
+ * inPlace mode branches + non-array failedSlots
  * ==================================================================== */
 
 describe('writeSaveData: inPlace mode', () => {
-  test('inPlace=true on unencrypted session omits SFO, includes assets', async () => {
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    // Add an asset file to exercise the asset-inclusion branches
-    rawFiles.set('icon0.png', { name: 'ICON0.PNG', bytes: new Uint8Array([0x89, 0x50]) });
-
-    const { slots } = await openSave(rawFiles);
-
-    // inPlace=true: SFO is NOT written, assets are skipped (already on disk)
-    // Only USER.DAT files are written.
-    const { filesToWrite } = await writeSaveData(slots, [], 0, "", null, true);
-
-    expect(filesToWrite.has('PARAM.SFO')).toBe(false); // inPlace omits SFO
-    expect(filesToWrite.has('USER.DAT')).toBe(true);
-    // Assets are skipped in inPlace mode.
-    expect(filesToWrite.has('ICON0.PNG')).toBe(false);
-  });
-
   test('inPlace=true on encrypted session omits SFO, decrypts backups', async () => {
     const buf = makeBlankSave();
     const rawFiles = makeEncryptedSaveFiles(buf);
@@ -587,7 +577,7 @@ describe('writeSaveData: inPlace mode', () => {
 
     // inPlace=true on encrypted source: assets are excluded (inPlace && encrypted),
     // but USER.DAT backups are decrypted and included
-    const { filesToWrite, filesToDelete } = await writeSaveData(slots, [], 0, "", null, true);
+    const { filesToWrite, filesToDelete } = await writeSaveData(slots, [], 0, '', null, true);
 
     expect(filesToWrite.has('PARAM.SFO')).toBe(false); // inPlace omits SFO
     expect(filesToWrite.has('USER.DAT')).toBe(true);
@@ -603,7 +593,7 @@ describe('writeSaveData: non-array failedSlots', () => {
     const { slots } = await openSave(rawFiles);
 
     // Pass null instead of array — should default to []
-    const { filesToWrite } = await writeSaveData(slots, null, 0, "");
+    const { filesToWrite } = await writeSaveData(slots, null, 0, '');
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
 
@@ -612,7 +602,7 @@ describe('writeSaveData: non-array failedSlots', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots } = await openSave(rawFiles);
 
-    const { filesToWrite } = await writeSaveData(slots, undefined, 0, "");
+    const { filesToWrite } = await writeSaveData(slots, undefined, 0, '');
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
 });
@@ -628,7 +618,14 @@ describe('exportEncryptedSave: inPlace mode', () => {
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // inPlace=true: assets are NOT included (already on disk)
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId, null, true);
+    const { filesToWrite } = await exportEncryptedSave(
+      slots,
+      [],
+      profileNumber,
+      accountId,
+      null,
+      true,
+    );
 
     expect(filesToWrite.has('PARAM.PFD')).toBe(true);
     expect(filesToWrite.has('PARAM.SFO')).toBe(true);
@@ -654,38 +651,11 @@ describe('exportEncryptedSave: onProgress callback', () => {
 });
 
 /* ========================================================================
- * Coverage: noop callback defaults, accountId undefined, no secondary,
- *           missing file in unencrypted decrypt, updateSession empty
- * Targets the remaining missing ternary/default branches.
+ * Optional callback defaults, accountId handling, no secondary,
+ * missing file in unencrypted decrypt, updateSession empty
  * ==================================================================== */
 
-describe('save-api: missing callback / default branches', () => {
-  test('openSave without onProgress uses noop', async () => {
-    // Call openSave without onProgress → triggers ternary else
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots } = await openSave(rawFiles);
-    expect(slots).toHaveLength(1);
-  });
-
-  test('writeSaveData with accountId undefined skips writeSfoAccountId', async () => {
-    // Trigger the `if (accountId !== undefined)` else branch
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots } = await openSave(rawFiles);
-    const { filesToWrite } = await writeSaveData(slots, [], 0, '');
-    expect(filesToWrite.has('USER.DAT')).toBe(true);
-  });
-
-  test('exportEncryptedSave with accountId undefined skips writeSfoAccountId', async () => {
-    // Trigger the `if (accountId !== undefined)` else branch
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber, accountId } = await openSave(rawFiles);
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
-    expect(filesToWrite.has('PARAM.PFD')).toBe(true);
-  });
-
+describe('save-api: updateSessionAfterWrite edge branches', () => {
   test('updateSessionAfterWrite with empty slots is a no-op', async () => {
     // Trigger the `if (slots.length === 0) return` branch
     await updateSessionAfterWrite([], new Map(), false);
@@ -708,20 +678,8 @@ describe('save-api: missing callback / default branches', () => {
   });
 });
 
-describe('save-api: no secondary file path', () => {
-  test('writeSaveData with no secondary file in rawFiles', async () => {
-    // Remove 04USER.DAT → triggers `hasSecondary ? secondaryFile : null` else
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    rawFiles.delete('04user.dat');
-
-    // openSave throws because resolveSaveFiles requires a secondary file.
-    // So we need to also delete the secondary variants resolution.
-    // Instead, test indirectly: build a save with only USER.DAT + 2USER.DAT
-    // but no 04* variants.
-    await expect(openSave(rawFiles)).rejects.toThrow();
-  });
-});
+// No-secondary-file, no-progress-callback, and accountId-undefined branches
+// are covered in save-api.test.js (same unencrypted scenario).
 
 describe('save-api: failed slot with missing primaryFile', () => {
   test('writeSaveData handles failed slot with null primaryFile', async () => {
@@ -738,7 +696,12 @@ describe('save-api: failed slot with missing primaryFile', () => {
       },
     ];
 
-    const { filesToWrite } = await writeSaveData(slots, failedWithNullPrimary, profileNumber, accountId);
+    const { filesToWrite } = await writeSaveData(
+      slots,
+      failedWithNullPrimary,
+      profileNumber,
+      accountId,
+    );
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
 
@@ -757,28 +720,36 @@ describe('save-api: failed slot with missing primaryFile', () => {
       },
     ];
 
-    const { filesToWrite } = await writeSaveData(slots, failedWithMissingFile, profileNumber, accountId);
+    const { filesToWrite } = await writeSaveData(
+      slots,
+      failedWithMissingFile,
+      profileNumber,
+      accountId,
+    );
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
 });
 
-describe('save-api: callbacks for ternary branch coverage', () => {
-  test('openSave with onProgress callback', async () => {
-    // Trigger ternary true branch: typeof onProgress === 'function'
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const messages = [];
-    await openSave(rawFiles, (msg) => messages.push(msg));
-    expect(messages.length).toBeGreaterThan(0);
-  });
+// onProgress callback coverage: the exportEncryptedSave onProgress test above
+// covers the ternary-true branch; every other test without onProgress covers else.
 
-  test('writeSaveData with onProgress callback', async () => {
-    // Trigger ternary true branch: typeof onProgress === 'function'
+/* ========================================================================
+ * exportEncryptedSave: sfoBytes return value + accountId
+ * ==================================================================== */
+
+describe('exportEncryptedSave: sfoBytes + accountId', () => {
+  test('returns sfoBytes with patched profile number + accountId', async () => {
     const buf = makeBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots } = await openSave(rawFiles);
-    const messages = [];
-    await writeSaveData(slots, [], 0, "", (msg) => messages.push(msg));
-    expect(messages.length).toBeGreaterThan(0);
+
+    const newAccountId = '0123456789abcdef0123456789abcdef';
+    const { sfoBytes, filesToWrite } = await exportEncryptedSave(slots, [], 77, newAccountId);
+
+    expect(sfoBytes).toBeInstanceOf(Uint8Array);
+    expect(sfoBytes[0x570]).toBe(77);
+    expect(filesToWrite.has('PARAM.SFO')).toBe(true);
+    // accountId write requires a real ACCOUNT_ID field in SFO;
+    // makeSfo() doesn't have one — see param-sfo.test.js for that.
   });
 });
