@@ -86,9 +86,9 @@ describe('exportEncryptedSave (PFD membership)', () => {
     });
     rawFiles.set('pic1.png', { name: 'PIC1.PNG', bytes: new Uint8Array(1000) });
 
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
 
     // Assets must be in output
     expect(filesToWrite.has('ICON0.PNG')).toBe(true);
@@ -120,8 +120,8 @@ describe('exportEncryptedSave (PFD membership)', () => {
     // makeUnencryptedSaveFiles already includes 2USER.DAT as a backup
     // (not the primary for any slot — slot 1 primary is USER.DAT)
 
-    const { slots, profileNumber } = await openSave(rawFiles);
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
 
     // All USER.DAT variants should be in output
     expect(filesToWrite.has('USER.DAT')).toBe(true);
@@ -155,7 +155,7 @@ describe('writeSaveData (encrypted → decrypted)', () => {
     const rawFiles = makeEncryptedSaveFiles(buf);
 
     // Open encrypted save
-    const { slots, profileNumber, encrypted } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId, encrypted } = await openSave(rawFiles);
     expect(encrypted).toBe(true);
 
     // Modify
@@ -167,7 +167,7 @@ describe('writeSaveData (encrypted → decrypted)', () => {
       filesToWrite,
       encrypted: outEncrypted,
       filesToDelete,
-    } = await writeSaveData(slots, [], profileNumber);
+    } = await writeSaveData(slots, [], profileNumber, accountId);
 
     expect(outEncrypted).toBe(false);
     expect(filesToWrite.has('PARAM.PFD')).toBe(false);
@@ -186,7 +186,7 @@ describe('writeSaveData (encrypted → decrypted)', () => {
 
     const { slots } = await openSave(rawFiles);
 
-    const { filesToDelete } = await writeSaveData(slots, [], 0);
+    const { filesToDelete } = await writeSaveData(slots, [], 0, '');
 
     expect(filesToDelete.size).toBe(0);
   });
@@ -201,7 +201,7 @@ describe('writeSaveData (encrypted → decrypted)', () => {
 
     // Step 2: Export encrypted
     slots1[0].model.vit = 75;
-    const { filesToWrite: encFiles } = await exportEncryptedSave(slots1, [], profile1);
+    const { filesToWrite: encFiles } = await exportEncryptedSave(slots1, [], profile1, '');
     expect(encFiles.has('PARAM.PFD')).toBe(true);
 
     // Build raw files map for reopening
@@ -221,7 +221,7 @@ describe('writeSaveData (encrypted → decrypted)', () => {
       filesToWrite: decFiles,
       encrypted: decEnc,
       filesToDelete: decDel,
-    } = await writeSaveData(slots2, [], profile2);
+    } = await writeSaveData(slots2, [], profile2, '');
 
     expect(decEnc).toBe(false);
     expect(decFiles.has('PARAM.PFD')).toBe(false);
@@ -247,7 +247,7 @@ describe('writeSaveData (encrypted → decrypted)', () => {
 
     // Step 2: Save as encrypted
     slots1[0].model.vit = 60;
-    const { filesToWrite: encOut1 } = await exportEncryptedSave(slots1, [], profile1);
+    const { filesToWrite: encOut1 } = await exportEncryptedSave(slots1, [], profile1, '');
     expect(encOut1.has('PARAM.PFD')).toBe(true);
     expect(encOut1.has('PARAM.SFO')).toBe(true);
     expect(encOut1.has('USER.DAT')).toBe(true);
@@ -263,7 +263,7 @@ describe('writeSaveData (encrypted → decrypted)', () => {
 
     // Step 4: Save as decrypted
     slots2[0].model.vit = 70;
-    const { filesToWrite: decOut2, encrypted: decEnc2 } = await writeSaveData(slots2, [], profile2);
+    const { filesToWrite: decOut2, encrypted: decEnc2 } = await writeSaveData(slots2, [], profile2, '');
     expect(decEnc2).toBe(false);
     expect(decOut2.has('USER.DAT')).toBe(true);
 
@@ -288,14 +288,14 @@ describe('writeSaveData (encrypted → decrypted)', () => {
     wInt32BE(buf, O.VIT, 30);
     const rawFiles = makeEncryptedSaveFiles(buf);
 
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // First operation: export encrypted
-    const { filesToWrite: encOut } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite: encOut } = await exportEncryptedSave(slots, [], profileNumber, accountId);
     expect(encOut.has('USER.DAT')).toBe(true);
 
     // Second operation on the SAME session: write decrypted
-    const { filesToWrite: decOut } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite: decOut } = await writeSaveData(slots, [], profileNumber, accountId);
     expect(decOut.has('USER.DAT')).toBe(true);
 
     // The decrypted output must be valid, parseable data
@@ -315,7 +315,7 @@ describe('updateSessionAfterWrite (session state sync)', () => {
     wInt32BE(buf, O.VIT, 50);
     const rawFiles = makeEncryptedSaveFiles(buf);
 
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
     const { session } = slots[0];
 
     // Before: session is encrypted with a valid PFD
@@ -324,7 +324,7 @@ describe('updateSessionAfterWrite (session state sync)', () => {
     expect(session.manager.encrypted).toBe(true);
 
     // Write decrypted output
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
 
     // Simulate in-place overwrite: sync session state
     await updateSessionAfterWrite(slots, filesToWrite, false);
@@ -349,7 +349,7 @@ describe('updateSessionAfterWrite (session state sync)', () => {
     wInt32BE(buf, O.VIT, 60);
     const rawFiles = makeUnencryptedSaveFiles(buf);
 
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
     const { session } = slots[0];
 
     // Before: session is unencrypted, no PFD
@@ -357,7 +357,7 @@ describe('updateSessionAfterWrite (session state sync)', () => {
     expect(session.manager.pfd).toBeNull();
 
     // Export encrypted output
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
 
     // Simulate in-place overwrite: sync session state
     await updateSessionAfterWrite(slots, filesToWrite, true);
@@ -383,7 +383,7 @@ describe('updateSessionAfterWrite (session state sync)', () => {
     let rawFiles = makeEncryptedSaveFiles(buf);
 
     // Step 1: Open encrypted save
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
     expect(slots[0].session.encrypted).toBe(true);
 
     // Step 2: Overwrite as decrypted, sync session
@@ -459,7 +459,7 @@ describe('exportEncryptedSave: with failedSlots', () => {
       },
     ];
 
-    const { filesToWrite } = await exportEncryptedSave(validResult.slots, syntheticFailed, 0);
+    const { filesToWrite } = await exportEncryptedSave(validResult.slots, syntheticFailed, 0, "");
 
     // The export should succeed
     expect(filesToWrite.has('PARAM.SFO')).toBe(true);
@@ -476,11 +476,11 @@ describe('writeSaveData: encrypted source with backup decrypt failure', () => {
     const backupBytes = rawFiles.get('2user.dat').bytes;
     backupBytes[0] ^= 0xff;
 
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
     expect(slots).toHaveLength(1);
 
     // writeSaveData should still succeed (backup failures are logged, not thrown)
-    const { filesToWrite, filesToDelete } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite, filesToDelete } = await writeSaveData(slots, [], profileNumber, accountId);
 
     expect(filesToWrite.has('USER.DAT')).toBe(true);
     expect(filesToDelete.has('PARAM.PFD')).toBe(true);
@@ -496,7 +496,7 @@ describe('decryptAndMergeSlots: corrupt secondary file (04USER.DAT)', () => {
     const buf = makeBlankSave();
     const rawFiles = makeEncryptedSaveFiles(buf);
 
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Corrupt the secondary file (04USER.DAT) AFTER openSave.
     // The session stores a reference to the same Uint8Array, so mutating
@@ -507,7 +507,7 @@ describe('decryptAndMergeSlots: corrupt secondary file (04USER.DAT)', () => {
 
     // writeSaveData should still succeed — secondary decrypt failure is
     // logged and skipped, not thrown.
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber);
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
 
@@ -515,14 +515,14 @@ describe('decryptAndMergeSlots: corrupt secondary file (04USER.DAT)', () => {
     const buf = makeBlankSave();
     const rawFiles = makeEncryptedSaveFiles(buf);
 
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Corrupt the secondary file after openSave
     const secondaryBytes = rawFiles.get('04user.dat').bytes;
     secondaryBytes[0] ^= 0xff;
 
     // exportEncryptedSave exercises the same decryptAndMergeSlots path
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
     expect(filesToWrite.has('PARAM.PFD')).toBe(true);
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
@@ -533,7 +533,7 @@ describe('exportEncryptedSave: corrupt backup decrypt failure', () => {
     const buf = makeBlankSave();
     const rawFiles = makeEncryptedSaveFiles(buf);
 
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Corrupt the backup 2USER.DAT after openSave so its decrypt fails
     // during the exportEncryptedSave backup-decrypt loop.
@@ -541,7 +541,7 @@ describe('exportEncryptedSave: corrupt backup decrypt failure', () => {
     backupBytes[0] ^= 0xff;
 
     // Export should still succeed (backup failure is logged, not thrown)
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
     expect(filesToWrite.has('PARAM.PFD')).toBe(true);
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
@@ -550,7 +550,7 @@ describe('exportEncryptedSave: corrupt backup decrypt failure', () => {
 describe('save-api: empty slots throws (export only)', () => {
   // writeSaveData empty-slots test is in save-api.test.js.
   test('exportEncryptedSave throws on empty slots', async () => {
-    await expect(exportEncryptedSave([], [], 0)).rejects.toThrow('No save slots provided');
+    await expect(exportEncryptedSave([], [], 0, '')).rejects.toThrow('No save slots provided');
   });
 });
 
@@ -569,7 +569,7 @@ describe('writeSaveData: inPlace mode', () => {
 
     // inPlace=true: SFO is NOT written, assets are skipped (already on disk)
     // Only USER.DAT files are written.
-    const { filesToWrite } = await writeSaveData(slots, [], 0, undefined, true);
+    const { filesToWrite } = await writeSaveData(slots, [], 0, "", null, true);
 
     expect(filesToWrite.has('PARAM.SFO')).toBe(false); // inPlace omits SFO
     expect(filesToWrite.has('USER.DAT')).toBe(true);
@@ -587,7 +587,7 @@ describe('writeSaveData: inPlace mode', () => {
 
     // inPlace=true on encrypted source: assets are excluded (inPlace && encrypted),
     // but USER.DAT backups are decrypted and included
-    const { filesToWrite, filesToDelete } = await writeSaveData(slots, [], 0, undefined, true);
+    const { filesToWrite, filesToDelete } = await writeSaveData(slots, [], 0, "", null, true);
 
     expect(filesToWrite.has('PARAM.SFO')).toBe(false); // inPlace omits SFO
     expect(filesToWrite.has('USER.DAT')).toBe(true);
@@ -603,7 +603,7 @@ describe('writeSaveData: non-array failedSlots', () => {
     const { slots } = await openSave(rawFiles);
 
     // Pass null instead of array — should default to []
-    const { filesToWrite } = await writeSaveData(slots, null, 0);
+    const { filesToWrite } = await writeSaveData(slots, null, 0, "");
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
 
@@ -612,7 +612,7 @@ describe('writeSaveData: non-array failedSlots', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots } = await openSave(rawFiles);
 
-    const { filesToWrite } = await writeSaveData(slots, undefined, 0);
+    const { filesToWrite } = await writeSaveData(slots, undefined, 0, "");
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
 });
@@ -625,10 +625,10 @@ describe('exportEncryptedSave: inPlace mode', () => {
     rawFiles.set('icon0.png', { name: 'ICON0.PNG', bytes: new Uint8Array([0x89, 0x50]) });
     rawFiles.set('pic1.png', { name: 'PIC1.PNG', bytes: new Uint8Array(100) });
 
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // inPlace=true: assets are NOT included (already on disk)
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, undefined, true);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId, null, true);
 
     expect(filesToWrite.has('PARAM.PFD')).toBe(true);
     expect(filesToWrite.has('PARAM.SFO')).toBe(true);
@@ -643,10 +643,10 @@ describe('exportEncryptedSave: onProgress callback', () => {
   test('calls onProgress during export', async () => {
     const buf = makeBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     const messages = [];
-    await exportEncryptedSave(slots, [], profileNumber, (msg) => messages.push(msg));
+    await exportEncryptedSave(slots, [], profileNumber, accountId, (msg) => messages.push(msg));
 
     expect(messages.length).toBeGreaterThan(0);
     expect(messages.some((m) => m.includes('PARAM.PFD'))).toBe(true);
@@ -673,8 +673,7 @@ describe('save-api: missing callback / default branches', () => {
     const buf = makeBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots } = await openSave(rawFiles);
-    delete slots[0].model.accountId;
-    const { filesToWrite } = await writeSaveData(slots, [], 0);
+    const { filesToWrite } = await writeSaveData(slots, [], 0, '');
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
 
@@ -682,9 +681,8 @@ describe('save-api: missing callback / default branches', () => {
     // Trigger the `if (accountId !== undefined)` else branch
     const buf = makeBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber } = await openSave(rawFiles);
-    delete slots[0].model.accountId;
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
     expect(filesToWrite.has('PARAM.PFD')).toBe(true);
   });
 
@@ -730,7 +728,7 @@ describe('save-api: failed slot with missing primaryFile', () => {
     // Trigger the `if (!fs.primaryFile) continue` branch
     const buf = makeBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     const failedWithNullPrimary = [
       {
@@ -740,7 +738,7 @@ describe('save-api: failed slot with missing primaryFile', () => {
       },
     ];
 
-    const { filesToWrite } = await writeSaveData(slots, failedWithNullPrimary, profileNumber);
+    const { filesToWrite } = await writeSaveData(slots, failedWithNullPrimary, profileNumber, accountId);
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
 
@@ -748,7 +746,7 @@ describe('save-api: failed slot with missing primaryFile', () => {
     // Trigger `if (!data) return { ok: false }` in decryptFilesFromManager
     const buf = makeBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber } = await openSave(rawFiles);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     const failedWithMissingFile = [
       {
@@ -759,7 +757,7 @@ describe('save-api: failed slot with missing primaryFile', () => {
       },
     ];
 
-    const { filesToWrite } = await writeSaveData(slots, failedWithMissingFile, profileNumber);
+    const { filesToWrite } = await writeSaveData(slots, failedWithMissingFile, profileNumber, accountId);
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
 });
@@ -780,7 +778,7 @@ describe('save-api: callbacks for ternary branch coverage', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots } = await openSave(rawFiles);
     const messages = [];
-    await writeSaveData(slots, [], 0, (msg) => messages.push(msg));
+    await writeSaveData(slots, [], 0, "", (msg) => messages.push(msg));
     expect(messages.length).toBeGreaterThan(0);
   });
 });

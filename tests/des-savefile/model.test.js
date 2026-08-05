@@ -562,3 +562,30 @@ describe('mergeModel: branch coverage', () => {
     }
   });
 });
+
+describe('accountId/profileNumber are folder-level (not on model)', () => {
+  test('sanitizeModel does not attach accountId or profileNumber', () => {
+    const full = makeFullModel();
+    const { model } = sanitizeModel(full);
+    expect(model).not.toHaveProperty('accountId');
+    expect(model).not.toHaveProperty('profileNumber');
+  });
+
+  test('mergeModel output has no accountId or profileNumber', () => {
+    const full = makeFullModel();
+    const { model } = sanitizeModel(full);
+    const merged = mergeModel(full, model);
+    expect(merged).not.toHaveProperty('accountId');
+    expect(merged).not.toHaveProperty('profileNumber');
+  });
+
+  test('mergeModel preserves all slot fields', () => {
+    const full = makeFullModel();
+    const { model } = sanitizeModel(full);
+    model.vit = 77;
+    const merged = mergeModel(full, model);
+    expect(merged.vit).toBe(77);
+    expect(merged.weapons).toBeDefined();
+    expect(merged.deposit).toBeDefined();
+  });
+});

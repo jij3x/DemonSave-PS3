@@ -38,8 +38,6 @@ export function assertBounds(bytes, offset, size) {
  */
 export function assertBelow(value, limit, label) {
   if (value >= limit) {
-    throw new Error(
-      `${label}: crossed region boundary (value ${value} >= limit ${limit})`,
-    );
+    throw new Error(`${label}: crossed region boundary (value ${value} >= limit ${limit})`);
   }
 }

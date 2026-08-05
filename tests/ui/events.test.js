@@ -249,6 +249,7 @@ jest.unstable_mockModule('../../js/des-db/index.js', () => ({
 const {
   populateForm,
   collectForm,
+  collectFolderFields,
   setupAddRowButtons,
   setupHairColorSample,
   setupEquipmentSync,
@@ -704,7 +705,7 @@ describe('UI events', () => {
   describe('populateForm / collectForm round-trip', () => {
     test('stats round-trip through DOM', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('vit').value).toBe('50');
       expect(byId('souls').value).toBe('99999');
@@ -718,7 +719,7 @@ describe('UI events', () => {
 
     test('vitals populate and round-trip through DOM', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('currHP').value).toBe('580');
       expect(byId('currMaxHP').value).toBe('600');
@@ -744,13 +745,13 @@ describe('UI events', () => {
 
     test('profile number is set', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, { profileNumber: 42, accountId: '' });
       expect(byId('profileNum').value).toBe('42');
     });
 
     test('tendency round-trip', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('charTendency').value).toBe('50');
       expect(byId('nexusTendency').value).toBe('-20');
@@ -762,7 +763,7 @@ describe('UI events', () => {
 
     test('NPC flags round-trip', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('sageFreke').value).toBe('friendly');
       expect(byId('thomas').value).toBe('friendly');
@@ -775,7 +776,7 @@ describe('UI events', () => {
 
     test('archSealed checkbox round-trip', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
       expect(byId('archSealed').checked).toBe(true);
 
       const collected = collectForm();
@@ -784,7 +785,7 @@ describe('UI events', () => {
 
     test('equipment text spans round-trip with raw item IDs', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Span should display the item name from the mock DB
       expect(byId('leftHand1').textContent).toBe('Weapon 5');
@@ -803,7 +804,7 @@ describe('UI events', () => {
       model.bolts = 0xffffffff;
       model.quickSlot3 = 0xffffffff;
 
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Span should show "(none)" and store 0xFFFFFFFF in data-id
       const boltsSpan = byId('bolts');
@@ -819,7 +820,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       model.ring2 = 0x00abcdef; // an ID not in the ring DB
 
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const ring2Span = byId('ring2');
       expect(ring2Span.textContent).toBe('Unknown (0x00ABCDEF)');
@@ -833,7 +834,7 @@ describe('UI events', () => {
   describe('inventory rendering and collection', () => {
     test('renders weapons with _ref token', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const rows = qsa('table.inv-table[data-category="weapons"] tbody tr');
       expect(rows.length).toBe(1);
@@ -844,7 +845,7 @@ describe('UI events', () => {
 
     test('renders armor, rings, goods', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(qsa('table.inv-table[data-category="armor"] tbody tr').length).toBe(1);
       expect(qsa('table.inv-table[data-category="rings"] tbody tr').length).toBe(1);
@@ -853,7 +854,7 @@ describe('UI events', () => {
 
     test('rings render as editable table rows', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const ringRows = qsa('table.inv-table[data-category="rings"] tbody tr');
       expect(ringRows.length).toBe(1);
@@ -864,7 +865,7 @@ describe('UI events', () => {
 
     test('rings misc2 survives round-trip; idx1/idx2 NOT in DOM', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
       expect(collected.rings[0].itemId).toBe(RING_IDS[1]);
@@ -880,7 +881,7 @@ describe('UI events', () => {
 
     test('_ref survives DOM round-trip in collectForm', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
 
@@ -892,7 +893,7 @@ describe('UI events', () => {
 
     test('collected inventory has NO binary internals', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
 
@@ -910,7 +911,7 @@ describe('UI events', () => {
 
     test('editable fields survive round-trip', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
 
@@ -921,7 +922,7 @@ describe('UI events', () => {
 
     test('weapon misc2 survives round-trip; idx1/idx2 NOT in DOM', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
 
@@ -933,7 +934,7 @@ describe('UI events', () => {
 
     test('weapon misc1 (Class hi + Class Idx lo) survives round-trip', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // misc1 = 0x0ffc → Class hi-byte = 0x0f (Curved Sword), Class Idx lo-byte = 0xfc
       const collected = collectForm();
@@ -944,7 +945,7 @@ describe('UI events', () => {
   describe('deposit rendering and collection', () => {
     test('renders deposit items in correct category tables', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const weaponRows = qsa('table.dep-table[data-category="weapons"] tbody tr');
       const goodsRows = qsa('table.dep-table[data-category="goods"] tbody tr');
@@ -955,7 +956,7 @@ describe('UI events', () => {
 
     test('deposit unknown fields survive DOM round-trip', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
 
@@ -971,7 +972,7 @@ describe('UI events', () => {
 
     test('collected deposit has no _ref', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
 
@@ -982,7 +983,7 @@ describe('UI events', () => {
 
     test('deposit count, itemId, and durability survive round-trip', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
 
@@ -997,7 +998,7 @@ describe('UI events', () => {
   describe('soft-delete behavior', () => {
     test('existing rows have data-existing="true"', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       expect(row.dataset.existing).toBe('true');
@@ -1005,7 +1006,7 @@ describe('UI events', () => {
 
     test('soft-delete on existing row marks it deleted but keeps it in DOM', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       expect(row.dataset.deleted).toBeUndefined();
@@ -1026,7 +1027,7 @@ describe('UI events', () => {
 
     test('collectForm skips soft-deleted rows', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Soft-delete the weapon row
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
@@ -1038,7 +1039,7 @@ describe('UI events', () => {
 
     test('undelete restores the row to editable state', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const delBtn = row.querySelector('.row-del');
@@ -1056,7 +1057,7 @@ describe('UI events', () => {
 
     test('collectForm includes undeleted rows', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const delBtn = row.querySelector('.row-del');
@@ -1072,7 +1073,7 @@ describe('UI events', () => {
 
     test('soft-delete works for spells', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('#spellsTableBody tbody tr');
       expect(row.dataset.existing).toBe('true');
@@ -1086,7 +1087,7 @@ describe('UI events', () => {
 
     test('soft-delete works for deposit', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="weapons"] tbody tr');
       expect(row.dataset.existing).toBe('true');
@@ -1116,7 +1117,7 @@ describe('UI events', () => {
         },
       ];
 
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const select = row.querySelector('select');
@@ -1132,7 +1133,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       model.spells = [{ itemId: 0xaaaaaaaa, status: 0, misc1: 0, misc2: 0 }];
 
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('#spellsTableBody tbody tr');
       const select = row.querySelector('select.spell-name');
@@ -1145,7 +1146,7 @@ describe('UI events', () => {
       // Use a non-weapon category (armor) to test unknown item rendering instead.
       model.deposit = [{ category: 'armor', itemId: 0xbbbbbbbb, count: 1, durability: 300 }];
 
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="armor"] tbody tr');
       const select = row.querySelector('select.dep-name');
@@ -1181,7 +1182,7 @@ describe('UI events', () => {
   describe('deposit flags JSON parse edge cases', () => {
     test('malformed flags JSON falls back to default array', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Corrupt the flags data attribute on the deposit row
       const row = qs('table.dep-table[data-category="weapons"] tbody tr');
@@ -1193,7 +1194,7 @@ describe('UI events', () => {
 
     test('empty durability input results in undefined durability', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="weapons"] tbody tr');
       const durInput = row.querySelector('.inv-dep-durability');
@@ -1206,7 +1207,7 @@ describe('UI events', () => {
     test('new deposit row without unknown fields omits them', () => {
       const model = makeSanitizedModel();
       model.deposit = [{ category: 'goods', itemId: ITEM_IDS[0], count: 1, durability: 0 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
       // New row has empty data attributes → fields are omitted
@@ -1223,7 +1224,7 @@ describe('UI events', () => {
     test('sageFreke dead state', () => {
       const model = makeSanitizedModel();
       model.sageFreke = { friendly: false, hostile: false, dead: true };
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('sageFreke').value).toBe('dead');
     });
@@ -1231,7 +1232,7 @@ describe('UI events', () => {
     test('sageFreke hostile state', () => {
       const model = makeSanitizedModel();
       model.sageFreke = { friendly: false, hostile: true, dead: false };
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('sageFreke').value).toBe('hostile');
     });
@@ -1239,7 +1240,7 @@ describe('UI events', () => {
     test('sageFreke empty state (all false)', () => {
       const model = makeSanitizedModel();
       model.sageFreke = { friendly: false, hostile: false, dead: false };
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('sageFreke').value).toBe('');
     });
@@ -1247,7 +1248,7 @@ describe('UI events', () => {
     test('thomas dead state', () => {
       const model = makeSanitizedModel();
       model.thomas = { friendly: false, hostile: false, dead: true };
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('thomas').value).toBe('dead');
     });
@@ -1255,7 +1256,7 @@ describe('UI events', () => {
     test('thomas hostile state', () => {
       const model = makeSanitizedModel();
       model.thomas = { friendly: false, hostile: true, dead: false };
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('thomas').value).toBe('hostile');
     });
@@ -1263,7 +1264,7 @@ describe('UI events', () => {
     test('thomas empty state (all false)', () => {
       const model = makeSanitizedModel();
       model.thomas = { friendly: false, hostile: false, dead: false };
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('thomas').value).toBe('');
     });
@@ -1271,7 +1272,7 @@ describe('UI events', () => {
     test('boldwin dead state', () => {
       const model = makeSanitizedModel();
       model.boldwin = { friendly: false, hostile: false, dead: true };
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('boldwin').value).toBe('dead');
     });
@@ -1279,7 +1280,7 @@ describe('UI events', () => {
     test('boldwin friendly state', () => {
       const model = makeSanitizedModel();
       model.boldwin = { friendly: true, hostile: false, dead: false };
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('boldwin').value).toBe('friendly');
     });
@@ -1287,7 +1288,7 @@ describe('UI events', () => {
     test('boldwin empty state (all false)', () => {
       const model = makeSanitizedModel();
       model.boldwin = { friendly: false, hostile: false, dead: false };
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('boldwin').value).toBe('');
     });
@@ -1297,7 +1298,7 @@ describe('UI events', () => {
       delete model.sageFreke;
       delete model.thomas;
       delete model.boldwin;
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(byId('sageFreke').value).toBe('');
       expect(byId('thomas').value).toBe('');
@@ -1309,7 +1310,7 @@ describe('UI events', () => {
     test('spell with undefined status defaults to 0 (Unavailable)', () => {
       const model = makeSanitizedModel();
       model.spells = [{ itemId: SPELL_IDS[0], misc1: 0, misc2: 0 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('#spellsTableBody tbody tr');
       const statusSel = row.querySelector('.spell-status');
@@ -1319,7 +1320,7 @@ describe('UI events', () => {
     test('inventory record with undefined durability defaults to 0', () => {
       const model = makeSanitizedModel();
       model.weapons = [{ _ref: 'inv:0', itemId: WEAPON_IDS[0], count: 1, misc1: 0, misc2: 0 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
       expect(collected.weapons[0].durability).toBe(0);
@@ -1328,7 +1329,7 @@ describe('UI events', () => {
     test('deposit record without count defaults to 1', () => {
       const model = makeSanitizedModel();
       model.deposit = [{ category: 'goods', itemId: ITEM_IDS[0], durability: 0 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
       expect(collected.deposit[0].count).toBe(1);
@@ -1337,7 +1338,7 @@ describe('UI events', () => {
     test('deposit record without durability defaults to 0', () => {
       const model = makeSanitizedModel();
       model.deposit = [{ category: 'goods', itemId: ITEM_IDS[0], count: 5 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
       expect(collected.deposit[0].durability).toBe(0);
@@ -1349,7 +1350,7 @@ describe('UI events', () => {
       model.armor = [];
       model.rings = [];
       model.goods = [];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(qsa('table.inv-table tbody tr').length).toBe(0);
     });
@@ -1357,7 +1358,7 @@ describe('UI events', () => {
     test('empty spells array renders no rows', () => {
       const model = makeSanitizedModel();
       model.spells = [];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(qsa('#spellsTableBody tbody tr').length).toBe(0);
     });
@@ -1365,7 +1366,7 @@ describe('UI events', () => {
     test('empty deposit array renders no rows', () => {
       const model = makeSanitizedModel();
       model.deposit = [];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       expect(qsa('table.dep-table tbody tr').length).toBe(0);
     });
@@ -1376,11 +1377,11 @@ describe('UI events', () => {
   describe('helper edge cases', () => {
     test('accountId defaults to empty string', () => {
       const model = makeSanitizedModel();
-      delete model.accountId;
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
-      const collected = collectForm();
-      expect(collected.accountId).toBe('');
+      const folderFields = collectFolderFields();
+      expect(folderFields).not.toBeNull();
+      expect(folderFields.accountId).toBe('');
     });
   });
 
@@ -1389,7 +1390,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       // Rings use 'single' layout, not 'hidden'. Manually create a row with
       // data-misc1 to exercise the hidden branch in collectInventory.
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Add a fake row to weapons table with the hidden misc1 attribute
       const tbody = qs('table.inv-table[data-category="weapons"] tbody');
@@ -1607,7 +1608,7 @@ describe('UI events', () => {
   describe('soft-delete reverts edits to original', () => {
     test('delete reverts edited field to original value', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const countInput = row.querySelector('.inv-count');
@@ -1623,7 +1624,7 @@ describe('UI events', () => {
 
     test('undelete shows original values', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const countInput = row.querySelector('.inv-count');
@@ -1639,7 +1640,7 @@ describe('UI events', () => {
 
     test('delete clears dirty marks on the row', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const countInput = row.querySelector('.inv-count');
@@ -1654,7 +1655,7 @@ describe('UI events', () => {
 
     test('delete reverts select (item name) to original', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const nameSel = row.querySelector('.inv-name');
@@ -1672,7 +1673,7 @@ describe('UI events', () => {
   describe('equipment slot sync with inventory', () => {
     test('changing equipped item updates the equipment slot', () => {
       const model = makeSanitizedModel();
-      populateForm(model, makeDisplay(), 42);
+      populateForm(model, makeDisplay());
       setupEquipmentSync();
 
       // The model has leftHand1 = WEAPON_IDS[5]
@@ -1694,7 +1695,7 @@ describe('UI events', () => {
 
     test('deleting equipped item clears the equipment slot', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const lh1 = byId('leftHand1');
       expect(lh1.textContent).toBe('Weapon 5');
@@ -1711,7 +1712,7 @@ describe('UI events', () => {
 
     test('undeleting restores the equipment slot', () => {
       const model = makeSanitizedModel();
-      populateForm(model, makeDisplay(), 42);
+      populateForm(model, makeDisplay());
 
       const lh1 = byId('leftHand1');
       const delBtn = qs('table.inv-table[data-category="weapons"] tbody tr .row-del');
@@ -1729,7 +1730,7 @@ describe('UI events', () => {
 
     test('equipment orig-id is tracked on initial render', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const lh1 = byId('leftHand1');
       expect(lh1.dataset.origId).toBe(String(WEAPON_IDS[5]));
@@ -1740,7 +1741,7 @@ describe('UI events', () => {
 
     test('changing non-equipped item does not affect equipment', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
       setupEquipmentSync();
 
       const lh1 = byId('leftHand1');
@@ -1773,7 +1774,7 @@ describe('UI events', () => {
     // Display data points ring1's equipment pointer to this inventory instance (idx1=10)
     const display = makeDisplay();
     display.equipmentPointers.ring1 = 10;
-    populateForm(model, display, 42);
+    populateForm(model, display);
     setupEquipmentSync();
 
     // ring1 = RING_IDS[0] in the model
@@ -1809,7 +1810,7 @@ describe('UI events', () => {
   describe('lazy-load dropdowns', () => {
     test('inventory select renders only selected option before focus', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const sel = qs('table.inv-table[data-category="weapons"] tbody tr .inv-name');
       // Should have only 1 option (the currently selected item)
@@ -1820,7 +1821,7 @@ describe('UI events', () => {
 
     test('inventory select populates type-filtered options after focus', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const sel = qs('table.inv-table[data-category="weapons"] tbody tr .inv-name');
       expect(sel.querySelectorAll('option').length).toBe(1);
@@ -1836,7 +1837,7 @@ describe('UI events', () => {
 
     test('deposit weapon row has decomposed selects (Base Weapon | Path | Level)', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="weapons"] tbody tr');
       // Decomposed rows have data-decomposed="true"
@@ -1866,7 +1867,7 @@ describe('UI events', () => {
           flags: [0x21, 0, 0, 0, 0, 0, 0],
         },
       ];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // The crossbow should be routed to the Bow (type 3) deposit table
       const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="3"] tbody tr');
@@ -1905,7 +1906,7 @@ describe('UI events', () => {
 
     test('deposit goods select renders only selected option before focus', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const sel = qs('table.dep-table[data-category="goods"] tbody tr .dep-name');
       expect(sel.querySelectorAll('option').length).toBe(1);
@@ -1914,7 +1915,7 @@ describe('UI events', () => {
 
     test('deposit goods select populates type-filtered options after focus', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const sel = qs('table.dep-table[data-category="goods"] tbody tr .dep-name');
       focusLazySelect(sel);
@@ -1927,7 +1928,7 @@ describe('UI events', () => {
 
     test('spell select renders only selected option before focus', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const sel = qs('#spellsTableBody tbody tr .spell-name');
       expect(sel.querySelectorAll('option').length).toBe(1);
@@ -1936,7 +1937,7 @@ describe('UI events', () => {
 
     test('spell select populates all options after focus', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const sel = qs('#spellsTableBody tbody tr .spell-name');
       focusLazySelect(sel);
@@ -1957,7 +1958,7 @@ describe('UI events', () => {
           misc2: 0x01000000,
         },
       ];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const sel = qs('table.inv-table[data-category="weapons"] tbody tr .inv-name');
       // Before focus: 1 option (the unknown item)
@@ -1974,7 +1975,7 @@ describe('UI events', () => {
 
     test('lazy population is idempotent (focus twice = no duplicate options)', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const sel = qs('table.inv-table[data-category="weapons"] tbody tr .inv-name');
       focusLazySelect(sel);
@@ -1986,7 +1987,7 @@ describe('UI events', () => {
 
     test('collectForm works without focus (lazy not triggered)', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Collect without focusing any select — should still read .value correctly
       const collected = collectForm();
@@ -1999,7 +2000,7 @@ describe('UI events', () => {
   describe('durability sync on item change', () => {
     test('changing weapon in inventory reloads durability from DB', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const durInput = row.querySelector('.inv-durability');
@@ -2019,7 +2020,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       // Set a partially-damaged weapon (durability 150 instead of 300)
       model.weapons[0].durability = 150;
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const durInput = row.querySelector('.inv-durability');
@@ -2038,7 +2039,7 @@ describe('UI events', () => {
 
     test('changing armor reloads durability (200 from mock DB)', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="armor"] tbody tr');
       const durInput = row.querySelector('.inv-durability');
@@ -2056,7 +2057,7 @@ describe('UI events', () => {
 
     test('changing ring resets durability to 0 in dataset (no durability input)', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="rings"] tbody tr');
 
@@ -2075,7 +2076,7 @@ describe('UI events', () => {
 
     test('changing goods resets durability to 0 in dataset (no durability input)', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="goods"] tbody tr');
 
@@ -2096,7 +2097,7 @@ describe('UI events', () => {
 
     test('changing deposit weapon reloads durability', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="weapons"] tbody tr');
       const durInput = row.querySelector('.inv-dep-durability');
@@ -2113,7 +2114,7 @@ describe('UI events', () => {
 
     test('changing deposit goods resets durability to 0 in dataset', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="goods"] tbody tr');
 
@@ -2145,7 +2146,7 @@ describe('UI events', () => {
           ro_idx1: 0,
         },
       ];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // weapon-1 table should have visible durability input
       const row = qs('table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
@@ -2155,7 +2156,7 @@ describe('UI events', () => {
 
     test('weapons (type 4 Ammo) hide durability column in inventory', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"][data-weapon-type="4"] tbody tr');
       if (row) {
@@ -2166,7 +2167,7 @@ describe('UI events', () => {
 
     test('armor shows durability column in inventory', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="armor"] tbody tr');
       expect(row).toBeTruthy();
@@ -2175,7 +2176,7 @@ describe('UI events', () => {
 
     test('rings hide durability column in inventory', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="rings"] tbody tr');
       expect(row).toBeTruthy();
@@ -2185,7 +2186,7 @@ describe('UI events', () => {
 
     test('goods hide durability column in inventory', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="goods"] tbody tr');
       expect(row).toBeTruthy();
@@ -2195,7 +2196,7 @@ describe('UI events', () => {
 
     test('deposit rings hide durability column', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="rings"] tbody tr');
       if (row) {
@@ -2206,7 +2207,7 @@ describe('UI events', () => {
 
     test('deposit goods hide durability column', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="goods"] tbody tr');
       expect(row).toBeTruthy();
@@ -2221,7 +2222,7 @@ describe('UI events', () => {
       if (goodsItem) {
         goodsItem.durability = 42;
       }
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Verify the dataset holds the value
       const row = qs('table.inv-table[data-category="goods"] tbody tr');
@@ -2240,7 +2241,7 @@ describe('UI events', () => {
   describe('count visibility and duplicate prevention', () => {
     test('weapons (non-Ammo types) hide count', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // The model's weapon is WEAPON_IDS[5] which is type 2 (Shield).
       // All non-Ammo weapon types hide the count column.
@@ -2253,7 +2254,7 @@ describe('UI events', () => {
 
     test('armor hides count; loaded count preserved in hidden input', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="armor"] tbody tr');
       const countTd = row.querySelector('.inv-count')?.closest('td');
@@ -2266,7 +2267,7 @@ describe('UI events', () => {
 
     test('rings hide count; loaded count preserved in hidden input', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="rings"] tbody tr');
       const countTd = row.querySelector('.inv-count')?.closest('td');
@@ -2275,7 +2276,7 @@ describe('UI events', () => {
 
     test('goods (type 9 Ore) show count', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       const countTd = row.querySelector('.inv-count')?.closest('td');
@@ -2285,7 +2286,7 @@ describe('UI events', () => {
 
     test('deposit weapons (type 1) hide count', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       const countTd = row.querySelector('.dep-count')?.closest('td');
@@ -2295,7 +2296,7 @@ describe('UI events', () => {
 
     test('deposit goods show count', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="goods"] tbody tr');
       const countTd = row.querySelector('.dep-count')?.closest('td');
@@ -2325,7 +2326,7 @@ describe('UI events', () => {
           ro_idx1: 1,
         },
       ];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const rows = qsa('table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       expect(rows.length).toBe(2);
@@ -2338,7 +2339,7 @@ describe('UI events', () => {
 
     test('count clamped to min 1 for inventory goods', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       const countInp = row.querySelector('.inv-count');
@@ -2353,7 +2354,7 @@ describe('UI events', () => {
 
     test('count clamped to max 99 for inventory goods', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       const countInp = row.querySelector('.inv-count');
@@ -2364,7 +2365,7 @@ describe('UI events', () => {
 
     test('count clamped to max 999 for deposit goods', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="goods"] tbody tr');
       const countInp = row.querySelector('.dep-count');
@@ -2386,7 +2387,7 @@ describe('UI events', () => {
           ro_idx1: 15,
         },
       ];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Focus the existing goods select to lazy-load it, then check that
       // ITEM_IDS[0] is selectable (it's the current row's own item).
@@ -2436,7 +2437,7 @@ describe('UI events', () => {
           ro_idx1: 15,
         },
       ];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Soft-delete the existing goods row
       const row = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
@@ -2485,7 +2486,7 @@ describe('UI events', () => {
           ro_idx1: 15,
         },
       ];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Step 1: Change R1 from ITEM_IDS[0] to ITEM_IDS[1]
       const r1 = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
@@ -2559,7 +2560,7 @@ describe('UI events', () => {
           ro_idx1: 16,
         },
       ];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const rows = qsa('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       const r1 = rows[0]; // ITEM_IDS[0]
@@ -2597,7 +2598,7 @@ describe('UI events', () => {
 
     test('new Ammo (type 4) inventory row shows count cell', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Click the "Add Ammo" button to create a new row in the Ammo (type 4) table.
       const addBtn = document.createElement('button');
@@ -2621,7 +2622,7 @@ describe('UI events', () => {
 
     test('new Ammo (type 4) deposit row shows count cell', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Click the "Add Ammo" deposit button to create a new row.
       const addBtn = document.createElement('button');
@@ -2647,7 +2648,7 @@ describe('UI events', () => {
   describe('deposit weapon sync (decomposed rows)', () => {
     test('changing Base Weapon repopulates Path and Level selects', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
       setupDepositWeaponSync();
 
       const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
@@ -2696,7 +2697,7 @@ describe('UI events', () => {
 
     test('changing Path repopulates Level select', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
       setupDepositWeaponSync();
 
       const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
@@ -2725,7 +2726,7 @@ describe('UI events', () => {
 
     test('changing Level recomposes itemId', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
       setupDepositWeaponSync();
 
       const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
@@ -2760,7 +2761,7 @@ describe('UI events', () => {
 
     test('changing Base Weapon updates durability', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
       setupDepositWeaponSync();
 
       const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
@@ -2786,7 +2787,7 @@ describe('UI events', () => {
 
     test('collectDeposit after Base Weapon change returns correct itemId', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
       setupDepositWeaponSync();
 
       const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
@@ -2810,7 +2811,7 @@ describe('UI events', () => {
   describe('deposit add button for decomposed weapon types', () => {
     test('deposit add weapon (type 1) creates decomposed row with Base/Path/Level', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const addBtn = document.createElement('button');
       addBtn.className = 'dep-add';
@@ -2848,7 +2849,7 @@ describe('UI events', () => {
 
     test('deposit add weapon (type 2 Shield) creates decomposed row', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const addBtn = document.createElement('button');
       addBtn.className = 'dep-add';
@@ -2871,7 +2872,7 @@ describe('UI events', () => {
   describe('setupSelectTooltipSync', () => {
     test('updates tooltip on dep-base-weapon change', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
       setupSelectTooltipSync();
 
       const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
@@ -2897,7 +2898,7 @@ describe('UI events', () => {
 
     test('clears tooltip when placeholder selected on dep-base-weapon', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
       setupSelectTooltipSync();
 
       // Create a new deposit weapon row (has placeholder)
@@ -2923,7 +2924,7 @@ describe('UI events', () => {
 
     test('updates tooltip on inventory item-name change', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
       setupSelectTooltipSync();
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
@@ -2943,7 +2944,7 @@ describe('UI events', () => {
 
     test('updates tooltip on spell-name change', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
       setupSelectTooltipSync();
 
       const row = qs('#spellsTableBody tbody tr');
@@ -2962,7 +2963,7 @@ describe('UI events', () => {
 
     test('clears tooltip on placeholder selection', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
       setupSelectTooltipSync();
 
       // Add a new row with placeholder
@@ -3001,7 +3002,7 @@ describe('UI events', () => {
           misc2: 0x01000000,
         },
       ];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // WEAPON_IDS[0] is type 1 (Weapon) → should appear in weapon-type-1 table
       const row = qs('table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
@@ -3022,7 +3023,7 @@ describe('UI events', () => {
           misc2: 0x01000000,
         },
       ];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // ITEM_IDS[0] is type 9 (Ore) → should appear in goods-type-9 table
       const row = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
@@ -3033,7 +3034,7 @@ describe('UI events', () => {
       // The deposit weapon table for type 1 exists — this tests normal routing
       const model = makeSanitizedModel();
       model.deposit = [{ category: 'weapons', itemId: WEAPON_IDS[0], count: 1, durability: 300 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody tr');
       expect(row).toBeTruthy();
@@ -3042,7 +3043,7 @@ describe('UI events', () => {
     test('deposit goods falls back to type 9 when type table missing', () => {
       const model = makeSanitizedModel();
       model.deposit = [{ category: 'goods', itemId: ITEM_IDS[0], count: 5, durability: 0 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="goods"][data-goods-type="9"] tbody tr');
       expect(row).toBeTruthy();
@@ -3061,7 +3062,7 @@ describe('UI events', () => {
           flags: [0x21, 1, 2, 3, 4, 5, 6],
         },
       ];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
       expect(collected.deposit).toHaveLength(1);
@@ -3073,7 +3074,7 @@ describe('UI events', () => {
     test('deposit armor row renders with visible durability', () => {
       const model = makeSanitizedModel();
       model.deposit = [{ category: 'armor', itemId: ARMOR_IDS[0], count: 1, durability: 200 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="armor"] tbody tr');
       expect(row).toBeTruthy();
@@ -3085,7 +3086,7 @@ describe('UI events', () => {
     test('deposit rings row renders without durability input', () => {
       const model = makeSanitizedModel();
       model.deposit = [{ category: 'rings', itemId: RING_IDS[0], count: 1, durability: 0 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="rings"] tbody tr');
       expect(row).toBeTruthy();
@@ -3121,7 +3122,7 @@ describe('UI events', () => {
     test('populateForm with display data sets equipment pointers', () => {
       const model = makeSanitizedModel();
       const display = makeDisplay();
-      populateForm(model, display, 42);
+      populateForm(model, display);
 
       // Equipment pointers should be stored on the spans
       const lh1 = byId('leftHand1');
@@ -3133,7 +3134,7 @@ describe('UI events', () => {
       const model = makeSanitizedModel();
       // Clear stale roIdx1 from prior tests
       byId('leftHand1').removeAttribute('data-ro-idx1');
-      populateForm(model, undefined, 42);
+      populateForm(model, undefined);
       // Should complete without errors
       expect(byId('vit').value).toBe('50');
       // No equipment pointers set when display is undefined
@@ -3143,7 +3144,7 @@ describe('UI events', () => {
     test('deposit add button respects max entries limit', () => {
       const model = makeSanitizedModel();
       model.deposit = []; // start empty
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       // Add many deposit rows to approach limit
       // The mock getLimits().depositMaxEntries returns a number from save-api
@@ -3169,7 +3170,7 @@ describe('UI events', () => {
     // which only test normal routing with all tables present.
     test('weapon falls back to type 1 table when type table missing', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const type1Table = qs('table.inv-table[data-category="weapons"][data-weapon-type="1"]');
       type1Table.remove();
@@ -3184,12 +3185,12 @@ describe('UI events', () => {
           misc2: 0x01000000,
         },
       ];
-      expect(() => populateForm(model, null, 42)).not.toThrow();
+      expect(() => populateForm(model, null, undefined)).not.toThrow();
     });
 
     test('goods falls back to type 9 table when type table missing', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const type10Table = qs('table.inv-table[data-category="goods"][data-goods-type="10"]');
       if (type10Table) type10Table.remove();
@@ -3204,29 +3205,29 @@ describe('UI events', () => {
           misc2: 0x01000000,
         },
       ];
-      expect(() => populateForm(model, null, 42)).not.toThrow();
+      expect(() => populateForm(model, null, undefined)).not.toThrow();
     });
 
     test('deposit weapon falls back when type table missing', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const depType1 = qs('table.dep-table[data-category="weapons"][data-weapon-type="1"]');
       if (depType1) depType1.remove();
 
       model.deposit = [{ category: 'weapons', itemId: WEAPON_IDS[0], count: 1, durability: 300 }];
-      expect(() => populateForm(model, null, 42)).not.toThrow();
+      expect(() => populateForm(model, null, undefined)).not.toThrow();
     });
 
     test('deposit goods falls back when type table missing', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const depType9 = qs('table.dep-table[data-category="goods"][data-goods-type="9"]');
       if (depType9) depType9.remove();
 
       model.deposit = [{ category: 'goods', itemId: ITEM_IDS[0], count: 5, durability: 0 }];
-      expect(() => populateForm(model, null, 42)).not.toThrow();
+      expect(() => populateForm(model, null, undefined)).not.toThrow();
     });
   });
 
@@ -3234,7 +3235,7 @@ describe('UI events', () => {
     test('spell with undefined itemId creates row with no matched option', () => {
       const model = makeSanitizedModel();
       model.spells = [{ itemId: undefined, status: 1, misc1: 5, misc2: 0 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('#spellsTableBody tbody tr');
       expect(row).toBeTruthy();
@@ -3246,7 +3247,7 @@ describe('UI events', () => {
     test('spell with itemId 0 creates row with no matched option', () => {
       const model = makeSanitizedModel();
       model.spells = [{ itemId: 0, status: 0, misc1: 0, misc2: 0 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('#spellsTableBody tbody tr');
       expect(row).toBeTruthy();
@@ -3257,7 +3258,7 @@ describe('UI events', () => {
     test('spell with non-numeric status defaults to 0', () => {
       const model = makeSanitizedModel();
       model.spells = [{ itemId: SPELL_IDS[0], status: 'invalid', misc1: 0, misc2: 0 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('#spellsTableBody tbody tr');
       const statusSel = row.querySelector('.spell-status');
@@ -3267,7 +3268,7 @@ describe('UI events', () => {
     test('spell row has misc2 in dataset', () => {
       const model = makeSanitizedModel();
       model.spells = [{ itemId: SPELL_IDS[0], status: 2, misc1: 10, misc2: 42 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('#spellsTableBody tbody tr');
       expect(row.dataset.misc2).toBe('42');
@@ -3275,7 +3276,7 @@ describe('UI events', () => {
 
     test('new spell row (isExisting=false) has placeholder', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const btn =
         byId('addSpell') ||
@@ -3334,7 +3335,7 @@ describe('UI events', () => {
 
     test('soft-deleted row is skipped in durability sync', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       row.dataset.deleted = 'true';
@@ -3352,7 +3353,7 @@ describe('UI events', () => {
     test('deposit armor with unknown item ID renders Unknown option', () => {
       const model = makeSanitizedModel();
       model.deposit = [{ category: 'armor', itemId: 0xdeadbeef, count: 1, durability: 200 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="armor"] tbody tr');
       const sel = row.querySelector('.dep-name');
@@ -3362,7 +3363,7 @@ describe('UI events', () => {
     test('deposit weapons decomposed with crossbow item renders correctly', () => {
       const model = makeSanitizedModel();
       model.deposit = [{ category: 'weapons', itemId: CROSSBOW_ID, count: 1, durability: 300 }];
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="weapons"][data-weapon-type="3"] tbody tr');
       expect(row).toBeTruthy();
@@ -3379,7 +3380,7 @@ describe('UI events', () => {
   describe('collectInventory edge cases', () => {
     test('inventory armor durability read from input', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
       // Armor should have durability
@@ -3388,7 +3389,7 @@ describe('UI events', () => {
 
     test('inventory goods misc2 from dataset survives round-trip', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
       expect(collected.goods[0].misc2).toBe(0x01000000);
@@ -3396,7 +3397,7 @@ describe('UI events', () => {
 
     test('inventory rings count default when hidden', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const collected = collectForm();
       // Rings have count hidden — default is 1
@@ -3404,68 +3405,69 @@ describe('UI events', () => {
     });
   });
 
-  // --- collectForm validation tests ---
+  // --- collectFolderFields validation tests ---
+  // accountId/profileNumber are folder-level SFO fields, validated by
+  // collectFolderFields() instead of collectForm().
 
-  describe('collectForm validation', () => {
+  describe('collectFolderFields validation', () => {
     test('returns null for invalid accountId (not 32 hex chars)', () => {
-      const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      makeSanitizedModel();
+      populateForm(makeSanitizedModel(), null, undefined);
 
-      // Set an invalid accountId
       byId('accountId').value = 'invalid';
 
-      const result = collectForm();
+      const result = collectFolderFields();
       expect(result).toBeNull();
     });
 
     test('returns null for accountId with wrong length', () => {
-      const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      makeSanitizedModel();
+      populateForm(makeSanitizedModel(), null, undefined);
 
       byId('accountId').value = 'ABCDEF';
 
-      const result = collectForm();
+      const result = collectFolderFields();
       expect(result).toBeNull();
     });
 
     test('accepts empty accountId', () => {
-      const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      makeSanitizedModel();
+      populateForm(makeSanitizedModel(), null, undefined);
 
       byId('accountId').value = '';
 
-      const result = collectForm();
+      const result = collectFolderFields();
       expect(result).not.toBeNull();
       expect(result.accountId).toBe('');
     });
 
     test('accepts valid 32-char hex accountId', () => {
-      const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      makeSanitizedModel();
+      populateForm(makeSanitizedModel(), null, undefined);
 
       const validHex = '0123456789abcdef0123456789abcdef';
       byId('accountId').value = validHex;
 
-      const result = collectForm();
+      const result = collectFolderFields();
       expect(result).not.toBeNull();
       expect(result.accountId).toBe(validHex);
     });
 
     test('trims whitespace from accountId before validation', () => {
-      const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      makeSanitizedModel();
+      populateForm(makeSanitizedModel(), null, undefined);
 
       const validHex = '0123456789abcdef0123456789abcdef';
       byId('accountId').value = '  ' + validHex + '  ';
 
-      const result = collectForm();
+      const result = collectFolderFields();
       expect(result).not.toBeNull();
       expect(result.accountId).toBe(validHex);
     });
 
     test('returns null for name exceeding 16 characters', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       byId('name').value = 'A'.repeat(17);
 
@@ -3475,7 +3477,7 @@ describe('UI events', () => {
 
     test('returns null for name with control characters', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       byId('name').value = 'Test\u0001Char';
 
@@ -3489,7 +3491,7 @@ describe('UI events', () => {
   describe('getNumClamped via collectForm', () => {
     test('clamps vit to max=99', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const inp = byId('vit');
       inp.min = '0';
@@ -3502,7 +3504,7 @@ describe('UI events', () => {
 
     test('clamps vit to min=0', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const inp = byId('vit');
       inp.min = '0';
@@ -3515,7 +3517,7 @@ describe('UI events', () => {
 
     test('profileNum is NOT clamped (SKIP_CLAMP_IDS)', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const inp = byId('profileNum');
       inp.value = '300'; // above max=255
@@ -3534,7 +3536,7 @@ describe('UI events', () => {
   describe('warp change bounds check', () => {
     test('warp change with invalid index (NaN) does not update position fields', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const originalWorld = byId('world').value;
       const warpSel = byId('warpLocation');
@@ -3547,7 +3549,7 @@ describe('UI events', () => {
 
     test('warp change with out-of-bounds index does not update position fields', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, 42);
+      populateForm(model, null, undefined);
 
       const originalWorld = byId('world').value;
       const warpSel = byId('warpLocation');
