@@ -264,7 +264,11 @@ export function readSave(bytes) {
     if (type !== 0x00 && type !== 0x10 && type !== 0x20 && type !== 0x40) continue;
 
     const itemId = (bytes[base + 5] << 16) | (bytes[base + 6] << 8) | bytes[base + 7];
-    const count = bytes[base + 12];
+    // Count is a 10-bit value: bits 0-7 in byte[base+12],
+    // bits 8-9 in the high 2 bits of byte[base+13] (the flag byte).
+    const countLow = bytes[base + 12];
+    const rawFlagByte = bytes[base + 13];
+    const count = (((rawFlagByte >> 6) & 0x03) << 8) | countLow;
 
     let category;
     switch (type) {
@@ -300,7 +304,10 @@ export function readSave(bytes) {
           (bytes[base + 10] << 8) |
           bytes[base + 11]) >>>
         0,
-      flags: [...bytes.subarray(base + 13, base + 20)],
+      // flags[0] is the flag byte — strip the count high bits (bits 6-7)
+      // so the writer gets a clean flag (0x21). The count high bits are
+      // re-encoded by the writer from the model's `count` field.
+      flags: [bytes[base + 13] & 0x3f, ...bytes.subarray(base + 14, base + 20)],
     });
     depositFound++;
   }

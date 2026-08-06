@@ -338,8 +338,16 @@ export function isCountVisible(category, typeId) {
  * Count range limits by location.
  */
 export const COUNT_LIMITS = {
+  // Inventory count is stored as UInt32BE (4 bytes) — supports up to ~4B,
+  // but the UI limits all countable items to 1–99, except Ammo (arrows/
+  // bolts) which can stack up to 999.
   inventory: { min: 1, max: 99 },
-  deposit: { min: 1, max: 999 },
+  // Deposit count is a 10-bit value (bits 0-7 in count byte + bits 8-9
+  // in the flag byte) — supports up to 1023, but the UI limits all
+  // countable items to 1–99, except Ammo which can stack up to 999.
+  deposit: { min: 1, max: 99 },
+  // Ammo (weapons type 4) — arrows/bolts can stack up to 999 in-game.
+  ammo: { min: 1, max: 999 },
 };
 
 /**

@@ -9,6 +9,7 @@
 import * as db from '../../des-db/index.js';
 import { registerChangeHandler } from './event-dispatcher.js';
 import { formatUnknownItem } from './item-helpers.js';
+import { COUNT_LIMITS } from './controls.js';
 
 /**
  * Map an equipment element id to the des-db category used for name lookup.
@@ -439,9 +440,12 @@ export function setupEquipmentSync() {
  * @param {string} cls  CSS class suffix (appended to 'inv-')
  * @param {number} val
  * @param {boolean} visible  whether the count cell should be visible
+ * @param {boolean} [isAmmo=false]  when true, use the Ammo count range
+ *   (1–999) instead of the default range for all other countable items
+ *   (1–99).
  * @returns {HTMLTableCellElement}
  */
-export function makeCountCell(cls, val, visible) {
+export function makeCountCell(cls, val, visible, isAmmo = false) {
   // NOTE: uses the exact class name (no 'inv-' prefix) so callers pass the
   // full class that collectInventory/collectDeposit query (e.g. 'inv-count'
   // or 'dep-count').
@@ -450,6 +454,21 @@ export function makeCountCell(cls, val, visible) {
   inp.type = 'number';
   inp.value = String(val ?? 0);
   inp.className = cls;
+  // Set native min/max so the browser's number-input validation also
+  // respects the limits (belt-and-suspenders alongside the JS clamp handler
+  // in setupCountAndDuplicateSync). The JS handler still fires on 'input'
+  // for immediate clamping during typing.
+  //
+  // Ammo (arrows/bolts) stacks up to 999; all other countable items
+  // (Ore, Consumables, Souls, Key Items) are limited to 1–99.
+  const isDeposit = cls.includes('dep');
+  const limits = isAmmo
+    ? COUNT_LIMITS.ammo
+    : isDeposit
+      ? COUNT_LIMITS.deposit
+      : COUNT_LIMITS.inventory;
+  inp.min = String(limits.min);
+  inp.max = String(limits.max);
   td.appendChild(inp);
   if (!visible) {
     td.hidden = true;
