@@ -259,18 +259,6 @@ jobs:
           # Alphabetical sort puts the two Linux groups adjacent:
           #   browser-…, linux-installer-…, linux-portable-…, macos-…, windows-…
           files: release-assets/*
-          body: |
-            ## Install
-
-            See [`howto.md`](https://github.com/jij3x/DemonSave-PS3/blob/main/howto.md)
-            for full per-platform install instructions.
-
-            - **Windows** — NSIS installer or portable `.exe`.
-            - **Linux** — `.deb` / `.rpm`, or portable `.tar.gz` (needs system WebKitGTK).
-            - **macOS (Apple Silicon)** — `.dmg` or zipped `.app`.
-
-            > ⚠️ **macOS: app is unsigned.** On first launch, right-click → **Open**
-            > (or `xattr -cr /Applications/DemonSave-PS3.app`). Details in `howto.md`.
 
   # NOTE: Lint, tests, and the coverage gate live in ci.yml (the "CI"
   # workflow). This file only handles cross-platform builds and releases.
