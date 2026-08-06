@@ -2355,15 +2355,15 @@ describe('UI events', () => {
       expect(countInp.value).toBe('99');
     });
 
-    test('count clamped to max 999 for deposit goods', () => {
+    test('count clamped to max 99 for deposit goods', () => {
       const model = makeSanitizedModel();
       populateForm(model, null, undefined);
 
       const row = qs('table.dep-table[data-category="goods"] tbody tr');
       const countInp = row.querySelector('.dep-count');
-      countInp.value = '1000';
+      countInp.value = '100';
       countInp.dispatchEvent(new Event('input', { bubbles: true }));
-      expect(countInp.value).toBe('999');
+      expect(countInp.value).toBe('99');
     });
 
     test('goods (show-count type) filter used IDs from sibling dropdowns', () => {

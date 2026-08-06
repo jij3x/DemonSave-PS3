@@ -195,7 +195,9 @@ export function makeDepositRow(category, rec, isExisting = true, typeIdHint = nu
   tr.appendChild(tdName);
 
   // Count (hidden for non-counted types; value preserved via the hidden input)
-  tr.appendChild(makeCountCell('dep-count', rec.count ?? 1, showCount));
+  // Ammo (weapons type 4) uses a wider range (1–999) than other countable
+  // items (1–99).
+  tr.appendChild(makeCountCell('dep-count', rec.count ?? 1, showCount, rowTypeId === 4));
 
   // Durability (hidden for non-durability types; value preserved via dataset)
   if (showDurability) {
@@ -383,8 +385,9 @@ export function makeDepositWeaponRow(typeId, rec, isExisting = true) {
   tdLevel.appendChild(levelSel);
   tr.appendChild(tdLevel);
 
-  // Count (hidden for decomposed weapon types 1/2/3 — always count=1)
-  tr.appendChild(makeCountCell('dep-count', rec.count ?? 1, showCount));
+  // Count (hidden for decomposed weapon types 1/2/3 — always count=1).
+  // Decomposed rows are only Weapon/Shield/Bow (types 1/2/3) — never Ammo.
+  tr.appendChild(makeCountCell('dep-count', rec.count ?? 1, showCount, false));
 
   // Durability
   tr.appendChild(makeNumCell('inv-dep-durability', rec.durability ?? 0));
@@ -602,8 +605,10 @@ export function collectDeposit() {
  * duplicate-prevention refresh.
  *
  * - Count clamping: when a visible count input changes, clamp it to the
- *   valid range [min, max] for the current location (inventory 1–99,
- *   deposit 1–999).  Prevents the user from decreasing below 1.
+ *   valid range for that row.  The range is set per-input by makeCountCell
+ *   (Ammo rows: 1–999, all other countable items: 1–99) and read from the
+ *   input's own min/max attributes here.  Prevents the user from
+ *   decreasing below 1 or exceeding the type-specific maximum.
  *
  * - Duplicate-prevention refresh: when a show-count item select changes,
  *   refresh the filtered options in all sibling selects in the same table
@@ -612,18 +617,21 @@ export function collectDeposit() {
  */
 export function setupCountAndDuplicateSync() {
   // Count clamping — fires on 'input' so the clamp is immediate.
+  // Reads the per-input min/max attributes set by makeCountCell so that
+  // Ammo rows (1–999) are clamped differently from other countable items
+  // (1–99), regardless of whether the row is in inventory or deposit.
   registerInputHandler((e) => {
     const inp = e.target;
     if (!(inp instanceof HTMLInputElement)) return;
     if (inp.type !== 'number') return;
     if (!inp.classList.contains('inv-count') && !inp.classList.contains('dep-count')) return;
 
-    const isDeposit = inp.classList.contains('dep-count');
-    const limits = isDeposit ? COUNT_LIMITS.deposit : COUNT_LIMITS.inventory;
+    const min = parseInt(inp.min, 10);
+    const max = parseInt(inp.max, 10);
     const raw = parseInt(inp.value, 10);
     if (isNaN(raw)) return; // let the user finish typing
-    if (raw < limits.min) inp.value = String(limits.min);
-    if (raw > limits.max) inp.value = String(limits.max);
+    if (!isNaN(min) && raw < min) inp.value = String(min);
+    if (!isNaN(max) && raw > max) inp.value = String(max);
   });
 
   // Sibling-dropdown refresh + deferred-dirty integration — fires on 'change'

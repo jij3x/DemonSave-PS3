@@ -621,11 +621,24 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
       const orderIdx = origOrderIdx !== 0 ? origOrderIdx : slot & 0xffff;
       const sortIdDurPack = ((sortId << 16) | orderIdx) >>> 0;
 
-      // Determine flag byte: 0x21 for items, preserve existing non-zero values
-      let flagByte = 0x21;
+      // Determine flag byte (low 6 bits): 0x21 for items, preserve existing
+      // non-zero values.  The high 2 bits (bits 6-7) are used for the deposit
+      // count overflow (bits 8-9 of the 10-bit count).
+      let flagLow = 0x21;
       if (Array.isArray(rec.flags) && rec.flags[0] !== 0) {
-        flagByte = rec.flags[0] & 0xff;
+        flagLow = rec.flags[0] & 0x3f;
       }
+
+      // Deposit count is a 10-bit value: bits 0-7 in byte[b+12],
+      // bits 8-9 merged into the high 2 bits of the flag byte (byte[b+13]).
+      // Validate as a 10-bit value [0, 1023] — the UI caps at 999.
+      const depositCountVal = val(rec.count);
+      if (!Number.isInteger(depositCountVal) || depositCountVal < 0 || depositCountVal > 0x3ff) {
+        throw new Error(`Deposit count ${depositCountVal} out of range [0, 1023] (10-bit field)`);
+      }
+      const countLow = depositCountVal & 0xff;
+      const countHigh = (depositCountVal >> 8) & 0x03;
+      const flagByte = (flagLow & 0x3f) | (countHigh << 6);
 
       // Determine durability for weapons/armor.
       // No silent defaults — if no value is provided anywhere, throw.
@@ -653,7 +666,7 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
       bytes[b + 6] = (itemId >> 8) & 0xff;
       bytes[b + 7] = itemId & 0xff;
       wUInt32BE(bytes, b + 8, sortIdDurPack);
-      bytes[b + 12] = assertU8(rec.count) & 0xff;
+      bytes[b + 12] = countLow;
       bytes[b + 13] = flagByte;
       // Preserve pad bytes (flags[1..4]) from the original record instead
       // of hardcoding zeros. In observed saves these are always 0x00 for items,

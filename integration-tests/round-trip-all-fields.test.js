@@ -594,9 +594,9 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
     assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
   });
 
-  test('deposit goods round-trip (count = 99, durability = 0)', async () => {
+  test('deposit goods round-trip (count = 999, durability = 0)', async () => {
     const model = opened.slots[0].model;
-    model.deposit[3].count = 99;
+    model.deposit[3].count = 999;
     model.deposit[3].itemId = 0xff0004;
 
     const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
@@ -604,7 +604,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
     expected.deposit[3] = {
       ...expected.deposit[3],
       itemId: 0xff0004,
-      count: 99,
+      count: 999,
     };
     assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
   });
