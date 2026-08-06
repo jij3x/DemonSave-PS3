@@ -14,6 +14,7 @@ import {
   updateSessionAfterWrite,
 } from '../js/des-savefile/save-api.js';
 import { readSave } from '../js/des-savefile/reader.js';
+import { getSfoAccountId } from '../js/lib/ps3-save-lib/index.js';
 import { zipSync, unzipSync } from 'fflate';
 import {
   createUnencryptedSaveFolder,
@@ -629,5 +630,70 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const pfdBytes = filesToWrite.get('PARAM.PFD');
     expect(pfdBytes.length).toBeGreaterThan(100);
     expect(pfdBytes[0]).toBe(0x00);
+  });
+
+  // -------------------------------------------------------------------
+  // SFO fields (profileNumber + accountId) survive encrypted export
+  // -------------------------------------------------------------------
+
+  test('SFO fields preserved through exportEncryptedSave → re-open', async () => {
+    const sb = newSandbox('sfo-enc');
+    const rawFiles = createUnencryptedSaveFolder([1], {
+      realisticSfo: true,
+      profileNumber: 42,
+      accountId: 'aabbccdd11223344aabbccdd11223344',
+    });
+    writeToDisk(sb, rawFiles);
+
+    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
+
+    // Export as encrypted (changes encryption state, rewrites SFO)
+    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
+
+    // Verify SFO fields in the output bytes directly
+    const sfoBytes = filesToWrite.get('PARAM.SFO');
+    expect(sfoBytes).toBeDefined();
+    expect(sfoBytes[0x570]).toBe(42);
+    expect(getSfoAccountId(sfoBytes)).toBe('aabbccdd11223344aabbccdd11223344');
+
+    // Re-open from disk and verify openSave reads the SFO fields
+    const sb2 = newSandbox('sfo-enc-2');
+    const reopened = writeOutputToDisk(sb2, filesToWrite);
+    const { profileNumber: readPn, accountId: readAi } = await openSave(reopened);
+    expect(readPn).toBe(42);
+    expect(readAi).toBe('aabbccdd11223344aabbccdd11223344');
+  });
+
+  test('SFO field changes survive exportEncryptedSave → re-open', async () => {
+    const sb = newSandbox('sfo-enc-change');
+    const rawFiles = createUnencryptedSaveFolder([1], {
+      realisticSfo: true,
+      profileNumber: 42,
+      accountId: 'aabbccdd11223344aabbccdd11223344',
+    });
+    writeToDisk(sb, rawFiles);
+
+    const { slots } = await openSave(sb.readFiles());
+
+    // Change both SFO fields AND a slot field
+    slots[0].model.vit = 90;
+    const newProfileNumber = 99;
+    const newAccountId = '11223344556677889900aabbccddeeff';
+
+    const { filesToWrite } = await exportEncryptedSave(slots, [], newProfileNumber, newAccountId);
+
+    // Verify SFO fields in the output bytes directly
+    const sfoBytes = filesToWrite.get('PARAM.SFO');
+    expect(sfoBytes).toBeDefined();
+    expect(sfoBytes[0x570]).toBe(99);
+    expect(getSfoAccountId(sfoBytes)).toBe(newAccountId);
+
+    // Re-open from disk and verify all fields
+    const sb2 = newSandbox('sfo-enc-change-2');
+    const reopened = writeOutputToDisk(sb2, filesToWrite);
+    const { slots: readSlots, profileNumber: readPn, accountId: readAi } = await openSave(reopened);
+    expect(readPn).toBe(99);
+    expect(readAi).toBe(newAccountId);
+    expect(readSlots[0].model.vit).toBe(90);
   });
 });
