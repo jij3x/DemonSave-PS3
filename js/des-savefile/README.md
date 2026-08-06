@@ -267,8 +267,8 @@ Durability is stored in a **parallel table** at `0x10364 + Idx1 * 8`, not within
 +0x04  type        UInt8   0x00=weapon, 0x10=armor, 0x20=ring, 0x40=goods, 0xFF=empty
 +0x05  itemId      UInt24  3-byte big-endian item ID
 +0x08  sortOrder   UInt32  hi16=sortId, lo16=deposit order index
-+0x0C  count       UInt8   stack count
-+0x0D  flag        UInt8   0x21 for items, 0x00 for empty
++0x0C  countLow    UInt8   bits 0-7 of stack count (10-bit total)
++0x0D  countFlag   UInt8   bits 6-7 = count bits 8-9 (10-bit total: 0-1023); bits 0-5 = flag (0x21 for items, 0x00 for empty)
 +0x0E  pad         UInt32  0x00000000 for items; 0x0000FFFF for empty
 +0x12  durability  UInt16  weapon/armor max durability
 ```
@@ -324,6 +324,7 @@ All integer fields are range-checked before writing:
 - `assertU8` — [0, 255], rejects non-integers
 - `assertU16` — [0, 65535], rejects non-integers
 - `assertU32` — [0, 4294967295], rejects non-integers
+- Deposit count uses a **10-bit field** (0–1023): bits 0–7 in byte[+0x0C], bits 8–9 in the high 2 bits of byte[+0x0D] (the flag byte). The writer validates as a 10-bit value and merges the high bits into the flag byte. The UI caps at 999.
 
 The `val()` helper uses `Number()` (not `parseFloat()`) for strict parsing — malformed
 strings like `"12abc"` are rejected rather than silently coerced. Non-integer values (e.g.

@@ -228,7 +228,7 @@ export function makeInventoryRow(category, rec, typeIdHint = null, invIdxByRef) 
   // The count is preserved losslessly via a hidden input so the writer still
   // receives the original value (typically 1).
   if (category === 'weapons' || category === 'armor') {
-    tr.appendChild(makeCountCell('inv-count', rec.count, showCount));
+    tr.appendChild(makeCountCell('inv-count', rec.count, showCount, rowTypeId === 4));
     // Hidden field — preserved via dataset for round-trip fidelity
     tr.dataset.misc2 = String(rec.misc2 ?? 0);
     tr.appendChild(makeNumCell('inv-misc1hi', (rec.misc1 >> 8) & 0xff));
@@ -249,7 +249,7 @@ export function makeInventoryRow(category, rec, typeIdHint = null, invIdxByRef) 
   //  idx1/idx2 are NOT in the DOM — restored by mergeModel via _ref)
   // Count is hidden for non-counted types (Rings).
   if (category === 'rings' || category === 'goods') {
-    tr.appendChild(makeCountCell('inv-count', rec.count, showCount));
+    tr.appendChild(makeCountCell('inv-count', rec.count, showCount, false));
     // Hidden field — preserved via dataset for round-trip fidelity
     tr.dataset.misc2 = String(rec.misc2 ?? 0);
     tr.appendChild(makeNumCell(layout.singleClass, rec.misc1));

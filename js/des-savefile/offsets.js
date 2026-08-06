@@ -286,8 +286,8 @@ export const HAIR_B = 0x14370;
  *   +0x05 itemId       UInt24BE — 3-byte big-endian item ID
  *   +0x08 sortOrder    UInt32BE — hi16=sortId (matches inventory misc1),
  *                      lo16=deposit order index
- *   +0x0C count        UInt8    — stack count for goods
- *   +0x0D flag         UInt8    — 0x21 for items, 0x00 for empty slots
+ *   +0x0C countLow     UInt8    - low 8 bits of stack count (10-bit total)
+ *   +0x0D countFlag    UInt8    - bits 6-7 = count high 2 bits; bits 0-5 = flag (0x21 items, 0x00 empty)
  *   +0x0E pad          UInt32BE — 0x00000000 for items; 0x0000FFFF for empty
  *                      slots
  *   +0x12 durability   UInt16BE — weapon/armor max durability (e.g. 300=0x012C,

@@ -431,9 +431,11 @@ describe('controls', () => {
     test('has inventory limits', () => {
       expect(COUNT_LIMITS.inventory).toEqual({ min: 1, max: 99 });
     });
-
     test('has deposit limits', () => {
-      expect(COUNT_LIMITS.deposit).toEqual({ min: 1, max: 999 });
+      expect(COUNT_LIMITS.deposit).toEqual({ min: 1, max: 99 });
+    });
+    test('has ammo limits (wider range for arrows/bolts)', () => {
+      expect(COUNT_LIMITS.ammo).toEqual({ min: 1, max: 999 });
     });
   });
 
