@@ -636,6 +636,40 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
   });
 
   // -------------------------------------------------------------------
+  // Deposit: add / delete
+  // -------------------------------------------------------------------
+
+  test('adding a new deposit item round-trips', async () => {
+    const model = opened.slots[0].model;
+    model.deposit.push({
+      category: 'rings',
+      itemId: 0x00ff0001,
+      count: 1,
+      durability: 0,
+      unknown1: 0,
+      sortOrder: 0,
+      flags: [0x21, 0, 0, 0, 0, 0, 0],
+    });
+
+    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
+    expect(slots[0].model.deposit).toHaveLength(5); // factory has 4
+    const newDep = slots[0].model.deposit.find((d) => d.itemId === 0x00ff0001);
+    expect(newDep).toBeDefined();
+    expect(newDep.count).toBe(1);
+    expect(newDep.category).toBe('rings');
+  });
+
+  test('deleting deposit items round-trips', async () => {
+    const model = opened.slots[0].model;
+    // Keep only the first deposit item
+    model.deposit = [model.deposit[0]];
+
+    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
+    expect(slots[0].model.deposit).toHaveLength(1);
+    expect(slots[0].model.deposit[0].itemId).toBe(0x00020001 + 1);
+  });
+
+  // -------------------------------------------------------------------
   // Spells
   // -------------------------------------------------------------------
 
@@ -878,6 +912,117 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
     // Re-open and verify openSave returns the accountId
     const { accountId } = await openSave(sandbox.readFiles());
     expect(accountId).toBe(newAccountId);
+  });
+
+  // -------------------------------------------------------------------
+  // SFO field preservation: modifying slot fields must NOT corrupt SFO
+  // -------------------------------------------------------------------
+
+  test('SFO fields preserved when only slot model fields change', async () => {
+    // Modify slot-level fields only — do NOT change profileNumber or accountId.
+    // The original bug (pre-b84344ac) caused accountId to be lost on save
+    // because it was read from firstSlot.model.accountId (which could be
+    // undefined), causing writeSfoAccountId to be silently skipped.
+    const model = opened.slots[0].model;
+    model.world = 9;
+    model.vit = 99;
+    model.name = 'Hero';
+
+    // writeAndReopen defaults accountId to opened.accountId, simulating
+    // the case where the user changes slot data but NOT folder-level fields.
+    const { slots, profileNumber, accountId } = await writeAndReopen(
+      opened.slots,
+      opened.profileNumber,
+    );
+
+    // SFO fields must be preserved exactly
+    expect(profileNumber).toBe(42);
+    expect(accountId).toBe('aabbccdd11223344aabbccdd11223344');
+
+    // Slot-level changes must also survive
+    expect(slots[0].model.world).toBe(9);
+    expect(slots[0].model.vit).toBe(99);
+    expect(slots[0].model.name).toBe('Hero');
+  });
+
+  test('slot model fields preserved when only SFO fields change', async () => {
+    // Change only SFO-level fields (profileNumber + accountId).
+    // Slot model data must remain untouched.
+    const newAccountId = '11223344556677889900aabbccddeeff';
+
+    const { slots, profileNumber, accountId } = await writeAndReopen(
+      opened.slots,
+      200,
+      newAccountId,
+    );
+
+    // SFO fields must reflect the new values
+    expect(profileNumber).toBe(200);
+    expect(accountId).toBe(newAccountId);
+
+    // All slot model fields must match the original factory values
+    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), getExpectedModel(1));
+  });
+
+  test('combined SFO + slot model fields change simultaneously', async () => {
+    // Change both SFO-level and slot-level fields at the same time.
+    const model = opened.slots[0].model;
+    model.vit = 80;
+    model.name = 'Combined';
+    const newAccountId = 'aabbccdd112233445566778899001122';
+
+    const { slots, profileNumber, accountId } = await writeAndReopen(
+      opened.slots,
+      100,
+      newAccountId,
+    );
+
+    // SFO fields must reflect the new values
+    expect(profileNumber).toBe(100);
+    expect(accountId).toBe(newAccountId);
+
+    // Slot model changes must also survive
+    expect(slots[0].model.vit).toBe(80);
+    expect(slots[0].model.name).toBe('Combined');
+  });
+
+  // -------------------------------------------------------------------
+  // SFO field edge cases
+  // -------------------------------------------------------------------
+
+  test('profileNumber = 0 round-trips through SFO', async () => {
+    const { profileNumber } = await writeAndReopen(opened.slots, 0);
+    expect(profileNumber).toBe(0);
+    const sfoBytes = sandbox.readFile('PARAM.SFO');
+    expect(sfoBytes[0x570]).toBe(0);
+  });
+
+  test('profileNumber = 255 round-trips through SFO', async () => {
+    const { profileNumber } = await writeAndReopen(opened.slots, 255);
+    expect(profileNumber).toBe(255);
+    const sfoBytes = sandbox.readFile('PARAM.SFO');
+    expect(sfoBytes[0x570]).toBe(255);
+  });
+
+  test('accountId cleared to zeros round-trips through SFO', async () => {
+    // writeSfoAccountId accepts a 32-char all-zeros hex string.
+    // This tests the "clear accountId" path (e.g., removing PSN binding).
+    const clearedAccountId = '00000000000000000000000000000000';
+
+    const { filesToWrite } = await writeSaveData(
+      opened.slots,
+      [],
+      opened.profileNumber,
+      clearedAccountId,
+    );
+    sandbox.writeFiles(filesToWrite);
+
+    const sfoBytes = sandbox.readFile('PARAM.SFO');
+    const readAcctId = getSfoAccountId(sfoBytes);
+    expect(readAcctId).toBe(clearedAccountId);
+
+    const { accountId } = await openSave(sandbox.readFiles());
+    expect(accountId).toBe(clearedAccountId);
   });
 
   // -------------------------------------------------------------------

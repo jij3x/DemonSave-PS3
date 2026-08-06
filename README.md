@@ -17,23 +17,35 @@ That's the *what*. The *why* is a little more fun.
 
 ## Why build this?
 
-Two reasons, tangled together.
+Three reasons, tangled together.
 
-The first is a game. Demon's Souls is a genuinely great game with genuinely
+The first is the practical one, and honestly the reason any of this exists: the
+existing tools didn't do what I needed. To be clear, they exist, they work, and
+this project stands on their reverse-engineering — you'll see them credited
+below. But for the one thing I actually wanted — reliably adding or updating
+items — they left me nervous. An edit would land, and so would the side
+effects: a hotbar that reshuffled itself, an "equipped" marker that quietly
+stopped meaning anything, item counts drifting on things I never touched. The
+save would load, but it wasn't quite *right*. Reinventing the wheel has no
+point unless the existing one wobbles, and here it wobbled just enough that I'd
+hesitate every time I touched an item. So I set out to write an editor that
+edits exactly what you ask and nothing else.
+
+The second is a game. Demon's Souls is a genuinely great game with genuinely
 great memories attached — and an old, persistent debate: is the PS5 Remake
 actually *better* than the original, or just prettier? I wanted to settle that
 for myself without re-living the parts nobody misses. Nobody fondly recalls
 farming for a rare Pure Bladestone drop until their soul gives out. A save
 editor sidesteps the grind and lets you actually play the comparison.
 
-The second is curiosity. I'd used AI plenty — but always in pieces, never to carry
+The third is curiosity. I'd used AI plenty — but always in pieces, never to carry
 a whole project, first sketch to last test, through all the redesigns and
 rewrites in between. This time I wanted to hand it the entire arc and see how
 far it actually goes. And I wanted to put a specific model through its paces:
 GLM 5.2, which people keep saying is good.
 
-> **Two goals, one project: revisit Boletaria — and build a product from
-> scratch with an AI.**
+> **Three goals, one project: edit items without breaking anything else —
+> revisit Boletaria — and build a product from scratch with an AI.**
 
 ---
 
@@ -94,7 +106,7 @@ that turns a prototype into something you'd trust with your save data.
 Some takeaways, in case you're weighing the same tools.
 
 **On GLM 5.2 specifically.** It's proficient — genuinely. I can't say how it
-compares to Fable 5 or k3, since I didn't run those head-to-head, but it
+compares to Fable 5 or K3, since I didn't run those head-to-head, but it
 absolutely gets the job done. Against Opus 4.8, the reasoning, problem-solving,
 debugging, and reverse-engineering felt about on par, and the cost was clearly
 lower. The one real complaint: GLM 5.2 doesn't handle image input, which
@@ -148,7 +160,7 @@ wrong. That's still the job. Frankly, it's the interesting part.
 | Tokens burned | ~2 billion |
 | Effort | ~3 weeks, part-time |
 | Source | ~15k lines of app logic + ~19k lines of game data |
-| Tests | >1,000 passing tests across 25+ suites with ~99% line coverage, plus 90+ integration tests |
+| Tests | 1,000+ passing unit tests across 25+ suites with ~99% line coverage, plus 100+ integration tests |
 
 ---
 
