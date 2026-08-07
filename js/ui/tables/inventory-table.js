@@ -126,6 +126,8 @@ export function renderInventory(category, records, invIdxByRef) {
  *
  * @param {string} category  'weapons'|'armor'|'rings'|'goods'
  * @param {Record<string, any>} rec  {itemId, count, misc1, misc2, durability}
+ * @param {*} [typeIdHint=null]  optional type hint for new rows (itemId undefined)
+ * @param {Map<string, number>} [invIdxByRef]  display-only map from _ref → idx1
  */
 export function makeInventoryRow(category, rec, typeIdHint = null, invIdxByRef) {
   const { ids, names } = getCategoryData(category);

@@ -26,6 +26,7 @@ export default [
         HTMLInputElement: 'readonly',
         HTMLSelectElement: 'readonly',
         HTMLButtonElement: 'readonly',
+        HTMLCanvasElement: 'readonly',
         Event: 'readonly',
         CustomEvent: 'readonly',
         DragEvent: 'readonly',

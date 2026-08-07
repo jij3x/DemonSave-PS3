@@ -39,6 +39,9 @@ describe('swap16', () => {
   test('0xFF00 -> 0x00FF', () => {
     expect(swap16(0xff00)).toBe(0x00ff);
   });
+  test('0x0000 palindrome', () => {
+    expect(swap16(0x0000)).toBe(0x0000);
+  });
 });
 
 describe('swap32', () => {
@@ -47,6 +50,10 @@ describe('swap32', () => {
   });
   test('0x000000FF -> 0xFF000000', () => {
     expect(swap32(0x000000ff)).toBe(0xff000000);
+  });
+  test('palindromes (all-zero / all-one)', () => {
+    expect(swap32(0x00000000)).toBe(0x00000000);
+    expect(swap32(0xffffffff)).toBe(0xffffffff);
   });
 });
 
@@ -58,6 +65,12 @@ describe('swap64Halves', () => {
     const r = swap64Halves(0x11223344, 0xaabbccdd);
     expect(r.hi).toBe(0xddccbbaa);
     expect(r.lo).toBe(0x44332211);
+  });
+
+  test('swaps hi and lo with a second value pair', () => {
+    const { hi, lo } = swap64Halves(0x11223344, 0x55667788);
+    expect(hi).toBe(0x88776655);
+    expect(lo).toBe(0x44332211);
   });
 });
 
@@ -278,26 +291,6 @@ describe('uint64 BE round-trips', () => {
   test('writeU64BEHalves throws on out-of-bounds', () => {
     const buf = new Uint8Array(4);
     expect(() => writeU64BEHalves(buf, 0, 1, 2)).toThrow(RangeError);
-  });
-});
-
-describe('swap helpers edge cases', () => {
-  test('swap16 edge values', () => {
-    expect(swap16(0x0000)).toBe(0x0000);
-    expect(swap16(0x00ff)).toBe(0xff00);
-    expect(swap16(0xff00)).toBe(0x00ff);
-  });
-
-  test('swap32 edge values', () => {
-    expect(swap32(0x00000000)).toBe(0x00000000);
-    expect(swap32(0x000000ff)).toBe(0xff000000);
-    expect(swap32(0xffffffff)).toBe(0xffffffff);
-  });
-
-  test('swap64Halves swaps hi and lo', () => {
-    const { hi, lo } = swap64Halves(0x11223344, 0x55667788);
-    expect(hi).toBe(0x88776655);
-    expect(lo).toBe(0x44332211);
   });
 });
 

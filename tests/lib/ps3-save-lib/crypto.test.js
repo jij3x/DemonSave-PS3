@@ -384,12 +384,9 @@ describe('HMAC-SHA1 bounds checking', () => {
 
 describe('compareDigests alias', () => {
   test('compareDigests is the same function as compareBytes', () => {
+    // compareDigests is a named alias of compareBytes (util/hex.js), so the
+    // equality behavior is already pinned by the compareBytes tests in
+    // hex.test.js — only the alias binding is asserted here.
     expect(compareDigests).toBe(compareBytes);
-  });
-
-  test('compareDigests works for equal digests', () => {
-    const a = new Uint8Array([1, 2, 3, 4]);
-    const b = new Uint8Array([1, 2, 3, 4]);
-    expect(compareDigests(a, b)).toBe(true);
   });
 });

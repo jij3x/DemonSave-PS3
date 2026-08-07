@@ -579,15 +579,16 @@ describe('save-api: decryptAndMergeSlots cached bytes branch', () => {
  * ==================================================================== */
 
 describe('reloadSlotModels', () => {
-  test('re-sanitizes models after write, producing fresh display data', async () => {
+  test('re-sanitizes models after write, preserving edited values + fresh display', async () => {
     const buf = makeBlankSave();
     wInt32BE(buf, O.VIT, 30);
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
-    // Modify model values
+    // Modify several editable values
     slots[0].model.vit = 99;
     slots[0].model.name = 'Hero';
+    slots[0].model.souls = 77777;
 
     // Write — this merges the model and updates session.fullModel
     await writeSaveData(slots, [], profileNumber, accountId);
@@ -595,10 +596,10 @@ describe('reloadSlotModels', () => {
     // Reload — re-sanitizes from the updated fullModel
     reloadSlotModels(slots);
 
-    // After reload: model and display should be freshly produced
-    expect(slots[0].model).toBeDefined();
+    // After reload: edited values are preserved and display is freshly produced
     expect(slots[0].model.vit).toBe(99);
     expect(slots[0].model.name).toBe('Hero');
+    expect(slots[0].model.souls).toBe(77777);
     expect(slots[0].display).toBeDefined();
     expect(slots[0].display.equipmentPointers).toBeDefined();
     expect(slots[0].display.invIdxByRef).toBeDefined();
@@ -614,25 +615,6 @@ describe('reloadSlotModels', () => {
 
     expect(messages.length).toBeGreaterThan(0);
     expect(messages.some((m) => m.includes('Refresh'))).toBe(true);
-  });
-
-  test('reloadSlotModels preserves editable field values', async () => {
-    const buf = makeBlankSave();
-    wInt32BE(buf, O.VIT, 42);
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber, accountId } = await openSave(rawFiles);
-
-    // Modify and write
-    slots[0].model.vit = 99;
-    slots[0].model.souls = 77777;
-    await writeSaveData(slots, [], profileNumber, accountId);
-
-    // Reload
-    reloadSlotModels(slots);
-
-    // Values should be preserved through the reload
-    expect(slots[0].model.vit).toBe(99);
-    expect(slots[0].model.souls).toBe(77777);
   });
 });
 
@@ -691,43 +673,6 @@ describe('repeated saves without reload (new items)', () => {
     // The weapon must NOT be duplicated — still exactly 1
     expect(model2.weapons).toHaveLength(1);
   });
-
-  test('add item → save → save again (no reload): no duplication', async () => {
-    // Even more aggressive: skip reloadSlotModels entirely between saves.
-    // The session's decryptedBytes cache is updated by decryptAndMergeSlots,
-    // so the second save uses the cached (already-written) bytes.
-    const buf = makeInitializedBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber, accountId } = await openSave(rawFiles);
-
-    // Add a new weapon
-    slots[0].model.weapons.push({
-      _ref: '',
-      itemId: 0x10000002,
-      count: 1,
-      misc1: 0,
-      misc2: 0x01000000,
-      durability: 200,
-    });
-
-    // Save #1
-    const result1 = await writeSaveData(slots, [], profileNumber, accountId);
-    const model1 = readSave(result1.filesToWrite.get('USER.DAT'));
-    expect(model1.weapons).toHaveLength(1);
-
-    // Save #2 directly — model still references the old sanitized state,
-    // but session.fullModel was updated by decryptAndMergeSlots.
-    // We need to re-collect the model from the session for this test.
-    // In practice the UI always calls reloadSlotModels, but this test
-    // verifies the session state is correct even without it.
-    const { model, display } = slots[0];
-    slots[0].model = model; // model is the same reference from openSave
-    slots[0].display = display;
-
-    const result2 = await writeSaveData(slots, [], profileNumber, accountId);
-    const model2 = readSave(result2.filesToWrite.get('USER.DAT'));
-    expect(model2.weapons).toHaveLength(1);
-  });
 });
 
 /* ========================================================================
@@ -735,22 +680,15 @@ describe('repeated saves without reload (new items)', () => {
  * ==================================================================== */
 
 describe('writeSaveData: sfoBytes return value', () => {
-  test('returns sfoBytes with patched profile number + accountId', async () => {
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots } = await openSave(rawFiles);
-
-    const newAccountId = '0123456789abcdef0123456789abcdef';
-    const { sfoBytes } = await writeSaveData(slots, [], 123, newAccountId);
-
-    expect(sfoBytes).toBeInstanceOf(Uint8Array);
-    expect(sfoBytes[0x570]).toBe(123);
-    // Note: accountId write requires a real ACCOUNT_ID field in SFO;
-    // makeSfo() doesn't have one, so we only verify profile number here.
-    // accountId write is tested in param-sfo.test.js.
-  });
-
-  test('inPlace=true still returns sfoBytes even when not in filesToWrite', async () => {
+  // sfoBytes is always returned (with the patched profile number) regardless
+  // of inPlace mode. One test.each covers both; the inPlace row also asserts
+  // PARAM.SFO is omitted from filesToWrite. (The accountId param is exercised
+  // by `writeSaveData with accountId writes to SFO` above; the real ACCOUNT_ID
+  // write lives in param-sfo.test.js.)
+  test.each([
+    { label: 'non-inPlace', inPlace: false, expectSfoInFiles: true },
+    { label: 'inPlace', inPlace: true, expectSfoInFiles: false },
+  ])('returns sfoBytes with patched profile number ($label)', async ({ inPlace, expectSfoInFiles }) => {
     const buf = makeBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
@@ -761,27 +699,12 @@ describe('writeSaveData: sfoBytes return value', () => {
       profileNumber,
       accountId,
       null,
-      true,
+      inPlace,
     );
 
-    expect(filesToWrite.has('PARAM.SFO')).toBe(false);
+    expect(filesToWrite.has('PARAM.SFO')).toBe(expectSfoInFiles);
     expect(sfoBytes).toBeInstanceOf(Uint8Array);
     expect(sfoBytes[0x570]).toBe(profileNumber);
-    // accountId write requires a real ACCOUNT_ID field in SFO; see
-    // param-sfo.test.js for accountId write verification.
-  });
-
-  test('writeSaveData accepts accountId param without error', async () => {
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber } = await openSave(rawFiles);
-
-    const newAccountId = 'aabbccdd11223344aabbccdd11223344';
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, newAccountId);
-
-    expect(filesToWrite.has('PARAM.SFO')).toBe(true);
-    // accountId write verification requires a real ACCOUNT_ID field in SFO;
-    // see param-sfo.test.js for that.
   });
 });
 

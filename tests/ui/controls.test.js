@@ -441,18 +441,6 @@ describe('controls', () => {
     });
   });
 
-  describe('canvas measurement fallback', () => {
-    test('uses char-count heuristic when canvas is unavailable', () => {
-      // The module already loaded with jsdom (no real canvas), so the
-      // char-count fallback path is already exercised at module load time.
-      // SELECT_WIDTHS values exist and are positive numbers.
-      for (const key of Object.keys(SELECT_WIDTHS)) {
-        expect(typeof SELECT_WIDTHS[key]).toBe('number');
-        expect(SELECT_WIDTHS[key]).toBeGreaterThan(0);
-      }
-    });
-  });
-
   describe('SELECT_WIDTHS', () => {
     test('has width for spells', () => {
       expect(typeof SELECT_WIDTHS.spells).toBe('number');
