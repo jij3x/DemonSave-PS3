@@ -375,6 +375,11 @@ header h1 {
   margin: 20px 0;
 }
 
+/* Breathing room between Character Tendency and World Tendency fieldsets */
+#charPanel .tab-content[data-tab="world"] > fieldset:nth-of-type(2) {
+  margin-top: 16px;
+}
+
 /* Separator line between Character fields and Hair section */
 #charPanel > .tab-content[data-tab="character"] > .grid {
   padding-bottom: 0;

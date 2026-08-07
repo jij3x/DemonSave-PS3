@@ -109,13 +109,19 @@ const COL_MIN_WIDTH_DELETE = 40; /* 28px button + 12px padding */
 
 /**
  * Create a `<fieldset>` with a `<legend>` label.
- * @param {string} legendText
+ * @param {string|{text: string, tooltip?: string}} legendText  legend label, or an
+ *   object with `text` and an optional `tooltip` (shown on hover via the unified
+ *   tooltip system)
  * @param {...Node} children
  * @returns {HTMLFieldSetElement}
  */
 function fieldset(legendText, ...children) {
+  const isObj = typeof legendText === 'object' && legendText !== null;
+  const text = isObj ? legendText.text : legendText;
+  const legendAttrs = { textContent: text };
+  if (isObj && legendText.tooltip) legendAttrs['data-tooltip'] = legendText.tooltip;
   return /** @type {HTMLFieldSetElement} */ (
-    el('fieldset', {}, el('legend', { textContent: legendText }), ...children)
+    el('fieldset', {}, el('legend', legendAttrs), ...children)
   );
 }
 
@@ -172,11 +178,14 @@ function selectInput(id, className, options, extraAttrs = {}) {
  * Create a `<label class="checkbox">` wrapping a checkbox input and text.
  * @param {string} id
  * @param {string} labelText
+ * @param {Object} [opts]  { 'data-tooltip' }
  * @returns {HTMLLabelElement}
  */
-function checkboxInput(id, labelText) {
+function checkboxInput(id, labelText, opts = {}) {
+  const attrs = { className: 'checkbox' };
+  if (opts['data-tooltip']) attrs['data-tooltip'] = opts['data-tooltip'];
   return /** @type {HTMLLabelElement} */ (
-    el('label', { className: 'checkbox' }, el('input', { id, type: 'checkbox' }), labelText)
+    el('label', attrs, el('input', { id, type: 'checkbox' }), labelText)
   );
 }
 
@@ -884,11 +893,26 @@ export function buildPage() {
       'div',
       { className: 'tab-content', 'data-tab': 'world', hidden: true },
       fieldset(
-        'World Tendency',
+        {
+          text: 'Character Tendency',
+          tooltip:
+            'Character Tendency \u2014 your personal karma (Pure White \u2194 Pure Black), shown as the statue\u2019s hue in the status menu. Pure White: +20% Soul Form attack & the Friend\u2019s Ring from the Monumental. Pure Black: lowers Soul Form HP & unlocks Mephistopheles\u2019 quests. Shifts white by killing Black Phantoms; black by invading hosts or killing NPCs.',
+        },
         el(
           'div',
           { className: 'grid' },
           label('charTendencyLabel', 'Character: ', numInput('charTendency', { step: '0.001' })),
+        ),
+      ),
+      fieldset(
+        {
+          text: 'World Tendency',
+          tooltip:
+            'World Tendency \u2014 each world\u2019s alignment (+200 Pure White \u2194 \u2212200 Pure Black), shown by the Archstone\u2019s hue on the status menu. Shifts White by killing that world\u2019s bosses (+60/+90); Black by dying in Body Form there (\u221260) or killing NPCs. Changes register only when you return to the Nexus and carry into New Game+. Pure White: weaker enemies & +10\u201320% Soul Form attack. Pure Black: tougher enemies, better/rarer drops, plus Black Phantoms & Primeval Demons that unlock unique gear & events.',
+        },
+        el(
+          'div',
+          { className: 'grid' },
           label('nexusTendencyLabel', 'Nexus: ', numInput('nexusTendency', { step: '0.001' })),
           label('w1TendencyLabel', 'W1 (Boletaria): ', numInput('w1Tendency', { step: '0.001' })),
           label('w2TendencyLabel', 'W2 (Stonefang): ', numInput('w2Tendency', { step: '0.001' })),
@@ -900,7 +924,10 @@ export function buildPage() {
       el(
         'div',
         { className: 'world-section-separator' },
-        checkboxInput('archSealed', 'Archdemon Sealed'),
+        checkboxInput('archSealed', 'Archdemon Sealed', {
+          'data-tooltip':
+            'Archdemon Sealed \u2014 the central Nexus seal guarding the path to the Old One (the end-game). Checked = sealed shut, meaning you haven\u2019t yet defeated all five Archdemons (each world\u2019s final boss). Once the last Archdemon falls the seal opens, the Maiden in Black escorts you to the Old One, and she stops offering level-ups.',
+        }),
       ),
       fieldset(
         'NPC State',

@@ -65,8 +65,10 @@ const WEAPON_TYPES = [
  *
  * Keyed by typeId → { ids, names }. Built once at module load from the
  * flat WEAPON_IDS/WEAPON_NAMES arrays, using getItem().type[0] to classify
- * each weapon. Unknown items (not in the DB) are excluded from these arrays
- * — they can't be classified, so they don't appear in type-filtered dropdowns.
+ * each weapon. sub_type 0 ("Experimental") items are excluded — they are
+ * ghost/test entries that should not be selectable in inventory dropdowns.
+ * Unknown items (not in the DB) are also excluded — they can't be classified,
+ * so they don't appear in type-filtered dropdowns.
  */
 const WEAPON_TYPE_DATA = {};
 for (const { typeId } of WEAPON_TYPES) {
@@ -77,6 +79,9 @@ for (let i = 0; i < WEAPON_IDS.length; i++) {
   try {
     const item = db.getItem('weapons', id);
     const typeId = item.type?.[0];
+    const subTypeId = item.type?.[1];
+    // Skip Experimental (sub_type 0) items in inventory dropdowns.
+    if (subTypeId === 0) continue;
     if (WEAPON_TYPE_DATA[typeId]) {
       WEAPON_TYPE_DATA[typeId].ids.push(id);
       WEAPON_TYPE_DATA[typeId].names.push(WEAPON_NAMES[i]);
@@ -89,9 +94,11 @@ for (let i = 0; i < WEAPON_IDS.length; i++) {
 /**
  * Deposit-specific per-type filtered arrays for weapons.
  *
- * Same as WEAPON_TYPE_DATA but excludes sub_type 0 ("Experimental") items —
+ * Same as WEAPON_TYPE_DATA: excludes sub_type 0 ("Experimental") items —
  * ghost/test entries that should not be selectable when adding items to
- * Thomas's Storage.  Inventory selects continue using the unfiltered set.
+ * Thomas's Storage.  Inventory selects now apply the same filter (see
+ * WEAPON_TYPE_DATA), so the two structures are functionally identical;
+ * the deposit variant is retained for its dedicated code path and width key.
  */
 const DEPOSIT_WEAPON_TYPE_DATA = {};
 for (const { typeId } of WEAPON_TYPES) {
