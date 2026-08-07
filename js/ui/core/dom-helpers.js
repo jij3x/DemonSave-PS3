@@ -158,8 +158,8 @@ export function setEquipmentText(id, val, category, resetOrig = false) {
   let text;
   if (raw === 0xffffffff) {
     text = '(none)';
-  } else if (db.hasItem(/** @type {any} */ (category), raw)) {
-    text = db.getItem(/** @type {any} */ (category), raw).name;
+  } else if (db.hasItem(category, raw)) {
+    text = db.getItem(category, raw).name;
   } else {
     text = formatUnknownItem(raw);
   }

@@ -13,8 +13,11 @@
 import { jest } from '@jest/globals';
 import { TextEncoder } from 'node:util';
 
-/** Browser window cast to allow Chromium File System Access API properties. */
-const w = /** @type {any} */ (window);
+/** Browser window with the (optional) Chromium File System Access pickers the tests mock. */
+const w = /** @type {Window & {
+  showDirectoryPicker?: jest.MockedFunction<() => Promise<any>>,
+  showSaveFilePicker?: jest.MockedFunction<(opts: object) => Promise<any>>,
+}} */ (window);
 
 // Mock tauri-bridge — default to NOT Tauri
 jest.unstable_mockModule('../../js/lib/tauri-bridge.js', () => ({
@@ -224,7 +227,9 @@ describe('readFilesFromDataTransfer', () => {
       },
     ];
 
-    const { files } = await readFilesFromDataTransfer(/** @type {any} */ (items));
+    const { files } = await readFilesFromDataTransfer(
+      /** @type {DataTransferItemList} */ (/** @type {unknown} */ (items)),
+    );
     expect(files.size).toBe(1);
     expect(files.has('test.bin')).toBe(true);
   });
@@ -291,8 +296,8 @@ describe('writeFilesToDirectory', () => {
   });
 
   test('delegates to Tauri IPC when handle has __tauriDirPath', async () => {
-    const tauriModule = /** @type {any} */ (await import('../../js/lib/tauri-bridge.js'));
-    tauriModule.tauriWriteFiles.mockResolvedValue(undefined);
+    const tauriModule = await import('../../js/lib/tauri-bridge.js');
+    jest.mocked(tauriModule.tauriWriteFiles).mockResolvedValue(undefined);
 
     const dirHandle = { __tauriDirPath: '/path/to/save' };
     const files = new Map([['USER.DAT', new Uint8Array([1])]]);
@@ -342,8 +347,8 @@ describe('deleteFilesFromDirectory', () => {
   });
 
   test('delegates to Tauri IPC when handle has __tauriDirPath', async () => {
-    const tauriModule = /** @type {any} */ (await import('../../js/lib/tauri-bridge.js'));
-    tauriModule.tauriDeleteFiles.mockResolvedValue(undefined);
+    const tauriModule = await import('../../js/lib/tauri-bridge.js');
+    jest.mocked(tauriModule.tauriDeleteFiles).mockResolvedValue(undefined);
 
     const dirHandle = { __tauriDirPath: '/path/to/save' };
     await deleteFilesFromDirectory(dirHandle, new Set(['PARAM.PFD']));
@@ -370,7 +375,7 @@ describe('downloadFilesAsZip', () => {
   test('creates an anchor with download attribute and clicks it', async () => {
     const files = new Map([['test.txt', new TextEncoder().encode('hello')]]);
 
-    let clickedAnchor = /** @type {any} */ (null);
+    let clickedAnchor = /** @type {HTMLAnchorElement | null} */ (null);
     // Save reference to real createElement before spying
     const realCreate = document.createElement;
     const spy = jest.spyOn(document, 'createElement').mockImplementation((tag) => {
@@ -394,7 +399,7 @@ describe('downloadFilesAsZip', () => {
   test('uses default name "des_save.zip" when no name provided', async () => {
     const files = new Map([['a.txt', new Uint8Array([1])]]);
 
-    let clickedAnchor = /** @type {any} */ (null);
+    let clickedAnchor = /** @type {HTMLAnchorElement | null} */ (null);
     const realCreate = document.createElement;
     const spy = jest.spyOn(document, 'createElement').mockImplementation((tag) => {
       const el = realCreate.call(document, tag);
@@ -418,9 +423,9 @@ describe('downloadFilesAsZip', () => {
     const files = new Map([['data.bin', content]]);
 
     // Mock createObjectURL to capture the blob
-    let capturedBlob = /** @type {any} */ (null);
+    let capturedBlob = /** @type {Blob | null} */ (null);
     const origCreate = URL.createObjectURL;
-    URL.createObjectURL = (blob) => {
+    URL.createObjectURL = (/** @type {Blob} */ blob) => {
       capturedBlob = blob;
       return 'blob:mock';
     };
@@ -465,7 +470,9 @@ describe('pickZipFile', () => {
     w.showSaveFilePicker.mockResolvedValue(mockHandle);
 
     await pickZipFile('out.zip');
-    const args = w.showSaveFilePicker.mock.calls[0][0];
+    const args = /** @type {{ types: Array<{ accept: Record<string, string[]> }> }} */ (
+      w.showSaveFilePicker.mock.calls[0][0]
+    );
     expect(args.types[0].accept).toEqual({ 'application/zip': ['.zip'] });
 
     delete w.showSaveFilePicker;
@@ -507,8 +514,8 @@ describe('writeZipToHandle', () => {
   });
 
   test('delegates to Tauri IPC when handle has __tauriPath', async () => {
-    const tauriModule = /** @type {any} */ (await import('../../js/lib/tauri-bridge.js'));
-    tauriModule.tauriWriteBytesToPath.mockResolvedValue(undefined);
+    const tauriModule = await import('../../js/lib/tauri-bridge.js');
+    jest.mocked(tauriModule.tauriWriteBytesToPath).mockResolvedValue(undefined);
 
     const handle = { __tauriPath: '/output/save.zip' };
     const files = new Map([['a.txt', new Uint8Array([1])]]);

@@ -12,14 +12,21 @@ import * as O from '../../js/des-savefile/offsets.js';
 /** Minimum buffer size to cover all offsets (position table ~0x21B00) */
 export const BUF_SIZE = 0x22000;
 
-/** Create a zeroed buffer with only SANITY_CHECK set (valid empty save). */
+/**
+ * Create a zeroed buffer with only SANITY_CHECK set (valid empty save).
+ * @returns {Uint8Array}
+ */
 export function makeBlankSave() {
   const buf = new Uint8Array(new ArrayBuffer(BUF_SIZE));
   wInt32BE(buf, O.SANITY_CHECK, 1);
   return buf;
 }
 
-/** Build a minimal PARAM.SFO for testing. */
+/**
+ * Build a minimal PARAM.SFO for testing.
+ * @param {number} [profileNumber]
+ * @returns {Uint8Array}
+ */
 export function makeSfo(profileNumber = 42) {
   const sfo = new Uint8Array(0x600);
   sfo[0] = 0x00;
@@ -30,7 +37,7 @@ export function makeSfo(profileNumber = 42) {
   return sfo;
 }
 
-/** Build a secondary file (04USER.DAT) for testing. */
+/** Build a secondary file (04USER.DAT) for testing. @returns {Uint8Array} */
 export function makeSecondary() {
   return new Uint8Array(0x800);
 }

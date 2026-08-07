@@ -831,7 +831,7 @@ export default {
     },
     '0x4A38': {
       name: '_?_?w?Rc   (Ghost dagger)',
-      type: [1, 1],
+      type: [1, 0],
     },
     '0x4E20': {
       name: 'Short Sword',
@@ -2532,7 +2532,7 @@ export default {
     },
     '0x7148': {
       name: '_?_?v?Rc    (Ghost Sword)',
-      type: [1, 2],
+      type: [1, 0],
     },
     '0x7530': {
       name: 'Rapier',
@@ -3139,7 +3139,7 @@ export default {
     },
     '0x9858': {
       name: '_?_?R:Rc    (Ghost Rapier)',
-      type: [1, 7],
+      type: [1, 0],
     },
     '0x9C40': {
       name: 'Scimitar',
@@ -4295,7 +4295,7 @@ export default {
     },
     '0xBF68': {
       name: '_?_?f?Rc    (Ghost Falchion)',
-      type: [1, 5],
+      type: [1, 0],
     },
     '0xC350': {
       name: 'Battle Axe',
@@ -5040,7 +5040,7 @@ export default {
     },
     '0xE678': {
       name: '_?_?e?    (Ghost Hand Axe)',
-      type: [1, 8],
+      type: [1, 0],
     },
     '0xEA60': {
       name: 'Club',
@@ -5922,7 +5922,7 @@ export default {
     },
     '0x10D88': {
       name: '_?_?i?    (Ghost Club)',
-      type: [1, 10],
+      type: [1, 0],
     },
     '0x11170': {
       name: 'Short Spear',
@@ -6341,7 +6341,7 @@ export default {
     },
     '0x13498': {
       name: '_?_?i?    (Ghost Spear)',
-      type: [1, 13],
+      type: [1, 0],
     },
     '0x13880': {
       name: 'War Scythe',
@@ -6959,7 +6959,7 @@ export default {
     },
     '0x15BA8': {
       name: '_?_?z?r?    (Ghost Spear #2)',
-      type: [1, 14],
+      type: [1, 0],
     },
     '0x15F90': {
       name: 'Wooden Catalyst',
@@ -7477,7 +7477,7 @@ export default {
     },
     '0x1A9C8': {
       name: '_?_?b?    (Ghost fists)',
-      type: [1, 12],
+      type: [1, 0],
     },
     '0x1FBD0': {
       name: 'Short Bow',
@@ -8028,7 +8028,7 @@ export default {
     },
     '0x21EF8': {
       name: '_?_?_    (Ghost Short Bow)',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x222E0': {
       name: 'Light Crossbow',
@@ -8047,7 +8047,7 @@ export default {
     },
     '0x24608': {
       name: '_?_?_)    (Ghost Crossbow)',
-      type: [3, 2],
+      type: [3, 0],
     },
     '0x249F0': {
       name: 'Buckler',
@@ -8976,7 +8976,7 @@ export default {
     },
     '0x26D18': {
       name: '_?_?v?    (Ghost Shield)',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x27100': {
       name: 'Arrow',

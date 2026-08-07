@@ -30,31 +30,39 @@ const SECURE_ID = fromHex('0123456789ABCDEFFEDCBA9876543210');
 
 /** Build encrypted save files from plaintext bytes (single slot).
  *  Creates a PARAM.PFD + encrypted USER.DAT variants (USER.DAT, 2USER.DAT, 04USER.DAT).
+ *
+ *  Pass `{ includeBackup: false }` to omit the 2USER.DAT backup variant — used to
+ *  exercise the "no backup USER.DAT files" branch in writeSaveData.
  */
-function makeEncryptedSaveFiles(userBytes) {
+function makeEncryptedSaveFiles(userBytes, { includeBackup = true } = {}) {
   const sfo = makeSfo();
   const secondary = makeSecondary();
 
   const fileList = [
     { name: 'PARAM.SFO', size: sfo.length },
     { name: 'USER.DAT', size: userBytes.length },
-    { name: '2USER.DAT', size: userBytes.length },
-    { name: '04USER.DAT', size: secondary.length },
   ];
+  if (includeBackup) {
+    fileList.push({ name: '2USER.DAT', size: userBytes.length });
+  }
+  fileList.push({ name: '04USER.DAT', size: secondary.length });
 
   const pfd = createPfdForFiles(fileList, SECURE_ID);
 
   const plainMap = new Map();
   plainMap.set('param.sfo', sfo);
   plainMap.set('user.dat', userBytes);
-  const secondaryCopy = new Uint8Array(userBytes);
-  plainMap.set('2user.dat', secondaryCopy);
+  if (includeBackup) {
+    plainMap.set('2user.dat', new Uint8Array(userBytes));
+  }
   plainMap.set('04user.dat', secondary);
 
   const encMap = new Map();
   encMap.set('param.sfo', sfo); // SFO not encrypted
   encMap.set('user.dat', encryptFile(userBytes, 'USER.DAT', pfd, true));
-  encMap.set('2user.dat', encryptFile(secondaryCopy, '2USER.DAT', pfd, true));
+  if (includeBackup) {
+    encMap.set('2user.dat', encryptFile(plainMap.get('2user.dat'), '2USER.DAT', pfd, true));
+  }
   encMap.set('04user.dat', encryptFile(secondary, '04USER.DAT', pfd, true));
 
   validAllParamHashes(encMap, true, pfd);
@@ -64,7 +72,9 @@ function makeEncryptedSaveFiles(userBytes) {
   files.set('param.sfo', { name: 'PARAM.SFO', bytes: sfo });
   files.set('param.pfd', { name: 'PARAM.PFD', bytes: pfdBytes });
   files.set('user.dat', { name: 'USER.DAT', bytes: encMap.get('user.dat') });
-  files.set('2user.dat', { name: '2USER.DAT', bytes: encMap.get('2user.dat') });
+  if (includeBackup) {
+    files.set('2user.dat', { name: '2USER.DAT', bytes: encMap.get('2user.dat') });
+  }
   files.set('04user.dat', { name: '04USER.DAT', bytes: encMap.get('04user.dat') });
 
   return files;
@@ -751,5 +761,85 @@ describe('exportEncryptedSave: sfoBytes + accountId', () => {
     expect(filesToWrite.has('PARAM.SFO')).toBe(true);
     // accountId write requires a real ACCOUNT_ID field in SFO;
     // makeSfo() doesn't have one — see param-sfo.test.js for that.
+  });
+});
+
+/* ========================================================================
+ * Additional branch coverage (tests-only)
+ * ==================================================================== */
+
+// exportEncryptedSave: non-array failedSlots → default to [] (BRDA 695).
+describe('exportEncryptedSave: non-array failedSlots', () => {
+  test('null failedSlots defaults to empty array', async () => {
+    const buf = makeBlankSave();
+    const rawFiles = makeUnencryptedSaveFiles(buf);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
+
+    const { filesToWrite } = await exportEncryptedSave(slots, null, profileNumber, accountId);
+    expect(filesToWrite.has('PARAM.PFD')).toBe(true);
+  });
+
+  test('undefined failedSlots defaults to empty array', async () => {
+    const buf = makeBlankSave();
+    const rawFiles = makeUnencryptedSaveFiles(buf);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
+
+    const { filesToWrite } = await exportEncryptedSave(slots, undefined, profileNumber, accountId);
+    expect(filesToWrite.has('PARAM.PFD')).toBe(true);
+  });
+});
+
+// writeSaveData: encrypted source + asset + non-inPlace → asset reaches the
+// endsWith('user.dat') false arm of the backup scan (BRDA 622).
+describe('writeSaveData: encrypted source with asset, non-inPlace', () => {
+  test('asset file hits the non-user.dat branch in the backup scan', async () => {
+    const rawFiles = makeEncryptedSaveFiles(makeBlankSave());
+    // Add an asset (non-user.dat) so the backup scan's endsWith check is false.
+    rawFiles.set('icon0.png', { name: 'ICON0.PNG', bytes: new Uint8Array([0x89, 0x50]) });
+
+    const { slots } = await openSave(rawFiles);
+
+    // non-inPlace (default): assets are carried through, not skipped.
+    const { filesToWrite, filesToDelete } = await writeSaveData(slots, [], 0, '');
+
+    expect(filesToWrite.has('USER.DAT')).toBe(true);
+    expect(filesToDelete.has('PARAM.PFD')).toBe(true);
+  });
+});
+
+// writeSaveData: encrypted source with NO backup USER.DAT variants →
+// backupNames stays empty (BRDA 626).
+describe('writeSaveData: encrypted source with no backup variants', () => {
+  test('empty backupNames skips the backup-decrypt block', async () => {
+    // Slot 1 resolves with only USER.DAT present (1USER.DAT / 2USER.DAT absent).
+    const rawFiles = makeEncryptedSaveFiles(makeBlankSave(), { includeBackup: false });
+
+    const { slots } = await openSave(rawFiles);
+    expect(slots).toHaveLength(1);
+
+    const { filesToWrite, filesToDelete } = await writeSaveData(slots, [], 0, '');
+
+    expect(filesToWrite.has('USER.DAT')).toBe(true);
+    expect(filesToDelete.has('PARAM.PFD')).toBe(true);
+  });
+});
+
+// updateSessionAfterWrite: encrypted=true but no PARAM.PFD in filesToWrite →
+// the `if (pfdBytes)` body is skipped (BRDA 908).
+describe('updateSessionAfterWrite: encrypted without PARAM.PFD', () => {
+  test('missing PARAM.PFD leaves manager.pfd unchanged', async () => {
+    const rawFiles = makeEncryptedSaveFiles(makeBlankSave());
+    const { slots } = await openSave(rawFiles);
+    const before = slots[0].session.manager.pfd;
+
+    // filesToWrite deliberately omits PARAM.PFD.
+    const filesToWrite = new Map([['USER.DAT', new Uint8Array([1, 2, 3])]]);
+    await updateSessionAfterWrite(slots, filesToWrite, true);
+
+    // Flags are still set to encrypted...
+    expect(slots[0].session.encrypted).toBe(true);
+    expect(slots[0].session.manager.encrypted).toBe(true);
+    // ...but the PFD parse was skipped (no PARAM.PFD provided).
+    expect(slots[0].session.manager.pfd).toBe(before);
   });
 });

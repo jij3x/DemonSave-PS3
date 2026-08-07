@@ -124,7 +124,7 @@ export function renderInventory(category, records, invIdxByRef) {
  * save file (have a `_ref`) and "false" for user-inserted items. This drives
  * the soft-delete vs. hard-delete behavior in the delete button.
  *
- * @param {'weapons'|'armor'|'rings'|'goods'} category
+ * @param {string} category  'weapons'|'armor'|'rings'|'goods'
  * @param {Record<string, any>} rec  {itemId, count, misc1, misc2, durability}
  */
 export function makeInventoryRow(category, rec, typeIdHint = null, invIdxByRef) {

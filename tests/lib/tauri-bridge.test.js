@@ -22,9 +22,17 @@ import {
 
 // ── Helpers for mocking the Tauri global ──
 
-/** @returns {any} */
+/**
+ * The browser `window` augmented with the optional Tauri global the tests
+ * install/remove. `__TAURI__` is intentionally permissive — several tests
+ * inject malformed shapes (missing `core`, non-function `invoke`) to verify
+ * the guard logic, so no `any` cast should be needed.
+ * @typedef {Window & { __TAURI__?: Record<string, unknown> }} MockTauriWindow
+ */
+
+/** @returns {MockTauriWindow} */
 function getWindow() {
-  return /** @type {any} */ (window);
+  return /** @type {MockTauriWindow} */ (window);
 }
 
 /**

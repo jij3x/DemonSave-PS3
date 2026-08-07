@@ -136,7 +136,7 @@ export function getGoodsTypeId(itemId) {
  * (rings, goods, spells) do not and return 0.  If the lookup fails (unknown
  * item or DB error), falls back to 200 for durability-bearing categories.
  *
- * @param {'weapons'|'armor'|'rings'|'goods'} category
+ * @param {string} category  'weapons'|'armor'|'rings'|'goods'
  * @param {number} itemId  raw item ID (unsigned 32-bit)
  * @returns {number} max durability value (0 for non-durability categories)
  */
@@ -157,7 +157,7 @@ export function lookupMaxDurability(category, itemId) {
  * individual upgrade variant — instead, the note lives on the base weapon
  * definition in rel-upgrades.js.  This helper resolves both cases.
  *
- * @param {'weapons'|'armor'|'rings'|'goods'|'spells'} category
+ * @param {string} category  'weapons'|'armor'|'rings'|'goods'|'spells'
  * @param {number} itemId  raw item ID (unsigned 32-bit)
  * @returns {string|null} the note text, or null if no note is available
  */

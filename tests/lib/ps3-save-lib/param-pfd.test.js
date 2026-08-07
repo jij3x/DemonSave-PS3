@@ -25,6 +25,7 @@ import {
   getStaticKey,
 } from '../../../js/lib/ps3-save-lib/index.js';
 import { decryptWithPortability } from '../../../js/lib/ps3-save-lib/crypto/aes.js';
+import { bad } from '../../helpers.js';
 
 const SECURE_ID = fromHex('0123456789ABCDEFFEDCBA9876543210');
 
@@ -819,7 +820,7 @@ describe('parseParamPfd corrupt-header guards', () => {
   });
 
   test('throws on non-Uint8Array input', () => {
-    expect(() => parseParamPfd(/** @type {never} */ ('bad'))).toThrow(TypeError);
+    expect(() => parseParamPfd(bad('bad'))).toThrow(TypeError);
   });
 
   test('throws on numReserved too large', () => {
@@ -878,7 +879,7 @@ describe('decryptFile with force=true', () => {
 
   test('throws on non-Uint8Array input', () => {
     const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
-    expect(() => decryptFile(/** @type {never} */ ('bad'), 'USER.DAT', pfd, true)).toThrow(
+    expect(() => decryptFile(bad('bad'), 'USER.DAT', pfd, true)).toThrow(
       TypeError,
     );
   });
@@ -887,7 +888,7 @@ describe('decryptFile with force=true', () => {
 describe('encryptFile additional coverage', () => {
   test('throws on non-Uint8Array input', () => {
     const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
-    expect(() => encryptFile(/** @type {never} */ ('bad'), 'USER.DAT', pfd, true)).toThrow(
+    expect(() => encryptFile(bad('bad'), 'USER.DAT', pfd, true)).toThrow(
       TypeError,
     );
   });
@@ -1073,7 +1074,7 @@ describe('getBucketChainHash: null and corrupt chains', () => {
     const result = validateParamPfdDetailed(data, pfd);
     expect(result.valid).toBe(false);
     expect(
-      result.failures.some((f) => /** @type {any} */ (f).reason === 'no valid bucket chain'),
+      result.failures.some((f) => f.reason === 'no valid bucket chain'),
     ).toBe(true);
   });
 
@@ -1345,7 +1346,7 @@ describe('validateParamPfdDetailed: specific failure types', () => {
 
     const result = validateParamPfdDetailed(fileData, pfd);
     expect(result.valid).toBe(false);
-    expect(result.failures.some((f) => /** @type {any} */ (f).hashType === 'topHash')).toBe(true);
+    expect(result.failures.some((f) => f.hashType === 'topHash')).toBe(true);
   });
 
   test('returns failure for missing file data', () => {
@@ -1355,7 +1356,7 @@ describe('validateParamPfdDetailed: specific failure types', () => {
 
     const result = validateParamPfdDetailed(fileData, pfd);
     expect(result.valid).toBe(false);
-    expect(result.failures.some((f) => /** @type {any} */ (f).reason.includes('not found'))).toBe(
+    expect(result.failures.some((f) => f.reason.includes('not found'))).toBe(
       true,
     );
   });

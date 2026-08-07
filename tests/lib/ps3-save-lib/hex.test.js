@@ -9,6 +9,7 @@ import {
   copy,
   concat,
 } from '../../../js/lib/ps3-save-lib/index.js';
+import { bad } from '../../helpers.js';
 
 describe('fromHex', () => {
   test('parses even-length hex string', () => {
@@ -24,9 +25,9 @@ describe('fromHex', () => {
     expect(fromHex('').length).toBe(0);
   });
   test('throws on non-string input', () => {
-    expect(() => fromHex(/** @type {never} */ (123))).toThrow(TypeError);
-    expect(() => fromHex(/** @type {never} */ (null))).toThrow(TypeError);
-    expect(() => fromHex(/** @type {never} */ (undefined))).toThrow(TypeError);
+    expect(() => fromHex(bad(123))).toThrow(TypeError);
+    expect(() => fromHex(bad(null))).toThrow(TypeError);
+    expect(() => fromHex(bad(undefined))).toThrow(TypeError);
   });
 });
 

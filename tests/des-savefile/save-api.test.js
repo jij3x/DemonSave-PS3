@@ -599,9 +599,9 @@ describe('reloadSlotModels', () => {
     expect(slots[0].model).toBeDefined();
     expect(slots[0].model.vit).toBe(99);
     expect(slots[0].model.name).toBe('Hero');
-    expect(/** @type {any} */ (slots[0]).display).toBeDefined();
-    expect(/** @type {any} */ (slots[0]).display.equipmentPointers).toBeDefined();
-    expect(/** @type {any} */ (slots[0]).display.invIdxByRef).toBeDefined();
+    expect(slots[0].display).toBeDefined();
+    expect(slots[0].display.equipmentPointers).toBeDefined();
+    expect(slots[0].display.invIdxByRef).toBeDefined();
   });
 
   test('reloadSlotModels with onProgress callback', async () => {
@@ -720,9 +720,9 @@ describe('repeated saves without reload (new items)', () => {
     // We need to re-collect the model from the session for this test.
     // In practice the UI always calls reloadSlotModels, but this test
     // verifies the session state is correct even without it.
-    const { model, display } = /** @type {any} */ (slots[0]);
+    const { model, display } = slots[0];
     slots[0].model = model; // model is the same reference from openSave
-    /** @type {any} */ (slots[0]).display = display;
+    slots[0].display = display;
 
     const result2 = await writeSaveData(slots, [], profileNumber, accountId);
     const model2 = readSave(result2.filesToWrite.get('USER.DAT'));
@@ -817,5 +817,59 @@ describe('save-api: onProgress callback branches', () => {
     const messages = [];
     await writeSaveData(slots, [], 0, '', (msg) => messages.push(msg));
     expect(messages.length).toBeGreaterThan(0);
+  });
+});
+
+/* ========================================================================
+ * decryptAndMergeSlots: secondary file absent during write
+ *
+ * Forces the hasSecondary === false path (BRDA 429/453/458/542): the
+ * shared 04USER.DAT is removed from the session's rawFiles after open,
+ * so no secondary item is queued, toDecrypt stays empty, and the return
+ * value's secondaryFile is null.
+ * ==================================================================== */
+
+describe('decryptAndMergeSlots: no secondary file during write', () => {
+  test('writeSaveData skips secondary update when 04USER.DAT is absent', async () => {
+    const buf = makeBlankSave();
+    const rawFiles = makeUnencryptedSaveFiles(buf);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
+
+    // Remove the secondary file from the session's shared rawFiles map.
+    // The slot primary is still served from the cached decryptedBytes, so
+    // the merge proceeds without the secondary.
+    slots[0].session.rawFiles.delete('04user.dat');
+
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
+
+    // Secondary must be absent from the output; primary still present.
+    expect(filesToWrite.has('04USER.DAT')).toBe(false);
+    expect(filesToWrite.has('USER.DAT')).toBe(true);
+  });
+});
+
+/* ========================================================================
+ * decryptAndMergeSlots: primary file absent from rawFiles
+ *
+ * Covers the origName fallback in the primary branch (BRDA 518): when the
+ * primary file is missing from rawFiles, the output name falls back to
+ * session.primaryFile. The primary bytes are still available via the
+ * cached session.decryptedBytes.
+ * ==================================================================== */
+
+describe('decryptAndMergeSlots: primary absent from rawFiles (origName fallback)', () => {
+  test('writeSaveData falls back to session.primaryFile for output name', async () => {
+    const buf = makeBlankSave();
+    const rawFiles = makeUnencryptedSaveFiles(buf);
+    const { slots, profileNumber, accountId } = await openSave(rawFiles);
+
+    // Remove the primary file from the session's shared rawFiles map.
+    // The merge still works because it uses the cached decryptedBytes.
+    slots[0].session.rawFiles.delete('user.dat');
+
+    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
+
+    // Primary is written under its fallback name (session.primaryFile).
+    expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
 });
