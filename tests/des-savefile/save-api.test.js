@@ -688,24 +688,27 @@ describe('writeSaveData: sfoBytes return value', () => {
   test.each([
     { label: 'non-inPlace', inPlace: false, expectSfoInFiles: true },
     { label: 'inPlace', inPlace: true, expectSfoInFiles: false },
-  ])('returns sfoBytes with patched profile number ($label)', async ({ inPlace, expectSfoInFiles }) => {
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber, accountId } = await openSave(rawFiles);
+  ])(
+    'returns sfoBytes with patched profile number ($label)',
+    async ({ inPlace, expectSfoInFiles }) => {
+      const buf = makeBlankSave();
+      const rawFiles = makeUnencryptedSaveFiles(buf);
+      const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
-    const { filesToWrite, sfoBytes } = await writeSaveData(
-      slots,
-      [],
-      profileNumber,
-      accountId,
-      null,
-      inPlace,
-    );
+      const { filesToWrite, sfoBytes } = await writeSaveData(
+        slots,
+        [],
+        profileNumber,
+        accountId,
+        null,
+        inPlace,
+      );
 
-    expect(filesToWrite.has('PARAM.SFO')).toBe(expectSfoInFiles);
-    expect(sfoBytes).toBeInstanceOf(Uint8Array);
-    expect(sfoBytes[0x570]).toBe(profileNumber);
-  });
+      expect(filesToWrite.has('PARAM.SFO')).toBe(expectSfoInFiles);
+      expect(sfoBytes).toBeInstanceOf(Uint8Array);
+      expect(sfoBytes[0x570]).toBe(profileNumber);
+    },
+  );
 });
 
 describe('openSave: accountId return value', () => {

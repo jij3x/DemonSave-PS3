@@ -77,7 +77,9 @@ describe('spell-table', () => {
       expect(statusSel.options.length).toBe(SPELL_STATUS_NAMES.length);
       expect(statusSel.selectedOptions[0].value).toBe('2');
 
-      expect(/** @type {HTMLInputElement} */ (tr.querySelector('.inv-spell-misc1')).value).toBe('7');
+      expect(/** @type {HTMLInputElement} */ (tr.querySelector('.inv-spell-misc1')).value).toBe(
+        '7',
+      );
       expect(tr.dataset.misc2).toBe('3');
       expect(tr.querySelector('.row-del')).toBeTruthy();
     });
@@ -86,14 +88,17 @@ describe('spell-table', () => {
       const tr = makeSpellRow({ itemId: 0, status: 0 }, false);
       expect(tr.dataset.existing).toBe('false');
       expect(tr.classList.contains('row-added')).toBe(true);
-      const placeholder = /** @type {HTMLOptionElement} */ (tr.querySelector('.spell-name option[value=""]'));
+      const placeholder = /** @type {HTMLOptionElement} */ (
+        tr.querySelector('.spell-name option[value=""]')
+      );
       expect(placeholder).toBeTruthy();
       expect(placeholder.selected).toBe(true);
     });
 
     test('unknown spell id renders an Unknown option', () => {
       const tr = makeSpellRow({ itemId: unknownSpellId, status: 0 });
-      const opt = /** @type {HTMLSelectElement} */ (tr.querySelector('.spell-name')).selectedOptions[0];
+      const opt = /** @type {HTMLSelectElement} */ (tr.querySelector('.spell-name'))
+        .selectedOptions[0];
       expect(opt.textContent).toMatch(/Unknown \(0x/);
       expect(opt.value).toBe(String(unknownSpellId));
     });
@@ -107,17 +112,26 @@ describe('spell-table', () => {
 
     test('undefined itemId renders no item option', () => {
       const tr = makeSpellRow({ status: 0 });
-      expect(/** @type {HTMLSelectElement} */ (tr.querySelector('.spell-name')).querySelectorAll('option').length).toBe(0);
+      expect(
+        /** @type {HTMLSelectElement} */ (tr.querySelector('.spell-name')).querySelectorAll(
+          'option',
+        ).length,
+      ).toBe(0);
     });
 
     test('non-numeric status defaults to 0', () => {
       const tr = makeSpellRow({ itemId: knownSpellId, status: 'oops' });
-      expect(/** @type {HTMLSelectElement} */ (tr.querySelector('.spell-status')).selectedOptions[0].value).toBe('0');
+      expect(
+        /** @type {HTMLSelectElement} */ (tr.querySelector('.spell-status')).selectedOptions[0]
+          .value,
+      ).toBe('0');
     });
 
     test('undefined misc1/misc2 default to 0', () => {
       const tr = makeSpellRow({ itemId: knownSpellId, status: 0 });
-      expect(/** @type {HTMLInputElement} */ (tr.querySelector('.inv-spell-misc1')).value).toBe('0');
+      expect(/** @type {HTMLInputElement} */ (tr.querySelector('.inv-spell-misc1')).value).toBe(
+        '0',
+      );
       expect(tr.dataset.misc2).toBe('0');
     });
   });
@@ -126,9 +140,7 @@ describe('spell-table', () => {
     test('round-trips rendered rows back into records', () => {
       setupSpellTable();
       renderSpellTable([{ itemId: knownSpellId, status: 1, misc1: 4, misc2: 8 }]);
-      expect(collectSpells()).toEqual([
-        { itemId: knownSpellId, status: 1, misc1: 4, misc2: 8 },
-      ]);
+      expect(collectSpells()).toEqual([{ itemId: knownSpellId, status: 1, misc1: 4, misc2: 8 }]);
     });
 
     test('skips soft-deleted rows', () => {

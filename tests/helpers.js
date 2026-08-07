@@ -27,5 +27,5 @@ export function bad(v) {
  * @param {unknown} value  intentionally bad-typed value
  */
 export function setBad(model, key, value) {
-  (/** @type {Record<string, unknown>} */ (model))[key] = value;
+  /** @type {Record<string, unknown>} */ (model)[key] = value;
 }

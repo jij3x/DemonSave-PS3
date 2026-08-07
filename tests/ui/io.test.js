@@ -787,9 +787,7 @@ describe('openDirectoryViaFSAccess (Chromium)', () => {
 describe('openDirectoryViaFSAccess (Tauri)', () => {
   test('returns a Tauri dir handle and files via IPC', async () => {
     jest.mocked(tauriModule.isTauri).mockReturnValue(true);
-    const files = new Map([
-      ['param.sfo', { name: 'PARAM.SFO', bytes: new Uint8Array([1, 2, 3]) }],
-    ]);
+    const files = new Map([['param.sfo', { name: 'PARAM.SFO', bytes: new Uint8Array([1, 2, 3]) }]]);
     jest.mocked(tauriModule.tauriOpenDirectory).mockResolvedValue({
       dirPath: '/saves/BLES01389',
       dirName: 'BLES01389SAVE',
