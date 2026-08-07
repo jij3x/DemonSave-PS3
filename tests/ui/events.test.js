@@ -10,6 +10,7 @@
  */
 
 import { jest } from '@jest/globals';
+import { bad } from '../helpers.js';
 
 /**
  * Typed getElementById — returns any to avoid HTMLElement|null narrowing
@@ -3567,7 +3568,7 @@ describe('UI events', () => {
     test('throws for unsupported category', () => {
       expect(() =>
         makeInventoryRow(
-          /** @type {never} */ ('unknownCategory'),
+          bad('unknownCategory'),
           {
             itemId: 1,
             count: 1,

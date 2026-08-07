@@ -9,6 +9,8 @@
 
 export {};
 
+import { bad } from '../helpers.js';
+
 const {
   populateCombos,
   getCategoryData,
@@ -135,7 +137,7 @@ describe('controls', () => {
     });
 
     test('returns empty arrays for unknown category (default branch)', () => {
-      const result = getCategoryData(/** @type {never} */ ('unknown'));
+      const result = getCategoryData(bad('unknown'));
       expect(result.ids).toEqual([]);
       expect(result.names).toEqual([]);
     });
@@ -391,7 +393,7 @@ describe('controls', () => {
     });
 
     test('unknown category defaults to true', () => {
-      expect(isDurabilityVisible(/** @type {never} */ ('unknown'), null)).toBe(true);
+      expect(isDurabilityVisible(bad('unknown'), null)).toBe(true);
     });
   });
 
@@ -423,7 +425,7 @@ describe('controls', () => {
     });
 
     test('unknown category defaults to true', () => {
-      expect(isCountVisible(/** @type {never} */ ('unknown'), null)).toBe(true);
+      expect(isCountVisible(bad('unknown'), null)).toBe(true);
     });
   });
 

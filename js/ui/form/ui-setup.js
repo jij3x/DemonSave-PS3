@@ -177,6 +177,7 @@ export function setupAddRowButtons() {
   /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.inv-add')).forEach((btn) => {
     btn.addEventListener('click', () => {
       const category = btn.dataset.category;
+      if (!category) return;
 
       // For weapons, use the button's data-weapon-type to target the
       // correct per-type table directly (flat tab structure).
@@ -199,7 +200,7 @@ export function setupAddRowButtons() {
         defaultItemId = typeIds[0] ?? 0;
       } else {
         tbody = document.querySelector(`table.inv-table[data-category="${category}"] tbody`);
-        const { ids: invIds } = getCategoryData(/** @type {any} */ (category));
+        const { ids: invIds } = getCategoryData(category);
         defaultItemId = invIds[0] ?? 0;
       }
       if (!tbody) return;
@@ -216,7 +217,7 @@ export function setupAddRowButtons() {
       }
       // Look up max durability from des-db for weapons/armor.
       // Falls back to 200 if not found (or for non-durability categories).
-      const durability = lookupMaxDurability(/** @type {any} */ (category), defaultItemId);
+      const durability = lookupMaxDurability(category, defaultItemId);
       const rec = {
         _ref: '',
         itemId: undefined,
@@ -226,9 +227,9 @@ export function setupAddRowButtons() {
         misc2: 0x01000000,
       };
       const newTr = makeInventoryRow(
-        /** @type {any} */ (category),
+        category,
         rec,
-        /** @type {any} */ (typeId),
+        typeId,
         undefined,
       );
       tbody.appendChild(newTr);
@@ -262,6 +263,7 @@ export function setupAddRowButtons() {
   /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.dep-add')).forEach((btn) => {
     btn.addEventListener('click', () => {
       const category = btn.dataset.category;
+      if (!category) return;
 
       // Count existing (non-deleted) deposit rows across ALL tables to enforce limit
       // (category is already typed as string from dataset)
@@ -301,7 +303,7 @@ export function setupAddRowButtons() {
         const { ids: typeIds } = getGoodsTypeData(Number(typeId));
         defaultItemId = typeIds[0] ?? 0;
       } else {
-        const { ids: depIds } = getCategoryData(/** @type {any} */ (category));
+        const { ids: depIds } = getCategoryData(category);
         defaultItemId = depIds[0] ?? 0;
         tbody = document.querySelector(`table.dep-table[data-category="${category}"] tbody`);
       }
@@ -345,9 +347,9 @@ export function setupAddRowButtons() {
         );
         tbody.appendChild(newDepTr);
       } else {
-        const defaultDurability = lookupMaxDurability(/** @type {any} */ (category), defaultItemId);
+        const defaultDurability = lookupMaxDurability(category, defaultItemId);
         const newDepTr = makeDepositRow(
-          /** @type {any} */ (category),
+          category,
           {
             itemId: undefined,
             count: 1,

@@ -40,6 +40,24 @@ import {
 } from '../lib/tauri-bridge.js';
 
 /**
+ * Directory handle used for in-place save-back.
+ *
+ * Either a real `FileSystemDirectoryHandle` (Chromium File System Access API)
+ * or a Tauri IPC shim carrying the native directory path. Both expose `.name`.
+ *
+ * @typedef {FileSystemDirectoryHandle | { __tauriDirPath: string; name: string }} SaveDirHandle
+ */
+
+/**
+ * File handle for a picked ZIP export destination.
+ *
+ * Either a real `FileSystemFileHandle` (Chromium) or a Tauri IPC shim carrying
+ * the native save path. Both expose `.name`.
+ *
+ * @typedef {FileSystemFileHandle | { __tauriPath: string; name: string }} SaveFileHandle
+ */
+
+/**
  * Check if in-place write (folder open + save-back) is available.
  *
  * Returns true in two cases:
@@ -64,7 +82,7 @@ export function canWriteInPlace() {
  * Tauri: dirHandle is `{ __tauriDirPath: string, name: string }`.
  * Chromium: dirHandle is a standard FileSystemDirectoryHandle.
  *
- * @returns {Promise<{dirHandle: object, files: Map<string, {name: string, bytes: Uint8Array}>}>}
+ * @returns {Promise<{dirHandle: SaveDirHandle, files: Map<string, {name: string, bytes: Uint8Array}>}>}
  */
 export async function openDirectoryViaFSAccess() {
   // Tauri path — native dialog + IPC file read
@@ -430,7 +448,7 @@ export function canChooseSaveLocation() {
  * Chromium: returns a FileSystemFileHandle.
  *
  * @param {string} suggestedName  default filename shown in the dialog
- * @returns {Promise<object|null>}
+ * @returns {Promise<SaveFileHandle|null>}
  */
 export async function pickZipFile(suggestedName = 'des_save.zip') {
   // Tauri path — defer actual writing until writeZipToHandle()

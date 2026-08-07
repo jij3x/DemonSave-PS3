@@ -3,6 +3,7 @@
  */
 
 import { sanitizeModel, mergeModel } from '../../js/des-savefile/model.js';
+import { setBad } from '../helpers.js';
 
 // Helper: create a full model (as reader.readSave would produce)
 /** @returns {import('../../js/des-savefile/model.js').FullModel} */
@@ -292,12 +293,9 @@ describe('mergeModel', () => {
     const { model: sanitized } = sanitizeModel(full);
 
     sanitized.deposit.push(
-      /** @type {any} */ ({
-        _ref: '',
-        category,
-        itemId,
-        count,
-      }),
+      /** @type {import('../../js/des-savefile/model.js').SanitizedDepositItem} */ (
+        /** @type {unknown} */ ({ _ref: '', category, itemId, count })
+      ),
     );
 
     const merged = mergeModel(full, sanitized);
@@ -429,7 +427,7 @@ describe('sanitizeModel: branch coverage', () => {
   test('sanitizes deposit items without flags array', () => {
     const full = makeFullModel();
     full.deposit[0].flags = undefined;
-    full.deposit[1].flags = /** @type {never} */ ('not-an-array');
+    setBad(full.deposit[1], 'flags', 'not-an-array');
     const { model: sanitized } = sanitizeModel(full);
     // Should get default flags array
     expect(sanitized.deposit[0].flags).toEqual([0, 0, 0, 0, 0, 0, 0]);
@@ -480,13 +478,9 @@ describe('mergeModel: branch coverage', () => {
     const { model: sanitized } = sanitizeModel(full);
     // Add an item without _ref
     sanitized.weapons.push(
-      /** @type {any} */ ({
-        itemId: 0x99999999,
-        count: 1,
-        misc1: 0,
-        misc2: 0x01000000,
-        durability: 100,
-      }),
+      /** @type {import('../../js/des-savefile/model.js').SanitizedInventoryItem} */ (
+        /** @type {unknown} */ ({ itemId: 0x99999999, count: 1, misc1: 0, misc2: 0x01000000, durability: 100 })
+      ),
     );
     const merged = mergeModel(full, sanitized);
     const newW = merged.weapons[merged.weapons.length - 1];

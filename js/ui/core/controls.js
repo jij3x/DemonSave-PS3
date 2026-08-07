@@ -213,7 +213,7 @@ export function populateCombos() {
 /**
  * Return the ids and names for a given category, used to populate
  * <select> elements inside table rows.
- * @param {'weapons'|'armor'|'rings'|'goods'} category
+ * @param {string} category  'weapons'|'armor'|'rings'|'goods'
  * @returns {{ids: number[], names: string[]}}
  */
 export function getCategoryData(category) {
@@ -286,7 +286,7 @@ export function getGoodsTypes() {
  * types, and Rings do not — their durability is always 0 and is hidden
  * from the UI (preserved losslessly via tr.dataset for round-trip fidelity).
  *
- * @param {'weapons'|'armor'|'rings'|'goods'} category
+ * @param {string} category  'weapons'|'armor'|'rings'|'goods'
  * @param {number|null} [typeId]  weapon/goods type ID (null for armor/rings)
  * @returns {boolean}  true if durability should be visible for this type
  */
@@ -314,7 +314,7 @@ export function isDurabilityVisible(category, typeId) {
  * Shield, Bow, Casting Tool, Armor, Ring) always have count=1 and are
  * allowed to be added multiple times.
  *
- * @param {'weapons'|'armor'|'rings'|'goods'} category
+ * @param {string} category  'weapons'|'armor'|'rings'|'goods'
  * @param {number|null} [typeId]  weapon/goods type ID (null for armor/rings)
  * @returns {boolean}  true if count should be visible for this type
  */

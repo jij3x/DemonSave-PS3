@@ -159,7 +159,8 @@ export function rebuildChanges(folder, encryptFiles = false, onProgress) {
 /**
  * Find an entry by name. Returns the PFDEntry or null.
  *
- * @param {{pfd: import("./param-pfd.js").ParamPFD|null}} folder
+ * @param {{pfd: { entries: Array<{ fileName: string }> }|null}} folder
+ *   Only the `pfd.entries` shape is required, so partial/test folders pass.
  * @param {string} name
  */
 export function findEntry(folder, name) {

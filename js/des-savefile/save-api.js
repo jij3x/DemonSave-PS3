@@ -52,6 +52,16 @@ import {
  */
 
 /**
+ * @typedef {Object} SaveSlot
+ * @property {number} slot
+ * @property {SaveSession} session
+ * @property {import('./model.js').SanitizedModel} model
+ * @property {import('./model.js').DisplayData} [display]
+ *   Display-only data (equipment pointers, inventory idx1 map). Populated by
+ *   `openSave`/`reloadSlotModels`; passed through but never written back.
+ */
+
+/**
  * DeS-specific profile number byte offset in PARAM.SFO.
  * (Game-specific — not part of the generic SFO format.)
  */
@@ -267,7 +277,7 @@ export function resolveSaveFiles(files, saveSlot) {
  * @param {Map<string, {name: string, bytes: Uint8Array}>} rawFiles
  *        Map of lowercase filename → {name, bytes}
  * @param {(msg: string) => void} [onProgress]
- * @returns {Promise<{slots: Array<{slot: number, session: SaveSession, model: import('./model.js').SanitizedModel}>, failedSlots: Array<{slot: number, error: string, primaryFile: string|null}>, profileNumber: number, accountId: string, encrypted: boolean}>}
+ * @returns {Promise<{slots: SaveSlot[], failedSlots: Array<{slot: number, error: string, primaryFile: string|null}>, profileNumber: number, accountId: string, encrypted: boolean}>}
  */
 export async function openSave(rawFiles, onProgress) {
   const log = typeof onProgress === 'function' ? onProgress : noop;
@@ -391,7 +401,7 @@ export async function openSave(rawFiles, onProgress) {
  * Shared by writeSaveData and exportEncryptedSave to avoid duplication of
  * the decrypt-list-building, decryption, and model-merge logic.
  *
- * @param {Array<{slot: number, session: SaveSession, model: import('./model.js').SanitizedModel}>} slots
+ * @param {SaveSlot[]} slots
  * @param {Array<{slot: number, error: string, primaryFile: string|null, decryptedBytes?: Uint8Array}>} failed
  * @param {SaveManager} manager  save folder context
  * @param {Map<string, {name: string, bytes: Uint8Array}>} rawFiles
@@ -549,7 +559,7 @@ async function decryptAndMergeSlots(slots, failed, manager, rawFiles, log) {
  * Failed slots (corrupt/unparseable) are preserved unchanged — their primary
  * files are decrypted and written as-is so the user doesn't lose data.
  *
- * @param {Array<{slot: number, session: SaveSession, model: import('./model.js').SanitizedModel}>} slots
+ * @param {SaveSlot[]} slots
  * @param {Array<{slot: number, error: string, primaryFile: string|null}>|undefined} failedSlots
  * @param {number} profileNumber  new profile number to write to SFO
  * @param {string} accountId  new account ID to write to SFO (empty string = clear)
@@ -663,7 +673,7 @@ export async function writeSaveData(
  * Works regardless of whether the original save was encrypted or
  * unencrypted (RPCS3).
  *
- * @param {Array<{slot: number, session: SaveSession, model: import('./model.js').SanitizedModel}>} slots
+ * @param {SaveSlot[]} slots
  * @param {Array<{slot: number, error: string, primaryFile: string|null}>|undefined} failedSlots
  * @param {number} profileNumber  new profile number to write to SFO
  * @param {string} accountId  new account ID to write to SFO (empty string = clear)
@@ -844,7 +854,7 @@ export async function exportEncryptedSave(
  * formerly-new items will now have _ref tokens, so they'll render as
  * "existing" rows (trash icon, no green border).
  *
- * @param {Array<{slot: number, session: SaveSession, model: import('./model.js').SanitizedModel, display?: import('./model.js').DisplayData}>} slots
+ * @param {SaveSlot[]} slots
  * @param {(msg: string) => void} [onProgress]
  */
 export function reloadSlotModels(slots, onProgress) {
@@ -878,7 +888,7 @@ export function reloadSlotModels(slots, onProgress) {
  * - For **decrypted** writes: clears manager.pfd (PARAM.PFD was deleted from
  *   disk), sets all file bytes to the plaintext output.
  *
- * @param {Array<{slot: number, session: SaveSession, model: import('./model.js').SanitizedModel}>} slots
+ * @param {SaveSlot[]} slots
  * @param {Map<string, Uint8Array>} filesToWrite  the actual bytes written to disk
  * @param {boolean} encrypted  whether the on-disk save is now encrypted
  */

@@ -181,7 +181,7 @@ export function ensureSelectPopulated(sel) {
       ({ ids, names } = getCategoryData('goods'));
     }
   } else {
-    ({ ids, names } = getCategoryData(/** @type {any} */ (sel.dataset.lazyCat)));
+    ({ ids, names } = getCategoryData(sel.dataset.lazyCat || ''));
   }
 
   // Preserve current value and its display text (for unknown items).
@@ -298,7 +298,7 @@ export function refreshFilteredOptions(sel) {
   // Only filter selects that belong to show-count types.
   const { category, typeId } = getSelectCategoryAndType(sel);
   if (category === null) return;
-  if (isCountVisible(/** @type {any} */ (category), typeId)) {
+  if (isCountVisible(category, typeId)) {
     const usedIds = getActiveItemIdsInTable(sel);
     for (const opt of sel.options) {
       // Never disable the placeholder (empty value) or the currently-selected option.
@@ -360,7 +360,7 @@ export function resolveDuplicateOnUndelete(undeletedTr) {
   // Only apply duplicate resolution for counted types
   const { category, typeId } = getSelectCategoryAndType(sel);
   if (category === null) return false;
-  if (!isCountVisible(/** @type {any} */ (category), typeId)) return false;
+  if (!isCountVisible(category, typeId)) return false;
 
   const itemId = sel.value;
   const tbody = undeletedTr.closest('tbody');

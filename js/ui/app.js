@@ -67,6 +67,7 @@ import {
   pickZipFile,
   writeZipToHandle,
 } from './io.js';
+/** @typedef {import('./io.js').SaveDirHandle} SaveDirHandle */
 import { refreshEquipmentDisplay } from './core/dom-helpers.js';
 import { resetDispatcher } from './core/event-dispatcher.js';
 
@@ -88,7 +89,7 @@ function createInitialState() {
     accountId: '', // PSN account ID (folder-level, 32 hex chars or empty)
     sourceEncrypted: undefined, // original encryption state (never changes after load)
     encryptMode: false, // user toggle: true=encrypted output, false=decrypted output
-    dirHandle: null, // FileSystemDirectoryHandle for write-back (Chromium)
+    dirHandle: /** @type {SaveDirHandle|null} */ (null), // handle for write-back (Chromium FS or Tauri path shim)
     dirName: '', // save folder name (for tooltip + ZIP filename)
     loaded: false, // true after first slot has been rendered
     fileCount: 0, // number of files loaded (used in close button tooltip)
@@ -514,7 +515,7 @@ function setupLandingBrowse() {
         setStatus('Select your PS3 save folder…');
         const { dirHandle, files } = await openDirectoryViaFSAccess();
         state.dirHandle = dirHandle;
-        state.dirName = /** @type {any} */ (dirHandle)?.name || '';
+        state.dirName = dirHandle?.name || '';
         await handleOpen(files);
       } catch (err) {
         if (err.name === 'AbortError') {
@@ -548,7 +549,7 @@ function setupOpenButton() {
       setStatus('Select your PS3 save folder…');
       const { dirHandle, files } = await openDirectoryViaFSAccess();
       state.dirHandle = dirHandle;
-      state.dirName = /** @type {any} */ (dirHandle)?.name || '';
+      state.dirName = dirHandle?.name || '';
       await handleOpen(files);
     } catch (err) {
       if (err.name === 'AbortError') {
@@ -864,11 +865,11 @@ async function ensureDirHandle() {
     // Verify the folder matches by comparing the directory name
     if (
       state.dirName &&
-      /** @type {any} */ (dirHandle).name &&
-      /** @type {any} */ (dirHandle).name !== state.dirName
+      dirHandle.name &&
+      dirHandle.name !== state.dirName
     ) {
       setStatus(
-        `Folder mismatch: selected "${/** @type {any} */ (dirHandle).name}" but the loaded save is "${state.dirName}". Save cancelled.`,
+        `Folder mismatch: selected "${dirHandle.name}" but the loaded save is "${state.dirName}". Save cancelled.`,
       );
       return false;
     }
@@ -1069,7 +1070,7 @@ function defaultZipName() {
  * Returns null if the browser doesn't support the API (caller falls back
  * to <a download>). Throws AbortError if the user cancels the dialog.
  *
- * @returns {Promise<object|null>}
+ * @returns {Promise<import('./io.js').SaveFileHandle|null>}
  */
 async function pickExportDestination() {
   if (!canChooseSaveLocation()) return null;
@@ -1117,8 +1118,8 @@ async function handleExportDecrypted() {
 
   if (handle) {
     setStatus('Writing decrypted ZIP…');
-    await writeZipToHandle(/** @type {any} */ (handle), filesToWrite);
-    setStatus(`Decrypted save exported as ${/** @type {any} */ (handle).name}.`);
+    await writeZipToHandle(handle, filesToWrite);
+    setStatus(`Decrypted save exported as ${handle.name}.`);
   } else {
     setStatus('Building decrypted ZIP…');
     const zipName = defaultZipName();
@@ -1233,8 +1234,8 @@ async function handleExportEncrypted() {
 
   if (handle) {
     setStatus('Writing encrypted ZIP…');
-    await writeZipToHandle(/** @type {any} */ (handle), filesToWrite);
-    setStatus(`Encrypted save exported as ${/** @type {any} */ (handle).name}.`);
+    await writeZipToHandle(handle, filesToWrite);
+    setStatus(`Encrypted save exported as ${handle.name}.`);
   } else {
     setStatus('Building encrypted ZIP…');
     const zipName = defaultZipName();

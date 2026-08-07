@@ -15,6 +15,7 @@ import {
   removeCopyProtection,
   FMT,
 } from '../../../js/lib/ps3-save-lib/index.js';
+import { bad } from '../../helpers.js';
 
 /**
  * Build a minimal synthetic PARAM.SFO buffer for testing.
@@ -334,7 +335,7 @@ describe('parseParamSfo: edge cases', () => {
   });
 
   test('throws on non-Uint8Array input', () => {
-    expect(() => parseParamSfo(/** @type {never} */ ('not-a-buffer'))).toThrow(TypeError);
+    expect(() => parseParamSfo(bad('not-a-buffer'))).toThrow(TypeError);
   });
 
   test('handles unknown data format (returns empty string)', () => {
@@ -377,11 +378,11 @@ describe('findParamDataOffset guards', () => {
   });
 
   test('getSfoAttribute throws on non-Uint8Array', () => {
-    expect(() => getSfoAttribute(/** @type {never} */ ('bad'))).toThrow(TypeError);
+    expect(() => getSfoAttribute(bad('bad'))).toThrow(TypeError);
   });
 
   test('removeCopyProtection throws on non-Uint8Array', () => {
-    expect(() => removeCopyProtection(/** @type {never} */ (123))).toThrow(TypeError);
+    expect(() => removeCopyProtection(bad(123))).toThrow(TypeError);
   });
 
   test('writeSfoAccountId throws on too-long hex', () => {
