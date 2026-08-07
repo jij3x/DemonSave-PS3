@@ -59,7 +59,7 @@ export default {
     './js/des-savefile/': {
       lines: 95,
       statements: 95,
-      branches: 92,
+      branches: 95,
       functions: 95,
     },
   },

@@ -553,7 +553,7 @@ export function getEntryKey(entry, pfd) {
  *
  * @param {PFDEntry} entry
  * @param {ParamPFD} pfd
- * @param {(hashIndex: number, hashKey: Uint8Array) => void} cb
+ * @param {(hashIndex: number, hashKey: Uint8Array) => boolean | void} cb
  *   Return `false` to stop iteration (zeroizes cached key and returns).
  */
 function forEachActiveHashIndex(entry, pfd, cb) {
@@ -566,12 +566,12 @@ function forEachActiveHashIndex(entry, pfd, cb) {
       if (!cachedKey) cachedKey = getEntryHashKey(entry, i, pfd);
       // Zeroize the cached key before early-exit so the HMAC key doesn't
       // linger in memory.
-      if (/** @type {any} */ (cb(i, cachedKey)) === false) {
+      if (cb(i, cachedKey) === false) {
         zeroize(cachedKey);
         return;
       }
     } else {
-      if (/** @type {any} */ (cb(i, getEntryHashKey(entry, i, pfd))) === false) return;
+      if (cb(i, getEntryHashKey(entry, i, pfd)) === false) return;
     }
   }
   // Zeroize the cached key after normal completion.
@@ -869,6 +869,16 @@ export function validAllParamHashes(fileData, fix, pfd, skipSet = null) {
 }
 
 /**
+ * A single validation failure reported by `validateParamPfdDetailed`.
+ *
+ * `reason` is always present; the identifying field varies by validator
+ * (`entry` for per-file checks, `bucket`/`slot` for table checks,
+ * `hashType` for the top/bottom hash checks).
+ *
+ * @typedef {{ entry?: string, bucket?: number, slot?: number, hashType?: string, reason: string }} ParamPfdFailure
+ */
+
+/**
  * Validate all PFD hashes WITHOUT fixing, returning detailed failure info.
  *
  * Collects and returns information about every validation failure, making
@@ -876,7 +886,7 @@ export function validAllParamHashes(fileData, fix, pfd, skipSet = null) {
  *
  * @param {Map<string, Uint8Array>} fileData
  * @param {ParamPFD} pfd
- * @returns {{ valid: boolean, failures: Array<object> }}
+ * @returns {{ valid: boolean, failures: ParamPfdFailure[] }}
  */
 export function validateParamPfdDetailed(fileData, pfd) {
   const failures = [];

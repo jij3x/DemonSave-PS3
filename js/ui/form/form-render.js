@@ -397,7 +397,7 @@ export function setupDurabilitySync() {
     if (!category) return;
 
     const newItemId = parseInt(sel.value, 10) || 0;
-    const maxDur = lookupMaxDurability(/** @type {any} */ (category), newItemId);
+    const maxDur = lookupMaxDurability(category, newItemId);
 
     // Update the durability input in the same row (if visible).
     // For non-durability types the value is stored in tr.dataset instead.
@@ -468,6 +468,6 @@ export function setupSelectTooltipSync() {
     const itemId = parseInt(sel.value, 10) || 0;
     if (!itemId) return;
 
-    updateSelectTooltip(sel, getItemNote(/** @type {any} */ (category), itemId));
+    updateSelectTooltip(sel, getItemNote(category, itemId));
   });
 }

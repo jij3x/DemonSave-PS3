@@ -16,6 +16,7 @@ import {
   updateSelectTooltip,
 } from '../../js/ui/core/item-helpers.js';
 import * as db from '../../js/des-db/index.js';
+import { bad } from '../helpers.js';
 
 const WEAPON_IDS = db.getItemIdsByCategory('weapons');
 const ARMOR_IDS = db.getItemIdsByCategory('armor');
@@ -96,7 +97,7 @@ describe('item-helpers', () => {
     });
 
     test('returns 0 for spells', () => {
-      expect(lookupMaxDurability(/** @type {never} */ ('spells'), SPELL_IDS[0])).toBe(0);
+      expect(lookupMaxDurability(bad('spells'), SPELL_IDS[0])).toBe(0);
     });
 
     test('returns 200 for unknown weapon ID (catch fallback)', () => {
@@ -125,11 +126,11 @@ describe('item-helpers', () => {
       // Find an item with a direct note in any category
       let found = false;
       for (const cat of ['armor', 'rings', 'goods', 'spells', 'weapons']) {
-        const ids = db.getItemIdsByCategory(/** @type {never} */ (cat));
+        const ids = db.getItemIdsByCategory(bad(cat));
         for (const id of ids) {
-          const item = db.getItem(/** @type {never} */ (cat), id);
+          const item = db.getItem(bad(cat), id);
           if (item.note) {
-            const result = getItemNote(/** @type {never} */ (cat), id);
+            const result = getItemNote(bad(cat), id);
             expect(result).toBe(item.note);
             found = true;
             break;

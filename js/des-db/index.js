@@ -284,7 +284,7 @@ export function getItemNamesByCategory(category) {
  * Accepts both a string key ('0x2710') and a number (0x2710).
  * Returns a frozen object; throws an Error if the item is not found.
  *
- * @param {'weapons'|'armor'|'rings'|'goods'|'spells'|'hairstyles'} category
+ * @param {string} category  des-db category, e.g. 'weapons'|'armor'|'rings'|'goods'|'spells'|'hairstyles'
  * @param {string|number} itemId  hex ID, e.g. '0x2710' or 0x2710
  * @returns {{name: string, type: [number, number|null], note?: string, upgrade_ref?: [number, number|null, number|null], durability?: number}}
  * @throws {Error} if the category is unknown or the item is not found.
@@ -304,7 +304,7 @@ export function getItem(category, itemId) {
  * Use this instead of try/catch around getItem() for expected-miss scenarios
  * (e.g. resolving unknown item IDs from save data).
  *
- * @param {'weapons'|'armor'|'rings'|'goods'|'spells'|'hairstyles'} category
+ * @param {string} category  des-db category, e.g. 'weapons'|'armor'|'rings'|'goods'|'spells'|'hairstyles'
  * @param {string|number} itemId  hex ID, e.g. '0x2710' or 0x2710
  * @returns {boolean}
  */

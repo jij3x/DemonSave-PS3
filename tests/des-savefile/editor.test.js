@@ -11,19 +11,12 @@
  *   3. Writer edge cases — inventory, spells, deposit, misc fields
  *   4. Secondary file writer
  */
-import { readSave as _readSave } from '../../js/des-savefile/reader.js';
+import { readSave } from '../../js/des-savefile/reader.js';
 import {
-  writeSave as _writeSave,
-  writeSaveInPlace as _writeSaveInPlace,
-  writeSecondaryFileInPlace as _writeSecondaryFileInPlace,
+  writeSave,
+  writeSaveInPlace,
+  writeSecondaryFileInPlace,
 } from '../../js/des-savefile/writer.js';
-
-// Cast to any: avoids Uint8Array<ArrayBufferLike> vs <ArrayBuffer> generic
-// friction and allows intentional bad-type model mutations in tests.
-const readSave = /** @type {any} */ (_readSave);
-const writeSave = /** @type {any} */ (_writeSave);
-const writeSaveInPlace = /** @type {any} */ (_writeSaveInPlace);
-const writeSecondaryFileInPlace = /** @type {any} */ (_writeSecondaryFileInPlace);
 
 import {
   rInt32BE,
@@ -36,6 +29,7 @@ import {
 import * as O from '../../js/des-savefile/offsets.js';
 import * as db from '../../js/des-db/index.js';
 import { BUF_SIZE, makeBlankSave, writeInvRecord, fillDepositEmpty } from './helpers.js';
+import { setBad } from '../helpers.js';
 
 const WEAPON_IDS = db.getItemIdsByCategory('weapons');
 const ARMOR_IDS = db.getItemIdsByCategory('armor');
@@ -477,7 +471,7 @@ describe('writer: spell round-trip', () => {
   test('throws on non-numeric spell status string', () => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m.spells = [{ itemId: SPELL_IDS[0], status: 'Bogus', misc1: 0, misc2: 0 }];
+    setBad(m, 'spells', [{ itemId: SPELL_IDS[0], status: 'Bogus', misc1: 0, misc2: 0 }]);
     expect(() => writeSave(buf, m)).toThrow(/invalid numeric string/);
   });
 });
@@ -756,8 +750,8 @@ describe('writer: val() edge cases', () => {
   test('val() parses string values', () => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m.souls = '12345';
-    m.vit = '99';
+    setBad(m, 'souls', '12345');
+    setBad(m, 'vit', '99');
     buf = writeSave(buf, m);
     const m2 = readSave(buf);
     expect(m2.souls).toBe(12345);
@@ -767,7 +761,7 @@ describe('writer: val() edge cases', () => {
   test('val() accepts trimmed numeric strings', () => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m.souls = '  42  ';
+    setBad(m, 'souls', '  42  ');
     buf = writeSave(buf, m);
     const m2 = readSave(buf);
     expect(m2.souls).toBe(42);
@@ -776,14 +770,14 @@ describe('writer: val() edge cases', () => {
   test('val() throws on NaN strings', () => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m.souls = 'notanumber';
+    setBad(m, 'souls', 'notanumber');
     expect(() => writeSave(buf, m)).toThrow(/invalid numeric string/);
   });
 
   test('val() throws on empty string', () => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m.souls = '   ';
+    setBad(m, 'souls', '   ');
     expect(() => writeSave(buf, m)).toThrow(/empty numeric string/);
   });
 
@@ -1476,13 +1470,18 @@ describe('reader: spell bounds check', () => {
  * ==================================================================== */
 
 describe('writer: buffer guards', () => {
+  // The model is never read in these tests — the buffer-size guard throws first.
+  const EMPTY_MODEL = /** @type {import('../../js/des-savefile/model.js').FullModel} */ (
+    /** @type {unknown} */ ({})
+  );
+
   test('writeSave throws on null input', () => {
-    expect(() => writeSave(null, {})).toThrow(/Save buffer too small/);
+    expect(() => writeSave(null, EMPTY_MODEL)).toThrow(/Save buffer too small/);
   });
 
   test('writeSave throws on too-small buffer', () => {
     const small = new Uint8Array(0x100);
-    expect(() => writeSave(small, {})).toThrow(/Save buffer too small/);
+    expect(() => writeSave(small, EMPTY_MODEL)).toThrow(/Save buffer too small/);
   });
 
   test('writeSave throws on position table out of bounds', () => {
@@ -1493,12 +1492,12 @@ describe('writer: buffer guards', () => {
   });
 
   test('writeSaveInPlace throws on null bytes', () => {
-    expect(() => writeSaveInPlace(null, {})).toThrow(/Save buffer too small/);
+    expect(() => writeSaveInPlace(null, EMPTY_MODEL)).toThrow(/Save buffer too small/);
   });
 
   test('writeSaveInPlace throws on too-small buffer', () => {
     const small = new Uint8Array(0x100);
-    expect(() => writeSaveInPlace(small, {})).toThrow(/Save buffer too small/);
+    expect(() => writeSaveInPlace(small, EMPTY_MODEL)).toThrow(/Save buffer too small/);
   });
 
   test('writeSaveInPlace mutates buffer in place (returns same reference)', () => {
@@ -1870,13 +1869,17 @@ describe('writer: idx1 = slot invariant for newly added items', () => {
     wUInt32BE(buf, O.DURABILITY_BASE + 1 * 8, 200);
 
     const m = readSave(buf);
-    m.weapons.push({
-      itemId: WEAPON_IDS[3],
-      count: 1,
-      misc1: 0x1016,
-      misc2: 0x01000000,
-      durability: 250,
-    });
+    m.weapons.push(
+      /** @type {import('../../js/des-savefile/model.js').FullInventoryItem} */ (
+        /** @type {unknown} */ ({
+          itemId: WEAPON_IDS[3],
+          count: 1,
+          misc1: 0x1016,
+          misc2: 0x01000000,
+          durability: 250,
+        })
+      ),
+    );
 
     buf = writeSave(buf, m);
 
@@ -1896,13 +1899,17 @@ describe('writer: idx1 = slot invariant for newly added items', () => {
 
     const m = readSave(buf);
     const newItemId = WEAPON_IDS[3];
-    m.weapons.push({
-      itemId: newItemId,
-      count: 1,
-      misc1: 0x1016,
-      misc2: 0x01000000,
-      durability: 250,
-    });
+    m.weapons.push(
+      /** @type {import('../../js/des-savefile/model.js').FullInventoryItem} */ (
+        /** @type {unknown} */ ({
+          itemId: newItemId,
+          count: 1,
+          misc1: 0x1016,
+          misc2: 0x01000000,
+          durability: 250,
+        })
+      ),
+    );
     m.rightHand1 = newItemId >>> 0;
     wUInt32BE(buf, O.RH1_PTR, 0xffffffff);
 
@@ -1918,13 +1925,17 @@ describe('writer: idx1 = slot invariant for newly added items', () => {
 
     const m = readSave(buf);
     const newRingId = RING_IDS[1];
-    m.rings.push({
-      itemId: newRingId,
-      count: 1,
-      misc1: 0x02,
-      misc2: 0x01000000,
-      durability: 0,
-    });
+    m.rings.push(
+      /** @type {import('../../js/des-savefile/model.js').FullInventoryItem} */ (
+        /** @type {unknown} */ ({
+          itemId: newRingId,
+          count: 1,
+          misc1: 0x02,
+          misc2: 0x01000000,
+          durability: 0,
+        })
+      ),
+    );
     m.ring1 = newRingId >>> 0;
     wUInt32BE(buf, O.RING1_PTR, 0xffffffff);
 

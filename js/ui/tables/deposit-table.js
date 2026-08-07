@@ -108,7 +108,7 @@ export function renderDeposit(records) {
  * Standard (non-decomposed) layout: Item | Count | Durability | Del
  * Used for Ammo (4), Casting Tool (6), Armor, Rings, Goods.
  *
- * @param {'weapons'|'armor'|'rings'|'goods'} category
+ * @param {string} category  'weapons'|'armor'|'rings'|'goods'
  * @param {Record<string, any>} rec  {itemId, count, unknown1, sortOrder, flags}
  * @param {boolean} [isExisting=true]  true if loaded from save file,
  *   false if user-inserted via the Add button. Determines soft vs. hard
