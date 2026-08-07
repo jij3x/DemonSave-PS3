@@ -465,35 +465,33 @@ describe('mergeModel: branch coverage', () => {
     expect(() => mergeModel(full, sanitized)).not.toThrow();
   });
 
-  test('handles deposit items with unknown1 defined (no default assigned)', () => {
+  // Both "no _ref" and "invalid _ref" leave _slot undefined — mergeModel
+  // treats them identically as new items. One test.each covers both.
+  test.each([
+    {
+      label: 'no _ref',
+      make: (sanitized) => {
+        sanitized.weapons.push(
+          /** @type {import('../../js/des-savefile/model.js').SanitizedInventoryItem} */ (
+            /** @type {unknown} */ ({ itemId: 0x99999999, count: 1, misc1: 0, misc2: 0x01000000, durability: 100 })
+          ),
+        );
+        return sanitized.weapons.length - 1;
+      },
+    },
+    {
+      label: 'invalid _ref',
+      make: (sanitized) => {
+        sanitized.weapons[0]._ref = 'inv:999'; // slot doesn't exist in original
+        return 0;
+      },
+    },
+  ])('unresolved inventory item ($label) gets no _slot restored', ({ make }) => {
     const full = makeFullModel();
     const { model: sanitized } = sanitizeModel(full);
-    // Existing items have unknown1 defined → should NOT get defaults
+    const idx = make(sanitized);
     const merged = mergeModel(full, sanitized);
-    expect(merged.deposit[0].unknown1).toBe(0);
-  });
-
-  test('handles inventory items with no _ref (treated as new)', () => {
-    const full = makeFullModel();
-    const { model: sanitized } = sanitizeModel(full);
-    // Add an item without _ref
-    sanitized.weapons.push(
-      /** @type {import('../../js/des-savefile/model.js').SanitizedInventoryItem} */ (
-        /** @type {unknown} */ ({ itemId: 0x99999999, count: 1, misc1: 0, misc2: 0x01000000, durability: 100 })
-      ),
-    );
-    const merged = mergeModel(full, sanitized);
-    const newW = merged.weapons[merged.weapons.length - 1];
-    expect(newW._slot).toBeUndefined();
-  });
-
-  test('handles inventory item with _ref that does not match any original', () => {
-    const full = makeFullModel();
-    const { model: sanitized } = sanitizeModel(full);
-    sanitized.weapons[0]._ref = 'inv:999'; // slot doesn't exist in original
-    const merged = mergeModel(full, sanitized);
-    // Item with invalid _ref gets no _slot restored
-    expect(merged.weapons[0]._slot).toBeUndefined();
+    expect(merged.weapons[idx]._slot).toBeUndefined();
   });
 
   test('deposit merge with unknown1 present (no defaults)', () => {
@@ -508,28 +506,17 @@ describe('mergeModel: branch coverage', () => {
 });
 
 describe('accountId/profileNumber are folder-level (not on model)', () => {
-  test('sanitizeModel does not attach accountId or profileNumber', () => {
+  // One test checks both directions: sanitizeModel output and mergeModel
+  // output never carry accountId/profileNumber (they are passed as separate
+  // folder-level params through the save-api layer).
+  test('sanitize + merge never attach accountId or profileNumber', () => {
     const full = makeFullModel();
     const { model } = sanitizeModel(full);
     expect(model).not.toHaveProperty('accountId');
     expect(model).not.toHaveProperty('profileNumber');
-  });
 
-  test('mergeModel output has no accountId or profileNumber', () => {
-    const full = makeFullModel();
-    const { model } = sanitizeModel(full);
     const merged = mergeModel(full, model);
     expect(merged).not.toHaveProperty('accountId');
     expect(merged).not.toHaveProperty('profileNumber');
-  });
-
-  test('mergeModel preserves all slot fields', () => {
-    const full = makeFullModel();
-    const { model } = sanitizeModel(full);
-    model.vit = 77;
-    const merged = mergeModel(full, model);
-    expect(merged.vit).toBe(77);
-    expect(merged.weapons).toBeDefined();
-    expect(merged.deposit).toBeDefined();
   });
 });

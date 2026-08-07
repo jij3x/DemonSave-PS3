@@ -14,6 +14,7 @@ const { setupHairColorSample, setupWarpAndWorld, setupTabs, setupAddRowButtons }
   await import('../../js/ui/form/ui-setup.js');
 const { populateCombos } = await import('../../js/ui/core/controls.js');
 const { refreshEquipmentDisplay } = await import('../../js/ui/core/dom-helpers.js');
+const { getLimits } = await import('../../js/des-savefile/save-api.js');
 
 describe('ui-setup', () => {
   beforeEach(() => {
@@ -48,6 +49,27 @@ describe('ui-setup', () => {
     test('missing hair inputs are skipped (no crash)', () => {
       // No hair inputs in the DOM — should not throw
       expect(() => setupHairColorSample()).not.toThrow();
+    });
+
+    test('empty channel value defaults to 0 (parses NaN → 0)', () => {
+      // Create the DOM elements
+      for (const id of ['hairR', 'hairG', 'hairB']) {
+        const inp = document.createElement('input');
+        inp.id = id;
+        inp.type = 'number';
+        document.body.appendChild(inp);
+      }
+      const sample = document.createElement('div');
+      sample.id = 'hairColorSample';
+      document.body.appendChild(sample);
+
+      setupHairColorSample();
+
+      // An empty value parses to NaN, which the `|| 0` defaults to 0.
+      /** @type {HTMLInputElement} */ (document.getElementById('hairR')).value = '';
+      document.getElementById('hairR').dispatchEvent(new Event('input'));
+
+      expect(sample.style.background).toBe('rgb(0, 0, 0)');
     });
   });
 
@@ -139,6 +161,16 @@ describe('ui-setup', () => {
       document.getElementById('world').dispatchEvent(new Event('input'));
 
       expect(document.getElementById('worldName').textContent).toBe('');
+    });
+
+    test('attaches the warp listener even when #world is absent', () => {
+      // warpLocation present (so setup does not early-return), but no #world
+      // input → the `if (worldInput)` branch is skipped.
+      const warpSel = document.createElement('select');
+      warpSel.id = 'warpLocation';
+      document.body.appendChild(warpSel);
+
+      expect(() => setupWarpAndWorld()).not.toThrow();
     });
   });
 
@@ -377,6 +409,21 @@ describe('ui-setup', () => {
       expect(addBtnB.hidden).toBe(false);
       expect(addBtnA.hidden).toBe(true);
     });
+
+    test('preserves existing ARIA roles instead of overwriting them', () => {
+      const { group, btnA, contentA } = buildTabGroup();
+      // Pre-set roles so the "already has role" branches are taken.
+      group.querySelector(':scope > .tabs').setAttribute('role', 'tablist');
+      btnA.setAttribute('role', 'tab');
+      contentA.setAttribute('role', 'tabpanel');
+
+      setupTabs();
+
+      // Roles were preserved (the auto-assign branches were skipped).
+      expect(group.querySelector(':scope > .tabs').getAttribute('role')).toBe('tablist');
+      expect(btnA.getAttribute('role')).toBe('tab');
+      expect(contentA.getAttribute('role')).toBe('tabpanel');
+    });
   });
 
   // --- setupAddRowButtons ---
@@ -574,6 +621,306 @@ describe('ui-setup', () => {
       // Second click should not add another (placeholder still active)
       invWeaponBtn.click();
       expect(tbody.querySelectorAll('tr').length).toBe(1);
+    });
+
+    test('deposit add button shows an alert and adds nothing when deposit is full', () => {
+      const { depArmorBtn } = buildAddButtonDOM();
+      setupAddRowButtons();
+
+      // Fill a deposit table up to the global entry limit so the "full" guard fires.
+      const tbody = document.querySelector('table.dep-table[data-category="armor"] tbody');
+      const max = getLimits().depositMaxEntries;
+      for (let i = 0; i < max; i++) {
+        tbody.appendChild(document.createElement('tr'));
+      }
+      expect(tbody.querySelectorAll('tr').length).toBe(max);
+
+      depArmorBtn.click();
+
+      // No new row added ...
+      expect(tbody.querySelectorAll('tr').length).toBe(max);
+      // ... and a modal alert was shown.
+      expect(document.querySelector('.modal-overlay')).not.toBeNull();
+    });
+
+    // --- inventory add-button guard / default branches ---
+    test('inventory add button without a category is a no-op', () => {
+      const btn = document.createElement('button');
+      btn.className = 'inv-add';
+      document.body.appendChild(btn);
+      setupAddRowButtons();
+      btn.click();
+      expect(document.querySelectorAll('tr').length).toBe(0);
+    });
+
+    test('inventory weapon add button defaults to type 1 when weaponType is absent', () => {
+      const scrollBody = document.createElement('div');
+      scrollBody.className = 'sub-tab-table-body';
+      const table = document.createElement('table');
+      table.className = 'grid-table inv-table';
+      table.dataset.category = 'weapons';
+      table.dataset.weaponType = '1';
+      const tbody = document.createElement('tbody');
+      table.appendChild(tbody);
+      scrollBody.appendChild(table);
+      document.body.appendChild(scrollBody);
+
+      const btn = document.createElement('button');
+      btn.className = 'inv-add';
+      btn.dataset.category = 'weapons';
+      // no data-weapon-type → defaults to '1'
+      document.body.appendChild(btn);
+
+      setupAddRowButtons();
+      btn.click();
+
+      expect(tbody.querySelectorAll('tr').length).toBe(1);
+    });
+
+    test('inventory goods add button defaults to type 9 when goodsType is absent', () => {
+      const scrollBody = document.createElement('div');
+      scrollBody.className = 'sub-tab-table-body';
+      const table = document.createElement('table');
+      table.className = 'grid-table inv-table';
+      table.dataset.category = 'goods';
+      table.dataset.goodsType = '9';
+      const tbody = document.createElement('tbody');
+      table.appendChild(tbody);
+      scrollBody.appendChild(table);
+      document.body.appendChild(scrollBody);
+
+      const btn = document.createElement('button');
+      btn.className = 'inv-add';
+      btn.dataset.category = 'goods';
+      document.body.appendChild(btn);
+
+      setupAddRowButtons();
+      btn.click();
+
+      expect(tbody.querySelectorAll('tr').length).toBe(1);
+    });
+
+    test('inventory add button is a no-op when the target table is absent', () => {
+      const btn = document.createElement('button');
+      btn.className = 'inv-add';
+      btn.dataset.category = 'armor';
+      // no armor inv-table in the DOM
+      document.body.appendChild(btn);
+
+      setupAddRowButtons();
+      btn.click();
+
+      expect(document.querySelectorAll('tr').length).toBe(0);
+    });
+
+    // --- spell add-button guard / gate branches ---
+    test('spell add button is a no-op when the spells table body is absent', () => {
+      const btn = document.createElement('button');
+      btn.id = 'addSpell';
+      document.body.appendChild(btn);
+      setupAddRowButtons();
+      btn.click();
+      expect(document.querySelectorAll('tr').length).toBe(0);
+    });
+
+    test('spell add button skips deleted rows in the gate and still adds', () => {
+      const spellsTable = document.createElement('table');
+      spellsTable.id = 'spellsTableBody';
+      const tbody = document.createElement('tbody');
+      spellsTable.appendChild(tbody);
+      const scrollBody = document.createElement('div');
+      scrollBody.className = 'sub-tab-table-body';
+      scrollBody.appendChild(spellsTable);
+      document.body.appendChild(scrollBody);
+
+      const deleted = document.createElement('tr');
+      deleted.dataset.deleted = 'true';
+      tbody.appendChild(deleted);
+
+      const btn = document.createElement('button');
+      btn.id = 'addSpell';
+      document.body.appendChild(btn);
+
+      setupAddRowButtons();
+      btn.click();
+
+      // The deleted row is skipped by the gate; a new row is still added.
+      expect(tbody.querySelectorAll('tr').length).toBe(2);
+    });
+
+    test('spell add button adds a second row when the existing row has a selection', () => {
+      const spellsTable = document.createElement('table');
+      spellsTable.id = 'spellsTableBody';
+      const tbody = document.createElement('tbody');
+      spellsTable.appendChild(tbody);
+      const scrollBody = document.createElement('div');
+      scrollBody.className = 'sub-tab-table-body';
+      scrollBody.appendChild(spellsTable);
+      document.body.appendChild(scrollBody);
+
+      // An existing row whose spell-name select already has a value.
+      const existing = document.createElement('tr');
+      const sel = document.createElement('select');
+      sel.className = 'spell-name';
+      const opt = document.createElement('option');
+      opt.value = '1';
+      sel.appendChild(opt);
+      sel.value = '1';
+      existing.appendChild(sel);
+      tbody.appendChild(existing);
+
+      const btn = document.createElement('button');
+      btn.id = 'addSpell';
+      document.body.appendChild(btn);
+
+      setupAddRowButtons();
+      btn.click();
+
+      // Gate passes (existing row has a value) → a second row is added.
+      expect(tbody.querySelectorAll('tr').length).toBe(2);
+    });
+
+    // --- deposit add-button guard / count / gate branches ---
+    test('deposit add button without a category is a no-op', () => {
+      const btn = document.createElement('button');
+      btn.className = 'dep-add';
+      document.body.appendChild(btn);
+      setupAddRowButtons();
+      btn.click();
+      expect(document.querySelectorAll('tr').length).toBe(0);
+    });
+
+    test('deposit add button skips deleted rows when counting and gating', () => {
+      const table = document.createElement('table');
+      table.className = 'grid-table dep-table';
+      table.dataset.category = 'armor';
+      const tbody = document.createElement('tbody');
+      table.appendChild(tbody);
+      document.body.appendChild(table);
+
+      const deleted = document.createElement('tr');
+      deleted.dataset.deleted = 'true';
+      tbody.appendChild(deleted);
+
+      const btn = document.createElement('button');
+      btn.className = 'dep-add';
+      btn.dataset.category = 'armor';
+      document.body.appendChild(btn);
+
+      setupAddRowButtons();
+      btn.click();
+
+      // Deleted row skipped by count (0 < max) and gate → new row added.
+      expect(tbody.querySelectorAll('tr').length).toBe(2);
+    });
+
+    // --- deferred row-added guard branches ---
+    test('deferred row handler ignores change events on non-select elements', () => {
+      setupAddRowButtons();
+      const inp = document.createElement('input');
+      document.body.appendChild(inp);
+      expect(() => inp.dispatchEvent(new Event('change', { bubbles: true }))).not.toThrow();
+    });
+
+    test('deferred row handler ignores selects that are not inside a row', () => {
+      setupAddRowButtons();
+      const sel = document.createElement('select');
+      sel.className = 'inv-name';
+      const opt = document.createElement('option');
+      opt.value = '10001';
+      sel.appendChild(opt);
+      sel.value = '10001';
+      document.body.appendChild(sel); // not inside a <tr>
+      expect(() => sel.dispatchEvent(new Event('change', { bubbles: true }))).not.toThrow();
+    });
+
+    test('deferred row handler ignores a select whose class is not an item-name', () => {
+      setupAddRowButtons();
+      const tr = document.createElement('tr');
+      const sel = document.createElement('select');
+      sel.className = 'other'; // not inv-name/spell-name/dep-name
+      const opt = document.createElement('option');
+      opt.value = '1';
+      sel.appendChild(opt);
+      sel.value = '1';
+      tr.appendChild(sel);
+      document.body.appendChild(tr);
+      expect(() => sel.dispatchEvent(new Event('change', { bubbles: true }))).not.toThrow();
+    });
+
+    test('deferred row handler ignores change on an existing row', () => {
+      setupAddRowButtons();
+      const tr = document.createElement('tr');
+      tr.dataset.existing = 'true';
+      const sel = document.createElement('select');
+      sel.className = 'inv-name';
+      const opt = document.createElement('option');
+      opt.value = '10001';
+      sel.appendChild(opt);
+      sel.value = '10001';
+      tr.appendChild(sel);
+      document.body.appendChild(tr);
+      // existing !== 'false' → early return (no onRowAdded).
+      expect(() => sel.dispatchEvent(new Event('change', { bubbles: true }))).not.toThrow();
+    });
+
+    test('deferred row handler fires onRowAdded when a new row select gets a value', () => {
+      setupAddRowButtons();
+      const tr = document.createElement('tr');
+      tr.dataset.existing = 'false';
+      const sel = document.createElement('select');
+      sel.className = 'inv-name';
+      const opt = document.createElement('option');
+      opt.value = '100000';
+      sel.appendChild(opt);
+      sel.value = '100000';
+      tr.appendChild(sel);
+      document.body.appendChild(tr);
+      // onRowAdded is guarded (no-op without a dirty tree).
+      expect(() => sel.dispatchEvent(new Event('change', { bubbles: true }))).not.toThrow();
+    });
+
+    test('deposit goods add button creates a row in the goods type table', () => {
+      buildAddButtonDOM();
+      const btn = document.createElement('button');
+      btn.className = 'dep-add';
+      btn.dataset.category = 'goods';
+      btn.dataset.goodsType = '9';
+      document.body.appendChild(btn);
+      setupAddRowButtons();
+      btn.click();
+      const tbody = document.querySelector(
+        'table.dep-table[data-category="goods"][data-goods-type="9"] tbody',
+      );
+      expect(tbody.querySelectorAll('tr').length).toBe(1);
+    });
+
+    test('spell add button gates while an unselected spell row exists', () => {
+      const { spellAddBtn } = buildAddButtonDOM();
+      setupAddRowButtons();
+      const tbody = document.querySelector('#spellsTableBody tbody');
+      const unselected = document.createElement('tr');
+      const sel = document.createElement('select');
+      sel.className = 'spell-name'; // no value → gate blocks
+      unselected.appendChild(sel);
+      tbody.appendChild(unselected);
+      const before = tbody.querySelectorAll('tr').length;
+      spellAddBtn.click();
+      expect(tbody.querySelectorAll('tr').length).toBe(before);
+    });
+
+    test('deposit add button gates while an unselected row exists', () => {
+      const { depArmorBtn } = buildAddButtonDOM();
+      setupAddRowButtons();
+      const tbody = document.querySelector('table.dep-table[data-category="armor"] tbody');
+      const unselected = document.createElement('tr');
+      const sel = document.createElement('select');
+      sel.className = 'dep-name'; // no value → gate blocks
+      unselected.appendChild(sel);
+      tbody.appendChild(unselected);
+      const before = tbody.querySelectorAll('tr').length;
+      depArmorBtn.click();
+      expect(tbody.querySelectorAll('tr').length).toBe(before);
     });
   });
 });

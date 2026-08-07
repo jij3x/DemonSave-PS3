@@ -29,6 +29,16 @@ import { bad } from '../../helpers.js';
 
 const SECURE_ID = fromHex('0123456789ABCDEFFEDCBA9876543210');
 
+/**
+ * Build a single-entry USER.DAT PFD (size 32) with the test SecureFileID.
+ * The most common fixture in this file; centralised to avoid repeating the
+ * literal createPfdForFiles(...) call ~20×.
+ * @returns {ReturnType<typeof createPfdForFiles>}
+ */
+function makeUserPfd() {
+  return createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+}
+
 /* ------------------------------------------------------------------ */
 /* Hash helpers                                                        */
 /* ------------------------------------------------------------------ */
@@ -55,40 +65,21 @@ describe('calculateHashTableEntryIndex', () => {
 });
 
 describe('generateHashKeyForSecureFileID', () => {
-  test('places magic bytes at positions 1,2,5,8', () => {
-    const secureId = fromHex('0123456789ABCDEFFEDCBA9876543210');
+  const secureId = fromHex('0123456789ABCDEFFEDCBA9876543210');
+
+  test('produces the known 20-byte mangled key', () => {
+    // Magic constants at positions 1,2,5,8 (0x0b,0x0f,0x0e,0x0a); all
+    // other bytes are secureId copied in order. The pinned hex encodes
+    // both contracts, so the full-output check subsumes per-position checks.
     const key = generateHashKeyForSecureFileID(secureId);
     expect(key.length).toBe(20);
-    expect(key[1]).toBe(11);
-    expect(key[2]).toBe(15);
-    expect(key[5]).toBe(14);
-    expect(key[8]).toBe(10);
-  });
-
-  test('fills remaining positions with secureId bytes in order (j starts at 0)', () => {
-    const secureId = fromHex('0123456789ABCDEFFEDCBA9876543210');
-    const key = generateHashKeyForSecureFileID(secureId);
-    let j = 0;
-    for (let i = 0; i < 20; i++) {
-      if (i === 1 || i === 2 || i === 5 || i === 8) continue;
-      expect(key[i]).toBe(secureId[j]);
-      j++;
-    }
-    expect(j).toBe(16);
+    const expected = '01' + '0b0f' + '2345' + '0e' + '6789' + '0a' + 'abcdeffedcba9876543210';
+    expect(toHex(key)).toBe(expected);
   });
 
   test('throws for wrong length', () => {
     expect(() => generateHashKeyForSecureFileID(new Uint8Array(15))).toThrow();
     expect(() => generateHashKeyForSecureFileID(new Uint8Array(17))).toThrow();
-  });
-});
-
-describe('SecureFileID key mangling — pinned output', () => {
-  test('known SecureFileID → known 20-byte key', () => {
-    const secureId = fromHex('0123456789ABCDEFFEDCBA9876543210');
-    const key = generateHashKeyForSecureFileID(secureId);
-    const expected = '01' + '0b0f' + '2345' + '0e' + '6789' + '0a' + 'abcdeffedcba9876543210';
-    expect(toHex(key)).toBe(expected);
   });
 });
 
@@ -275,7 +266,7 @@ describe('decryptFile error paths', () => {
   });
 
   test('throws when entry not found', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     expect(() => decryptFile(new Uint8Array(16), 'NONEXIST.DAT', pfd)).toThrow(
       'entryname does not exist',
     );
@@ -291,7 +282,7 @@ describe('encryptFile error paths', () => {
   });
 
   test('throws when entry not found', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     expect(() => encryptFile(new Uint8Array(16), 'NONEXIST.DAT', pfd)).toThrow(
       'entryname does not exist',
     );
@@ -339,12 +330,12 @@ describe('encryptFile error paths', () => {
 
 describe('isValidEntryHash', () => {
   test('returns false for non-existent entry', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     expect(isValidEntryHash(new Uint8Array(16), 'NONEXIST.DAT', pfd)).toBe(false);
   });
 
   test('returns true for valid encrypted data', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     const plain = new Uint8Array(32).fill(0xcd);
     const enc = encryptFile(plain, 'USER.DAT', pfd, true);
 
@@ -356,7 +347,7 @@ describe('isValidEntryHash', () => {
   });
 
   test('returns false for modified data', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     const plain = new Uint8Array(32).fill(0xee);
     const enc = encryptFile(plain, 'USER.DAT', pfd, true);
 
@@ -378,7 +369,7 @@ describe('isValidEntryHash', () => {
 
 describe('validAllParamHashes non-fix mode', () => {
   test('returns false when file data is missing', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     const fileData = new Map();
     // Don't add any file data
     expect(validAllParamHashes(fileData, false, pfd)).toBe(false);
@@ -515,7 +506,7 @@ describe('rebuildParamPfd', () => {
 
 describe('getEntryKey', () => {
   test('derives 16-byte AES key from entry', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     const key = getEntryKey(pfd.entries[0], pfd);
     expect(key.length).toBe(16);
     // Key should be non-trivial (not all zeros)
@@ -523,7 +514,7 @@ describe('getEntryKey', () => {
   });
 
   test('derives same key for same entry + PFD', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     const k1 = getEntryKey(pfd.entries[0], pfd);
     const k2 = getEntryKey(pfd.entries[0], pfd);
     expect(toHex(k1)).toBe(toHex(k2));
@@ -669,7 +660,7 @@ describe('Validation non-fix false paths (corrupted PFD)', () => {
 
 describe('decryptFile hash validation failure', () => {
   test('throws on invalid encrypted data (hash mismatch)', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     const plain = new Uint8Array(32).fill(0x55);
     const enc = encryptFile(plain, 'USER.DAT', pfd, true);
 
@@ -750,7 +741,7 @@ describe('Trophy SFO hash indices 0-3', () => {
 
 describe('cloneParamPfd', () => {
   test('produces a deep-independent copy', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     const clone = cloneParamPfd(pfd);
 
     // Scalars match
@@ -778,7 +769,7 @@ describe('cloneParamPfd', () => {
   });
 
   test('preserves secureFileID as a copy', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     const clone = cloneParamPfd(pfd);
     clone.secureFileID[0] = 0xff;
     expect(pfd.secureFileID[0]).not.toBe(0xff);
@@ -853,7 +844,7 @@ describe('parseParamPfd corrupt-header guards', () => {
 
 describe('decryptFile with force=true', () => {
   test('force=true skips validation and decrypts corrupted data', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     const plain = new Uint8Array(32).fill(0x44);
     const enc = encryptFile(plain, 'USER.DAT', pfd, true);
 
@@ -866,7 +857,7 @@ describe('decryptFile with force=true', () => {
   });
 
   test('throws when entry.fileSize exceeds available data', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     const enc = encryptFile(new Uint8Array(32).fill(0x44), 'USER.DAT', pfd, true);
 
     // Set fileSize to be larger than the actual data
@@ -878,19 +869,15 @@ describe('decryptFile with force=true', () => {
   });
 
   test('throws on non-Uint8Array input', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
-    expect(() => decryptFile(bad('bad'), 'USER.DAT', pfd, true)).toThrow(
-      TypeError,
-    );
+    const pfd = makeUserPfd();
+    expect(() => decryptFile(bad('bad'), 'USER.DAT', pfd, true)).toThrow(TypeError);
   });
 });
 
 describe('encryptFile additional coverage', () => {
   test('throws on non-Uint8Array input', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
-    expect(() => encryptFile(bad('bad'), 'USER.DAT', pfd, true)).toThrow(
-      TypeError,
-    );
+    const pfd = makeUserPfd();
+    expect(() => encryptFile(bad('bad'), 'USER.DAT', pfd, true)).toThrow(TypeError);
   });
 });
 
@@ -1047,22 +1034,17 @@ describe('parseParamPfd: corrupt hash/sig table guards', () => {
   // the sig table guard by ensuring the hash table fits within the buffer.
 });
 
-describe('getEntryHashKey: missing SecureFileID', () => {
-  test('decryptFile throws for non-SFO file when SecureFileID is null', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
-    // Remove secureFileID to trigger the guard
-    pfd.secureFileID = null;
-    expect(() => decryptFile(new Uint8Array(32), 'USER.DAT', pfd)).toThrow(
-      'SecureFileID is not valid',
-    );
-  });
-});
+// Note: the decryptFile null-secureFileID guard (param-pfd.js:1000) is
+// already covered by 'decryptFile error paths' → 'throws when secureFileID
+// is not set' above, so it is not re-tested here. The getEntryHashKey null
+// path reached via getEntryKey is covered in 'getEntryKey: null SecureFileID
+// on non-SFO entry' below.
 
 describe('getBucketChainHash: null and corrupt chains', () => {
   test('validateParamPfdDetailed detects orphaned entry (bucket head = 0xFFFF…F)', () => {
     // Create a PFD where an entry exists but its hash table bucket points
     // to 0xFFFF...F (no chain) — getBucketChainHash returns null
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     // Corrupt: set ALL hashEntries to 0xFFFF...F so the entry's bucket
     // head points nowhere
     for (let i = 0; i < pfd.hashEntries.length; i++) {
@@ -1073,13 +1055,11 @@ describe('getBucketChainHash: null and corrupt chains', () => {
 
     const result = validateParamPfdDetailed(data, pfd);
     expect(result.valid).toBe(false);
-    expect(
-      result.failures.some((f) => f.reason === 'no valid bucket chain'),
-    ).toBe(true);
+    expect(result.failures.some((f) => f.reason === 'no valid bucket chain')).toBe(true);
   });
 
   test('validAllParamHashes with fix=true throws on orphaned entry', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     for (let i = 0; i < pfd.hashEntries.length; i++) {
       pfd.hashEntries[i] = 0xffffffffffffffffn;
     }
@@ -1089,7 +1069,7 @@ describe('getBucketChainHash: null and corrupt chains', () => {
   });
 
   test('getBucketChainHash throws on hash chain cycle', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     // Create a cycle: entry 0's additionEntry points to itself
     pfd.entries[0].additionEntry = 0n; // points to entry 0 = cycle
     const data = new Map();
@@ -1098,7 +1078,7 @@ describe('getBucketChainHash: null and corrupt chains', () => {
   });
 
   test('getBucketChainHash throws on corrupt chain entry index', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     // Make numUsed larger than entries.length so that a chain pointer
     // can be < numUsed but >= entries.length → entries[Number(currentIndex)]
     // returns undefined → "PFD hash chain corrupt" throw.
@@ -1198,7 +1178,7 @@ describe('writeEntryHashData: filename too long (via validation)', () => {
 
 describe('getEntryKey: null SecureFileID on non-SFO entry', () => {
   test('throws when secureFileID is null and entry is non-SFO', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     pfd.secureFileID = null;
     // getEntryKey calls getEntryHashKey(entry, 0, pfd) which hits the
     // default-case guard for non-SFO files.
@@ -1356,9 +1336,7 @@ describe('validateParamPfdDetailed: specific failure types', () => {
 
     const result = validateParamPfdDetailed(fileData, pfd);
     expect(result.valid).toBe(false);
-    expect(result.failures.some((f) => f.reason.includes('not found'))).toBe(
-      true,
-    );
+    expect(result.failures.some((f) => f.reason.includes('not found'))).toBe(true);
   });
 });
 
@@ -1373,7 +1351,7 @@ describe('PFD error messages include actual values', () => {
   });
 
   test('unsupported version error includes actual version', () => {
-    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const pfd = makeUserPfd();
     pfd.version = 99n;
     const data = getParamPfdCombinedData(pfd);
     expect(() => parseParamPfd(data)).toThrow(/version: 99/i);

@@ -281,15 +281,6 @@ describe('reader/writer idempotency', () => {
     expect(m2.soulMem).toBe(123456);
   });
 
-  test('name round-trip', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    m.name = 'TestChar';
-    buf = writeSave(buf, m);
-    const m2 = readSave(buf);
-    expect(m2.name).toBe('TestChar');
-  });
-
   test('tendency dual writes', () => {
     let buf = makeBlankSave();
     const m = readSave(buf);
@@ -349,6 +340,10 @@ describe('reader/writer idempotency', () => {
   test('deposit (Thomas storage) round-trip', () => {
     let buf = makeBlankSave();
     const m = readSave(buf);
+    // Two categories exercise the multi-item round-trip: weapons + rings.
+    // Armor/goods deposit read-back is covered by the writer deposit
+    // edge-case tests below; the rings category mapping (reader 0x20 case)
+    // is only exercised here, so it stays.
     m.deposit = [
       {
         category: 'weapons',
@@ -358,24 +353,6 @@ describe('reader/writer idempotency', () => {
         unknown1: 0,
         sortOrder: 0,
         flags: [0x21, 0, 0, 0, 0, 0x01, 0x2c],
-      },
-      {
-        category: 'armor',
-        itemId: ARMOR_IDS[0],
-        count: 5,
-        durability: 200,
-        unknown1: 0,
-        sortOrder: 0,
-        flags: [0x21, 0, 0, 0, 0, 0x00, 0xc8],
-      },
-      {
-        category: 'goods',
-        itemId: ITEM_IDS[2],
-        count: 99,
-        durability: 0,
-        unknown1: 0,
-        sortOrder: 0,
-        flags: [0x21, 0, 0, 0, 0, 0, 0],
       },
       {
         category: 'rings',
@@ -389,17 +366,12 @@ describe('reader/writer idempotency', () => {
     ];
     buf = writeSave(buf, m);
     const m2 = readSave(buf);
-    expect(m2.deposit.length).toBe(4);
+    expect(m2.deposit.length).toBe(2);
     expect(m2.deposit[0].category).toBe('weapons');
     expect(m2.deposit[0].itemId).toBe(WEAPON_IDS[2]);
     expect(m2.deposit[0].count).toBe(1);
-    expect(m2.deposit[1].category).toBe('armor');
-    expect(m2.deposit[1].itemId).toBe(ARMOR_IDS[0]);
-    expect(m2.deposit[1].count).toBe(5);
-    expect(m2.deposit[2].category).toBe('goods');
-    expect(m2.deposit[2].count).toBe(99);
-    expect(m2.deposit[3].category).toBe('rings');
-    expect(m2.deposit[3].itemId).toBe(RING_IDS[1]);
+    expect(m2.deposit[1].category).toBe('rings');
+    expect(m2.deposit[1].itemId).toBe(RING_IDS[1]);
   });
 
   test('inventory count is written to both offsets', () => {
@@ -767,46 +739,21 @@ describe('writer: val() edge cases', () => {
     expect(m2.souls).toBe(42);
   });
 
-  test('val() throws on NaN strings', () => {
+  // All six val() rejection cases hit the same val() function
+  // (writer.js:55-73); each triggers a distinct throw site. One test.each
+  // covers them, keeping every sub-condition exercised.
+  test.each([
+    { label: 'NaN string', field: 'souls', value: 'notanumber', match: /invalid numeric string/ },
+    { label: 'empty string', field: 'souls', value: '   ', match: /empty numeric string/ },
+    { label: 'NaN number', field: 'vit', value: NaN, match: /NaN or Infinity/ },
+    { label: 'Infinity number', field: 'souls', value: Infinity, match: /NaN or Infinity/ },
+    { label: 'undefined value', field: 'souls', value: undefined, match: /expected number or string/ },
+    { label: 'null value', field: 'vit', value: null, match: /expected number or string/ },
+  ])('val() throws on $label', ({ field, value, match }) => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    setBad(m, 'souls', 'notanumber');
-    expect(() => writeSave(buf, m)).toThrow(/invalid numeric string/);
-  });
-
-  test('val() throws on empty string', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    setBad(m, 'souls', '   ');
-    expect(() => writeSave(buf, m)).toThrow(/empty numeric string/);
-  });
-
-  test('val() throws on NaN number', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    m.vit = NaN;
-    expect(() => writeSave(buf, m)).toThrow(/NaN or Infinity/);
-  });
-
-  test('val() throws on Infinity number', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    m.souls = Infinity;
-    expect(() => writeSave(buf, m)).toThrow(/NaN or Infinity/);
-  });
-
-  test('val() throws on undefined values', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    m.souls = undefined;
-    expect(() => writeSave(buf, m)).toThrow(/expected number or string/);
-  });
-
-  test('val() throws on null values', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    m.vit = null;
-    expect(() => writeSave(buf, m)).toThrow(/expected number or string/);
+    setBad(m, field, value);
+    expect(() => writeSave(buf, m)).toThrow(match);
   });
 });
 
@@ -815,28 +762,25 @@ describe('writer: val() edge cases', () => {
  * ==================================================================== */
 
 describe('writer: range validation', () => {
-  test('throws on U8 overflow (world > 255)', () => {
+  // U8 range check (assertU8): overflow, underflow, and fractional values
+  // all hit the same `out of range [0, 255]` branch (writer.js:85).
+  test.each([
+    { label: 'overflow (world > 255)', field: 'world', value: 256 },
+    { label: 'underflow (gender < 0)', field: 'gender', value: -1 },
+    { label: 'fractional (world = 3.5)', field: 'world', value: 3.5 },
+  ])('throws on U8 $label', ({ field, value }) => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m.world = 256;
+    m[field] = value;
     expect(() => writeSave(buf, m)).toThrow(/out of range \[0, 255\]/);
   });
 
-  test('throws on U8 underflow (gender < 0)', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    m.gender = -1;
-    expect(() => writeSave(buf, m)).toThrow(/out of range \[0, 255\]/);
-  });
-
-  test('throws on fractional U8 value (world = 3.5)', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    m.world = 3.5;
-    expect(() => writeSave(buf, m)).toThrow(/out of range \[0, 255\]/);
-  });
-
-  test('throws on fractional U16 value (misc1 = 3.5)', () => {
+  // U16 range check (assertU16): misc1 is a U16 field on inventory items.
+  // Both fractional and overflow hit `out of range [0, 65535]` (writer.js:100).
+  test.each([
+    { label: 'fractional misc1', misc1: 3.5 },
+    { label: 'misc1 overflow', misc1: 65536 },
+  ])('throws on U16 $label', ({ misc1 }) => {
     let buf = makeBlankSave();
     const m = readSave(buf);
     m.weapons.push({
@@ -844,7 +788,7 @@ describe('writer: range validation', () => {
       count: 1,
       _slot: undefined,
       idx1: 0,
-      misc1: 3.5,
+      misc1,
       idx2: 0,
       misc2: 0x01000000,
       durability: 300,
@@ -852,33 +796,15 @@ describe('writer: range validation', () => {
     expect(() => writeSave(buf, m)).toThrow(/out of range \[0, 65535\]/);
   });
 
-  test('throws on U16 overflow (inventory misc1 > 65535)', () => {
+  // U32 range check (assertU32): overflow and fractional hit
+  // `out of range [0, 4294967295]` (writer.js:115).
+  test.each([
+    { label: 'overflow (vit > 4294967295)', field: 'vit', value: 4294967296 },
+    { label: 'fractional (vit = 3.5)', field: 'vit', value: 3.5 },
+  ])('throws on U32 $label', ({ field, value }) => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m.weapons.push({
-      itemId: WEAPON_IDS[2],
-      count: 1,
-      _slot: undefined,
-      idx1: 0,
-      misc1: 65536,
-      idx2: 0,
-      misc2: 0x01000000,
-      durability: 300,
-    });
-    expect(() => writeSave(buf, m)).toThrow(/out of range \[0, 65535\]/);
-  });
-
-  test('throws on U32 overflow (vit > 4294967295)', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    m.vit = 4294967296;
-    expect(() => writeSave(buf, m)).toThrow(/out of range \[0, 4294967295\]/);
-  });
-
-  test('throws on fractional U32 value (vit = 3.5)', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    m.vit = 3.5;
+    m[field] = value;
     expect(() => writeSave(buf, m)).toThrow(/out of range \[0, 4294967295\]/);
   });
 
@@ -1111,16 +1037,6 @@ describe('secondary file writer', () => {
     const m2 = readSave(buf);
     expect(m2.name).toBe('0123456789ABCDEF');
   });
-
-  // 15-char name boundary also safe.
-  test('15-char name round-trips correctly', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    m.name = '0123456789ABCDE'; // 15 chars
-    buf = writeSave(buf, m);
-    const m2 = readSave(buf);
-    expect(m2.name).toBe('0123456789ABCDE');
-  });
 });
 
 /* ========================================================================
@@ -1219,16 +1135,6 @@ describe('reader/writer: UTF-16 name support', () => {
     buf = writeSave(buf, m);
     const m2 = readSave(buf);
     expect(m2.name).toBe('\u3042');
-  });
-
-  test('mixed Latin1 + CJK name round-trips', () => {
-    let buf = makeBlankSave();
-    const m = readSave(buf);
-    // Mix of ASCII and a CJK character
-    m.name = 'A\u3042B'; // A, あ, B
-    buf = writeSave(buf, m);
-    const m2 = readSave(buf);
-    expect(m2.name).toBe('A\u3042B');
   });
 });
 

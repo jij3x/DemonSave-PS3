@@ -719,15 +719,15 @@ export default {
     },
     '0x29E1': {
       name: 'Tearing Dagger+1',
-      type: [1, 1],
+      type: [1, 0],
     },
     '0x29E2': {
       name: 'Tearing Dagger+2',
-      type: [1, 1],
+      type: [1, 0],
     },
     '0x29E3': {
       name: 'Tearing Dagger+3',
-      type: [1, 1],
+      type: [1, 0],
     },
     '0x29EB': {
       name: 'Crescent Secret Dagger+1',
@@ -2220,31 +2220,31 @@ export default {
     },
     '0x526D': {
       name: 'Storm Ruler',
-      type: [1, 3],
+      type: [1, 0],
     },
     '0x526E': {
       name: 'Storm Ruler',
-      type: [1, 3],
+      type: [1, 0],
     },
     '0x526F': {
       name: 'Storm Ruler',
-      type: [1, 3],
+      type: [1, 0],
     },
     '0x5270': {
       name: 'Storm Ruler',
-      type: [1, 3],
+      type: [1, 0],
     },
     '0x5271': {
       name: 'Storm Ruler',
-      type: [1, 3],
+      type: [1, 0],
     },
     '0x5272': {
       name: 'Storm Ruler',
-      type: [1, 3],
+      type: [1, 0],
     },
     '0x5273': {
       name: 'Storm Ruler',
-      type: [1, 3],
+      type: [1, 0],
     },
     '0x5334': {
       name: 'Knight Sword',
@@ -2438,7 +2438,7 @@ export default {
     },
     '0x53FD': {
       name: 'Northern Regalia',
-      type: [1, 4],
+      type: [1, 0],
     },
     '0x5460': {
       name: 'Large Sword of Moonlight',
@@ -2512,23 +2512,23 @@ export default {
     },
     '0x558D': {
       name: 'Morion Blade',
-      type: [1, 3],
+      type: [1, 0],
     },
     '0x558E': {
       name: 'Morion Blade',
-      type: [1, 3],
+      type: [1, 0],
     },
     '0x558F': {
       name: 'Morion Blade',
-      type: [1, 3],
+      type: [1, 0],
     },
     '0x5590': {
       name: 'Morion Blade',
-      type: [1, 3],
+      type: [1, 0],
     },
     '0x5591': {
       name: 'Morion Blade',
-      type: [1, 3],
+      type: [1, 0],
     },
     '0x7148': {
       name: '_?_?v?Rc    (Ghost Sword)',
@@ -4263,35 +4263,35 @@ export default {
     },
     '0x9FC5': {
       name: 'Large Sword of Searching',
-      type: [1, 4],
+      type: [1, 0],
     },
     '0x9FC6': {
       name: 'Large Sword of Searching',
-      type: [1, 4],
+      type: [1, 0],
     },
     '0x9FC7': {
       name: 'Large Sword of Searching',
-      type: [1, 4],
+      type: [1, 0],
     },
     '0x9FC8': {
       name: 'Large Sword of Searching',
-      type: [1, 4],
+      type: [1, 0],
     },
     '0x9FC9': {
       name: 'Large Sword of Searching',
-      type: [1, 4],
+      type: [1, 0],
     },
     '0x9FCA': {
       name: 'Large Sword of Searching',
-      type: [1, 4],
+      type: [1, 0],
     },
     '0x9FCB': {
       name: 'Large Sword of Searching',
-      type: [1, 4],
+      type: [1, 0],
     },
     '0x9FCC': {
       name: 'Large Sword of Searching',
-      type: [1, 4],
+      type: [1, 0],
     },
     '0xBF68': {
       name: '_?_?f?Rc    (Ghost Falchion)',
@@ -5024,19 +5024,19 @@ export default {
     },
     '0xC545': {
       name: 'Dozer Axe',
-      type: [1, 9],
+      type: [1, 0],
     },
     '0xC546': {
       name: 'Dozer Axe',
-      type: [1, 9],
+      type: [1, 0],
     },
     '0xC547': {
       name: 'Dozer Axe',
-      type: [1, 9],
+      type: [1, 0],
     },
     '0xC548': {
       name: 'Dozer Axe',
-      type: [1, 9],
+      type: [1, 0],
     },
     '0xE678': {
       name: '_?_?e?    (Ghost Hand Axe)',
@@ -5049,43 +5049,43 @@ export default {
     },
     '0xEA61': {
       name: 'Crushing Club+1',
-      type: [1, 10],
+      type: [1, 0],
     },
     '0xEA62': {
       name: 'Crushing Club+2',
-      type: [1, 10],
+      type: [1, 0],
     },
     '0xEA63': {
       name: 'Crushing Club+3',
-      type: [1, 10],
+      type: [1, 0],
     },
     '0xEA64': {
       name: 'Crushing Club+4',
-      type: [1, 10],
+      type: [1, 0],
     },
     '0xEA65': {
       name: 'Crushing Club+5',
-      type: [1, 10],
+      type: [1, 0],
     },
     '0xEA6B': {
       name: 'Blessed Club+1',
-      type: [1, 10],
+      type: [1, 0],
     },
     '0xEA6C': {
       name: 'Blessed Club+2',
-      type: [1, 10],
+      type: [1, 0],
     },
     '0xEA6D': {
       name: 'Blessed Club+3',
-      type: [1, 10],
+      type: [1, 0],
     },
     '0xEA6E': {
       name: 'Blessed Club+4',
-      type: [1, 10],
+      type: [1, 0],
     },
     '0xEA6F': {
       name: 'Blessed Club+5',
-      type: [1, 10],
+      type: [1, 0],
     },
     '0xEAC4': {
       name: 'Mace',
@@ -5634,43 +5634,43 @@ export default {
     },
     '0xEBF1': {
       name: 'Crushing Great Club+1',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xEBF2': {
       name: 'Crushing Great Club+2',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xEBF3': {
       name: 'Crushing Great Club+3',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xEBF4': {
       name: 'Crushing Great Club+4',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xEBF5': {
       name: 'Crushing Great Club+5',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xEBFB': {
       name: 'Blessed Great Club+1',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xEBFC': {
       name: 'Blessed Great Club+2',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xEBFD': {
       name: 'Blessed Great Club+3',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xEBFE': {
       name: 'Blessed Great Club+4',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xEBFF': {
       name: 'Blessed Great Club+5',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xEC54': {
       name: 'Bramd',
@@ -5889,31 +5889,31 @@ export default {
     },
     '0xED1D': {
       name: 'Meat Cleaver',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xED1E': {
       name: 'Meat Cleaver',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xED1F': {
       name: 'Meat Cleaver',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xED20': {
       name: 'Meat Cleaver',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xED21': {
       name: 'Meat Cleaver',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xED22': {
       name: 'Meat Cleaver',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xED23': {
       name: 'Meat Cleaver',
-      type: [1, 11],
+      type: [1, 0],
     },
     '0xED80': {
       name: 'Torch    (Non-functioning)',
@@ -6321,23 +6321,23 @@ export default {
     },
     '0x11301': {
       name: 'Scraping Spear',
-      type: [1, 13],
+      type: [1, 0],
     },
     '0x11302': {
       name: 'Scraping Spear',
-      type: [1, 13],
+      type: [1, 0],
     },
     '0x11303': {
       name: 'Scraping Spear',
-      type: [1, 13],
+      type: [1, 0],
     },
     '0x11304': {
       name: 'Scraping Spear',
-      type: [1, 13],
+      type: [1, 0],
     },
     '0x11305': {
       name: 'Scraping Spear',
-      type: [1, 13],
+      type: [1, 0],
     },
     '0x13498': {
       name: '_?_?i?    (Ghost Spear)',
@@ -6450,23 +6450,23 @@ export default {
     },
     '0x1389F': {
       name: 'Crescent War Scythe+1',
-      type: [1, 14],
+      type: [1, 0],
     },
     '0x138A0': {
       name: 'Crescent War Scythe+2',
-      type: [1, 14],
+      type: [1, 0],
     },
     '0x138A1': {
       name: 'Crescent War Scythe+3',
-      type: [1, 14],
+      type: [1, 0],
     },
     '0x138A2': {
       name: 'Crescent War Scythe+4',
-      type: [1, 14],
+      type: [1, 0],
     },
     '0x138A3': {
       name: 'Crescent War Scythe+5',
-      type: [1, 14],
+      type: [1, 0],
     },
     '0x138A9': {
       name: 'Quality War Scythe+1',
@@ -6625,15 +6625,15 @@ export default {
     },
     '0x138F9': {
       name: 'Mercury Mirdan Hammer+1',
-      type: [1, 14],
+      type: [1, 0],
     },
     '0x138FA': {
       name: 'Mercury Mirdan Hammer+2',
-      type: [1, 14],
+      type: [1, 0],
     },
     '0x138FB': {
       name: 'Mercury Mirdan Hammer+3',
-      type: [1, 14],
+      type: [1, 0],
     },
     '0x13903': {
       name: 'Crushing Mirdan Hammer+1',
@@ -6817,15 +6817,15 @@ export default {
     },
     '0x1395D': {
       name: 'Mercury Halberd+1',
-      type: [1, 14],
+      type: [1, 0],
     },
     '0x1395E': {
       name: 'Mercury Halberd+2',
-      type: [1, 14],
+      type: [1, 0],
     },
     '0x1395F': {
       name: 'Mercury Halberd+3',
-      type: [1, 14],
+      type: [1, 0],
     },
     '0x13967': {
       name: 'Crushing Halberd+1',
@@ -7348,23 +7348,23 @@ export default {
     },
     '0x18723': {
       name: 'Crescent Claws+1',
-      type: [1, 12],
+      type: [1, 0],
     },
     '0x18724': {
       name: 'Crescent Claws+2',
-      type: [1, 12],
+      type: [1, 0],
     },
     '0x18725': {
       name: 'Crescent Claws+3',
-      type: [1, 12],
+      type: [1, 0],
     },
     '0x18726': {
       name: 'Crescent Claws+4',
-      type: [1, 12],
+      type: [1, 0],
     },
     '0x18727': {
       name: 'Crescent Claws+5',
-      type: [1, 12],
+      type: [1, 0],
     },
     '0x1872D': {
       name: 'Quality Claws+1',
@@ -7536,23 +7536,23 @@ export default {
     },
     '0x1FBDB': {
       name: 'R[??0nShort Bow+1',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FBDC': {
       name: 'R[??0nShort Bow+2',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FBDD': {
       name: 'R[??0nShort Bow+3',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FBDE': {
       name: 'R[??0nShort Bow+4',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FBDF': {
       name: 'R[??0nShort Bow+5',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FBE5': {
       name: 'Sticky Short Bow+1',
@@ -7661,23 +7661,23 @@ export default {
     },
     '0x1FC3F': {
       name: 'R[??0nCompound Short Bow+1',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FC40': {
       name: 'R[??0nCompound Short Bow+2',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FC41': {
       name: 'R[??0nCompound Short Bow+3',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FC42': {
       name: 'R[??0nCompound Short Bow+4',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FC43': {
       name: 'R[??0nCompound Short Bow+5',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FC49': {
       name: 'Sticky Compound Short Bow+1',
@@ -7786,23 +7786,23 @@ export default {
     },
     '0x1FCA3': {
       name: 'R[??0nLong Bow+1',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FCA4': {
       name: 'R[??0nLong Bow+2',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FCA5': {
       name: 'R[??0nLong Bow+3',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FCA6': {
       name: 'R[??0nLong Bow+4',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FCA7': {
       name: 'R[??0nLong Bow+5',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FCAD': {
       name: 'Sticky Long Bow+1',
@@ -7911,23 +7911,23 @@ export default {
     },
     '0x1FD07': {
       name: 'R[??0nCompound Long Bow+1',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FD08': {
       name: 'R[??0nCompound Long Bow+2',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FD09': {
       name: 'R[??0nCompound Long Bow+3',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FD0A': {
       name: 'R[??0nCompound Long Bow+4',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FD0B': {
       name: 'R[??0nCompound Long Bow+5',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FD11': {
       name: 'Sticky Compound Long Bow+1',
@@ -8016,15 +8016,15 @@ export default {
     },
     '0x1FDC5': {
       name: 'Lava Bow',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FDC6': {
       name: 'Lava Bow',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x1FDC7': {
       name: 'Lava Bow',
-      type: [3, 1],
+      type: [3, 0],
     },
     '0x21EF8': {
       name: '_?_?_    (Ghost Short Bow)',
@@ -8106,23 +8106,23 @@ export default {
     },
     '0x249FB': {
       name: '0o0X0OBuckler+1',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x249FC': {
       name: '0o0X0OBuckler+2',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x249FD': {
       name: '0o0X0OBuckler+3',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x249FE': {
       name: '0o0X0OBuckler+4',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x249FF': {
       name: '0o0X0OBuckler+5',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24A05': {
       name: 'Dark Buckler+1',
@@ -8211,23 +8211,23 @@ export default {
     },
     '0x24AC3': {
       name: '0o0X0OKite Shield+1',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24AC4': {
       name: '0o0X0OKite Shield+2',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24AC5': {
       name: '0o0X0OKite Shield+3',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24AC6': {
       name: '0o0X0OKite Shield+4',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24AC7': {
       name: '0o0X0OKite Shield+5',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24ACD': {
       name: 'Dark Kite Shield+1',
@@ -8311,23 +8311,23 @@ export default {
     },
     '0x24B27': {
       name: '0o0X0OHeater Shield+1',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24B28': {
       name: '0o0X0OHeater Shield+2',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24B29': {
       name: '0o0X0OHeater Shield+3',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24B2A': {
       name: '0o0X0OHeater Shield+4',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24B2B': {
       name: '0o0X0OHeater Shield+5',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24B31': {
       name: 'Dark Heater Shield+1',
@@ -8386,23 +8386,23 @@ export default {
     },
     '0x24B8B': {
       name: "0o0X0OAdjudicator's Shield+1",
-      type: [2, 2],
+      type: [2, 0],
     },
     '0x24B8C': {
       name: "0o0X0OAdjudicator's Shield+2",
-      type: [2, 2],
+      type: [2, 0],
     },
     '0x24B8D': {
       name: "0o0X0OAdjudicator's Shield+3",
-      type: [2, 2],
+      type: [2, 0],
     },
     '0x24B8E': {
       name: "0o0X0OAdjudicator's Shield+4",
-      type: [2, 2],
+      type: [2, 0],
     },
     '0x24B8F': {
       name: "0o0X0OAdjudicator's Shield+5",
-      type: [2, 2],
+      type: [2, 0],
     },
     '0x24BE4': {
       name: 'Spiked Shield',
@@ -8461,23 +8461,23 @@ export default {
     },
     '0x24BEF': {
       name: '0o0X0OSpiked Shield+1',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24BF0': {
       name: '0o0X0OSpiked Shield+2',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24BF1': {
       name: '0o0X0OSpiked Shield+3',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24BF2': {
       name: '0o0X0OSpiked Shield+4',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24BF3': {
       name: '0o0X0OSpiked Shield+5',
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24BF9': {
       name: 'Sharp Spiked Shield+1',
@@ -8701,23 +8701,23 @@ export default {
     },
     '0x24D7F': {
       name: "0o0X0OKnight's Shield+1",
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24D80': {
       name: "0o0X0OKnight's Shield+2",
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24D81': {
       name: "0o0X0OKnight's Shield+3",
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24D82': {
       name: "0o0X0OKnight's Shield+4",
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24D83': {
       name: "0o0X0OKnight's Shield+5",
-      type: [2, 1],
+      type: [2, 0],
     },
     '0x24D89': {
       name: "Dark Knight's Shield+1",

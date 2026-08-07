@@ -27,6 +27,8 @@ const {
 } = await import('../../js/ui/core/dom-helpers.js');
 const { resetDispatcher } = await import('../../js/ui/core/event-dispatcher.js');
 const db = await import('../../js/des-db/index.js');
+const { formatUnknownItem } = await import('../../js/ui/core/item-helpers.js');
+const { COUNT_LIMITS } = await import('../../js/ui/core/controls.js');
 
 const WEAPON_IDS = db.getItemIdsByCategory('weapons');
 const VALID_WEAPON_ID = WEAPON_IDS[0]; // Dagger (10000)
@@ -391,6 +393,39 @@ describe('dom-helpers', () => {
       expect(span.dataset.id).toBe(String(VALID_WEAPON_ID));
       expect(span.textContent).toBe(db.getItem('weapons', VALID_WEAPON_ID).name);
     });
+
+    test('debounced refresh restores "(none)" slot via formatUnknownItem for an unknown item', () => {
+      const span = document.createElement('span');
+      span.id = 'helmet'; // EQ_CATEGORY.helmet === 'armor'
+      span.dataset.id = String(0xffffffff); // currently "(none)"
+      span.dataset.origId = String(0xfffffffe); // original item is not in the DB
+      document.body.appendChild(span);
+
+      // An inventory row carrying the unknown original item (simulating its return).
+      const table = document.createElement('table');
+      table.className = 'grid-table inv-table';
+      table.dataset.category = 'armor';
+      const tbody = document.createElement('tbody');
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      const sel = document.createElement('select');
+      sel.className = 'inv-name';
+      const opt = document.createElement('option');
+      opt.value = String(0xfffffffe);
+      sel.appendChild(opt);
+      sel.value = String(0xfffffffe);
+      td.appendChild(sel);
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      table.appendChild(tbody);
+      document.body.appendChild(table);
+
+      refreshEquipmentDisplay();
+      refreshEquipmentDisplay.flush();
+
+      expect(span.dataset.id).toBe(String(0xfffffffe));
+      expect(span.textContent).toBe(formatUnknownItem(0xfffffffe));
+    });
   });
 
   // --- refreshEquipmentForItems (targeted refresh) ---
@@ -525,6 +560,54 @@ describe('dom-helpers', () => {
       // Delete with SAME idx1 AND no remaining inventory → slot cleared
       refreshEquipmentForItems([{ itemId: String(VALID_WEAPON_ID), idx1: '5', action: 'delete' }]);
       expect(span.dataset.id).toBe(String(0xffffffff));
+    });
+
+    test('idx1 pair matching on delete — keeps slot when a matching-pair duplicate exists', () => {
+      const span = document.createElement('span');
+      span.id = 'leftHand1';
+      span.dataset.id = String(VALID_WEAPON_ID);
+      span.dataset.origId = String(VALID_WEAPON_ID);
+      span.dataset.roIdx1 = '5';
+      document.body.appendChild(span);
+
+      // An inventory row with the SAME itemId AND SAME roIdx1 → pair still present,
+      // so isItemStillInInventory returns true via the pair-match branch.
+      const table = document.createElement('table');
+      table.className = 'grid-table inv-table';
+      table.dataset.category = 'weapons';
+      const tbody = document.createElement('tbody');
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      const sel = document.createElement('select');
+      sel.className = 'inv-name';
+      sel.dataset.roIdx1 = '5';
+      const opt = document.createElement('option');
+      opt.value = String(VALID_WEAPON_ID);
+      sel.appendChild(opt);
+      sel.value = String(VALID_WEAPON_ID);
+      td.appendChild(sel);
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      table.appendChild(tbody);
+      document.body.appendChild(table);
+
+      refreshEquipmentForItems([{ itemId: String(VALID_WEAPON_ID), idx1: '5', action: 'delete' }]);
+
+      // Pair still in inventory → slot NOT cleared.
+      expect(span.dataset.id).toBe(String(VALID_WEAPON_ID));
+    });
+
+    test('restores "(none)" slot on undelete using formatUnknownItem for an unknown item', () => {
+      const span = document.createElement('span');
+      span.id = 'helmet'; // EQ_CATEGORY.helmet === 'armor'
+      span.dataset.id = String(0xffffffff); // currently "(none)"
+      span.dataset.origId = String(0xfffffffe); // original item is not in the DB
+      document.body.appendChild(span);
+
+      refreshEquipmentForItems([{ itemId: String(0xfffffffe), idx1: null, action: 'undelete' }]);
+
+      expect(span.dataset.id).toBe(String(0xfffffffe));
+      expect(span.textContent).toBe(formatUnknownItem(0xfffffffe));
     });
   });
 
@@ -708,6 +791,266 @@ describe('dom-helpers', () => {
       expect(EQ_CATEGORY.helmet).toBe('armor');
       expect(EQ_CATEGORY.ring1).toBe('rings');
       expect(EQ_CATEGORY.quickSlot1).toBe('goods');
+    });
+  });
+
+  // --- Branch-coverage additions ---
+
+  /**
+   * Create an equipment <span> with the given dataset attributes.
+   * @param {string} id
+   * @param {{ dataId?: unknown; origId?: unknown; roIdx1?: unknown }} [opts]
+   */
+  function makeEquipSpan(id, { dataId, origId, roIdx1 } = {}) {
+    const span = document.createElement('span');
+    span.id = id;
+    if (dataId !== undefined) span.dataset.id = String(dataId);
+    if (origId !== undefined) span.dataset.origId = String(origId);
+    if (roIdx1 !== undefined) span.dataset.roIdx1 = String(roIdx1);
+    document.body.appendChild(span);
+    return span;
+  }
+
+  /**
+   * Create an inventory table row carrying a `.inv-name` <select>.
+   * `itemId` selects the option/value; pass '' for a placeholder (empty) row.
+   * @param {{ itemId: unknown; roIdx1?: unknown; deleted?: boolean }} opts
+   */
+  function makeInvRow({ itemId, roIdx1, deleted = false }) {
+    const table = document.createElement('table');
+    table.className = 'grid-table inv-table';
+    table.dataset.category = 'weapons';
+    const tbody = document.createElement('tbody');
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    const sel = document.createElement('select');
+    sel.className = 'inv-name';
+    if (itemId !== undefined && itemId !== '') {
+      const opt = document.createElement('option');
+      opt.value = String(itemId);
+      sel.appendChild(opt);
+    }
+    sel.value = itemId === undefined ? '' : String(itemId);
+    if (roIdx1 !== undefined) sel.dataset.roIdx1 = String(roIdx1);
+    td.appendChild(sel);
+    tr.appendChild(td);
+    if (deleted) tr.dataset.deleted = 'true';
+    tbody.appendChild(tr);
+    table.appendChild(tbody);
+    document.body.appendChild(table);
+    return tr;
+  }
+
+  describe('getNum / makeCountCell branch coverage', () => {
+    test('getNum returns 0 for a non-numeric text input', () => {
+      // A text input keeps "abc" as-is (number inputs coerce it to ""), so
+      // parseFloat → NaN → the `isNaN ? 0 : n` consequent fires.
+      const inp = document.createElement('input');
+      inp.id = 'note';
+      inp.type = 'text';
+      inp.value = 'abc';
+      document.body.appendChild(inp);
+
+      expect(getNum('note')).toBe(0);
+    });
+
+    test('makeCountCell uses ammo limits when isAmmo=true', () => {
+      const td = makeCountCell('inv-count', 5, true, true);
+      const inp = td.querySelector('input');
+      expect(inp.min).toBe(String(COUNT_LIMITS.ammo.min));
+      expect(inp.max).toBe(String(COUNT_LIMITS.ammo.max));
+    });
+
+    test('makeCountCell uses deposit limits for a dep-* class', () => {
+      const td = makeCountCell('dep-count', 5, true);
+      const inp = td.querySelector('input');
+      expect(inp.min).toBe(String(COUNT_LIMITS.deposit.min));
+      expect(inp.max).toBe(String(COUNT_LIMITS.deposit.max));
+    });
+  });
+
+  describe('refreshEquipmentDisplay (pending-coalesce branch)', () => {
+    beforeAll(() => jest.useFakeTimers());
+    afterAll(() => jest.useRealTimers());
+
+    test('a second call while one is pending clears the previous timer', () => {
+      makeEquipSpan('leftHand1', { dataId: VALID_WEAPON_ID, origId: VALID_WEAPON_ID });
+
+      // Two rapid calls — the second hits `if (_refreshTimer !== null) clearTimeout`.
+      refreshEquipmentDisplay();
+      expect(() => refreshEquipmentDisplay()).not.toThrow();
+      refreshEquipmentDisplay.flush();
+    });
+  });
+
+  describe('refreshEquipmentForItems delete — inventory scan branches', () => {
+    test('skips deleted rows and mismatched rows before clearing', () => {
+      makeEquipSpan('leftHand1', { dataId: VALID_WEAPON_ID, origId: VALID_WEAPON_ID });
+      // A deleted row carrying the item (skipped) and a row with a different item (skipped).
+      makeInvRow({ itemId: VALID_WEAPON_ID, deleted: true });
+      makeInvRow({ itemId: VALID_WEAPON_ID + 1 });
+
+      refreshEquipmentForItems([{ itemId: String(VALID_WEAPON_ID), idx1: null, action: 'delete' }]);
+
+      // No live row has the item → slot cleared.
+      expect(document.getElementById('leftHand1').dataset.id).toBe(String(0xffffffff));
+    });
+
+    test('idx1 pair mismatch means the row does not count as present', () => {
+      makeEquipSpan('leftHand1', { dataId: VALID_WEAPON_ID, origId: VALID_WEAPON_ID });
+      // Same item but a different instance index → pair mismatch, not counted.
+      makeInvRow({ itemId: VALID_WEAPON_ID, roIdx1: 9 });
+
+      refreshEquipmentForItems([{ itemId: String(VALID_WEAPON_ID), idx1: '5', action: 'delete' }]);
+
+      expect(document.getElementById('leftHand1').dataset.id).toBe(String(0xffffffff));
+    });
+  });
+
+  describe('refreshEquipmentForItems undelete — idx1 branches', () => {
+    test('does not restore when idx1 mismatches the slot origIdx1', () => {
+      makeEquipSpan('leftHand1', { dataId: 0xffffffff, origId: VALID_WEAPON_ID, roIdx1: 5 });
+
+      refreshEquipmentForItems([
+        { itemId: String(VALID_WEAPON_ID), idx1: '9', action: 'undelete' },
+      ]);
+
+      // idx1/origIdx1 mismatch → continue → slot stays "(none)".
+      expect(document.getElementById('leftHand1').dataset.id).toBe(String(0xffffffff));
+    });
+
+    test('restores by id when idx1 is null (no pair binding)', () => {
+      makeEquipSpan('leftHand1', { dataId: 0xffffffff, origId: VALID_WEAPON_ID });
+
+      refreshEquipmentForItems([
+        { itemId: String(VALID_WEAPON_ID), idx1: null, action: 'undelete' },
+      ]);
+
+      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+    });
+
+    test('restores when the slot has no origIdx1 but a matching origId', () => {
+      // Slot at "(none)" with an original item but no instance binding.
+      makeEquipSpan('leftHand1', { dataId: 0xffffffff, origId: VALID_WEAPON_ID });
+
+      refreshEquipmentForItems([
+        { itemId: String(VALID_WEAPON_ID), idx1: '5', action: 'undelete' },
+      ]);
+
+      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+    });
+  });
+
+  describe('full refresh — inventory scan and slot pair branches', () => {
+    beforeAll(() => jest.useFakeTimers());
+    afterAll(() => jest.useRealTimers());
+
+    test('scan skips deleted rows, empty-select rows, and records idx1 pairs', () => {
+      makeEquipSpan('leftHand1', { dataId: VALID_WEAPON_ID, origId: VALID_WEAPON_ID });
+      // deleted row (skipped), placeholder row with empty value (skipped),
+      // and a live row carrying the item with an instance index.
+      makeInvRow({ itemId: VALID_WEAPON_ID, deleted: true });
+      makeInvRow({ itemId: '' });
+      makeInvRow({ itemId: VALID_WEAPON_ID, roIdx1: 3 });
+
+      refreshEquipmentDisplay();
+      refreshEquipmentDisplay.flush();
+
+      // Item still present → slot kept.
+      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+    });
+
+    test('slot with curIdx1 is checked via the pair lookup (kept)', () => {
+      makeEquipSpan('leftHand1', { dataId: VALID_WEAPON_ID, origId: VALID_WEAPON_ID, roIdx1: 3 });
+      makeInvRow({ itemId: VALID_WEAPON_ID, roIdx1: 3 });
+
+      refreshEquipmentDisplay();
+      refreshEquipmentDisplay.flush();
+
+      // Pair still in inventory → slot kept via the pairKey branch.
+      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+    });
+
+    test('"(none)" slot restores via the orig pair lookup', () => {
+      makeEquipSpan('leftHand1', { dataId: 0xffffffff, origId: VALID_WEAPON_ID, roIdx1: 3 });
+      makeInvRow({ itemId: VALID_WEAPON_ID, roIdx1: 3 });
+
+      refreshEquipmentDisplay();
+      refreshEquipmentDisplay.flush();
+
+      // Original pair returned → slot restored.
+      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+    });
+
+    test('"(none)" slot with no restorable original stays "(none)"', () => {
+      // origId is itself "(none)" → restore condition is false.
+      makeEquipSpan('leftHand1', { dataId: 0xffffffff, origId: 0xffffffff });
+      makeInvRow({ itemId: VALID_WEAPON_ID });
+
+      refreshEquipmentDisplay();
+      refreshEquipmentDisplay.flush();
+
+      expect(document.getElementById('leftHand1').dataset.id).toBe(String(0xffffffff));
+    });
+  });
+
+  describe('setupEquipmentSync — guard and match branches', () => {
+    test('ignores change events from non-select elements', () => {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      document.body.appendChild(inp);
+
+      setupEquipmentSync();
+
+      expect(() => inp.dispatchEvent(new Event('change', { bubbles: true }))).not.toThrow();
+    });
+
+    test('returns early when the changed select has no prevId', () => {
+      makeEquipSpan('leftHand1', { dataId: VALID_WEAPON_ID, origId: VALID_WEAPON_ID, roIdx1: 0 });
+
+      const sel = document.createElement('select');
+      sel.className = 'inv-name';
+      sel.dataset.roIdx1 = '0';
+      const opt1 = document.createElement('option');
+      opt1.value = String(VALID_WEAPON_ID);
+      const opt2 = document.createElement('option');
+      opt2.value = String(VALID_WEAPON_ID + 1);
+      sel.appendChild(opt1);
+      sel.appendChild(opt2);
+      document.body.appendChild(sel);
+
+      setupEquipmentSync();
+
+      // No prevId → oldId '' → early return; span unchanged.
+      sel.value = String(VALID_WEAPON_ID + 1);
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+
+      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+    });
+
+    test('does not update a slot whose idx1 does not match', () => {
+      makeEquipSpan('leftHand1', { dataId: VALID_WEAPON_ID, origId: VALID_WEAPON_ID, roIdx1: 0 });
+
+      const sel = document.createElement('select');
+      sel.className = 'inv-name';
+      sel.dataset.prevId = String(VALID_WEAPON_ID);
+      sel.dataset.roIdx1 = '1'; // different instance → no match
+      const opt1 = document.createElement('option');
+      opt1.value = String(VALID_WEAPON_ID);
+      const opt2 = document.createElement('option');
+      opt2.value = String(VALID_WEAPON_ID + 1);
+      sel.appendChild(opt1);
+      sel.appendChild(opt2);
+      sel.value = String(VALID_WEAPON_ID);
+      document.body.appendChild(sel);
+
+      setupEquipmentSync();
+
+      sel.value = String(VALID_WEAPON_ID + 1);
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+
+      // idx1 mismatch → match branch false → span unchanged.
+      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
     });
   });
 });
