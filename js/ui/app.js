@@ -863,11 +863,7 @@ async function ensureDirHandle() {
   try {
     const { dirHandle, files } = await openDirectoryViaFSAccess();
     // Verify the folder matches by comparing the directory name
-    if (
-      state.dirName &&
-      dirHandle.name &&
-      dirHandle.name !== state.dirName
-    ) {
+    if (state.dirName && dirHandle.name && dirHandle.name !== state.dirName) {
       setStatus(
         `Folder mismatch: selected "${dirHandle.name}" but the loaded save is "${state.dirName}". Save cancelled.`,
       );

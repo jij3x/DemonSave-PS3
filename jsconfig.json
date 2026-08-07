@@ -21,12 +21,12 @@
     "js/lib/tauri-bridge.js",
     "js/ui/**/*",
     "tests/**/*",
-    "tools/**/*"
+    "tools/**/*",
+    "rpcs3-mcp-server/src/**/*.js"
   ],
   "exclude": [
     "node_modules",
     "src-tauri",
-    "rpcs3-mcp-server",
     "integration-tests"
   ]
 }

@@ -13,7 +13,6 @@ coverage/
 
 # Separate projects
 src-tauri/
-rpcs3-mcp-server/
 
 # Generated files
 package-lock.json

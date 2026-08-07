@@ -12,7 +12,14 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { GdbClient, resolveRegId, getRegSize, bufToHex, hexToBuf, paddedHexToBigInt, bigIntToPaddedHex } from './gdb-client.js';
+import {
+  GdbClient,
+  resolveRegId,
+  getRegSize,
+  hexToBuf,
+  paddedHexToBigInt,
+  bigIntToPaddedHex,
+} from './gdb-client.js';
 
 // Global GDB client instance - persists across tool calls
 let gdb = null;
@@ -34,7 +41,9 @@ async function getClient(host, port) {
 /** Format a tool result as MCP content */
 function result(text, isError = false) {
   return {
-    content: [{ type: 'text', text: typeof text === 'string' ? text : JSON.stringify(text, null, 2) }],
+    content: [
+      { type: 'text', text: typeof text === 'string' ? text : JSON.stringify(text, null, 2) },
+    ],
     isError,
   };
 }
@@ -54,9 +63,24 @@ const server = new McpServer({
   version: '1.0.0',
 });
 
+/**
+ * Register an MCP tool. Wraps server.tool() because the SDK's overloads cannot infer the
+ * zod-v4 `Args` generic when checking plain JS (checkJs), which would otherwise raise TS2769
+ * on every registration. Schema/handler are intentionally loosely typed here.
+ *
+ * @param {string} name
+ * @param {string} description
+ * @param {Record<string, any>} schema
+ * @param {(args: any, extra: any) => unknown} handler
+ */
+function registerMcpTool(name, description, schema, handler) {
+  // @ts-expect-error SDK tool() overloads don't infer zod-v4 Args under checkJs (TS2769)
+  server.tool(name, description, schema, handler);
+}
+
 // -------------------- Connection Management --------------------
 
-server.tool(
+registerMcpTool(
   'connect',
   'Connect to RPCS3 GDB server (default 127.0.0.1:2345). Must be called before other debug commands.',
   {
@@ -79,25 +103,20 @@ server.tool(
     } catch (e) {
       return result(`Failed to connect: ${e.message}`, true);
     }
-  }
+  },
 );
 
-server.tool(
-  'disconnect',
-  'Disconnect from RPCS3 GDB server.',
-  {},
-  async () => {
-    if (gdb) {
-      await gdb.disconnect();
-      gdb = null;
-    }
-    return result({ status: 'disconnected' });
+registerMcpTool('disconnect', 'Disconnect from RPCS3 GDB server.', {}, async () => {
+  if (gdb) {
+    await gdb.disconnect();
+    gdb = null;
   }
-);
+  return result({ status: 'disconnected' });
+});
 
 // -------------------- Status & Info --------------------
 
-server.tool(
+registerMcpTool(
   'get_stop_reason',
   'Get the reason the target stopped (GDB `?` command). Returns signal number (5=SIGTRAP/breakpoint).',
   {},
@@ -106,11 +125,13 @@ server.tool(
       const client = await getClient();
       const reason = await client.getStopReason();
       return result(reason);
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'query_supported',
   'Query GDB server supported features (qSupported).',
   {},
@@ -119,11 +140,13 @@ server.tool(
       const client = await getClient();
       const supported = await client.querySupported();
       return result(supported);
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'query_attached',
   'Query if attached to an existing process (qAttached). RPCS3 always returns 1.',
   {},
@@ -132,13 +155,15 @@ server.tool(
       const client = await getClient();
       const attached = await client.queryAttached();
       return result({ attached: attached });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
 // -------------------- Thread Management --------------------
 
-server.tool(
+registerMcpTool(
   'list_threads',
   'List all PPU thread IDs (qfThreadInfo). Returns hex thread IDs.',
   {},
@@ -146,12 +171,14 @@ server.tool(
     try {
       const client = await getClient();
       const threads = await client.getThreadList();
-      return result({ threads: threads.map(t => `0x${t.toString(16)}`), count: threads.length });
-    } catch (e) { return result(e.message, true); }
-  }
+      return result({ threads: threads.map((t) => `0x${t.toString(16)}`), count: threads.length });
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'get_current_thread',
   'Get the currently selected thread ID (qC).',
   {},
@@ -160,16 +187,22 @@ server.tool(
       const client = await getClient();
       const tid = await client.getCurrentThread();
       return result({ threadId: tid !== null ? `0x${tid.toString(16)}` : null });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'set_thread',
   'Set which thread to use for subsequent operations (H command). Use type "c" for continue/step ops, "g" for general (register/memory) ops. Use threadId -1 for all threads.',
   {
-    type: z.enum(['c', 'g']).describe('"c" for continue/step operations, "g" for general operations'),
-    threadId: z.union([z.string(), z.number(), z.literal(-1)]).describe('Thread ID (hex string like "0x123" or number, -1 for all threads)'),
+    type: z
+      .enum(['c', 'g'])
+      .describe('"c" for continue/step operations, "g" for general operations'),
+    threadId: z
+      .union([z.string(), z.number(), z.literal(-1)])
+      .describe('Thread ID (hex string like "0x123" or number, -1 for all threads)'),
   },
   async ({ type, threadId }) => {
     try {
@@ -184,13 +217,15 @@ server.tool(
       const client = await getClient();
       const resp = await client.setThread(type, tid);
       return result({ response: resp, threadId: tid === -1 ? 'ALL' : `0x${tid.toString(16)}` });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
 // -------------------- Execution Control --------------------
 
-server.tool(
+registerMcpTool(
   'continue',
   'Continue execution (vCont;c). Runs until a breakpoint is hit or an interrupt is received. This is a blocking call.',
   {},
@@ -198,12 +233,18 @@ server.tool(
     try {
       const client = await getClient();
       const result_ = await client.continue();
-      return result({ status: 'stopped', signal: result_.signal, signalName: result_.signal === 5 ? 'SIGTRAP' : `signal ${result_.signal}` });
-    } catch (e) { return result(e.message, true); }
-  }
+      return result({
+        status: 'stopped',
+        signal: result_.signal,
+        signalName: result_.signal === 5 ? 'SIGTRAP' : `signal ${result_.signal}`,
+      });
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'step',
   'Step one instruction (vCont;s / step into). Executes a single PPU instruction and stops.',
   {},
@@ -211,12 +252,18 @@ server.tool(
     try {
       const client = await getClient();
       const result_ = await client.step();
-      return result({ status: 'stopped', signal: result_.signal, signalName: result_.signal === 5 ? 'SIGTRAP' : `signal ${result_.signal}` });
-    } catch (e) { return result(e.message, true); }
-  }
+      return result({
+        status: 'stopped',
+        signal: result_.signal,
+        signalName: result_.signal === 5 ? 'SIGTRAP' : `signal ${result_.signal}`,
+      });
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'interrupt',
   'Send interrupt (0x03 / Ctrl-C) to break running emulation. Use this to pause a running game.',
   {},
@@ -225,11 +272,13 @@ server.tool(
       const client = await getClient();
       client.interrupt();
       return result({ status: 'interrupt_sent' });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'kill',
   'Kill the emulated process (k command). Gracefully shuts down emulation in RPCS3.',
   {},
@@ -238,11 +287,13 @@ server.tool(
       const client = await getClient();
       const resp = await client.kill();
       return result({ status: 'killed', response: resp });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'query_continue_support',
   'Query what vCont actions the server supports (vCont?).',
   {},
@@ -250,48 +301,66 @@ server.tool(
     try {
       const client = await getClient();
       const resp = await client.queryContinueSupport();
-      return result({ supported: resp, actions: resp.split(';').filter(a => a) });
-    } catch (e) { return result(e.message, true); }
-  }
+      return result({ supported: resp, actions: resp.split(';').filter((a) => a) });
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
 // -------------------- Breakpoints --------------------
 
-server.tool(
+registerMcpTool(
   'set_breakpoint',
   'Set a software breakpoint at an address (Z0 command). Address must be 4-byte aligned. PPU decoder must be set to Interpreter (not LLVM).',
   {
-    address: z.union([z.string(), z.number()]).describe('Breakpoint address (hex like "0x12345678" or decimal number)'),
+    address: z
+      .union([z.string(), z.number()])
+      .describe('Breakpoint address (hex like "0x12345678" or decimal number)'),
   },
   async ({ address }) => {
     try {
       const addr = parseAddr(address);
       const client = await getClient();
       const resp = await client.setBreakpoint(addr);
-      return result({ status: 'breakpoint_set', address: `0x${addr.toString(16)}`, response: resp });
-    } catch (e) { return result(e.message, true); }
-  }
+      return result({
+        status: 'breakpoint_set',
+        address: `0x${addr.toString(16)}`,
+        response: resp,
+      });
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'remove_breakpoint',
   'Remove a software breakpoint at an address (z0 command).',
   {
-    address: z.union([z.string(), z.number()]).describe('Breakpoint address (hex like "0x12345678" or decimal number)'),
+    address: z
+      .union([z.string(), z.number()])
+      .describe('Breakpoint address (hex like "0x12345678" or decimal number)'),
   },
   async ({ address }) => {
     try {
       const addr = parseAddr(address);
       const client = await getClient();
       const resp = await client.removeBreakpoint(addr);
-      return result({ status: 'breakpoint_removed', address: `0x${addr.toString(16)}`, response: resp });
-    } catch (e) { return result(e.message, true); }
-  }
+      return result({
+        status: 'breakpoint_removed',
+        address: `0x${addr.toString(16)}`,
+        response: resp,
+      });
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
 // -------------------- Register Access --------------------
 
-server.tool(
+registerMcpTool(
   'read_register',
   'Read a single PPU register by name or ID (p command). Names: r0-r31, f0-f31, pc, msr, cr, lr, ctr, xer, fpscr. Returns hex value.',
   {
@@ -306,18 +375,25 @@ server.tool(
         register: register,
         hex: hex,
         value: bigVal !== null ? bigVal.toString() : null,
-        address: (register.toLowerCase() === 'pc' || register.toLowerCase() === 'cia') && bigVal ? `0x${BigInt(bigVal).toString(16)}` : undefined,
+        address:
+          (register.toLowerCase() === 'pc' || register.toLowerCase() === 'cia') && bigVal
+            ? `0x${BigInt(bigVal).toString(16)}`
+            : undefined,
       });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'write_register',
   'Write a single PPU register by name or ID (P command). Value can be hex string or integer.',
   {
     register: z.string().describe('Register name (e.g. "r3", "pc", "lr") or numeric ID (0-70)'),
-    value: z.union([z.string(), z.number()]).describe('Value to write (hex string like "0x12345678" or integer)'),
+    value: z
+      .union([z.string(), z.number()])
+      .describe('Value to write (hex string like "0x12345678" or integer)'),
   },
   async ({ register, value }) => {
     try {
@@ -327,7 +403,11 @@ server.tool(
       if (typeof value === 'string' && (value.startsWith('0x') || value.startsWith('0X'))) {
         const bigVal = BigInt(value);
         hexVal = bigIntToPaddedHex(bigVal, size);
-      } else if (typeof value === 'string' && /^[0-9a-fA-F]+$/.test(value) && value.length === size * 2) {
+      } else if (
+        typeof value === 'string' &&
+        /^[0-9a-fA-F]+$/.test(value) &&
+        value.length === size * 2
+      ) {
         hexVal = value;
       } else {
         const bigVal = BigInt(value);
@@ -336,11 +416,13 @@ server.tool(
       const client = await getClient();
       const resp = await client.writeRegister(register, hexVal);
       return result({ status: 'ok', register: register, value: hexVal, response: resp });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'read_all_registers',
   'Read all 71 PPU registers at once (g command). Returns GPR0-31, FPR0-31, PC, MSR, CR, LR, CTR, XER, FPSCR.',
   {},
@@ -349,11 +431,13 @@ server.tool(
       const client = await getClient();
       const regs = await client.readAllRegisters();
       return result(regs);
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'read_pc',
   'Convenience: Read the current Program Counter (PC/CIA). Returns the address of the next instruction to execute.',
   {},
@@ -363,17 +447,21 @@ server.tool(
       const hex = await client.readRegister('pc');
       const pc = paddedHexToBigInt(hex);
       return result({ pc: `0x${BigInt(pc).toString(16)}`, raw: hex });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
 // -------------------- Memory Access --------------------
 
-server.tool(
+registerMcpTool(
   'read_memory',
   'Read memory as hex (m command). Returns hex-encoded bytes from PS3 virtual memory.',
   {
-    address: z.union([z.string(), z.number()]).describe('Memory address (hex like "0x12345678" or decimal)'),
+    address: z
+      .union([z.string(), z.number()])
+      .describe('Memory address (hex like "0x12345678" or decimal)'),
     length: z.union([z.string(), z.number()]).describe('Number of bytes to read (hex or decimal)'),
   },
   async ({ address, length }) => {
@@ -383,11 +471,13 @@ server.tool(
       const client = await getClient();
       const hex = await client.readMemory(addr, len);
       return result({ address: `0x${addr.toString(16)}`, length: len, hex: hex });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'read_memory_ascii',
   'Read memory and decode as ASCII string.',
   {
@@ -404,11 +494,13 @@ server.tool(
       // Filter to printable ASCII
       const ascii = buf.toString('ascii').replace(/[^\x20-\x7E]/g, '.');
       return result({ address: `0x${addr.toString(16)}`, length: len, ascii: ascii, hex: hex });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'read_memory_u32',
   'Read a 32-bit big-endian unsigned integer from memory (PS3 is big-endian).',
   {
@@ -419,12 +511,18 @@ server.tool(
       const addr = parseAddr(address);
       const client = await getClient();
       const val = await client.readU32(addr);
-      return result({ address: `0x${addr.toString(16)}`, value: val, hex: `0x${val.toString(16).padStart(8, '0')}` });
-    } catch (e) { return result(e.message, true); }
-  }
+      return result({
+        address: `0x${addr.toString(16)}`,
+        value: val,
+        hex: `0x${val.toString(16).padStart(8, '0')}`,
+      });
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'read_memory_u64',
   'Read a 64-bit big-endian unsigned integer from memory.',
   {
@@ -435,12 +533,18 @@ server.tool(
       const addr = parseAddr(address);
       const client = await getClient();
       const val = await client.readU64(addr);
-      return result({ address: `0x${addr.toString(16)}`, value: val.toString(), hex: `0x${BigInt(val).toString(16).padStart(16, '0')}` });
-    } catch (e) { return result(e.message, true); }
-  }
+      return result({
+        address: `0x${addr.toString(16)}`,
+        value: val.toString(),
+        hex: `0x${BigInt(val).toString(16).padStart(16, '0')}`,
+      });
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'write_memory',
   'Write hex data to memory (M command). Data must be hex-encoded bytes.',
   {
@@ -452,17 +556,26 @@ server.tool(
       const addr = parseAddr(address);
       const client = await getClient();
       const resp = await client.writeMemory(addr, hexData);
-      return result({ status: 'ok', address: `0x${addr.toString(16)}`, bytesWritten: hexData.length / 2, response: resp });
-    } catch (e) { return result(e.message, true); }
-  }
+      return result({
+        status: 'ok',
+        address: `0x${addr.toString(16)}`,
+        bytesWritten: hexData.length / 2,
+        response: resp,
+      });
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
-server.tool(
+registerMcpTool(
   'write_memory_u32',
   'Write a 32-bit big-endian value to memory.',
   {
     address: z.union([z.string(), z.number()]).describe('Memory address'),
-    value: z.union([z.string(), z.number()]).describe('Value to write (hex string like "0x12345678" or integer)'),
+    value: z
+      .union([z.string(), z.number()])
+      .describe('Value to write (hex string like "0x12345678" or integer)'),
   },
   async ({ address, value }) => {
     try {
@@ -475,14 +588,20 @@ server.tool(
       }
       const client = await getClient();
       await client.writeU32(addr, val);
-      return result({ status: 'ok', address: `0x${addr.toString(16)}`, value: `0x${(val >>> 0).toString(16).padStart(8, '0')}` });
-    } catch (e) { return result(e.message, true); }
-  }
+      return result({
+        status: 'ok',
+        address: `0x${addr.toString(16)}`,
+        value: `0x${(val >>> 0).toString(16).padStart(8, '0')}`,
+      });
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
 // -------------------- Extended Mode --------------------
 
-server.tool(
+registerMcpTool(
   'extended_mode',
   'Switch to extended mode (! command). No-op in RPCS3, always returns OK.',
   {},
@@ -491,30 +610,36 @@ server.tool(
       const client = await getClient();
       const resp = await client.extendedMode();
       return result({ response: resp });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
 // -------------------- Raw Command --------------------
 
-server.tool(
+registerMcpTool(
   'send_raw_command',
   'Send a raw GDB RSP command. For advanced use when a specific command is not covered by other tools. The command string should NOT include the $ and # framing.',
   {
-    command: z.string().describe('Raw GDB command (e.g. "m1234,10" to read memory, "g" for all registers)'),
+    command: z
+      .string()
+      .describe('Raw GDB command (e.g. "m1234,10" to read memory, "g" for all registers)'),
   },
   async ({ command }) => {
     try {
       const client = await getClient();
       const resp = await client.sendCommand(command);
       return result({ command: command, response: resp });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
 // -------------------- Dump State --------------------
 
-server.tool(
+registerMcpTool(
   'dump_state',
   'Convenience: Dump current debug state - stop reason, current thread, PC, and all registers. Great for getting a snapshot of the current state.',
   {},
@@ -529,15 +654,17 @@ server.tool(
 
       return result({
         stopReason: reason,
-        threads: threads.map(t => `0x${t.toString(16)}`),
+        threads: threads.map((t) => `0x${t.toString(16)}`),
         threadCount: threads.length,
         currentThread: currentThread !== null ? `0x${currentThread.toString(16)}` : null,
         pc: regs.pc_int ? `0x${BigInt(regs.pc_int).toString(16)}` : regs.pc,
         lr: regs.lr_int ? `0x${BigInt(regs.lr_int).toString(16)}` : regs.lr,
         registers: regs,
       });
-    } catch (e) { return result(e.message, true); }
-  }
+    } catch (e) {
+      return result(e.message, true);
+    }
+  },
 );
 
 // -------------------- Start Server --------------------

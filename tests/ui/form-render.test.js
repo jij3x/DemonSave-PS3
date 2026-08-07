@@ -10,9 +10,8 @@
 
 export {};
 
-const { setupSelectTooltipSync, setupDurabilitySync } = await import(
-  '../../js/ui/form/form-render.js'
-);
+const { setupSelectTooltipSync, setupDurabilitySync } =
+  await import('../../js/ui/form/form-render.js');
 
 describe('setupSelectTooltipSync', () => {
   beforeEach(() => {
