@@ -238,6 +238,17 @@ describe('controls', () => {
       expect(data.names).toEqual([]);
     });
 
+    test('getWeaponTypeData excludes sub_type 0 (Experimental) items', () => {
+      // Inventory dropdowns must not list ghost/test entries.
+      for (const { typeId } of getWeaponTypes()) {
+        const { ids } = getWeaponTypeData(typeId);
+        for (const id of ids) {
+          const item = db.getItem('weapons', id);
+          expect(item.type?.[1]).not.toBe(0);
+        }
+      }
+    });
+
     test('getWeaponTypeDataForDeposit returns non-empty for known types', () => {
       for (const { typeId } of getWeaponTypes()) {
         const data = getWeaponTypeDataForDeposit(typeId);
