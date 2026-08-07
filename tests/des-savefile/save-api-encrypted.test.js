@@ -582,14 +582,17 @@ describe('writeSaveData: inPlace mode', () => {
 
 describe('writeSaveData: non-array failedSlots', () => {
   // null and undefined both default to [] — one test.each covers both.
-  test.each([null, undefined])('writeSaveData handles %p failedSlots gracefully', async (failedSlots) => {
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots } = await openSave(rawFiles);
+  test.each([null, undefined])(
+    'writeSaveData handles %p failedSlots gracefully',
+    async (failedSlots) => {
+      const buf = makeBlankSave();
+      const rawFiles = makeUnencryptedSaveFiles(buf);
+      const { slots } = await openSave(rawFiles);
 
-    const { filesToWrite } = await writeSaveData(slots, failedSlots, 0, '');
-    expect(filesToWrite.has('USER.DAT')).toBe(true);
-  });
+      const { filesToWrite } = await writeSaveData(slots, failedSlots, 0, '');
+      expect(filesToWrite.has('USER.DAT')).toBe(true);
+    },
+  );
 });
 
 describe('exportEncryptedSave: inPlace mode', () => {
@@ -751,7 +754,12 @@ describe('exportEncryptedSave: non-array failedSlots', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
-    const { filesToWrite } = await exportEncryptedSave(slots, failedSlots, profileNumber, accountId);
+    const { filesToWrite } = await exportEncryptedSave(
+      slots,
+      failedSlots,
+      profileNumber,
+      accountId,
+    );
     expect(filesToWrite.has('PARAM.PFD')).toBe(true);
   });
 });

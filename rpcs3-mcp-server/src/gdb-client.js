@@ -10,17 +10,74 @@ import net from 'net';
 // PPU register name → GDB register ID mapping (from GDB.cpp get_reg())
 export const REG_NAMES = {
   // General Purpose Registers (0-31)
-  r0: 0, r1: 1, r2: 2, r3: 3, r4: 4, r5: 5, r6: 6, r7: 7,
-  r8: 8, r9: 9, r10: 10, r11: 11, r12: 12, r13: 13, r14: 14, r15: 15,
-  r16: 16, r17: 17, r18: 18, r19: 19, r20: 20, r21: 21, r22: 22, r23: 23,
-  r24: 24, r25: 25, r26: 26, r27: 27, r28: 28, r29: 29, r30: 30, r31: 31,
+  r0: 0,
+  r1: 1,
+  r2: 2,
+  r3: 3,
+  r4: 4,
+  r5: 5,
+  r6: 6,
+  r7: 7,
+  r8: 8,
+  r9: 9,
+  r10: 10,
+  r11: 11,
+  r12: 12,
+  r13: 13,
+  r14: 14,
+  r15: 15,
+  r16: 16,
+  r17: 17,
+  r18: 18,
+  r19: 19,
+  r20: 20,
+  r21: 21,
+  r22: 22,
+  r23: 23,
+  r24: 24,
+  r25: 25,
+  r26: 26,
+  r27: 27,
+  r28: 28,
+  r29: 29,
+  r30: 30,
+  r31: 31,
   // Floating Point Registers (32-63)
-  f0: 32, f1: 33, f2: 34, f3: 35, f4: 36, f5: 37, f6: 38, f7: 39,
-  f8: 40, f9: 41, f10: 42, f11: 43, f12: 44, f13: 45, f14: 46, f15: 47,
-  f16: 48, f17: 49, f18: 50, f19: 51, f20: 52, f21: 53, f22: 54, f23: 55,
-  f24: 56, f25: 57, f26: 58, f27: 59, f28: 60, f29: 61, f30: 62, f31: 63,
+  f0: 32,
+  f1: 33,
+  f2: 34,
+  f3: 35,
+  f4: 36,
+  f5: 37,
+  f6: 38,
+  f7: 39,
+  f8: 40,
+  f9: 41,
+  f10: 42,
+  f11: 43,
+  f12: 44,
+  f13: 45,
+  f14: 46,
+  f15: 47,
+  f16: 48,
+  f17: 49,
+  f18: 50,
+  f19: 51,
+  f20: 52,
+  f21: 53,
+  f22: 54,
+  f23: 55,
+  f24: 56,
+  f25: 57,
+  f26: 58,
+  f27: 59,
+  f28: 60,
+  f29: 61,
+  f30: 62,
+  f31: 63,
   // Special registers (64-70)
-  pc: 64, cia: 64,
+  pc: 64,
+  cia: 64,
   msr: 65,
   cr: 66,
   lr: 67,
@@ -31,15 +88,78 @@ export const REG_NAMES = {
 
 export const REG_SIZES = {
   // 8-byte registers
-  r0:8,r1:8,r2:8,r3:8,r4:8,r5:8,r6:8,r7:8,r8:8,r9:8,r10:8,r11:8,r12:8,r13:8,
-  r14:8,r15:8,r16:8,r17:8,r18:8,r19:8,r20:8,r21:8,r22:8,r23:8,r24:8,r25:8,
-  r26:8,r27:8,r28:8,r29:8,r30:8,r31:8,
-  f0:8,f1:8,f2:8,f3:8,f4:8,f5:8,f6:8,f7:8,f8:8,f9:8,f10:8,f11:8,f12:8,f13:8,
-  f14:8,f15:8,f16:8,f17:8,f18:8,f19:8,f20:8,f21:8,f22:8,f23:8,f24:8,f25:8,
-  f26:8,f27:8,f28:8,f29:8,f30:8,f31:8,
-  pc:8, msr:8, lr:8, ctr:8,
+  r0: 8,
+  r1: 8,
+  r2: 8,
+  r3: 8,
+  r4: 8,
+  r5: 8,
+  r6: 8,
+  r7: 8,
+  r8: 8,
+  r9: 8,
+  r10: 8,
+  r11: 8,
+  r12: 8,
+  r13: 8,
+  r14: 8,
+  r15: 8,
+  r16: 8,
+  r17: 8,
+  r18: 8,
+  r19: 8,
+  r20: 8,
+  r21: 8,
+  r22: 8,
+  r23: 8,
+  r24: 8,
+  r25: 8,
+  r26: 8,
+  r27: 8,
+  r28: 8,
+  r29: 8,
+  r30: 8,
+  r31: 8,
+  f0: 8,
+  f1: 8,
+  f2: 8,
+  f3: 8,
+  f4: 8,
+  f5: 8,
+  f6: 8,
+  f7: 8,
+  f8: 8,
+  f9: 8,
+  f10: 8,
+  f11: 8,
+  f12: 8,
+  f13: 8,
+  f14: 8,
+  f15: 8,
+  f16: 8,
+  f17: 8,
+  f18: 8,
+  f19: 8,
+  f20: 8,
+  f21: 8,
+  f22: 8,
+  f23: 8,
+  f24: 8,
+  f25: 8,
+  f26: 8,
+  f27: 8,
+  f28: 8,
+  f29: 8,
+  f30: 8,
+  f31: 8,
+  pc: 8,
+  msr: 8,
+  lr: 8,
+  ctr: 8,
   // 4-byte registers
-  cr:4, xer:4, fpscr:4,
+  cr: 4,
+  xer: 4,
+  fpscr: 4,
 };
 
 /** Resolve register name or numeric ID to numeric GDB register ID */
@@ -108,18 +228,22 @@ export class GdbClient {
     this._interruptResolver = null;
   }
 
-  /** Connect to the GDB server */
+  /** Connect to the GDB server
+   * @returns {Promise<void>} */
   async connect() {
     if (this.connected) return;
 
     return new Promise((resolve, reject) => {
-      this.socket = net.createConnection({
-        host: this.host,
-        port: this.port,
-      }, () => {
-        this.connected = true;
-        resolve();
-      });
+      this.socket = net.createConnection(
+        {
+          host: this.host,
+          port: this.port,
+        },
+        () => {
+          this.connected = true;
+          resolve();
+        },
+      );
 
       this.socket.on('error', (err) => {
         if (!this.connected) {
@@ -319,7 +443,11 @@ export class GdbClient {
   async getThreadList() {
     const resp = await this.sendCommand('qfThreadInfo');
     if (resp.startsWith('m')) {
-      const ids = resp.slice(1, -1).split(',').filter(s => s).map(h => parseInt(h, 16));
+      const ids = resp
+        .slice(1, -1)
+        .split(',')
+        .filter((s) => s)
+        .map((h) => parseInt(h, 16));
       return ids;
     }
     return [];
@@ -477,7 +605,7 @@ export class GdbClient {
     // Total: 512 + 512 + 16 + 16 + 8 + 16 + 16 + 8 + 8 = 1112 hex chars
 
     for (let id = 0; id <= 70; id++) {
-      const size = (id === 66 || id === 69 || id === 70) ? 4 : 8;
+      const size = id === 66 || id === 69 || id === 70 ? 4 : 8;
       const hexLen = size * 2;
       const hexVal = hexStr.slice(offset, offset + hexLen);
       offset += hexLen;

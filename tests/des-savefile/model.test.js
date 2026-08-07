@@ -473,7 +473,13 @@ describe('mergeModel: branch coverage', () => {
       make: (sanitized) => {
         sanitized.weapons.push(
           /** @type {import('../../js/des-savefile/model.js').SanitizedInventoryItem} */ (
-            /** @type {unknown} */ ({ itemId: 0x99999999, count: 1, misc1: 0, misc2: 0x01000000, durability: 100 })
+            /** @type {unknown} */ ({
+              itemId: 0x99999999,
+              count: 1,
+              misc1: 0,
+              misc2: 0x01000000,
+              durability: 100,
+            })
           ),
         );
         return sanitized.weapons.length - 1;

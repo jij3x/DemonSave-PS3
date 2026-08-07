@@ -4,7 +4,11 @@
  * Tests for inventory-table.js — inventory table rendering and collection.
  */
 
-import { renderInventory, makeInventoryRow, collectInventory } from '../../js/ui/tables/inventory-table.js';
+import {
+  renderInventory,
+  makeInventoryRow,
+  collectInventory,
+} from '../../js/ui/tables/inventory-table.js';
 import { getCategoryData } from '../../js/ui/core/controls.js';
 
 const IDS = {
@@ -44,20 +48,37 @@ describe('inventory-table', () => {
         count: 1,
       });
       expect(tr.dataset.existing).toBe('true');
-      expect(/** @type {HTMLSelectElement} */ (tr.querySelector('.inv-name')).value).toBe(String(IDS.weapon));
+      expect(/** @type {HTMLSelectElement} */ (tr.querySelector('.inv-name')).value).toBe(
+        String(IDS.weapon),
+      );
       expect(/** @type {HTMLInputElement} */ (tr.querySelector('.inv-misc1hi')).value).toBe('1');
       expect(/** @type {HTMLInputElement} */ (tr.querySelector('.inv-misc1lo')).value).toBe('2');
-      expect(/** @type {HTMLInputElement} */ (tr.querySelector('.inv-durability')).value).toBe('50');
+      expect(/** @type {HTMLInputElement} */ (tr.querySelector('.inv-durability')).value).toBe(
+        '50',
+      );
       expect(tr.dataset.misc2).toBe('7');
     });
 
     test('defaults typeIdHint when only two args are passed', () => {
-      const tr = makeInventoryRow('armor', { itemId: IDS.armor, _ref: 'r', misc1: 0, durability: 10, count: 1 });
-      expect(/** @type {HTMLSelectElement} */ (tr.querySelector('.inv-name')).value).toBe(String(IDS.armor));
+      const tr = makeInventoryRow('armor', {
+        itemId: IDS.armor,
+        _ref: 'r',
+        misc1: 0,
+        durability: 10,
+        count: 1,
+      });
+      expect(/** @type {HTMLSelectElement} */ (tr.querySelector('.inv-name')).value).toBe(
+        String(IDS.armor),
+      );
     });
 
     test('new row (no _ref) is marked row-added with a placeholder', () => {
-      const tr = makeInventoryRow('armor', { itemId: IDS.armor, misc1: 0, durability: 10, count: 1 });
+      const tr = makeInventoryRow('armor', {
+        itemId: IDS.armor,
+        misc1: 0,
+        durability: 10,
+        count: 1,
+      });
       expect(tr.dataset.existing).toBe('false');
       expect(tr.classList.contains('row-added')).toBe(true);
       expect(tr.querySelector('.inv-name option[value=""]')).toBeTruthy();
@@ -70,7 +91,9 @@ describe('inventory-table', () => {
         null,
         new Map([['other', 9]]),
       );
-      expect(/** @type {HTMLSelectElement} */ (tr.querySelector('.inv-name')).dataset.roIdx1).toBeUndefined();
+      expect(
+        /** @type {HTMLSelectElement} */ (tr.querySelector('.inv-name')).dataset.roIdx1,
+      ).toBeUndefined();
     });
 
     test('invIdxByRef with the row _ref sets roIdx1', () => {
@@ -80,11 +103,19 @@ describe('inventory-table', () => {
         null,
         new Map([['r', 42]]),
       );
-      expect(/** @type {HTMLSelectElement} */ (tr.querySelector('.inv-name')).dataset.roIdx1).toBe('42');
+      expect(/** @type {HTMLSelectElement} */ (tr.querySelector('.inv-name')).dataset.roIdx1).toBe(
+        '42',
+      );
     });
 
     test('weapons/armor misc2 defaults to 0 when undefined', () => {
-      const tr = makeInventoryRow('armor', { itemId: IDS.armor, _ref: 'r', misc1: 0, durability: 10, count: 1 });
+      const tr = makeInventoryRow('armor', {
+        itemId: IDS.armor,
+        _ref: 'r',
+        misc1: 0,
+        durability: 10,
+        count: 1,
+      });
       expect(tr.dataset.misc2).toBe('0');
     });
 
@@ -105,7 +136,8 @@ describe('inventory-table', () => {
 
     test('unknown item id renders an Unknown option', () => {
       const tr = makeInventoryRow('rings', { itemId: 0x10ffff, _ref: 'r', misc1: 0, count: 1 });
-      const opt = /** @type {HTMLSelectElement} */ (tr.querySelector('.inv-name')).selectedOptions[0];
+      const opt = /** @type {HTMLSelectElement} */ (tr.querySelector('.inv-name'))
+        .selectedOptions[0];
       expect(opt.textContent).toMatch(/Unknown \(0x/);
     });
 
@@ -122,7 +154,9 @@ describe('inventory-table', () => {
         { itemId: IDS.weapon, _ref: 'r', misc1: 0x0102, durability: 50, count: 1 },
         1,
       );
-      expect(/** @type {HTMLSelectElement} */ (tr.querySelector('.inv-name')).value).toBe(String(IDS.weapon));
+      expect(/** @type {HTMLSelectElement} */ (tr.querySelector('.inv-name')).value).toBe(
+        String(IDS.weapon),
+      );
     });
 
     test('undefined itemId sets no prevId and adds no matched option', () => {
@@ -141,7 +175,9 @@ describe('inventory-table', () => {
   describe('renderInventory', () => {
     test('weapons: routes a type-1 item into its type table', () => {
       typedTable('weapons', { weaponType: 1 });
-      renderInventory('weapons', [{ itemId: IDS.weapon, _ref: 'r', misc1: 0, durability: 50, count: 1 }]);
+      renderInventory('weapons', [
+        { itemId: IDS.weapon, _ref: 'r', misc1: 0, durability: 50, count: 1 },
+      ]);
       const tb1 = document.querySelector('table.inv-table[data-weapon-type="1"] tbody');
       expect(tb1.querySelectorAll('tr').length).toBe(1);
     });
@@ -149,7 +185,9 @@ describe('inventory-table', () => {
     test('weapons: falls back to the type-1 table when the item type table is absent', () => {
       // Only type-1 table exists; item is a shield (type 2) → its table is missing.
       typedTable('weapons', { weaponType: 1 });
-      renderInventory('weapons', [{ itemId: IDS.shield, _ref: 'r', misc1: 0, durability: 50, count: 1 }]);
+      renderInventory('weapons', [
+        { itemId: IDS.shield, _ref: 'r', misc1: 0, durability: 50, count: 1 },
+      ]);
       const tb1 = document.querySelector('table.inv-table[data-weapon-type="1"] tbody');
       expect(tb1.querySelectorAll('tr').length).toBe(1);
     });
@@ -168,7 +206,9 @@ describe('inventory-table', () => {
     });
 
     test('weapons: drops the record when neither its type table nor the type-1 fallback exist', () => {
-      renderInventory('weapons', [{ itemId: IDS.shield, _ref: 'r', misc1: 0, durability: 50, count: 1 }]);
+      renderInventory('weapons', [
+        { itemId: IDS.shield, _ref: 'r', misc1: 0, durability: 50, count: 1 },
+      ]);
       expect(document.querySelectorAll('tr').length).toBe(0);
     });
 
@@ -180,7 +220,9 @@ describe('inventory-table', () => {
 
     test('armor: is a no-op when the category table is absent', () => {
       expect(() =>
-        renderInventory('armor', [{ itemId: IDS.armor, _ref: 'r', misc1: 0, durability: 10, count: 1 }]),
+        renderInventory('armor', [
+          { itemId: IDS.armor, _ref: 'r', misc1: 0, durability: 10, count: 1 },
+        ]),
       ).not.toThrow();
       expect(document.querySelectorAll('tr').length).toBe(0);
     });
@@ -189,7 +231,9 @@ describe('inventory-table', () => {
       typedTable('armor');
       const tbody = document.querySelector('table.inv-table[data-category="armor"] tbody');
       tbody.appendChild(document.createElement('tr'));
-      renderInventory('armor', [{ itemId: IDS.armor, _ref: 'r', misc1: 0, durability: 10, count: 1 }]);
+      renderInventory('armor', [
+        { itemId: IDS.armor, _ref: 'r', misc1: 0, durability: 10, count: 1 },
+      ]);
       expect(tbody.querySelectorAll('tr').length).toBe(1);
     });
   });
@@ -203,7 +247,14 @@ describe('inventory-table', () => {
       typedTable('armor');
       const tbody = document.querySelector('table.inv-table[data-category="armor"] tbody');
       tbody.appendChild(
-        makeInventoryRow('armor', { itemId: IDS.armor, _ref: 'r', misc1: 0x0102, misc2: 4, durability: 60, count: 1 }),
+        makeInventoryRow('armor', {
+          itemId: IDS.armor,
+          _ref: 'r',
+          misc1: 0x0102,
+          misc2: 4,
+          durability: 60,
+          count: 1,
+        }),
       );
       const [rec] = collectInventory('armor');
       expect(rec.itemId).toBe(IDS.armor);
@@ -239,8 +290,20 @@ describe('inventory-table', () => {
     test('skips soft-deleted rows', () => {
       typedTable('armor');
       const tbody = document.querySelector('table.inv-table[data-category="armor"] tbody');
-      const live = makeInventoryRow('armor', { itemId: IDS.armor, _ref: 'r', misc1: 0, durability: 10, count: 1 });
-      const dead = makeInventoryRow('armor', { itemId: IDS.armor, _ref: 'r2', misc1: 0, durability: 10, count: 1 });
+      const live = makeInventoryRow('armor', {
+        itemId: IDS.armor,
+        _ref: 'r',
+        misc1: 0,
+        durability: 10,
+        count: 1,
+      });
+      const dead = makeInventoryRow('armor', {
+        itemId: IDS.armor,
+        _ref: 'r2',
+        misc1: 0,
+        durability: 10,
+        count: 1,
+      });
       dead.dataset.deleted = 'true';
       tbody.appendChild(live);
       tbody.appendChild(dead);

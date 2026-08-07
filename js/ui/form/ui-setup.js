@@ -226,12 +226,7 @@ export function setupAddRowButtons() {
         durability,
         misc2: 0x01000000,
       };
-      const newTr = makeInventoryRow(
-        category,
-        rec,
-        typeId,
-        undefined,
-      );
+      const newTr = makeInventoryRow(category, rec, typeId, undefined);
       tbody.appendChild(newTr);
       // onRowAdded deferred until user selects an item (change listener)
       scrollTableBodyToBottom(/** @type {HTMLElement} */ (tbody));

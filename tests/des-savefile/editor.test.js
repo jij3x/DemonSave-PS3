@@ -747,7 +747,12 @@ describe('writer: val() edge cases', () => {
     { label: 'empty string', field: 'souls', value: '   ', match: /empty numeric string/ },
     { label: 'NaN number', field: 'vit', value: NaN, match: /NaN or Infinity/ },
     { label: 'Infinity number', field: 'souls', value: Infinity, match: /NaN or Infinity/ },
-    { label: 'undefined value', field: 'souls', value: undefined, match: /expected number or string/ },
+    {
+      label: 'undefined value',
+      field: 'souls',
+      value: undefined,
+      match: /expected number or string/,
+    },
     { label: 'null value', field: 'vit', value: null, match: /expected number or string/ },
   ])('val() throws on $label', ({ field, value, match }) => {
     let buf = makeBlankSave();
