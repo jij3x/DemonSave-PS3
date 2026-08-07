@@ -488,5 +488,42 @@ describe('tooltips', () => {
       const topValue = parseInt(tip.style.top, 10);
       expect(topValue).toBeGreaterThanOrEqual(12);
     });
+
+    test('places tooltip above and clamps to app top when there is little room below', () => {
+      const app = document.createElement('div');
+      app.id = 'app';
+      document.body.appendChild(app);
+
+      const el = document.createElement('button');
+      el.setAttribute('data-tooltip', 'Flip above');
+      // spaceAbove (100) > spaceBelow (90), and spaceBelow (90) < tipH+GAP (308)
+      // → forces the "place above" branch (not place-below).
+      Object.defineProperty(el, 'getBoundingClientRect', {
+        value: () => ({ left: 100, top: 100, right: 200, bottom: 110, width: 100, height: 10 }),
+        configurable: true,
+      });
+      app.appendChild(el);
+
+      Object.defineProperty(app, 'getBoundingClientRect', {
+        value: () => ({ left: 0, top: 0, right: 1000, bottom: 200, width: 1000, height: 200 }),
+        configurable: true,
+      });
+
+      // Tall tooltip: place-above yields top = 100 - 300 - 8 = -208, which is
+      // below appRect.top + EDGE_PADDING → clamped to 12.
+      const tip = /** @type {HTMLElement} */ (document.querySelector('.custom-tooltip'));
+      Object.defineProperty(tip, 'offsetHeight', { value: 300, configurable: true });
+      Object.defineProperty(tip, 'getBoundingClientRect', {
+        value: () => ({ left: 0, top: 0, right: 200, bottom: 300, width: 200, height: 300 }),
+        configurable: true,
+      });
+
+      el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+      jest.advanceTimersByTime(500);
+
+      expect(tip.style.display).toBe('block');
+      // place-above clamp → top == appRect.top + EDGE_PADDING == 12
+      expect(parseInt(tip.style.top, 10)).toBe(12);
+    });
   });
 });

@@ -141,6 +141,18 @@ describe('modal — showAlert', () => {
     buttons[0].click();
     await promise;
   });
+
+  test('does not resolve twice (double-click safety)', async () => {
+    const promise = showAlert('Notice.');
+    const overlay = document.querySelector('.modal-overlay');
+    const okBtn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary'));
+
+    okBtn.click(); // first close → resolves + tears down
+    okBtn.click(); // second close → `if (resolved) return` guard (no throw)
+
+    await promise;
+    expect(document.querySelector('.modal-overlay')).toBeNull();
+  });
 });
 
 describe('modal — accessibility', () => {
@@ -240,6 +252,19 @@ describe('modal — focus trap', () => {
 
     // Enter resolves the confirm dialog
     await expect(promise).resolves.toBe(true);
+  });
+
+  test('trapFocus early-returns for non-Tab keys that onKey does not handle', async () => {
+    // A plain letter key: onKey (Enter/Escape only) ignores it without
+    // closing, so trapFocus runs and hits its `e.key !== "Tab"` early return.
+    const promise = showConfirm('Confirm?');
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'a' }));
+
+    // Nothing closed the dialog.
+    expect(document.querySelector('.modal-overlay')).not.toBeNull();
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    await promise;
   });
 });
 
@@ -341,6 +366,23 @@ describe('modal — focus restoration', () => {
     expect(document.activeElement).toBe(primaryBtn);
 
     primaryBtn.click();
+    await promise;
+  });
+
+  test('auto-focus is skipped (no crash) when the primary button is absent', async () => {
+    const promise = showAlert('No primary.');
+    const overlay = document.querySelector('.modal-overlay');
+    const dialog = overlay.querySelector('.modal');
+
+    // Remove the primary button BEFORE the rAF autofocus fires.
+    dialog.querySelector('.modal-btn-primary').remove();
+
+    // Flush the queued rAF callback — `if (primary)` is false; no crash.
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    expect(document.querySelector('.modal-overlay')).not.toBeNull();
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     await promise;
   });
 

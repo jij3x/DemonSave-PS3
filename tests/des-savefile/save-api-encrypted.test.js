@@ -262,6 +262,13 @@ describe('writeSaveData (encrypted → decrypted)', () => {
     expect(encOut1.has('PARAM.SFO')).toBe(true);
     expect(encOut1.has('USER.DAT')).toBe(true);
 
+    // Same-session multi-op integrity: a second op on the SAME session
+    // (write decrypted after export encrypted) must not corrupt the
+    // in-memory data. (Was a standalone test; folded in to avoid retesting.)
+    const { filesToWrite: sameSessDec } = await writeSaveData(slots1, [], profile1, '');
+    expect(sameSessDec.has('USER.DAT')).toBe(true);
+    expect(readSave(sameSessDec.get('USER.DAT')).vit).toBe(60);
+
     // Step 3: Load the encrypted save produced in step 2
     rawFiles = new Map();
     for (const [name, bytes] of encOut1) {
@@ -294,29 +301,6 @@ describe('writeSaveData (encrypted → decrypted)', () => {
     expect(slots3.length).toBeGreaterThan(0);
     expect(slots3[0].model.vit).toBe(70);
     expect(slots3[0].model.souls).toBe(5000);
-  });
-
-  // Multiple operations on the same session must not corrupt the in-memory
-  // file data.
-  test('multiple saves from same session preserve data integrity', async () => {
-    const buf = makeBlankSave();
-    wInt32BE(buf, O.VIT, 30);
-    const rawFiles = makeEncryptedSaveFiles(buf);
-
-    const { slots, profileNumber, accountId } = await openSave(rawFiles);
-
-    // First operation: export encrypted
-    const { filesToWrite: encOut } = await exportEncryptedSave(slots, [], profileNumber, accountId);
-    expect(encOut.has('USER.DAT')).toBe(true);
-
-    // Second operation on the SAME session: write decrypted
-    const { filesToWrite: decOut } = await writeSaveData(slots, [], profileNumber, accountId);
-    expect(decOut.has('USER.DAT')).toBe(true);
-
-    // The decrypted output must be valid, parseable data
-    const userBytes = decOut.get('USER.DAT');
-    const result = readSave(userBytes);
-    expect(result.vit).toBe(30);
   });
 });
 
@@ -597,22 +581,13 @@ describe('writeSaveData: inPlace mode', () => {
 });
 
 describe('writeSaveData: non-array failedSlots', () => {
-  test('writeSaveData handles null failedSlots gracefully', async () => {
+  // null and undefined both default to [] — one test.each covers both.
+  test.each([null, undefined])('writeSaveData handles %p failedSlots gracefully', async (failedSlots) => {
     const buf = makeBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots } = await openSave(rawFiles);
 
-    // Pass null instead of array — should default to []
-    const { filesToWrite } = await writeSaveData(slots, null, 0, '');
-    expect(filesToWrite.has('USER.DAT')).toBe(true);
-  });
-
-  test('writeSaveData handles undefined failedSlots gracefully', async () => {
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots } = await openSave(rawFiles);
-
-    const { filesToWrite } = await writeSaveData(slots, undefined, 0, '');
+    const { filesToWrite } = await writeSaveData(slots, failedSlots, 0, '');
     expect(filesToWrite.has('USER.DAT')).toBe(true);
   });
 });
@@ -770,21 +745,13 @@ describe('exportEncryptedSave: sfoBytes + accountId', () => {
 
 // exportEncryptedSave: non-array failedSlots → default to [] (BRDA 695).
 describe('exportEncryptedSave: non-array failedSlots', () => {
-  test('null failedSlots defaults to empty array', async () => {
+  // null and undefined both default to [] — one test.each covers both.
+  test.each([null, undefined])('%p failedSlots defaults to empty array', async (failedSlots) => {
     const buf = makeBlankSave();
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
-    const { filesToWrite } = await exportEncryptedSave(slots, null, profileNumber, accountId);
-    expect(filesToWrite.has('PARAM.PFD')).toBe(true);
-  });
-
-  test('undefined failedSlots defaults to empty array', async () => {
-    const buf = makeBlankSave();
-    const rawFiles = makeUnencryptedSaveFiles(buf);
-    const { slots, profileNumber, accountId } = await openSave(rawFiles);
-
-    const { filesToWrite } = await exportEncryptedSave(slots, undefined, profileNumber, accountId);
+    const { filesToWrite } = await exportEncryptedSave(slots, failedSlots, profileNumber, accountId);
     expect(filesToWrite.has('PARAM.PFD')).toBe(true);
   });
 });

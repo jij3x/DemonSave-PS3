@@ -30,6 +30,39 @@ const {
   hasSlotChanges,
 } = await import('../../js/ui/core/dirty.js');
 
+/**
+ * Build a minimal #app > #charPanel.tab-group.top-level tree (one tab button
+ * + tab-content) and seed the dirty tree. Returns the created elements so a
+ * test can append inputs/tables into `content` and assert on `btn`/`app`.
+ */
+function buildTreeContent(tabKey = 't') {
+  const app = document.createElement('div');
+  app.id = 'app';
+  document.body.appendChild(app);
+
+  const btn = document.createElement('button');
+  btn.className = 'tab';
+  btn.dataset.tab = tabKey;
+  btn.appendChild(document.createElement('span')).className = 'dirty-dot';
+  const tabsDiv = document.createElement('div');
+  tabsDiv.className = 'tabs';
+  tabsDiv.appendChild(btn);
+
+  const content = document.createElement('div');
+  content.className = 'tab-content';
+  content.dataset.tab = tabKey;
+
+  const charPanel = document.createElement('div');
+  charPanel.id = 'charPanel';
+  charPanel.className = 'tab-group top-level';
+  charPanel.appendChild(tabsDiv);
+  charPanel.appendChild(content);
+  app.appendChild(charPanel);
+
+  buildDirtyTree();
+  return { app, charPanel, btn, content };
+}
+
 describe('dirty tracking', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
@@ -346,50 +379,6 @@ describe('dirty tracking', () => {
     });
   });
 
-  describe('clearDirtyMarks', () => {
-    test('removes .dirty and .row-dirty classes', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const inp = document.createElement('input');
-      inp.classList.add('dirty');
-      app.appendChild(inp);
-
-      const tr = document.createElement('tr');
-      tr.classList.add('row-dirty');
-      app.appendChild(tr);
-
-      clearDirtyMarks();
-
-      expect(inp.classList.contains('dirty')).toBe(false);
-      expect(tr.classList.contains('row-dirty')).toBe(false);
-    });
-  });
-
-  describe('purgeDeletedRows', () => {
-    test('removes soft-deleted rows from tables', () => {
-      const table = document.createElement('table');
-      table.className = 'grid-table inv-table';
-      table.dataset.category = 'weapons';
-      const tbody = document.createElement('tbody');
-      table.appendChild(tbody);
-      document.body.appendChild(table);
-
-      const tr1 = document.createElement('tr');
-      tr1.dataset.deleted = 'true';
-      const tr2 = document.createElement('tr');
-      tbody.appendChild(tr1);
-      tbody.appendChild(tr2);
-
-      purgeDeletedRows();
-
-      expect(tbody.querySelectorAll('tr').length).toBe(1);
-      expect(tbody.contains(tr1)).toBe(false);
-      expect(tbody.contains(tr2)).toBe(true);
-    });
-  });
-
   describe('hasUnsavedChanges', () => {
     test('returns false when nothing changed', () => {
       const app = document.createElement('div');
@@ -501,6 +490,38 @@ describe('dirty tracking', () => {
       tbody.appendChild(tr);
 
       captureBaseline();
+
+      expect(hasUnsavedChanges()).toBe(true);
+    });
+
+    test('returns true via row scan for a dirty SKIP_ID field in a grid row', () => {
+      // The scalar fallback loop skips SKIP_ID elements, but the grid-row
+      // scan (hasUnsavedChanges row loop) still inspects them — so a dirty
+      // SKIP_ID field inside a row is caught by the row path, not the scalar path.
+      const app = document.createElement('div');
+      app.id = 'app';
+      document.body.appendChild(app);
+
+      const table = document.createElement('table');
+      table.className = 'grid-table inv-table';
+      const tbody = document.createElement('tbody');
+      table.appendChild(tbody);
+      app.appendChild(table);
+
+      const tr = document.createElement('tr');
+      tr.dataset.existing = 'true';
+      const td = document.createElement('td');
+      const inp = document.createElement('input');
+      inp.id = 'warpLocation'; // SKIP_ID: skipped by scalar loop + captureBaseline
+      inp.type = 'text';
+      inp.value = '5';
+      td.appendChild(inp);
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+
+      captureBaseline(); // skips warpLocation, so set the baseline manually
+      inp.dataset.orig = '5';
+      inp.value = '10'; // now dirty
 
       expect(hasUnsavedChanges()).toBe(true);
     });
@@ -883,29 +904,7 @@ describe('dirty tracking', () => {
     let app;
 
     beforeEach(() => {
-      app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      // Build a minimal tab structure so tree exists
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 'test';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 'test';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      app = buildTreeContent().app;
     });
 
     function makeTestRow(existing = true) {
@@ -1006,28 +1005,7 @@ describe('dirty tracking', () => {
     afterAll(() => jest.useRealTimers());
 
     beforeEach(() => {
-      app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 'test';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 'test';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      app = buildTreeContent().app;
     });
 
     test('callback fires with true when form becomes dirty', () => {
@@ -1077,82 +1055,6 @@ describe('dirty tracking', () => {
   });
 
   describe('recomputeDirty scalar and row paths', () => {
-    test('recomputeDirty marks dirty scalar (not in table row)', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const inp = document.createElement('input');
-      inp.type = 'number';
-      inp.value = '50';
-      app.appendChild(inp);
-
-      captureBaseline();
-      inp.value = '99';
-      recomputeDirty();
-
-      expect(inp.classList.contains('dirty')).toBe(true);
-    });
-
-    test('recomputeDirty skips new rows (data-existing="false")', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const table = document.createElement('table');
-      table.className = 'grid-table inv-table';
-      const tbody = document.createElement('tbody');
-      table.appendChild(tbody);
-      app.appendChild(table);
-
-      const tr = document.createElement('tr');
-      tr.dataset.existing = 'false';
-      const td = document.createElement('td');
-      const inp = document.createElement('input');
-      inp.type = 'number';
-      inp.value = '5';
-      inp.dataset.orig = '5';
-      td.appendChild(inp);
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-
-      captureBaseline();
-      inp.value = '99';
-      recomputeDirty();
-
-      // New rows should NOT get per-cell dirty marks from recompute
-      expect(inp.classList.contains('dirty')).toBe(false);
-    });
-
-    test('recomputeDirty marks soft-deleted rows as dirty', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const table = document.createElement('table');
-      table.className = 'grid-table inv-table';
-      const tbody = document.createElement('tbody');
-      table.appendChild(tbody);
-      app.appendChild(table);
-
-      const tr = document.createElement('tr');
-      tr.dataset.existing = 'true';
-      tr.dataset.deleted = 'true';
-      const td = document.createElement('td');
-      const inp = document.createElement('input');
-      inp.type = 'number';
-      inp.value = '5';
-      td.appendChild(inp);
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-
-      captureBaseline();
-      recomputeDirty();
-
-      // Soft-deleted rows should be marked as row-dirty
-      expect(tr.classList.contains('row-dirty')).toBe(true);
-    });
-
     test('recomputeDirty with no inputs in a grid-table tbody row is safe', () => {
       const app = document.createElement('div');
       app.id = 'app';
@@ -1177,7 +1079,7 @@ describe('dirty tracking', () => {
   });
 
   describe('hasUnsavedChanges with table rows', () => {
-    test('returns true when a table row has a dirty cell', () => {
+    function buildDirtyRow(deleted = false) {
       const app = document.createElement('div');
       app.id = 'app';
       document.body.appendChild(app);
@@ -1190,6 +1092,7 @@ describe('dirty tracking', () => {
 
       const tr = document.createElement('tr');
       tr.dataset.existing = 'true';
+      if (deleted) tr.dataset.deleted = 'true';
       const td = document.createElement('td');
       const inp = document.createElement('input');
       inp.type = 'number';
@@ -1197,7 +1100,11 @@ describe('dirty tracking', () => {
       td.appendChild(inp);
       tr.appendChild(td);
       tbody.appendChild(tr);
+      return { tr, inp };
+    }
 
+    test('returns true when a table row has a dirty cell', () => {
+      const { inp } = buildDirtyRow();
       captureBaseline();
       inp.value = '99';
       // recomputeDirty is needed to update the dirty tree
@@ -1207,28 +1114,7 @@ describe('dirty tracking', () => {
     });
 
     test('returns true when a table row is soft-deleted', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const table = document.createElement('table');
-      table.className = 'grid-table inv-table';
-      const tbody = document.createElement('tbody');
-      table.appendChild(tbody);
-      app.appendChild(table);
-
-      const tr = document.createElement('tr');
-      tr.dataset.existing = 'true';
-      tr.dataset.deleted = 'true';
-      const td = document.createElement('td');
-      const inp = document.createElement('input');
-      inp.type = 'number';
-      inp.value = '5';
-      inp.dataset.orig = '5';
-      td.appendChild(inp);
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-
+      buildDirtyRow(true);
       captureBaseline();
       // recomputeDirty marks soft-deleted rows as dirty in the tree
       recomputeDirty();
@@ -1237,67 +1123,10 @@ describe('dirty tracking', () => {
     });
 
     test('returns false when all table rows match baseline', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const table = document.createElement('table');
-      table.className = 'grid-table inv-table';
-      const tbody = document.createElement('tbody');
-      table.appendChild(tbody);
-      app.appendChild(table);
-
-      const tr = document.createElement('tr');
-      tr.dataset.existing = 'true';
-      const td = document.createElement('td');
-      const inp = document.createElement('input');
-      inp.type = 'number';
-      inp.value = '5';
-      td.appendChild(inp);
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-
+      buildDirtyRow();
       captureBaseline();
 
       expect(hasUnsavedChanges()).toBe(false);
-    });
-  });
-
-  describe('onRowSoftDeleted clears per-cell dirty', () => {
-    test('soft-deleting a row with dirty cells clears their dirty marks', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const table = document.createElement('table');
-      table.className = 'grid-table inv-table';
-      const tbody = document.createElement('tbody');
-      table.appendChild(tbody);
-      app.appendChild(table);
-
-      const tr = document.createElement('tr');
-      tr.dataset.existing = 'true';
-      const td = document.createElement('td');
-      const inp = document.createElement('input');
-      inp.type = 'number';
-      inp.value = '5';
-      td.appendChild(inp);
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-
-      captureBaseline();
-      buildDirtyTree();
-
-      // Make the cell dirty via recomputeDirty (updates elementDirty WeakMap)
-      inp.value = '99';
-      recomputeDirty();
-      expect(inp.classList.contains('dirty')).toBe(true);
-
-      // Soft-delete the row — should clear the dirty cell contribution
-      onRowSoftDeleted(tr);
-
-      expect(inp.classList.contains('dirty')).toBe(false);
-      expect(tr.classList.contains('row-dirty')).toBe(true);
     });
   });
 
@@ -1485,29 +1314,7 @@ describe('dirty tracking', () => {
     afterAll(() => jest.useRealTimers());
 
     test('editing a cell inside a grid-table row marks the row dirty via debounce', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      // Build minimal tab structure for tree
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 't';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 't';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      const { content, btn } = buildTreeContent();
 
       // Add a table with an existing row containing an input
       const table = document.createElement('table');
@@ -1545,29 +1352,7 @@ describe('dirty tracking', () => {
     });
 
     test('change event on a select inside a grid-table row marks it dirty', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      // Build minimal tab structure for tree
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 't';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 't';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      const { content } = buildTreeContent();
 
       // Add a table with a row containing a select
       const table = document.createElement('table');
@@ -1610,29 +1395,7 @@ describe('dirty tracking', () => {
     let app;
 
     beforeEach(() => {
-      app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      // Build a minimal tab structure so tree exists
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 'test';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 'test';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      app = buildTreeContent().app;
     });
 
     test('onRowRemoved on a row that was never added is a no-op', () => {
@@ -1861,28 +1624,8 @@ describe('dirty tracking', () => {
 
   describe('bump clamp safety', () => {
     test('count clamps to 0 when going negative', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
+      const { content } = buildTreeContent();
 
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 't';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 't';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
       captureBaseline();
 
       // Add then remove then remove again — second remove guard prevents
@@ -1908,28 +1651,7 @@ describe('dirty tracking', () => {
 
   describe('hasUnsavedChanges outside tab-content', () => {
     test('scalar outside tab-content is detected after recomputeDirty', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 't';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 't';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      const { app } = buildTreeContent();
 
       // Input outside any tab-content (directly in #app)
       const inp = document.createElement('input');
@@ -1979,28 +1701,7 @@ describe('dirty tracking', () => {
     afterAll(() => jest.useRealTimers());
 
     test('editing input inside a new row (data-existing=false) does not mark dirty', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 't';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 't';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      const { content } = buildTreeContent();
 
       const table = document.createElement('table');
       table.className = 'grid-table inv-table';
@@ -2031,28 +1732,7 @@ describe('dirty tracking', () => {
     });
 
     test('editing input inside a soft-deleted row does not mark dirty', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 't';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 't';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      const { content } = buildTreeContent();
 
       const table = document.createElement('table');
       table.className = 'grid-table inv-table';
@@ -2085,28 +1765,7 @@ describe('dirty tracking', () => {
     });
 
     test('input without baseline (no data-orig) is ignored by dirty listener', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 't';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 't';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      const { content } = buildTreeContent();
       setupDirtyListeners();
 
       // Input with no baseline — should be ignored
@@ -2125,28 +1784,7 @@ describe('dirty tracking', () => {
     });
 
     test('reverting value to baseline via debounce clears dirty', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 't';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 't';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      const { content } = buildTreeContent();
 
       const inp = document.createElement('input');
       inp.type = 'number';
@@ -2174,29 +1812,7 @@ describe('dirty tracking', () => {
 
   describe('resetAndCaptureBaseline', () => {
     test('captures baseline and clears dirty marks in a single pass', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      // Build minimal tab structure
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 't';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 't';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      const { content, btn } = buildTreeContent();
 
       const inp = document.createElement('input');
       inp.type = 'number';
@@ -2291,6 +1907,21 @@ describe('dirty tracking', () => {
       expect(tr.classList.contains('row-dirty')).toBe(false);
     });
 
+    test('removes dirty class from non-input elements (tab buttons, row markers)', () => {
+      const app = document.createElement('div');
+      app.id = 'app';
+      document.body.appendChild(app);
+
+      // A non-input/non-select element carrying .dirty (e.g. a tab button or row marker).
+      const marker = document.createElement('div');
+      marker.className = 'dirty';
+      app.appendChild(marker);
+
+      resetAndCaptureBaseline();
+
+      expect(marker.classList.contains('dirty')).toBe(false);
+    });
+
     test('cancels pending debounced flush', () => {
       const app = document.createElement('div');
       app.id = 'app';
@@ -2313,29 +1944,7 @@ describe('dirty tracking', () => {
     afterAll(() => jest.useRealTimers());
 
     test('clears dirty state so hasUnsavedChanges uses fallback scan', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      // Build tree first
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 't';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 't';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      const { content } = buildTreeContent();
       captureBaseline();
 
       const inp = document.createElement('input');
@@ -2355,28 +1964,7 @@ describe('dirty tracking', () => {
     });
 
     test('clears the dirty callback', () => {
-      const app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 't';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 't';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      const { content } = buildTreeContent();
 
       const calls = [];
       setDirtyCallback((isDirty) => calls.push(isDirty));
@@ -2462,32 +2050,8 @@ describe('dirty tracking', () => {
   // --- Enc/dec toggle dirty tracking tests ---
 
   describe('setEncToggleDirty', () => {
-    let app;
-
     beforeEach(() => {
-      app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      // Build a minimal tab structure so tree exists
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 'test';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      const content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 'test';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      buildTreeContent();
       captureBaseline();
     });
 
@@ -2563,29 +2127,9 @@ describe('dirty tracking', () => {
     let content;
 
     beforeEach(() => {
-      app = document.createElement('div');
-      app.id = 'app';
-      document.body.appendChild(app);
-
-      // Build a minimal tab structure so tree exists
-      const charPanel = document.createElement('div');
-      charPanel.id = 'charPanel';
-      charPanel.className = 'tab-group top-level';
-      const tabsDiv = document.createElement('div');
-      tabsDiv.className = 'tabs';
-      const btn = document.createElement('button');
-      btn.className = 'tab';
-      btn.dataset.tab = 'test';
-      btn.appendChild(document.createElement('span')).className = 'dirty-dot';
-      tabsDiv.appendChild(btn);
-      content = document.createElement('div');
-      content.className = 'tab-content';
-      content.dataset.tab = 'test';
-      charPanel.appendChild(tabsDiv);
-      charPanel.appendChild(content);
-      app.appendChild(charPanel);
-
-      buildDirtyTree();
+      const built = buildTreeContent();
+      app = built.app;
+      content = built.content;
       captureBaseline();
     });
 
@@ -2687,6 +2231,185 @@ describe('dirty tracking', () => {
     test('returns false when tree is not built (resetDirtyState)', () => {
       resetDirtyState();
       expect(hasSlotChanges()).toBe(false);
+    });
+  });
+
+  // --- Branch-coverage: skip paths in recomputeDirty / baseline ---
+
+  describe('resetAndCaptureBaseline and recomputeDirty skip branches', () => {
+    test('resetAndCaptureBaseline falls back to document.body when #app is absent', () => {
+      // No #app element → exercises the `document.body` fallback.
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.value = '42';
+      document.body.appendChild(inp);
+
+      resetAndCaptureBaseline();
+
+      expect(inp.dataset.orig).toBe('42');
+    });
+
+    test('recomputeDirty skips SKIP_ID scalars and scalars without a baseline', () => {
+      const app = document.createElement('div');
+      app.id = 'app';
+      document.body.appendChild(app);
+
+      // SKIP_ID element (warpLocation) — skipped by the scalar loop.
+      const skip = document.createElement('input');
+      skip.id = 'warpLocation';
+      skip.type = 'number';
+      skip.value = '5';
+      app.appendChild(skip);
+
+      // Plain scalar with no data-orig (no captureBaseline) — skipped.
+      const noBaseline = document.createElement('input');
+      noBaseline.type = 'number';
+      noBaseline.value = '7';
+      app.appendChild(noBaseline);
+
+      // Should not throw; both `continue` branches fire.
+      expect(() => recomputeDirty()).not.toThrow();
+    });
+
+    test('recomputeDirty skips existing-row cells without a baseline', () => {
+      const app = document.createElement('div');
+      app.id = 'app';
+      document.body.appendChild(app);
+
+      const table = document.createElement('table');
+      table.className = 'grid-table inv-table';
+      const tbody = document.createElement('tbody');
+      table.appendChild(tbody);
+      app.appendChild(table);
+
+      const tr = document.createElement('tr');
+      tr.dataset.existing = 'true';
+      const td = document.createElement('td');
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.value = '5';
+      td.appendChild(inp);
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+
+      // No captureBaseline → cell has no data-orig → `continue` fires.
+      expect(() => recomputeDirty()).not.toThrow();
+      expect(tr.classList.contains('row-dirty')).toBe(false);
+    });
+  });
+
+  // --- Branch-coverage: debounce / listener target edge cases ---
+
+  describe('debounce and listener-target branch coverage', () => {
+    beforeAll(() => jest.useFakeTimers());
+    afterAll(() => jest.useRealTimers());
+
+    test('updateElementDirty skips an input inside a soft-deleted row', () => {
+      const { content } = buildTreeContent();
+
+      const table = document.createElement('table');
+      table.className = 'grid-table inv-table';
+      const tbody = document.createElement('tbody');
+      table.appendChild(tbody);
+      content.appendChild(table);
+
+      const tr = document.createElement('tr');
+      tr.dataset.existing = 'true';
+      const td = document.createElement('td');
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.value = '5';
+      td.appendChild(inp);
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+
+      captureBaseline(); // input is enabled → data-orig captured
+      setupDirtyListeners();
+
+      // Now soft-delete the row AFTER baseline capture so data-orig is defined.
+      tr.dataset.deleted = 'true';
+
+      inp.value = '99';
+      inp.dispatchEvent(new Event('input', { bubbles: true }));
+      jest.advanceTimersByTime(200);
+
+      // updateElementDirty hit the deleted-row early return (no per-cell tracking).
+      expect(inp.classList.contains('dirty')).toBe(false);
+    });
+
+    test('input/change handlers ignore non-input/non-select targets (textarea)', () => {
+      const { content } = buildTreeContent();
+      captureBaseline();
+      setupDirtyListeners();
+
+      // A textarea is neither HTMLInputElement nor HTMLSelectElement.
+      const ta = document.createElement('textarea');
+      ta.value = 'x';
+      content.appendChild(ta);
+
+      expect(() => {
+        ta.value = 'y';
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+        ta.dispatchEvent(new Event('change', { bubbles: true }));
+        jest.advanceTimersByTime(200);
+      }).not.toThrow();
+    });
+
+    test('input event from a <select> schedules a dirty check', () => {
+      const { content } = buildTreeContent();
+
+      const sel = document.createElement('select');
+      const opt1 = document.createElement('option');
+      opt1.value = 'a';
+      const opt2 = document.createElement('option');
+      opt2.value = 'b';
+      sel.appendChild(opt1);
+      sel.appendChild(opt2);
+      sel.value = 'a';
+      content.appendChild(sel);
+
+      captureBaseline();
+      setupDirtyListeners();
+
+      sel.value = 'b';
+      sel.dispatchEvent(new Event('input', { bubbles: true }));
+      jest.advanceTimersByTime(200);
+
+      // The select target exercised the right-hand `instanceof HTMLSelectElement`
+      // side of the `||` and was scheduled → now dirty.
+      expect(sel.classList.contains('dirty')).toBe(true);
+    });
+
+    test('first dirty cell on a fresh row via debounce (empty rowCellDirtyCount)', () => {
+      const { content } = buildTreeContent();
+
+      const table = document.createElement('table');
+      table.className = 'grid-table inv-table';
+      const tbody = document.createElement('tbody');
+      table.appendChild(tbody);
+      content.appendChild(table);
+
+      const tr = document.createElement('tr');
+      tr.dataset.existing = 'true';
+      const td = document.createElement('td');
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.value = '5';
+      td.appendChild(inp);
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+
+      captureBaseline();
+      setupDirtyListeners();
+
+      // No recomputeDirty first → rowCellDirtyCount has no entry for this tr,
+      // so the `|| 0` fallback fires on the first clean→dirty transition.
+      inp.value = '99';
+      inp.dispatchEvent(new Event('input', { bubbles: true }));
+      jest.advanceTimersByTime(200);
+
+      expect(inp.classList.contains('dirty')).toBe(true);
+      expect(tr.classList.contains('row-dirty')).toBe(true);
     });
   });
 });

@@ -19,10 +19,10 @@ const w = /** @type {Window & {
   showSaveFilePicker?: jest.MockedFunction<(opts: object) => Promise<any>>,
 }} */ (window);
 
-// Mock tauri-bridge — default to NOT Tauri
+// Mock tauri-bridge — default to NOT Tauri (toggleable per test via tauriModule.isTauri)
 jest.unstable_mockModule('../../js/lib/tauri-bridge.js', () => ({
   __esModule: true,
-  isTauri: () => false,
+  isTauri: jest.fn(),
   tauriOpenDirectory: jest.fn(),
   tauriWriteFiles: jest.fn(),
   tauriDeleteFiles: jest.fn(),
@@ -63,6 +63,14 @@ const {
   openDirectoryViaFSAccess,
 } = await import('../../js/ui/io.js');
 
+// Shared mock handle — toggled via jest.mocked(tauriModule.isTauri).mockReturnValue(...).
+// Browser mode is the default; reset between tests so a Tauri-mode test never leaks.
+const tauriModule = await import('../../js/lib/tauri-bridge.js');
+jest.mocked(tauriModule.isTauri).mockReturnValue(false);
+beforeEach(() => {
+  jest.mocked(tauriModule.isTauri).mockReturnValue(false);
+});
+
 // --- Capability detection ---
 describe('capability detection', () => {
   describe('canWriteInPlace', () => {
@@ -87,6 +95,12 @@ describe('capability detection', () => {
         writable: true,
       });
     });
+
+    test('returns true in Tauri without checking the File System Access API', () => {
+      jest.mocked(tauriModule.isTauri).mockReturnValue(true);
+      // No showDirectoryPicker / insecure context — Tauri short-circuits.
+      expect(canWriteInPlace()).toBe(true);
+    });
   });
 
   describe('canChooseSaveLocation', () => {
@@ -110,64 +124,62 @@ describe('capability detection', () => {
         writable: true,
       });
     });
+
+    test('returns true in Tauri without checking showSaveFilePicker', () => {
+      jest.mocked(tauriModule.isTauri).mockReturnValue(true);
+      expect(canChooseSaveLocation()).toBe(true);
+    });
   });
 });
 
 // --- readFilesFromDataTransfer — drag-and-drop folder reading ---
 describe('readFilesFromDataTransfer', () => {
   /**
-   * Build a mock DataTransferItemList simulating a dropped directory
-   * containing files.
+   * Build a FileSystemEntry-like mock from a node tree.
+   *
+   * File nodes: `{ name, content }`. Directory nodes: `{ name, isDirectory,
+   * children: [...] }` where children may themselves be files or nested
+   * directories (arbitrary depth). The directory reader mimics the real API
+   * by returning all children on the first readEntries() call and [] after.
    */
-  function makeMockItems(entries) {
-    return entries.map((entry) => {
-      if (entry.isDirectory) {
-        // readEntries must return empty on the second call (mimics real API)
-        let readOnce = false;
-        return {
-          webkitGetAsEntry: () => ({
-            isFile: false,
-            isDirectory: true,
-            name: entry.name,
-            createReader: () => ({
-              readEntries: (callback) => {
-                if (readOnce) {
-                  callback([]);
-                  return;
-                }
-                readOnce = true;
-                callback(
-                  entry.children?.map((c) => ({
-                    isFile: true,
-                    isDirectory: false,
-                    name: c.name,
-                    file: (cb) =>
-                      cb({
-                        name: c.name,
-                        size: c.content.length,
-                        arrayBuffer: () => Promise.resolve(c.content.buffer),
-                      }),
-                  })) || [],
-                );
-              },
-            }),
-          }),
-        };
-      }
+  function buildEntry(node) {
+    if (node.isDirectory) {
+      let readOnce = false;
       return {
-        webkitGetAsEntry: () => ({
-          isFile: true,
-          isDirectory: false,
-          name: entry.name,
-          file: (cb) =>
-            cb({
-              name: entry.name,
-              size: entry.content.length,
-              arrayBuffer: () => Promise.resolve(entry.content.buffer),
-            }),
+        isFile: false,
+        isDirectory: true,
+        name: node.name,
+        createReader: () => ({
+          readEntries: (callback) => {
+            if (readOnce) {
+              callback([]);
+              return;
+            }
+            readOnce = true;
+            callback((node.children || []).map(buildEntry));
+          },
         }),
       };
-    });
+    }
+    return {
+      isFile: true,
+      isDirectory: false,
+      name: node.name,
+      file: (cb) =>
+        cb({
+          name: node.name,
+          size: node.content.length,
+          arrayBuffer: () => Promise.resolve(node.content.buffer),
+        }),
+    };
+  }
+
+  /**
+   * Build a mock DataTransferItemList simulating a dropped directory
+   * containing files (and optionally nested subdirectories).
+   */
+  function makeMockItems(entries) {
+    return entries.map((entry) => ({ webkitGetAsEntry: () => buildEntry(entry) }));
   }
 
   test('reads a directory entry and its files', async () => {
@@ -265,6 +277,33 @@ describe('readFilesFromDataTransfer', () => {
 
     await expect(readFilesFromDataTransfer(items)).rejects.toThrow(/total.*exceeds/i);
   });
+
+  test('recursively reads files in nested subdirectories', async () => {
+    const deepContent = new Uint8Array([7, 8, 9]);
+    const items = makeMockItems([
+      {
+        name: 'ROOT',
+        isDirectory: true,
+        children: [
+          { name: 'TOP.DAT', content: new Uint8Array([1]) },
+          {
+            name: 'SUB',
+            isDirectory: true,
+            children: [{ name: 'DEEP.DAT', content: deepContent }],
+          },
+        ],
+      },
+    ]);
+
+    const { files, dirName } = await readFilesFromDataTransfer(items);
+
+    expect(dirName).toBe('ROOT');
+    expect(files.size).toBe(2);
+    // Nested files are keyed by their relative path (webkitdirectory convention).
+    expect(files.has('top.dat')).toBe(true);
+    expect(files.has('sub/deep.dat')).toBe(true);
+    expect(Array.from(files.get('sub/deep.dat').bytes)).toEqual(Array.from(deepContent));
+  });
 });
 
 // --- writeFilesToDirectory — Chromium FileSystemDirectoryHandle path ---
@@ -296,7 +335,6 @@ describe('writeFilesToDirectory', () => {
   });
 
   test('delegates to Tauri IPC when handle has __tauriDirPath', async () => {
-    const tauriModule = await import('../../js/lib/tauri-bridge.js');
     jest.mocked(tauriModule.tauriWriteFiles).mockResolvedValue(undefined);
 
     const dirHandle = { __tauriDirPath: '/path/to/save' };
@@ -347,7 +385,6 @@ describe('deleteFilesFromDirectory', () => {
   });
 
   test('delegates to Tauri IPC when handle has __tauriDirPath', async () => {
-    const tauriModule = await import('../../js/lib/tauri-bridge.js');
     jest.mocked(tauriModule.tauriDeleteFiles).mockResolvedValue(undefined);
 
     const dirHandle = { __tauriDirPath: '/path/to/save' };
@@ -446,6 +483,55 @@ describe('downloadFilesAsZip', () => {
     URL.createObjectURL = origCreate;
     spy.mockRestore();
   });
+
+  test('revokes the blob URL after the 10s delay', async () => {
+    jest.useFakeTimers();
+    URL.createObjectURL = jest.fn(() => 'blob:delayed-url');
+    URL.revokeObjectURL = jest.fn();
+
+    const files = new Map([['a.txt', new Uint8Array([1])]]);
+    const realCreate = document.createElement;
+    const spy = jest.spyOn(document, 'createElement').mockImplementation((tag) => {
+      const el = realCreate.call(document, tag);
+      if (tag === 'a') el.click = () => {};
+      return el;
+    });
+
+    await downloadFilesAsZip(files, 't.zip');
+    // Not revoked yet — the URL is still tracked pending the delayed cleanup.
+    expect(jest.mocked(URL.revokeObjectURL)).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(10000);
+    expect(jest.mocked(URL.revokeObjectURL)).toHaveBeenCalledWith('blob:delayed-url');
+
+    spy.mockRestore();
+    jest.useRealTimers();
+  });
+
+  test('revokes all tracked blob URLs on beforeunload', async () => {
+    jest.useFakeTimers();
+    URL.createObjectURL = jest.fn(() => 'blob:unload-url');
+    URL.revokeObjectURL = jest.fn();
+
+    const files = new Map([['a.txt', new Uint8Array([1])]]);
+    const realCreate = document.createElement;
+    const spy = jest.spyOn(document, 'createElement').mockImplementation((tag) => {
+      const el = realCreate.call(document, tag);
+      if (tag === 'a') el.click = () => {};
+      return el;
+    });
+
+    await downloadFilesAsZip(files, 't.zip');
+
+    // The cleanup timer hasn't fired, so the URL is still tracked. Simulate
+    // the page tearing down — the beforeunload listener must revoke it.
+    window.dispatchEvent(new Event('beforeunload'));
+    expect(jest.mocked(URL.revokeObjectURL)).toHaveBeenCalledWith('blob:unload-url');
+
+    jest.clearAllTimers();
+    spy.mockRestore();
+    jest.useRealTimers();
+  });
 });
 
 // --- pickZipFile ---
@@ -484,6 +570,17 @@ describe('pickZipFile', () => {
     // before calling pickZipFile.
     await expect(pickZipFile('test.zip')).rejects.toThrow();
   });
+
+  test('delegates to Tauri IPC (tauriPickSavePath) when in Tauri', async () => {
+    jest.mocked(tauriModule.isTauri).mockReturnValue(true);
+    const tauriHandle = { __tauriPath: '/output/save.zip', name: 'save.zip' };
+    jest.mocked(tauriModule.tauriPickSavePath).mockResolvedValue(tauriHandle);
+
+    const handle = await pickZipFile('save.zip');
+
+    expect(handle).toBe(tauriHandle);
+    expect(tauriModule.tauriPickSavePath).toHaveBeenCalledWith('save.zip');
+  });
 });
 
 // --- writeZipToHandle ---
@@ -514,7 +611,6 @@ describe('writeZipToHandle', () => {
   });
 
   test('delegates to Tauri IPC when handle has __tauriPath', async () => {
-    const tauriModule = await import('../../js/lib/tauri-bridge.js');
     jest.mocked(tauriModule.tauriWriteBytesToPath).mockResolvedValue(undefined);
 
     const handle = { __tauriPath: '/output/save.zip' };
@@ -650,6 +746,68 @@ describe('openDirectoryViaFSAccess (Chromium)', () => {
       configurable: true,
       writable: true,
     });
+  });
+
+  test('rejects total size exceeding MAX_TOTAL_SAVE_SIZE', async () => {
+    // Each file is 10MB (< 16MB per-file cap) but 7 files = 70MB > 64MB total.
+    const tenMB = 10 * 1024 * 1024;
+    const mockFileEntries = Array.from({ length: 7 }, (_, i) => ({
+      kind: 'file',
+      name: `FILE${i}.DAT`,
+      getFile: () =>
+        Promise.resolve({
+          name: `FILE${i}.DAT`,
+          size: tenMB,
+          arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
+        }),
+    }));
+
+    const mockDirHandle = makeMockDirHandle(mockFileEntries);
+
+    w.showDirectoryPicker = jest.fn();
+    w.showDirectoryPicker.mockResolvedValue(mockDirHandle);
+    Object.defineProperty(window, 'isSecureContext', {
+      value: true,
+      configurable: true,
+      writable: true,
+    });
+
+    await expect(openDirectoryViaFSAccess()).rejects.toThrow(/total.*exceeds/i);
+
+    delete w.showDirectoryPicker;
+    Object.defineProperty(window, 'isSecureContext', {
+      value: false,
+      configurable: true,
+      writable: true,
+    });
+  });
+});
+
+// --- openDirectoryViaFSAccess (Tauri path) ---
+describe('openDirectoryViaFSAccess (Tauri)', () => {
+  test('returns a Tauri dir handle and files via IPC', async () => {
+    jest.mocked(tauriModule.isTauri).mockReturnValue(true);
+    const files = new Map([
+      ['param.sfo', { name: 'PARAM.SFO', bytes: new Uint8Array([1, 2, 3]) }],
+    ]);
+    jest.mocked(tauriModule.tauriOpenDirectory).mockResolvedValue({
+      dirPath: '/saves/BLES01389',
+      dirName: 'BLES01389SAVE',
+      files,
+    });
+
+    const { dirHandle, files: returnedFiles } = await openDirectoryViaFSAccess();
+
+    expect(dirHandle).toEqual({ __tauriDirPath: '/saves/BLES01389', name: 'BLES01389SAVE' });
+    expect(returnedFiles).toBe(files);
+    expect(tauriModule.tauriOpenDirectory).toHaveBeenCalledTimes(1);
+  });
+
+  test('throws AbortError when the user cancels the native dialog', async () => {
+    jest.mocked(tauriModule.isTauri).mockReturnValue(true);
+    jest.mocked(tauriModule.tauriOpenDirectory).mockResolvedValue(null);
+
+    await expect(openDirectoryViaFSAccess()).rejects.toMatchObject({ name: 'AbortError' });
   });
 });
 // ---  tests are covered in zip.test.js

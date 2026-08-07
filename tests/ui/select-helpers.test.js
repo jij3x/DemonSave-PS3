@@ -122,6 +122,34 @@ describe('select-helpers', () => {
       expect(placeholder).toBeTruthy();
       expect(placeholder.disabled).toBe(true);
     });
+
+    test('spell-name select is populated from spell data', () => {
+      const sel = document.createElement('select');
+      sel.classList.add('spell-name');
+      ensureSelectPopulated(sel);
+      // Exercises the getSpellData() branch (not the lazyCat branches).
+      expect(sel.querySelectorAll('option').length).toBeGreaterThan(0);
+    });
+
+    test('goods select is type-filtered from the parent table goods-type', () => {
+      const table = document.createElement('table');
+      table.dataset.goodsType = '9';
+      const tbody = document.createElement('tbody');
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      const sel = document.createElement('select');
+      sel.classList.add('inv-name');
+      sel.dataset.lazyCat = 'goods';
+      td.appendChild(sel);
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      table.appendChild(tbody);
+      document.body.appendChild(table);
+
+      ensureSelectPopulated(sel);
+      // Exercises the getGoodsTypeData(typeId) branch.
+      expect(sel.querySelectorAll('option').length).toBeGreaterThan(0);
+    });
   });
 
   describe('getSelectCategoryAndType', () => {
