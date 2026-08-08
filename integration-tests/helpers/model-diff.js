@@ -12,8 +12,8 @@
  * Compares all scalar fields, inventory arrays, deposit arrays, spell
  * arrays, NPC flags, and tendency values.
  *
- * @param {object} actual   model read back after round-trip
- * @param {object} expected model with the intended saved values
+ * @param {Record<string, any>} actual   model read back after round-trip
+ * @param {Record<string, any>} expected model with the intended saved values
  * @param {{floatPrecision?: number}} [opts]
  */
 export function assertModelsMatch(actual, expected, opts = {}) {
@@ -29,8 +29,8 @@ export function assertModelsMatch(actual, expected, opts = {}) {
 /**
  * Collect all field mismatches between two models.
  *
- * @param {object} actual
- * @param {object} expected
+ * @param {Record<string, any>} actual
+ * @param {Record<string, any>} expected
  * @param {number} floatPrecision
  * @returns {string[]}  array of human-readable error strings
  */
@@ -247,8 +247,8 @@ function collectDepositItemDiff(actual, expected, label) {
  * Returns a shallow copy with only the UI-visible fields for comparison.
  * Strips `_slot`, `_ref`, `idx1`, and `idx2` — all are binary-internal
  * fields not present in the sanitized/collected model.
- * @param {object} fullModel
- * @returns {object}
+ * @param {Record<string, any>} fullModel
+ * @returns {Record<string, any>}
  */
 export function extractComparableModel(fullModel) {
   const m = { ...fullModel };

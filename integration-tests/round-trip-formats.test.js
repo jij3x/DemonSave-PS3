@@ -584,11 +584,18 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
 
     const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
-    const { filesToDelete, encrypted } = await writeSaveData(slots, [], profileNumber, accountId);
+    const { filesToWrite, filesToDelete, encrypted } = await writeSaveData(
+      slots,
+      [],
+      profileNumber,
+      accountId,
+    );
 
     expect(encrypted).toBe(false);
     expect(filesToDelete.has('PARAM.PFD')).toBe(true);
     expect(filesToDelete.size).toBe(1);
+    // PFD is deleted, so it must also be absent from the written output
+    expect(filesToWrite.has('PARAM.PFD')).toBe(false);
   });
 
   test('unencrypted → decrypted write has empty filesToDelete', async () => {
@@ -605,17 +612,6 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
   // -------------------------------------------------------------------
   // PFD presence/absence in output
   // -------------------------------------------------------------------
-
-  test('decrypted output does not contain PARAM.PFD', async () => {
-    const sb = newSandbox('no-pfd-out');
-    const rawFiles = createEncryptedSaveFolder([1]);
-    writeToDisk(sb, rawFiles);
-
-    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
-
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
-    expect(filesToWrite.has('PARAM.PFD')).toBe(false);
-  });
 
   test('encrypted output contains valid PARAM.PFD', async () => {
     const sb = newSandbox('has-pfd');
@@ -635,34 +631,6 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
   // -------------------------------------------------------------------
   // SFO fields (profileNumber + accountId) survive encrypted export
   // -------------------------------------------------------------------
-
-  test('SFO fields preserved through exportEncryptedSave → re-open', async () => {
-    const sb = newSandbox('sfo-enc');
-    const rawFiles = createUnencryptedSaveFolder([1], {
-      realisticSfo: true,
-      profileNumber: 42,
-      accountId: 'aabbccdd11223344aabbccdd11223344',
-    });
-    writeToDisk(sb, rawFiles);
-
-    const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
-
-    // Export as encrypted (changes encryption state, rewrites SFO)
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
-
-    // Verify SFO fields in the output bytes directly
-    const sfoBytes = filesToWrite.get('PARAM.SFO');
-    expect(sfoBytes).toBeDefined();
-    expect(sfoBytes[0x570]).toBe(42);
-    expect(getSfoAccountId(sfoBytes)).toBe('aabbccdd11223344aabbccdd11223344');
-
-    // Re-open from disk and verify openSave reads the SFO fields
-    const sb2 = newSandbox('sfo-enc-2');
-    const reopened = writeOutputToDisk(sb2, filesToWrite);
-    const { profileNumber: readPn, accountId: readAi } = await openSave(reopened);
-    expect(readPn).toBe(42);
-    expect(readAi).toBe('aabbccdd11223344aabbccdd11223344');
-  });
 
   test('SFO field changes survive exportEncryptedSave → re-open', async () => {
     const sb = newSandbox('sfo-enc-change');

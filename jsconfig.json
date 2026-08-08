@@ -22,11 +22,11 @@
     "js/ui/**/*",
     "tests/**/*",
     "tools/**/*",
-    "rpcs3-mcp-server/src/**/*.js"
+    "rpcs3-mcp-server/src/**/*.js",
+    "integration-tests/**/*"
   ],
   "exclude": [
     "node_modules",
-    "src-tauri",
-    "integration-tests"
+    "src-tauri"
   ]
 }

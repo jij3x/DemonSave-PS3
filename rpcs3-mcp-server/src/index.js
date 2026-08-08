@@ -64,9 +64,10 @@ const server = new McpServer({
 });
 
 /**
- * Register an MCP tool. Wraps server.tool() because the SDK's overloads cannot infer the
- * zod-v4 `Args` generic when checking plain JS (checkJs), which would otherwise raise TS2769
- * on every registration. Schema/handler are intentionally loosely typed here.
+ * Register an MCP tool. Wraps server.registerTool() (the non-deprecated API);
+ * the SDK's generic overloads don't infer the zod-v4 Args under checkJs, so the
+ * schema/handler are intentionally loosely typed here and the call needs a
+ * suppression.
  *
  * @param {string} name
  * @param {string} description
@@ -74,8 +75,8 @@ const server = new McpServer({
  * @param {(args: any, extra: any) => unknown} handler
  */
 function registerMcpTool(name, description, schema, handler) {
-  // @ts-expect-error SDK tool() overloads don't infer zod-v4 Args under checkJs (TS2769)
-  server.tool(name, description, schema, handler);
+  // @ts-expect-error SDK registerTool() overloads don't infer zod-v4 Args under checkJs (TS2769)
+  server.registerTool(name, { description, inputSchema: schema }, handler);
 }
 
 // -------------------- Connection Management --------------------
