@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-08-07
+
+### Added
+- Inline tooltips for Character and World Tendency values so each setting's
+  effect is visible without leaving the editor.
+
+### Changed
+- Experimental weapons are now hidden from the inventory browser.
+- Character Tendency and World Tendency are presented as separate sections.
+- Replaced scattered `@type` / `{@type never}` JSDoc casts with proper typedefs
+  and shared test helpers across the UI and test layers.
+- Brought `integration-tests/` under `tsc --checkJs` typechecking and tightened
+  the resulting JSDoc types.
+- Brought `rpcs3-mcp-server/` under the shared ESLint, Prettier, and typecheck
+  tooling (previously ignored as a separate project).
+- Expanded branch-coverage tests and split monolithic test suites into
+  dedicated per-feature files.
+
 ### Fixed
 - Deposit entry count is now encoded as a 10-bit value split across the count
   and flag bytes, preventing truncation for large deposit lists.
@@ -77,5 +95,6 @@ First public release.
 - Staged the Linux portable `.tar.gz` only for the `linux-portable` matrix
   entry to avoid duplicate assets.
 
-[Unreleased]: https://github.com/jij3x/DemonSave-PS3/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/jij3x/DemonSave-PS3/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/jij3x/DemonSave-PS3/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/jij3x/DemonSave-PS3/releases/tag/v1.0.0
