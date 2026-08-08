@@ -13,6 +13,7 @@
 import { jest } from '@jest/globals';
 
 const { el, icon, buildPage } = await import('../../js/ui/dom.js');
+const { APP_VERSION } = await import('../../js/version.js');
 
 // --- el() helper ---
 describe('el()', () => {
@@ -168,6 +169,7 @@ describe('buildPage()', () => {
 
     // Header
     expect(app.querySelector('header h1').textContent).toContain('DemonSave');
+    expect(app.querySelector('header .app-version').textContent).toBe(`v${APP_VERSION}`);
 
     // Status element
     expect(app.querySelector('#status')).not.toBeNull();

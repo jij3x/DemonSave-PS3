@@ -1,6 +1,6 @@
 [package]
 name = "demonsave-ps3"
-version = "1.0.0"
+version = "1.1.0"
 description = "Demon's Souls (PS3) Save Editor"
 edition = "2021"
 
