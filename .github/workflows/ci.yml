@@ -62,10 +62,10 @@ jobs:
         run: npm ci || npm install
 
       - name: Install rpcs3-mcp-server dependencies
-        # rpcs3-mcp-server is a self-contained package with its own lockfile.
-        # It is type-checked/linted by the root jsconfig + eslint, so its
-        # deps (@modelcontextprotocol/sdk, zod) must be present for tsc to
-        # resolve them.
+        # rpcs3-mcp-server is a self-contained, portable package with its own
+        # lockfile and its own eslint/prettier/tsc tooling. Its deps
+        # (@modelcontextprotocol/sdk, zod, @types/node) must be present for the
+        # server's own `npm run lint` (tsc) to resolve them.
         working-directory: rpcs3-mcp-server
         run: npm ci || npm install
 
@@ -73,6 +73,14 @@ jobs:
         run: npm run lint
 
       - name: Format check
+        run: npm run format:check
+
+      - name: Lint rpcs3-mcp-server
+        working-directory: rpcs3-mcp-server
+        run: npm run lint
+
+      - name: Format check rpcs3-mcp-server
+        working-directory: rpcs3-mcp-server
         run: npm run format:check
 
       - name: Run unit tests

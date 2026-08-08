@@ -22,7 +22,6 @@
     "js/ui/**/*",
     "tests/**/*",
     "tools/**/*",
-    "rpcs3-mcp-server/src/**/*.js",
     "integration-tests/**/*"
   ],
   "exclude": [

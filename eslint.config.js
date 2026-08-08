@@ -84,9 +84,6 @@ export default [
 
   // Ignore generated files
   {
-    ignores: [
-      'node_modules/**',
-      'rpcs3-mcp-server/node_modules/**', // nested deps of the separate Node.js project
-    ],
+    ignores: ['node_modules/**'],
   },
 ];
