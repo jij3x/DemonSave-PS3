@@ -16,7 +16,7 @@ import os from 'node:os';
  * Create a temporary directory for an integration test.
  *
  * @param {string} label  human-readable label for the dir name
- * @returns {{dir: string, writeFiles: (files: Map<string, Uint8Array>) => void, writeFile: (name: string, bytes: Uint8Array) => void, readFile: (name: string) => Uint8Array, readFiles: () => Map<string, {name: string, bytes: Uint8Array}>, listFiles: () => string[], cleanup: () => Promise<void>}}
+ * @returns {{dir: string, writeFiles: (files: Map<string, Uint8Array>) => void, writeFile: (name: string, bytes: Uint8Array) => void, readFile: (name: string) => Uint8Array, readFiles: () => Map<string, {name: string, bytes: Uint8Array}>, listFiles: () => string[], deleteFile: (name: string) => void, cleanup: () => Promise<void>}}
  */
 export function createTmpSandbox(label) {
   const prefix = path.join(os.tmpdir(), `des-test-${label || 'sandbox'}-`);

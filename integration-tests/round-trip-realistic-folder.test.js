@@ -114,43 +114,6 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
   });
 
   // -------------------------------------------------------------------
-  // Modify + export with realistic folder
-  // -------------------------------------------------------------------
-
-  test('realistic folder: modify all slots → export encrypted → re-open', async () => {
-    const sb1 = newSandbox('real-mod-1');
-    const rawFiles = createRealisticSaveFolder([1, 2, 3], {
-      encrypted: true,
-    });
-    writeToDisk(sb1, rawFiles);
-
-    const { slots, profileNumber, accountId } = await openSave(sb1.readFiles());
-
-    // Modify each slot distinctly
-    slots.find((s) => s.slot === 1).model.vit = 111;
-    slots.find((s) => s.slot === 2).model.vit = 222;
-    slots.find((s) => s.slot === 3).model.vit = 333;
-    slots.find((s) => s.slot === 1).model.name = 'Slot1Mod';
-    slots.find((s) => s.slot === 3).model.souls = 999999;
-
-    const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
-
-    // Write to fresh sandbox and re-open
-    const sb2 = newSandbox('real-mod-2');
-    const reopened = writeOutputToDisk(sb2, filesToWrite);
-    const { slots: readSlots } = await openSave(reopened);
-
-    expect(readSlots).toHaveLength(3);
-
-    // Verify all modifications survived
-    expect(readSlots.find((s) => s.slot === 1).model.vit).toBe(111);
-    expect(readSlots.find((s) => s.slot === 2).model.vit).toBe(222);
-    expect(readSlots.find((s) => s.slot === 3).model.vit).toBe(333);
-    expect(readSlots.find((s) => s.slot === 1).model.name).toBe('Slot1Mod');
-    expect(readSlots.find((s) => s.slot === 3).model.souls).toBe(999999);
-  });
-
-  // -------------------------------------------------------------------
   // Stale zeroed-out file + active file (resolveRotational)
   // -------------------------------------------------------------------
 
@@ -312,6 +275,7 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     for (const slot of s1) {
       slot.model.vit = slot.slot * 100;
       slot.model.souls = slot.slot * 10000;
+      slot.model.name = `Slot${slot.slot}Mod`;
     }
 
     // Step 2: Export encrypted
@@ -330,6 +294,7 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
       const slot = s2.find((s) => s.slot === slotNum);
       expect(slot.model.vit).toBe(slotNum * 100);
       expect(slot.model.souls).toBe(slotNum * 10000);
+      expect(slot.model.name).toBe(`Slot${slotNum}Mod`);
     }
 
     // Verify assets survived

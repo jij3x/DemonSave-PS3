@@ -84,116 +84,8 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
   });
 
   // -------------------------------------------------------------------
-  // World / position
-  // -------------------------------------------------------------------
-
-  test('world and block round-trip', async () => {
-    const model = opened.slots[0].model;
-    model.world = 7;
-    model.block = 2;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = { ...getExpectedModel(1), world: 7, block: 2 };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
-  });
-
-  test('position (x, y, z, rot) round-trip', async () => {
-    const model = opened.slots[0].model;
-    model.x = -500.5;
-    model.y = 300.25;
-    model.z = 0.0;
-    model.rot = 6.28318;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = {
-      ...getExpectedModel(1),
-      x: -500.5,
-      y: 300.25,
-      z: 0.0,
-      rot: 6.28318,
-    };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected, {
-      floatPrecision: 5,
-    });
-  });
-
-  // -------------------------------------------------------------------
-  // Vitals (9 fields)
-  // -------------------------------------------------------------------
-
-  test('all vitals round-trip (HP, MP, stamina)', async () => {
-    const model = opened.slots[0].model;
-    model.currHP = 1;
-    model.currMaxHP = 2;
-    model.maxHP = 3;
-    model.currMP = 4;
-    model.currMaxMP = 5;
-    model.maxMP = 6;
-    model.currStam = 7;
-    model.currMaxStam = 8;
-    model.maxStam = 9;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = {
-      ...getExpectedModel(1),
-      currHP: 1,
-      currMaxHP: 2,
-      maxHP: 3,
-      currMP: 4,
-      currMaxMP: 5,
-      maxMP: 6,
-      currStam: 7,
-      currMaxStam: 8,
-      maxStam: 9,
-    };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
-  });
-
-  // -------------------------------------------------------------------
   // Stats (11 fields — verifies dual base+effective writes)
   // -------------------------------------------------------------------
-
-  test('all stats round-trip (vit, int, end, str, dex, magic, faith, luck)', async () => {
-    const model = opened.slots[0].model;
-    model.vit = 50;
-    model.int = 51;
-    model.end = 52;
-    model.str = 53;
-    model.dex = 54;
-    model.magic = 55;
-    model.faith = 56;
-    model.luck = 57;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = {
-      ...getExpectedModel(1),
-      vit: 50,
-      int: 51,
-      end: 52,
-      str: 53,
-      dex: 54,
-      magic: 55,
-      faith: 56,
-      luck: 57,
-    };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
-  });
-
-  test('souls, soul memory, and levels purchased round-trip', async () => {
-    const model = opened.slots[0].model;
-    model.souls = 0;
-    model.soulMem = 9999999;
-    model.levelsPurchased = 99;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = {
-      ...getExpectedModel(1),
-      souls: 0,
-      soulMem: 9999999,
-      levelsPurchased: 99,
-    };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
-  });
 
   test('stat at U32 boundary (0xFFFFFFFF) round-trips', async () => {
     const model = opened.slots[0].model;
@@ -212,31 +104,6 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
   // -------------------------------------------------------------------
   // Identity
   // -------------------------------------------------------------------
-
-  test('phantomType, gender, startClass round-trip', async () => {
-    const model = opened.slots[0].model;
-    model.phantomType = 5;
-    model.gender = 1;
-    model.startClass = 7;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = {
-      ...getExpectedModel(1),
-      phantomType: 5,
-      gender: 1,
-      startClass: 7,
-    };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
-  });
-
-  test('character name round-trip (ASCII)', async () => {
-    const model = opened.slots[0].model;
-    model.name = 'Warrior';
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = { ...getExpectedModel(1), name: 'Warrior' };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
-  });
 
   test('character name round-trip (16-char maximum)', async () => {
     const model = opened.slots[0].model;
@@ -404,19 +271,6 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
     assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
   });
 
-  test('weapon durability round-trips', async () => {
-    const model = opened.slots[0].model;
-    model.weapons[0].durability = 555;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = { ...getExpectedModel(1) };
-    expected.weapons[0] = {
-      ...expected.weapons[0],
-      durability: 555,
-    };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
-  });
-
   test('adding a new inventory item round-trips', async () => {
     const model = opened.slots[0].model;
     // Add a new weapon (no _ref → treated as new by mergeModel).
@@ -447,6 +301,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
 
     // Add two new weapons (no _ref → new items)
     model.weapons.push({
+      _ref: '',
       itemId: 0x00077777,
       count: 1,
       misc1: 0,
@@ -454,6 +309,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
       durability: 300,
     });
     model.weapons.push({
+      _ref: '',
       itemId: 0x00088888,
       count: 1,
       misc1: 0,
@@ -512,10 +368,12 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
     // Tamper with ro_idx1/ro_idx2 — these read-only display fields should
     // NOT affect the actual idx1/idx2 written to disk. The writer gets
     // idx1/idx2 from the original fullModel via _ref lookup, not from ro_.
-    model.weapons[0].ro_idx1 = 999;
-    model.weapons[0].ro_idx2 = 999;
-    model.weapons[1].ro_idx1 = 888;
-    model.weapons[1].ro_idx2 = 888;
+    const w0 = /** @type {Record<string, any>} */ (model.weapons[0]);
+    const w1 = /** @type {Record<string, any>} */ (model.weapons[1]);
+    w0.ro_idx1 = 999;
+    w0.ro_idx2 = 999;
+    w1.ro_idx1 = 888;
+    w1.ro_idx2 = 888;
 
     const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
     // Verify at the full-model level that idx1/idx2 are unchanged
@@ -673,20 +531,6 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
   // Spells
   // -------------------------------------------------------------------
 
-  test('spellSlots and miracleSlots round-trip', async () => {
-    const model = opened.slots[0].model;
-    model.spellSlots = 10;
-    model.miracleSlots = 8;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = {
-      ...getExpectedModel(1),
-      spellSlots: 10,
-      miracleSlots: 8,
-    };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
-  });
-
   test('spell records round-trip (itemId, status, misc1, misc2)', async () => {
     const model = opened.slots[0].model;
     model.spells[0].itemId = 0x02000001;
@@ -730,60 +574,12 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
   // Appearance (hair color)
   // -------------------------------------------------------------------
 
-  test('hair color (R, G, B) round-trip', async () => {
-    const model = opened.slots[0].model;
-    model.hairR = 0.75;
-    model.hairG = 0.5;
-    model.hairB = 0.25;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = {
-      ...getExpectedModel(1),
-      hairR: 0.75,
-      hairG: 0.5,
-      hairB: 0.25,
-    };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected, {
-      floatPrecision: 5,
-    });
-  });
-
   test('negative hair color round-trips', async () => {
     const model = opened.slots[0].model;
     model.hairR = -0.5;
 
     const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
     const expected = { ...getExpectedModel(1), hairR: -0.5 };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected, {
-      floatPrecision: 5,
-    });
-  });
-
-  // -------------------------------------------------------------------
-  // Tendency (7 fields — verifies dual writes)
-  // -------------------------------------------------------------------
-
-  test('all tendency values round-trip', async () => {
-    const model = opened.slots[0].model;
-    model.charTendency = 100.0;
-    model.nexusTendency = -100.0;
-    model.w1Tendency = 50.5;
-    model.w2Tendency = -50.5;
-    model.w3Tendency = 0.0;
-    model.w4Tendency = 75.25;
-    model.w5Tendency = -75.25;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = {
-      ...getExpectedModel(1),
-      charTendency: 100.0,
-      nexusTendency: -100.0,
-      w1Tendency: 50.5,
-      w2Tendency: -50.5,
-      w3Tendency: 0.0,
-      w4Tendency: 75.25,
-      w5Tendency: -75.25,
-    };
     assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected, {
       floatPrecision: 5,
     });
@@ -811,57 +607,9 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
     assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
   });
 
-  test('archSealed toggle round-trips (true → false, false → true)', async () => {
-    // Factory sets archSealed = slot % 2 === 0 → false for slot 1
-    expect(opened.slots[0].model.archSealed).toBe(false);
-
-    const model = opened.slots[0].model;
-    model.archSealed = true;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = { ...getExpectedModel(1), archSealed: true };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
-  });
-
   // -------------------------------------------------------------------
   // NPC flags (nested objects)
   // -------------------------------------------------------------------
-
-  test('sageFreke flags round-trip', async () => {
-    const model = opened.slots[0].model;
-    model.sageFreke = { friendly: false, hostile: true, dead: true };
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = {
-      ...getExpectedModel(1),
-      sageFreke: { friendly: false, hostile: true, dead: true },
-    };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
-  });
-
-  test('thomas flags round-trip', async () => {
-    const model = opened.slots[0].model;
-    model.thomas = { friendly: false, hostile: true, dead: true };
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = {
-      ...getExpectedModel(1),
-      thomas: { friendly: false, hostile: true, dead: true },
-    };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
-  });
-
-  test('boldwin flags round-trip', async () => {
-    const model = opened.slots[0].model;
-    model.boldwin = { friendly: true, hostile: false, dead: true };
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
-    const expected = {
-      ...getExpectedModel(1),
-      boldwin: { friendly: true, hostile: false, dead: true },
-    };
-    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected);
-  });
 
   test('all NPC flags set to false round-trip', async () => {
     const model = opened.slots[0].model;
@@ -1032,64 +780,130 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
   test('full model: modify all field groups simultaneously', async () => {
     const model = opened.slots[0].model;
 
-    // Modify a representative field from every group
+    // Modify every normal-range scalar field across all groups in a single
+    // round-trip. Genuine edge cases (U32 boundaries, 0xFFFFFFFF clearing,
+    // CJK/empty/max names, negative floats, durability=0, deposit flags,
+    // add/delete, idx1/idx2 invariants) are covered by their own focused
+    // tests below/above. assertModelsMatch verifies every field — modified
+    // ones against the new values AND unmodified arrays against the factory
+    // model, so cross-field corruption is also caught here.
     model.world = 9;
-    model.x = 42.5;
-    model.currHP = 777;
-    model.vit = 99;
+    model.block = 2;
+    model.x = -500.5;
+    model.y = 300.25;
+    model.z = 0.0;
+    model.rot = 6.28318;
+
+    // Vitals
+    model.currHP = 1;
+    model.currMaxHP = 2;
+    model.maxHP = 3;
+    model.currMP = 4;
+    model.currMaxMP = 5;
+    model.maxMP = 6;
+    model.currStam = 7;
+    model.currMaxStam = 8;
+    model.maxStam = 9;
+
+    // Stats
+    model.vit = 50;
+    model.int = 51;
+    model.end = 52;
+    model.str = 53;
+    model.dex = 54;
+    model.magic = 55;
+    model.faith = 56;
+    model.luck = 57;
     model.souls = 123456;
+    model.soulMem = 9999999;
+    model.levelsPurchased = 99;
+
+    // Identity
+    model.phantomType = 5;
     model.name = 'Hero';
-    model.gender = 0;
-    model.leftHand1 = 0xcafebabe;
-    model.helmet = 0xdeadbeef;
-    model.weapons[0].itemId = 0x00000001;
-    model.weapons[0].count = 5;
-    model.armor[0].durability = 1;
-    model.deposit[0].count = 50;
-    model.spells[0].status = 1;
-    model.hairR = 0.99;
-    model.charTendency = 80.0;
-    model.w3Tendency = -40.0;
-    model.clearCount = 7;
-    model.archSealed = !model.archSealed;
-    model.sageFreke.friendly = !model.sageFreke.friendly;
-    model.thomas.dead = !model.thomas.dead;
-    model.boldwin.hostile = !model.boldwin.hostile;
+    model.gender = 1;
+    model.startClass = 7;
+
+    // Spell slots / appearance
     model.spellSlots = 6;
     model.miracleSlots = 4;
+    model.hairR = 0.75;
+    model.hairG = 0.5;
+    model.hairB = 0.25;
+
+    // Tendency
+    model.charTendency = 80.0;
+    model.nexusTendency = -10.0;
+    model.w1Tendency = 11.5;
+    model.w2Tendency = -12.5;
+    model.w3Tendency = 13.75;
+    model.w4Tendency = -14.25;
+    model.w5Tendency = 15.5;
+
+    // Misc
+    model.clearCount = 7;
+    model.archSealed = !model.archSealed;
+
+    // NPC flags (set all three objects fully)
+    model.sageFreke = { friendly: false, hostile: true, dead: true };
+    model.thomas = { friendly: false, hostile: true, dead: true };
+    model.boldwin = { friendly: true, hostile: false, dead: true };
 
     const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
 
-    // Verify all modified fields
-    const m = slots[0].model;
-    expect(m.world).toBe(9);
-    expect(m.x).toBeCloseTo(42.5, 5);
-    expect(m.currHP).toBe(777);
-    expect(m.vit).toBe(99);
-    expect(m.souls).toBe(123456);
-    expect(m.name).toBe('Hero');
-    expect(m.gender).toBe(0);
-    expect(m.leftHand1).toBe(0xcafebabe);
-    expect(m.helmet).toBe(0xdeadbeef);
-    expect(m.weapons[0].itemId).toBe(0x00000001);
-    expect(m.weapons[0].count).toBe(5);
-    expect(m.armor[0].durability).toBe(1);
-    expect(m.deposit[0].count).toBe(50);
-    expect(m.spells[0].status).toBe(1);
-    expect(m.hairR).toBeCloseTo(0.99, 5);
-    expect(m.charTendency).toBeCloseTo(80.0, 5);
-    expect(m.w3Tendency).toBeCloseTo(-40.0, 5);
-    expect(m.clearCount).toBe(7);
-    // NPC toggles: original values derived from slot 1
-    //   sageFreke.friendly = true → toggled → false
-    //   thomas.dead = (1%5===0) = false → toggled → true
-    //   boldwin.hostile = (1%2===0) = false → toggled → true
-    expect(m.archSealed).toBe(true); // was false, toggled
-    expect(m.sageFreke.friendly).toBe(false); // was true, toggled
-    expect(m.thomas.dead).toBe(true); // was false, toggled
-    expect(m.boldwin.hostile).toBe(true); // was false, toggled
-    expect(m.spellSlots).toBe(6);
-    expect(m.miracleSlots).toBe(4);
+    const expected = {
+      ...getExpectedModel(1),
+      world: 9,
+      block: 2,
+      x: -500.5,
+      y: 300.25,
+      z: 0.0,
+      rot: 6.28318,
+      currHP: 1,
+      currMaxHP: 2,
+      maxHP: 3,
+      currMP: 4,
+      currMaxMP: 5,
+      maxMP: 6,
+      currStam: 7,
+      currMaxStam: 8,
+      maxStam: 9,
+      vit: 50,
+      int: 51,
+      end: 52,
+      str: 53,
+      dex: 54,
+      magic: 55,
+      faith: 56,
+      luck: 57,
+      souls: 123456,
+      soulMem: 9999999,
+      levelsPurchased: 99,
+      phantomType: 5,
+      name: 'Hero',
+      gender: 1,
+      startClass: 7,
+      spellSlots: 6,
+      miracleSlots: 4,
+      hairR: 0.75,
+      hairG: 0.5,
+      hairB: 0.25,
+      charTendency: 80.0,
+      nexusTendency: -10.0,
+      w1Tendency: 11.5,
+      w2Tendency: -12.5,
+      w3Tendency: 13.75,
+      w4Tendency: -14.25,
+      w5Tendency: 15.5,
+      clearCount: 7,
+      archSealed: true,
+      sageFreke: { friendly: false, hostile: true, dead: true },
+      thomas: { friendly: false, hostile: true, dead: true },
+      boldwin: { friendly: true, hostile: false, dead: true },
+    };
+    assertModelsMatch(extractComparableModel(slots[0].session.fullModel), expected, {
+      floatPrecision: 5,
+    });
   });
 
   // -------------------------------------------------------------------
@@ -1097,7 +911,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
   // -------------------------------------------------------------------
 
   test('no-op re-save preserves all fields unchanged', async () => {
-    const model = opened.slots[0].model;
+    const model = /** @type {Record<string, any>} */ (opened.slots[0].model);
 
     // Tamper with ALL ro_ pointer fields — simulating a UI layer setting
     // bogus values. These must never reach disk: the writer only reads

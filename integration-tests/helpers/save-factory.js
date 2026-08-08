@@ -39,7 +39,7 @@ export const SECURE_ID = fromHex('0123456789ABCDEFFEDCBA9876543210');
  * distinguishable and cross-contamination is immediately detectable.
  *
  * @param {number} slot  1-based slot number
- * @returns {object} a plain model object with all fields populated
+ * Returns a plain model object with all fields populated (return type inferred).
  */
 export function getExpectedModel(slot) {
   const s = slot * 1000;

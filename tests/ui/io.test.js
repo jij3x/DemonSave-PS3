@@ -15,8 +15,8 @@ import { TextEncoder } from 'node:util';
 
 /** Browser window with the (optional) Chromium File System Access pickers the tests mock. */
 const w = /** @type {Window & {
-  showDirectoryPicker?: jest.MockedFunction<() => Promise<any>>,
-  showSaveFilePicker?: jest.MockedFunction<(opts: object) => Promise<any>>,
+  showDirectoryPicker?: jest.MockedFunction<() => Promise<unknown>>,
+  showSaveFilePicker?: jest.MockedFunction<(opts: object) => Promise<unknown>>,
 }} */ (window);
 
 // Mock tauri-bridge — default to NOT Tauri (toggleable per test via tauriModule.isTauri)
