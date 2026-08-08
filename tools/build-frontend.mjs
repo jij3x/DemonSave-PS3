@@ -39,6 +39,9 @@ const __dirname = dirname(__filename);
 const ROOT = join(__dirname, '..');
 const DIST = join(ROOT, 'dist');
 
+// Sync the app version (single source of truth: package.json) before copying js/.
+execSync('node tools/gen-version.mjs', { cwd: ROOT, stdio: 'inherit' });
+
 // ── Pre-flight: ensure runtime deps exist ─────────────────────────────────
 
 const REQUIRED_PACKAGES = [

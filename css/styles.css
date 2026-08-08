@@ -207,6 +207,13 @@ header h1 {
   gap: 8px;
 }
 
+.app-version {
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--text-secondary);
+  letter-spacing: 0;
+}
+
 .status-container {
   position: relative;
 }

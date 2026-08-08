@@ -16,6 +16,7 @@ import { createReadStream, statSync } from 'node:fs';
 import { dirname, extname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'node:http';
+import { execSync } from 'node:child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -90,6 +91,13 @@ function serveFile(filePath, res) {
     res.writeHead(404);
     res.end('Not Found');
   }
+}
+
+// Sync the app version (single source of truth: package.json) before serving.
+try {
+  execSync('node tools/gen-version.mjs', { cwd: ROOT, stdio: 'inherit' });
+} catch {
+  /* dev tolerates a stale committed js/version.js */
 }
 
 server.listen(PORT, () => {

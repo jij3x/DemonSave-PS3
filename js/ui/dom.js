@@ -86,6 +86,7 @@ import {
   SELECT_WIDTHS,
 } from './core/controls.js';
 import { selectWidthKey } from './core/item-helpers.js';
+import { APP_VERSION } from '../version.js';
 
 export { icon, el };
 
@@ -709,7 +710,11 @@ export function buildPage() {
     el(
       'header',
       {},
-      el('h1', { textContent: 'DemonSave-PS3' }),
+      el(
+        'h1',
+        { textContent: 'DemonSave-PS3' },
+        el('span', { className: 'app-version', textContent: `v${APP_VERSION}` }),
+      ),
       el(
         'div',
         { className: 'status-container' },
