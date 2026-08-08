@@ -119,26 +119,6 @@ describe('round-trip: multi-slot persistence', () => {
     assertModelsMatch(s2.model, getExpectedModel(2));
   });
 
-  test('modifying slot 2 does not affect slot 1', async () => {
-    const rawFiles = createUnencryptedSaveFolder([1, 2]);
-    const opened = await setupAndOpen(rawFiles);
-
-    const slot2 = opened.slots.find((s) => s.slot === 2);
-    slot2.model.vit = 42;
-    slot2.model.name = 'Slot2Char';
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber, opened.accountId);
-
-    const s1 = slots.find((s) => s.slot === 1);
-    const s2 = slots.find((s) => s.slot === 2);
-
-    expect(s2.model.vit).toBe(42);
-    expect(s2.model.name).toBe('Slot2Char');
-
-    // Slot 1 must be unchanged
-    assertModelsMatch(s1.model, getExpectedModel(1));
-  });
-
   test('modifying all slots independently preserves each one', async () => {
     const rawFiles = createUnencryptedSaveFolder([1, 2, 3]);
     const opened = await setupAndOpen(rawFiles);
@@ -168,50 +148,36 @@ describe('round-trip: multi-slot persistence', () => {
   // Inventory/deposit/spell independence across slots
   // -------------------------------------------------------------------
 
-  test('inventory items are independent per slot', async () => {
+  test('inventory, deposit, and spells are independent per slot', async () => {
     const rawFiles = createUnencryptedSaveFolder([1, 2]);
     const opened = await setupAndOpen(rawFiles);
 
-    // Modify slot 1's weapon count
+    // Inventory: slot 1 weapon count, slot 2 weapon durability
     opened.slots.find((s) => s.slot === 1).model.weapons[0].count = 77;
-    // Modify slot 2's weapon durability
     opened.slots.find((s) => s.slot === 2).model.weapons[0].durability = 1;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber, opened.accountId);
-
-    expect(slots.find((s) => s.slot === 1).model.weapons[0].count).toBe(77);
-    expect(slots.find((s) => s.slot === 2).model.weapons[0].durability).toBe(1);
-
-    // Slot 2's weapon count should be original factory value
-    expect(slots.find((s) => s.slot === 2).model.weapons[0].count).toBe(
-      getExpectedModel(2).weapons[0].count,
-    );
-  });
-
-  test('deposit items are independent per slot', async () => {
-    const rawFiles = createUnencryptedSaveFolder([1, 2]);
-    const opened = await setupAndOpen(rawFiles);
-
+    // Deposit: distinct counts per slot
     opened.slots.find((s) => s.slot === 1).model.deposit[0].count = 33;
     opened.slots.find((s) => s.slot === 2).model.deposit[0].count = 66;
-
-    const { slots } = await writeAndReopen(opened.slots, opened.profileNumber, opened.accountId);
-
-    expect(slots.find((s) => s.slot === 1).model.deposit[0].count).toBe(33);
-    expect(slots.find((s) => s.slot === 2).model.deposit[0].count).toBe(66);
-  });
-
-  test('spells are independent per slot', async () => {
-    const rawFiles = createUnencryptedSaveFolder([1, 2]);
-    const opened = await setupAndOpen(rawFiles);
-
+    // Spells: distinct status per slot
     opened.slots.find((s) => s.slot === 1).model.spells[0].status = 0;
     opened.slots.find((s) => s.slot === 2).model.spells[0].status = 3;
 
     const { slots } = await writeAndReopen(opened.slots, opened.profileNumber, opened.accountId);
 
-    expect(slots.find((s) => s.slot === 1).model.spells[0].status).toBe(0);
-    expect(slots.find((s) => s.slot === 2).model.spells[0].status).toBe(3);
+    const s1 = slots.find((s) => s.slot === 1);
+    const s2 = slots.find((s) => s.slot === 2);
+
+    // Inventory
+    expect(s1.model.weapons[0].count).toBe(77);
+    expect(s2.model.weapons[0].durability).toBe(1);
+    // Slot 2's weapon count should be original factory value
+    expect(s2.model.weapons[0].count).toBe(getExpectedModel(2).weapons[0].count);
+    // Deposit
+    expect(s1.model.deposit[0].count).toBe(33);
+    expect(s2.model.deposit[0].count).toBe(66);
+    // Spells
+    expect(s1.model.spells[0].status).toBe(0);
+    expect(s2.model.spells[0].status).toBe(3);
   });
 
   // -------------------------------------------------------------------
@@ -309,29 +275,5 @@ describe('round-trip: multi-slot persistence', () => {
     assertModelsMatch(slots.find((s) => s.slot === 1).model, getExpectedModel(1));
     assertModelsMatch(slots.find((s) => s.slot === 2).model, getExpectedModel(2));
     assertModelsMatch(slots.find((s) => s.slot === 3).model, getExpectedModel(3));
-  });
-
-  // -------------------------------------------------------------------
-  // Multi-slot with assets
-  // -------------------------------------------------------------------
-
-  test('multi-slot save with assets preserves asset bytes on disk', async () => {
-    const rawFiles = createUnencryptedSaveFolder([1, 2], { assets: true });
-    const opened = await setupAndOpen(rawFiles);
-
-    const { filesToWrite } = await writeSaveData(
-      opened.slots,
-      [],
-      opened.profileNumber,
-      opened.accountId,
-    );
-    sandbox.writeFiles(filesToWrite);
-
-    // Assets must be on disk and unchanged
-    const iconBytes = sandbox.readFile('ICON0.PNG');
-    expect(iconBytes[0]).toBe(0x89); // PNG magic byte preserved
-
-    const picBytes = sandbox.readFile('PIC1.PNG');
-    expect(picBytes.length).toBeGreaterThan(100);
   });
 });

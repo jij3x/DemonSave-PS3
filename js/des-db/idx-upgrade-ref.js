@@ -8,6629 +8,6628 @@
  * Regenerate:  node tools/gen-des-db-index.mjs
  */
 export default {
-  _meta: {
-    tool: 'tools/gen-des-db-index.mjs',
-    source: 'js/des-db/weapons.js',
-    schema:
-      'Keyed by "base_weapon_id:path_id:level" where null components are serialized as "null". Each value is { category, id } where category is always "weapons" and id is the hex-ID string from weapons.js.',
-    entryCount: 1654,
+  "_meta": {
+    "tool": "tools/gen-des-db-index.mjs",
+    "source": "js/des-db/weapons.js",
+    "schema": "Keyed by \"base_weapon_id:path_id:level\" where null components are serialized as \"null\". Each value is { category, id } where category is always \"weapons\" and id is the hex-ID string from weapons.js.",
+    "entryCount": 1654
   },
-  index: {
-    '1:1:0': {
-      category: 'weapons',
-      id: '0x2710',
-    },
-    '1:1:1': {
-      category: 'weapons',
-      id: '0x2711',
-    },
-    '1:1:2': {
-      category: 'weapons',
-      id: '0x2712',
-    },
-    '1:1:3': {
-      category: 'weapons',
-      id: '0x2713',
-    },
-    '1:1:4': {
-      category: 'weapons',
-      id: '0x2714',
-    },
-    '1:1:5': {
-      category: 'weapons',
-      id: '0x2715',
-    },
-    '1:1:6': {
-      category: 'weapons',
-      id: '0x2716',
-    },
-    '1:1:7': {
-      category: 'weapons',
-      id: '0x2717',
-    },
-    '1:1:8': {
-      category: 'weapons',
-      id: '0x2718',
-    },
-    '1:1:9': {
-      category: 'weapons',
-      id: '0x2719',
-    },
-    '1:1:10': {
-      category: 'weapons',
-      id: '0x271A',
-    },
-    '1:2:1': {
-      category: 'weapons',
-      id: '0x271B',
-    },
-    '1:2:2': {
-      category: 'weapons',
-      id: '0x271C',
-    },
-    '1:2:3': {
-      category: 'weapons',
-      id: '0x271D',
-    },
-    '1:2:4': {
-      category: 'weapons',
-      id: '0x271E',
-    },
-    '1:2:5': {
-      category: 'weapons',
-      id: '0x271F',
-    },
-    '1:7:1': {
-      category: 'weapons',
-      id: '0x2725',
-    },
-    '1:7:2': {
-      category: 'weapons',
-      id: '0x2726',
-    },
-    '1:7:3': {
-      category: 'weapons',
-      id: '0x2727',
-    },
-    '1:7:4': {
-      category: 'weapons',
-      id: '0x2728',
-    },
-    '1:7:5': {
-      category: 'weapons',
-      id: '0x2729',
-    },
-    '1:4:1': {
-      category: 'weapons',
-      id: '0x272F',
-    },
-    '1:4:2': {
-      category: 'weapons',
-      id: '0x2730',
-    },
-    '1:4:3': {
-      category: 'weapons',
-      id: '0x2731',
-    },
-    '1:4:4': {
-      category: 'weapons',
-      id: '0x2732',
-    },
-    '1:4:5': {
-      category: 'weapons',
-      id: '0x2733',
+  "index": {
+    "1:1:0": {
+      "category": "weapons",
+      "id": "0x2710"
+    },
+    "1:1:1": {
+      "category": "weapons",
+      "id": "0x2711"
+    },
+    "1:1:2": {
+      "category": "weapons",
+      "id": "0x2712"
+    },
+    "1:1:3": {
+      "category": "weapons",
+      "id": "0x2713"
+    },
+    "1:1:4": {
+      "category": "weapons",
+      "id": "0x2714"
+    },
+    "1:1:5": {
+      "category": "weapons",
+      "id": "0x2715"
+    },
+    "1:1:6": {
+      "category": "weapons",
+      "id": "0x2716"
+    },
+    "1:1:7": {
+      "category": "weapons",
+      "id": "0x2717"
+    },
+    "1:1:8": {
+      "category": "weapons",
+      "id": "0x2718"
+    },
+    "1:1:9": {
+      "category": "weapons",
+      "id": "0x2719"
+    },
+    "1:1:10": {
+      "category": "weapons",
+      "id": "0x271A"
+    },
+    "1:2:1": {
+      "category": "weapons",
+      "id": "0x271B"
+    },
+    "1:2:2": {
+      "category": "weapons",
+      "id": "0x271C"
+    },
+    "1:2:3": {
+      "category": "weapons",
+      "id": "0x271D"
+    },
+    "1:2:4": {
+      "category": "weapons",
+      "id": "0x271E"
+    },
+    "1:2:5": {
+      "category": "weapons",
+      "id": "0x271F"
+    },
+    "1:7:1": {
+      "category": "weapons",
+      "id": "0x2725"
+    },
+    "1:7:2": {
+      "category": "weapons",
+      "id": "0x2726"
+    },
+    "1:7:3": {
+      "category": "weapons",
+      "id": "0x2727"
+    },
+    "1:7:4": {
+      "category": "weapons",
+      "id": "0x2728"
+    },
+    "1:7:5": {
+      "category": "weapons",
+      "id": "0x2729"
+    },
+    "1:4:1": {
+      "category": "weapons",
+      "id": "0x272F"
+    },
+    "1:4:2": {
+      "category": "weapons",
+      "id": "0x2730"
+    },
+    "1:4:3": {
+      "category": "weapons",
+      "id": "0x2731"
+    },
+    "1:4:4": {
+      "category": "weapons",
+      "id": "0x2732"
+    },
+    "1:4:5": {
+      "category": "weapons",
+      "id": "0x2733"
     },
-    '1:8:1': {
-      category: 'weapons',
-      id: '0x2739',
+    "1:8:1": {
+      "category": "weapons",
+      "id": "0x2739"
     },
-    '1:8:2': {
-      category: 'weapons',
-      id: '0x273A',
+    "1:8:2": {
+      "category": "weapons",
+      "id": "0x273A"
     },
-    '1:8:3': {
-      category: 'weapons',
-      id: '0x273B',
+    "1:8:3": {
+      "category": "weapons",
+      "id": "0x273B"
     },
-    '1:8:4': {
-      category: 'weapons',
-      id: '0x273C',
+    "1:8:4": {
+      "category": "weapons",
+      "id": "0x273C"
     },
-    '1:8:5': {
-      category: 'weapons',
-      id: '0x273D',
+    "1:8:5": {
+      "category": "weapons",
+      "id": "0x273D"
     },
-    '1:10:1': {
-      category: 'weapons',
-      id: '0x2743',
+    "1:10:1": {
+      "category": "weapons",
+      "id": "0x2743"
     },
-    '1:10:2': {
-      category: 'weapons',
-      id: '0x2744',
+    "1:10:2": {
+      "category": "weapons",
+      "id": "0x2744"
     },
-    '1:10:3': {
-      category: 'weapons',
-      id: '0x2745',
+    "1:10:3": {
+      "category": "weapons",
+      "id": "0x2745"
     },
-    '1:10:4': {
-      category: 'weapons',
-      id: '0x2746',
+    "1:10:4": {
+      "category": "weapons",
+      "id": "0x2746"
     },
-    '1:10:5': {
-      category: 'weapons',
-      id: '0x2747',
+    "1:10:5": {
+      "category": "weapons",
+      "id": "0x2747"
     },
-    '2:1:0': {
-      category: 'weapons',
-      id: '0x2774',
+    "2:1:0": {
+      "category": "weapons",
+      "id": "0x2774"
     },
-    '2:1:1': {
-      category: 'weapons',
-      id: '0x2775',
+    "2:1:1": {
+      "category": "weapons",
+      "id": "0x2775"
     },
-    '2:1:2': {
-      category: 'weapons',
-      id: '0x2776',
+    "2:1:2": {
+      "category": "weapons",
+      "id": "0x2776"
     },
-    '2:1:3': {
-      category: 'weapons',
-      id: '0x2777',
+    "2:1:3": {
+      "category": "weapons",
+      "id": "0x2777"
     },
-    '2:1:4': {
-      category: 'weapons',
-      id: '0x2778',
+    "2:1:4": {
+      "category": "weapons",
+      "id": "0x2778"
     },
-    '2:1:5': {
-      category: 'weapons',
-      id: '0x2779',
+    "2:1:5": {
+      "category": "weapons",
+      "id": "0x2779"
     },
-    '2:1:6': {
-      category: 'weapons',
-      id: '0x277A',
+    "2:1:6": {
+      "category": "weapons",
+      "id": "0x277A"
     },
-    '2:1:7': {
-      category: 'weapons',
-      id: '0x277B',
+    "2:1:7": {
+      "category": "weapons",
+      "id": "0x277B"
     },
-    '2:1:8': {
-      category: 'weapons',
-      id: '0x277C',
+    "2:1:8": {
+      "category": "weapons",
+      "id": "0x277C"
     },
-    '2:1:9': {
-      category: 'weapons',
-      id: '0x277D',
+    "2:1:9": {
+      "category": "weapons",
+      "id": "0x277D"
     },
-    '2:1:10': {
-      category: 'weapons',
-      id: '0x277E',
+    "2:1:10": {
+      "category": "weapons",
+      "id": "0x277E"
     },
-    '2:2:1': {
-      category: 'weapons',
-      id: '0x277F',
+    "2:2:1": {
+      "category": "weapons",
+      "id": "0x277F"
     },
-    '2:2:2': {
-      category: 'weapons',
-      id: '0x2780',
+    "2:2:2": {
+      "category": "weapons",
+      "id": "0x2780"
     },
-    '2:2:3': {
-      category: 'weapons',
-      id: '0x2781',
+    "2:2:3": {
+      "category": "weapons",
+      "id": "0x2781"
     },
-    '2:2:4': {
-      category: 'weapons',
-      id: '0x2782',
+    "2:2:4": {
+      "category": "weapons",
+      "id": "0x2782"
     },
-    '2:2:5': {
-      category: 'weapons',
-      id: '0x2783',
+    "2:2:5": {
+      "category": "weapons",
+      "id": "0x2783"
     },
-    '2:7:1': {
-      category: 'weapons',
-      id: '0x2789',
+    "2:7:1": {
+      "category": "weapons",
+      "id": "0x2789"
     },
-    '2:7:2': {
-      category: 'weapons',
-      id: '0x278A',
+    "2:7:2": {
+      "category": "weapons",
+      "id": "0x278A"
     },
-    '2:7:3': {
-      category: 'weapons',
-      id: '0x278B',
+    "2:7:3": {
+      "category": "weapons",
+      "id": "0x278B"
     },
-    '2:7:4': {
-      category: 'weapons',
-      id: '0x278C',
+    "2:7:4": {
+      "category": "weapons",
+      "id": "0x278C"
     },
-    '2:7:5': {
-      category: 'weapons',
-      id: '0x278D',
+    "2:7:5": {
+      "category": "weapons",
+      "id": "0x278D"
     },
-    '2:8:1': {
-      category: 'weapons',
-      id: '0x2793',
+    "2:8:1": {
+      "category": "weapons",
+      "id": "0x2793"
     },
-    '2:8:2': {
-      category: 'weapons',
-      id: '0x2794',
+    "2:8:2": {
+      "category": "weapons",
+      "id": "0x2794"
     },
-    '2:8:3': {
-      category: 'weapons',
-      id: '0x2795',
+    "2:8:3": {
+      "category": "weapons",
+      "id": "0x2795"
     },
-    '2:8:4': {
-      category: 'weapons',
-      id: '0x2796',
+    "2:8:4": {
+      "category": "weapons",
+      "id": "0x2796"
     },
-    '2:8:5': {
-      category: 'weapons',
-      id: '0x2797',
+    "2:8:5": {
+      "category": "weapons",
+      "id": "0x2797"
     },
-    '2:4:1': {
-      category: 'weapons',
-      id: '0x279D',
+    "2:4:1": {
+      "category": "weapons",
+      "id": "0x279D"
     },
-    '2:4:2': {
-      category: 'weapons',
-      id: '0x279E',
+    "2:4:2": {
+      "category": "weapons",
+      "id": "0x279E"
     },
-    '2:4:3': {
-      category: 'weapons',
-      id: '0x279F',
+    "2:4:3": {
+      "category": "weapons",
+      "id": "0x279F"
     },
-    '2:4:4': {
-      category: 'weapons',
-      id: '0x27A0',
+    "2:4:4": {
+      "category": "weapons",
+      "id": "0x27A0"
     },
-    '2:4:5': {
-      category: 'weapons',
-      id: '0x27A1',
+    "2:4:5": {
+      "category": "weapons",
+      "id": "0x27A1"
     },
-    '2:10:1': {
-      category: 'weapons',
-      id: '0x27A7',
+    "2:10:1": {
+      "category": "weapons",
+      "id": "0x27A7"
     },
-    '2:10:2': {
-      category: 'weapons',
-      id: '0x27A8',
+    "2:10:2": {
+      "category": "weapons",
+      "id": "0x27A8"
     },
-    '2:10:3': {
-      category: 'weapons',
-      id: '0x27A9',
+    "2:10:3": {
+      "category": "weapons",
+      "id": "0x27A9"
     },
-    '2:10:4': {
-      category: 'weapons',
-      id: '0x27AA',
+    "2:10:4": {
+      "category": "weapons",
+      "id": "0x27AA"
     },
-    '2:10:5': {
-      category: 'weapons',
-      id: '0x27AB',
+    "2:10:5": {
+      "category": "weapons",
+      "id": "0x27AB"
     },
-    '3:1:0': {
-      category: 'weapons',
-      id: '0x27D8',
+    "3:1:0": {
+      "category": "weapons",
+      "id": "0x27D8"
     },
-    '3:1:1': {
-      category: 'weapons',
-      id: '0x27D9',
+    "3:1:1": {
+      "category": "weapons",
+      "id": "0x27D9"
     },
-    '3:1:2': {
-      category: 'weapons',
-      id: '0x27DA',
+    "3:1:2": {
+      "category": "weapons",
+      "id": "0x27DA"
     },
-    '3:1:3': {
-      category: 'weapons',
-      id: '0x27DB',
+    "3:1:3": {
+      "category": "weapons",
+      "id": "0x27DB"
     },
-    '3:1:4': {
-      category: 'weapons',
-      id: '0x27DC',
+    "3:1:4": {
+      "category": "weapons",
+      "id": "0x27DC"
     },
-    '3:1:5': {
-      category: 'weapons',
-      id: '0x27DD',
+    "3:1:5": {
+      "category": "weapons",
+      "id": "0x27DD"
     },
-    '3:1:6': {
-      category: 'weapons',
-      id: '0x27DE',
+    "3:1:6": {
+      "category": "weapons",
+      "id": "0x27DE"
     },
-    '3:1:7': {
-      category: 'weapons',
-      id: '0x27DF',
+    "3:1:7": {
+      "category": "weapons",
+      "id": "0x27DF"
     },
-    '3:1:8': {
-      category: 'weapons',
-      id: '0x27E0',
+    "3:1:8": {
+      "category": "weapons",
+      "id": "0x27E0"
     },
-    '3:1:9': {
-      category: 'weapons',
-      id: '0x27E1',
+    "3:1:9": {
+      "category": "weapons",
+      "id": "0x27E1"
     },
-    '3:1:10': {
-      category: 'weapons',
-      id: '0x27E2',
+    "3:1:10": {
+      "category": "weapons",
+      "id": "0x27E2"
     },
-    '3:2:1': {
-      category: 'weapons',
-      id: '0x27E3',
+    "3:2:1": {
+      "category": "weapons",
+      "id": "0x27E3"
     },
-    '3:2:2': {
-      category: 'weapons',
-      id: '0x27E4',
+    "3:2:2": {
+      "category": "weapons",
+      "id": "0x27E4"
     },
-    '3:2:3': {
-      category: 'weapons',
-      id: '0x27E5',
+    "3:2:3": {
+      "category": "weapons",
+      "id": "0x27E5"
     },
-    '3:2:4': {
-      category: 'weapons',
-      id: '0x27E6',
+    "3:2:4": {
+      "category": "weapons",
+      "id": "0x27E6"
     },
-    '3:2:5': {
-      category: 'weapons',
-      id: '0x27E7',
+    "3:2:5": {
+      "category": "weapons",
+      "id": "0x27E7"
     },
-    '3:7:1': {
-      category: 'weapons',
-      id: '0x27ED',
+    "3:7:1": {
+      "category": "weapons",
+      "id": "0x27ED"
     },
-    '3:7:2': {
-      category: 'weapons',
-      id: '0x27EE',
+    "3:7:2": {
+      "category": "weapons",
+      "id": "0x27EE"
     },
-    '3:7:3': {
-      category: 'weapons',
-      id: '0x27EF',
+    "3:7:3": {
+      "category": "weapons",
+      "id": "0x27EF"
     },
-    '3:7:4': {
-      category: 'weapons',
-      id: '0x27F0',
+    "3:7:4": {
+      "category": "weapons",
+      "id": "0x27F0"
     },
-    '3:7:5': {
-      category: 'weapons',
-      id: '0x27F1',
+    "3:7:5": {
+      "category": "weapons",
+      "id": "0x27F1"
     },
-    '3:8:1': {
-      category: 'weapons',
-      id: '0x27F7',
+    "3:8:1": {
+      "category": "weapons",
+      "id": "0x27F7"
     },
-    '3:8:2': {
-      category: 'weapons',
-      id: '0x27F8',
+    "3:8:2": {
+      "category": "weapons",
+      "id": "0x27F8"
     },
-    '3:8:3': {
-      category: 'weapons',
-      id: '0x27F9',
+    "3:8:3": {
+      "category": "weapons",
+      "id": "0x27F9"
     },
-    '3:8:4': {
-      category: 'weapons',
-      id: '0x27FA',
+    "3:8:4": {
+      "category": "weapons",
+      "id": "0x27FA"
     },
-    '3:8:5': {
-      category: 'weapons',
-      id: '0x27FB',
+    "3:8:5": {
+      "category": "weapons",
+      "id": "0x27FB"
     },
-    '3:4:1': {
-      category: 'weapons',
-      id: '0x2801',
+    "3:4:1": {
+      "category": "weapons",
+      "id": "0x2801"
     },
-    '3:4:2': {
-      category: 'weapons',
-      id: '0x2802',
+    "3:4:2": {
+      "category": "weapons",
+      "id": "0x2802"
     },
-    '3:4:3': {
-      category: 'weapons',
-      id: '0x2803',
+    "3:4:3": {
+      "category": "weapons",
+      "id": "0x2803"
     },
-    '3:4:4': {
-      category: 'weapons',
-      id: '0x2804',
+    "3:4:4": {
+      "category": "weapons",
+      "id": "0x2804"
     },
-    '3:4:5': {
-      category: 'weapons',
-      id: '0x2805',
+    "3:4:5": {
+      "category": "weapons",
+      "id": "0x2805"
     },
-    '3:10:1': {
-      category: 'weapons',
-      id: '0x280B',
+    "3:10:1": {
+      "category": "weapons",
+      "id": "0x280B"
     },
-    '3:10:2': {
-      category: 'weapons',
-      id: '0x280C',
+    "3:10:2": {
+      "category": "weapons",
+      "id": "0x280C"
     },
-    '3:10:3': {
-      category: 'weapons',
-      id: '0x280D',
+    "3:10:3": {
+      "category": "weapons",
+      "id": "0x280D"
     },
-    '3:10:4': {
-      category: 'weapons',
-      id: '0x280E',
+    "3:10:4": {
+      "category": "weapons",
+      "id": "0x280E"
     },
-    '3:10:5': {
-      category: 'weapons',
-      id: '0x280F',
+    "3:10:5": {
+      "category": "weapons",
+      "id": "0x280F"
     },
-    '48:14:0': {
-      category: 'weapons',
-      id: '0x28A0',
+    "48:14:0": {
+      "category": "weapons",
+      "id": "0x28A0"
     },
-    '48:14:1': {
-      category: 'weapons',
-      id: '0x28A1',
+    "48:14:1": {
+      "category": "weapons",
+      "id": "0x28A1"
     },
-    '48:14:2': {
-      category: 'weapons',
-      id: '0x28A2',
+    "48:14:2": {
+      "category": "weapons",
+      "id": "0x28A2"
     },
-    '48:14:3': {
-      category: 'weapons',
-      id: '0x28A3',
+    "48:14:3": {
+      "category": "weapons",
+      "id": "0x28A3"
     },
-    '48:14:4': {
-      category: 'weapons',
-      id: '0x28A4',
+    "48:14:4": {
+      "category": "weapons",
+      "id": "0x28A4"
     },
-    '48:14:5': {
-      category: 'weapons',
-      id: '0x28A5',
+    "48:14:5": {
+      "category": "weapons",
+      "id": "0x28A5"
     },
-    '53:14:0': {
-      category: 'weapons',
-      id: '0x2904',
+    "53:14:0": {
+      "category": "weapons",
+      "id": "0x2904"
     },
-    '53:14:1': {
-      category: 'weapons',
-      id: '0x2905',
+    "53:14:1": {
+      "category": "weapons",
+      "id": "0x2905"
     },
-    '53:14:2': {
-      category: 'weapons',
-      id: '0x2906',
+    "53:14:2": {
+      "category": "weapons",
+      "id": "0x2906"
     },
-    '53:14:3': {
-      category: 'weapons',
-      id: '0x2907',
+    "53:14:3": {
+      "category": "weapons",
+      "id": "0x2907"
     },
-    '53:14:4': {
-      category: 'weapons',
-      id: '0x2908',
+    "53:14:4": {
+      "category": "weapons",
+      "id": "0x2908"
     },
-    '53:14:5': {
-      category: 'weapons',
-      id: '0x2909',
+    "53:14:5": {
+      "category": "weapons",
+      "id": "0x2909"
     },
-    '57:14:0': {
-      category: 'weapons',
-      id: '0x2968',
+    "57:14:0": {
+      "category": "weapons",
+      "id": "0x2968"
     },
-    '57:14:1': {
-      category: 'weapons',
-      id: '0x2969',
+    "57:14:1": {
+      "category": "weapons",
+      "id": "0x2969"
     },
-    '57:14:2': {
-      category: 'weapons',
-      id: '0x296A',
+    "57:14:2": {
+      "category": "weapons",
+      "id": "0x296A"
     },
-    '57:14:3': {
-      category: 'weapons',
-      id: '0x296B',
+    "57:14:3": {
+      "category": "weapons",
+      "id": "0x296B"
     },
-    '57:14:4': {
-      category: 'weapons',
-      id: '0x296C',
+    "57:14:4": {
+      "category": "weapons",
+      "id": "0x296C"
     },
-    '57:14:5': {
-      category: 'weapons',
-      id: '0x296D',
+    "57:14:5": {
+      "category": "weapons",
+      "id": "0x296D"
     },
-    '4:1:0': {
-      category: 'weapons',
-      id: '0x29CC',
+    "4:1:0": {
+      "category": "weapons",
+      "id": "0x29CC"
     },
-    '4:1:1': {
-      category: 'weapons',
-      id: '0x29CD',
+    "4:1:1": {
+      "category": "weapons",
+      "id": "0x29CD"
     },
-    '4:1:2': {
-      category: 'weapons',
-      id: '0x29CE',
+    "4:1:2": {
+      "category": "weapons",
+      "id": "0x29CE"
     },
-    '4:1:3': {
-      category: 'weapons',
-      id: '0x29CF',
+    "4:1:3": {
+      "category": "weapons",
+      "id": "0x29CF"
     },
-    '4:1:4': {
-      category: 'weapons',
-      id: '0x29D0',
+    "4:1:4": {
+      "category": "weapons",
+      "id": "0x29D0"
     },
-    '4:1:5': {
-      category: 'weapons',
-      id: '0x29D1',
+    "4:1:5": {
+      "category": "weapons",
+      "id": "0x29D1"
     },
-    '4:1:6': {
-      category: 'weapons',
-      id: '0x29D2',
+    "4:1:6": {
+      "category": "weapons",
+      "id": "0x29D2"
     },
-    '4:1:7': {
-      category: 'weapons',
-      id: '0x29D3',
+    "4:1:7": {
+      "category": "weapons",
+      "id": "0x29D3"
     },
-    '4:1:8': {
-      category: 'weapons',
-      id: '0x29D4',
+    "4:1:8": {
+      "category": "weapons",
+      "id": "0x29D4"
     },
-    '4:1:9': {
-      category: 'weapons',
-      id: '0x29D5',
+    "4:1:9": {
+      "category": "weapons",
+      "id": "0x29D5"
     },
-    '4:1:10': {
-      category: 'weapons',
-      id: '0x29D6',
+    "4:1:10": {
+      "category": "weapons",
+      "id": "0x29D6"
     },
-    '4:4:1': {
-      category: 'weapons',
-      id: '0x29D7',
+    "4:4:1": {
+      "category": "weapons",
+      "id": "0x29D7"
     },
-    '4:4:2': {
-      category: 'weapons',
-      id: '0x29D8',
+    "4:4:2": {
+      "category": "weapons",
+      "id": "0x29D8"
     },
-    '4:4:3': {
-      category: 'weapons',
-      id: '0x29D9',
+    "4:4:3": {
+      "category": "weapons",
+      "id": "0x29D9"
     },
-    '4:4:4': {
-      category: 'weapons',
-      id: '0x29DA',
+    "4:4:4": {
+      "category": "weapons",
+      "id": "0x29DA"
     },
-    '4:4:5': {
-      category: 'weapons',
-      id: '0x29DB',
+    "4:4:5": {
+      "category": "weapons",
+      "id": "0x29DB"
     },
-    '4:10:1': {
-      category: 'weapons',
-      id: '0x29EB',
+    "4:10:1": {
+      "category": "weapons",
+      "id": "0x29EB"
     },
-    '4:10:2': {
-      category: 'weapons',
-      id: '0x29EC',
+    "4:10:2": {
+      "category": "weapons",
+      "id": "0x29EC"
     },
-    '4:10:3': {
-      category: 'weapons',
-      id: '0x29ED',
+    "4:10:3": {
+      "category": "weapons",
+      "id": "0x29ED"
     },
-    '4:10:4': {
-      category: 'weapons',
-      id: '0x29EE',
+    "4:10:4": {
+      "category": "weapons",
+      "id": "0x29EE"
     },
-    '4:10:5': {
-      category: 'weapons',
-      id: '0x29EF',
+    "4:10:5": {
+      "category": "weapons",
+      "id": "0x29EF"
     },
-    '4:2:1': {
-      category: 'weapons',
-      id: '0x29F5',
+    "4:2:1": {
+      "category": "weapons",
+      "id": "0x29F5"
     },
-    '4:2:2': {
-      category: 'weapons',
-      id: '0x29F6',
+    "4:2:2": {
+      "category": "weapons",
+      "id": "0x29F6"
     },
-    '4:2:3': {
-      category: 'weapons',
-      id: '0x29F7',
+    "4:2:3": {
+      "category": "weapons",
+      "id": "0x29F7"
     },
-    '4:2:4': {
-      category: 'weapons',
-      id: '0x29F8',
+    "4:2:4": {
+      "category": "weapons",
+      "id": "0x29F8"
     },
-    '4:2:5': {
-      category: 'weapons',
-      id: '0x29F9',
+    "4:2:5": {
+      "category": "weapons",
+      "id": "0x29F9"
     },
-    '4:7:1': {
-      category: 'weapons',
-      id: '0x29FF',
+    "4:7:1": {
+      "category": "weapons",
+      "id": "0x29FF"
     },
-    '4:7:2': {
-      category: 'weapons',
-      id: '0x2A00',
+    "4:7:2": {
+      "category": "weapons",
+      "id": "0x2A00"
     },
-    '4:7:3': {
-      category: 'weapons',
-      id: '0x2A01',
+    "4:7:3": {
+      "category": "weapons",
+      "id": "0x2A01"
     },
-    '4:7:4': {
-      category: 'weapons',
-      id: '0x2A02',
+    "4:7:4": {
+      "category": "weapons",
+      "id": "0x2A02"
     },
-    '4:7:5': {
-      category: 'weapons',
-      id: '0x2A03',
+    "4:7:5": {
+      "category": "weapons",
+      "id": "0x2A03"
     },
-    '4:8:1': {
-      category: 'weapons',
-      id: '0x2A09',
+    "4:8:1": {
+      "category": "weapons",
+      "id": "0x2A09"
     },
-    '4:8:2': {
-      category: 'weapons',
-      id: '0x2A0A',
+    "4:8:2": {
+      "category": "weapons",
+      "id": "0x2A0A"
     },
-    '4:8:3': {
-      category: 'weapons',
-      id: '0x2A0B',
+    "4:8:3": {
+      "category": "weapons",
+      "id": "0x2A0B"
     },
-    '4:8:4': {
-      category: 'weapons',
-      id: '0x2A0C',
+    "4:8:4": {
+      "category": "weapons",
+      "id": "0x2A0C"
     },
-    '4:8:5': {
-      category: 'weapons',
-      id: '0x2A0D',
+    "4:8:5": {
+      "category": "weapons",
+      "id": "0x2A0D"
     },
-    '5:1:0': {
-      category: 'weapons',
-      id: '0x4E20',
+    "5:1:0": {
+      "category": "weapons",
+      "id": "0x4E20"
     },
-    '5:1:1': {
-      category: 'weapons',
-      id: '0x4E21',
+    "5:1:1": {
+      "category": "weapons",
+      "id": "0x4E21"
     },
-    '5:1:2': {
-      category: 'weapons',
-      id: '0x4E22',
+    "5:1:2": {
+      "category": "weapons",
+      "id": "0x4E22"
     },
-    '5:1:3': {
-      category: 'weapons',
-      id: '0x4E23',
+    "5:1:3": {
+      "category": "weapons",
+      "id": "0x4E23"
     },
-    '5:1:4': {
-      category: 'weapons',
-      id: '0x4E24',
+    "5:1:4": {
+      "category": "weapons",
+      "id": "0x4E24"
     },
-    '5:1:5': {
-      category: 'weapons',
-      id: '0x4E25',
+    "5:1:5": {
+      "category": "weapons",
+      "id": "0x4E25"
     },
-    '5:1:6': {
-      category: 'weapons',
-      id: '0x4E26',
+    "5:1:6": {
+      "category": "weapons",
+      "id": "0x4E26"
     },
-    '5:1:7': {
-      category: 'weapons',
-      id: '0x4E27',
+    "5:1:7": {
+      "category": "weapons",
+      "id": "0x4E27"
     },
-    '5:1:8': {
-      category: 'weapons',
-      id: '0x4E28',
+    "5:1:8": {
+      "category": "weapons",
+      "id": "0x4E28"
     },
-    '5:1:9': {
-      category: 'weapons',
-      id: '0x4E29',
+    "5:1:9": {
+      "category": "weapons",
+      "id": "0x4E29"
     },
-    '5:1:10': {
-      category: 'weapons',
-      id: '0x4E2A',
+    "5:1:10": {
+      "category": "weapons",
+      "id": "0x4E2A"
     },
-    '5:2:1': {
-      category: 'weapons',
-      id: '0x4E2B',
+    "5:2:1": {
+      "category": "weapons",
+      "id": "0x4E2B"
     },
-    '5:2:2': {
-      category: 'weapons',
-      id: '0x4E2C',
+    "5:2:2": {
+      "category": "weapons",
+      "id": "0x4E2C"
     },
-    '5:2:3': {
-      category: 'weapons',
-      id: '0x4E2D',
+    "5:2:3": {
+      "category": "weapons",
+      "id": "0x4E2D"
     },
-    '5:2:4': {
-      category: 'weapons',
-      id: '0x4E2E',
+    "5:2:4": {
+      "category": "weapons",
+      "id": "0x4E2E"
     },
-    '5:2:5': {
-      category: 'weapons',
-      id: '0x4E2F',
+    "5:2:5": {
+      "category": "weapons",
+      "id": "0x4E2F"
     },
-    '5:5:1': {
-      category: 'weapons',
-      id: '0x4E35',
+    "5:5:1": {
+      "category": "weapons",
+      "id": "0x4E35"
     },
-    '5:5:2': {
-      category: 'weapons',
-      id: '0x4E36',
+    "5:5:2": {
+      "category": "weapons",
+      "id": "0x4E36"
     },
-    '5:5:3': {
-      category: 'weapons',
-      id: '0x4E37',
+    "5:5:3": {
+      "category": "weapons",
+      "id": "0x4E37"
     },
-    '5:5:4': {
-      category: 'weapons',
-      id: '0x4E38',
+    "5:5:4": {
+      "category": "weapons",
+      "id": "0x4E38"
     },
-    '5:5:5': {
-      category: 'weapons',
-      id: '0x4E39',
+    "5:5:5": {
+      "category": "weapons",
+      "id": "0x4E39"
     },
-    '5:9:1': {
-      category: 'weapons',
-      id: '0x4E3F',
+    "5:9:1": {
+      "category": "weapons",
+      "id": "0x4E3F"
     },
-    '5:9:2': {
-      category: 'weapons',
-      id: '0x4E40',
+    "5:9:2": {
+      "category": "weapons",
+      "id": "0x4E40"
     },
-    '5:9:3': {
-      category: 'weapons',
-      id: '0x4E41',
+    "5:9:3": {
+      "category": "weapons",
+      "id": "0x4E41"
     },
-    '5:9:4': {
-      category: 'weapons',
-      id: '0x4E42',
+    "5:9:4": {
+      "category": "weapons",
+      "id": "0x4E42"
     },
-    '5:9:5': {
-      category: 'weapons',
-      id: '0x4E43',
+    "5:9:5": {
+      "category": "weapons",
+      "id": "0x4E43"
     },
-    '5:3:1': {
-      category: 'weapons',
-      id: '0x4E49',
+    "5:3:1": {
+      "category": "weapons",
+      "id": "0x4E49"
     },
-    '5:3:2': {
-      category: 'weapons',
-      id: '0x4E4A',
+    "5:3:2": {
+      "category": "weapons",
+      "id": "0x4E4A"
     },
-    '5:3:3': {
-      category: 'weapons',
-      id: '0x4E4B',
+    "5:3:3": {
+      "category": "weapons",
+      "id": "0x4E4B"
     },
-    '5:3:4': {
-      category: 'weapons',
-      id: '0x4E4C',
+    "5:3:4": {
+      "category": "weapons",
+      "id": "0x4E4C"
     },
-    '5:3:5': {
-      category: 'weapons',
-      id: '0x4E4D',
+    "5:3:5": {
+      "category": "weapons",
+      "id": "0x4E4D"
     },
-    '5:11:1': {
-      category: 'weapons',
-      id: '0x4E53',
+    "5:11:1": {
+      "category": "weapons",
+      "id": "0x4E53"
     },
-    '5:11:2': {
-      category: 'weapons',
-      id: '0x4E54',
+    "5:11:2": {
+      "category": "weapons",
+      "id": "0x4E54"
     },
-    '5:11:3': {
-      category: 'weapons',
-      id: '0x4E55',
+    "5:11:3": {
+      "category": "weapons",
+      "id": "0x4E55"
     },
-    '5:11:4': {
-      category: 'weapons',
-      id: '0x4E56',
+    "5:11:4": {
+      "category": "weapons",
+      "id": "0x4E56"
     },
-    '5:11:5': {
-      category: 'weapons',
-      id: '0x4E57',
+    "5:11:5": {
+      "category": "weapons",
+      "id": "0x4E57"
     },
-    '16:1:0': {
-      category: 'weapons',
-      id: '0x4E84',
+    "16:1:0": {
+      "category": "weapons",
+      "id": "0x4E84"
     },
-    '16:1:1': {
-      category: 'weapons',
-      id: '0x4E85',
+    "16:1:1": {
+      "category": "weapons",
+      "id": "0x4E85"
     },
-    '16:1:2': {
-      category: 'weapons',
-      id: '0x4E86',
+    "16:1:2": {
+      "category": "weapons",
+      "id": "0x4E86"
     },
-    '16:1:3': {
-      category: 'weapons',
-      id: '0x4E87',
+    "16:1:3": {
+      "category": "weapons",
+      "id": "0x4E87"
     },
-    '16:1:4': {
-      category: 'weapons',
-      id: '0x4E88',
+    "16:1:4": {
+      "category": "weapons",
+      "id": "0x4E88"
     },
-    '16:1:5': {
-      category: 'weapons',
-      id: '0x4E89',
+    "16:1:5": {
+      "category": "weapons",
+      "id": "0x4E89"
     },
-    '16:1:6': {
-      category: 'weapons',
-      id: '0x4E8A',
+    "16:1:6": {
+      "category": "weapons",
+      "id": "0x4E8A"
     },
-    '16:1:7': {
-      category: 'weapons',
-      id: '0x4E8B',
+    "16:1:7": {
+      "category": "weapons",
+      "id": "0x4E8B"
     },
-    '16:1:8': {
-      category: 'weapons',
-      id: '0x4E8C',
+    "16:1:8": {
+      "category": "weapons",
+      "id": "0x4E8C"
     },
-    '16:1:9': {
-      category: 'weapons',
-      id: '0x4E8D',
+    "16:1:9": {
+      "category": "weapons",
+      "id": "0x4E8D"
     },
-    '16:1:10': {
-      category: 'weapons',
-      id: '0x4E8E',
+    "16:1:10": {
+      "category": "weapons",
+      "id": "0x4E8E"
     },
-    '16:4:1': {
-      category: 'weapons',
-      id: '0x4E8F',
+    "16:4:1": {
+      "category": "weapons",
+      "id": "0x4E8F"
     },
-    '16:4:2': {
-      category: 'weapons',
-      id: '0x4E90',
+    "16:4:2": {
+      "category": "weapons",
+      "id": "0x4E90"
     },
-    '16:4:3': {
-      category: 'weapons',
-      id: '0x4E91',
+    "16:4:3": {
+      "category": "weapons",
+      "id": "0x4E91"
     },
-    '16:4:4': {
-      category: 'weapons',
-      id: '0x4E92',
+    "16:4:4": {
+      "category": "weapons",
+      "id": "0x4E92"
     },
-    '16:4:5': {
-      category: 'weapons',
-      id: '0x4E93',
+    "16:4:5": {
+      "category": "weapons",
+      "id": "0x4E93"
     },
-    '16:6:1': {
-      category: 'weapons',
-      id: '0x4E99',
+    "16:6:1": {
+      "category": "weapons",
+      "id": "0x4E99"
     },
-    '16:6:2': {
-      category: 'weapons',
-      id: '0x4E9A',
+    "16:6:2": {
+      "category": "weapons",
+      "id": "0x4E9A"
     },
-    '16:6:3': {
-      category: 'weapons',
-      id: '0x4E9B',
+    "16:6:3": {
+      "category": "weapons",
+      "id": "0x4E9B"
     },
-    '16:6:4': {
-      category: 'weapons',
-      id: '0x4E9C',
+    "16:6:4": {
+      "category": "weapons",
+      "id": "0x4E9C"
     },
-    '16:6:5': {
-      category: 'weapons',
-      id: '0x4E9D',
+    "16:6:5": {
+      "category": "weapons",
+      "id": "0x4E9D"
     },
-    '16:10:1': {
-      category: 'weapons',
-      id: '0x4EA3',
+    "16:10:1": {
+      "category": "weapons",
+      "id": "0x4EA3"
     },
-    '16:10:2': {
-      category: 'weapons',
-      id: '0x4EA4',
+    "16:10:2": {
+      "category": "weapons",
+      "id": "0x4EA4"
     },
-    '16:10:3': {
-      category: 'weapons',
-      id: '0x4EA5',
+    "16:10:3": {
+      "category": "weapons",
+      "id": "0x4EA5"
     },
-    '16:10:4': {
-      category: 'weapons',
-      id: '0x4EA6',
+    "16:10:4": {
+      "category": "weapons",
+      "id": "0x4EA6"
     },
-    '16:10:5': {
-      category: 'weapons',
-      id: '0x4EA7',
+    "16:10:5": {
+      "category": "weapons",
+      "id": "0x4EA7"
     },
-    '16:2:1': {
-      category: 'weapons',
-      id: '0x4EAD',
+    "16:2:1": {
+      "category": "weapons",
+      "id": "0x4EAD"
     },
-    '16:2:2': {
-      category: 'weapons',
-      id: '0x4EAE',
+    "16:2:2": {
+      "category": "weapons",
+      "id": "0x4EAE"
     },
-    '16:2:3': {
-      category: 'weapons',
-      id: '0x4EAF',
+    "16:2:3": {
+      "category": "weapons",
+      "id": "0x4EAF"
     },
-    '16:2:4': {
-      category: 'weapons',
-      id: '0x4EB0',
+    "16:2:4": {
+      "category": "weapons",
+      "id": "0x4EB0"
     },
-    '16:2:5': {
-      category: 'weapons',
-      id: '0x4EB1',
+    "16:2:5": {
+      "category": "weapons",
+      "id": "0x4EB1"
     },
-    '16:7:1': {
-      category: 'weapons',
-      id: '0x4EB7',
+    "16:7:1": {
+      "category": "weapons",
+      "id": "0x4EB7"
     },
-    '16:7:2': {
-      category: 'weapons',
-      id: '0x4EB8',
+    "16:7:2": {
+      "category": "weapons",
+      "id": "0x4EB8"
     },
-    '16:7:3': {
-      category: 'weapons',
-      id: '0x4EB9',
+    "16:7:3": {
+      "category": "weapons",
+      "id": "0x4EB9"
     },
-    '16:7:4': {
-      category: 'weapons',
-      id: '0x4EBA',
+    "16:7:4": {
+      "category": "weapons",
+      "id": "0x4EBA"
     },
-    '16:7:5': {
-      category: 'weapons',
-      id: '0x4EBB',
+    "16:7:5": {
+      "category": "weapons",
+      "id": "0x4EBB"
     },
-    '16:9:1': {
-      category: 'weapons',
-      id: '0x4EC1',
+    "16:9:1": {
+      "category": "weapons",
+      "id": "0x4EC1"
     },
-    '16:9:2': {
-      category: 'weapons',
-      id: '0x4EC2',
+    "16:9:2": {
+      "category": "weapons",
+      "id": "0x4EC2"
     },
-    '16:9:3': {
-      category: 'weapons',
-      id: '0x4EC3',
+    "16:9:3": {
+      "category": "weapons",
+      "id": "0x4EC3"
     },
-    '16:9:4': {
-      category: 'weapons',
-      id: '0x4EC4',
+    "16:9:4": {
+      "category": "weapons",
+      "id": "0x4EC4"
     },
-    '16:9:5': {
-      category: 'weapons',
-      id: '0x4EC5',
+    "16:9:5": {
+      "category": "weapons",
+      "id": "0x4EC5"
     },
-    '6:1:0': {
-      category: 'weapons',
-      id: '0x4EE8',
+    "6:1:0": {
+      "category": "weapons",
+      "id": "0x4EE8"
     },
-    '6:1:1': {
-      category: 'weapons',
-      id: '0x4EE9',
+    "6:1:1": {
+      "category": "weapons",
+      "id": "0x4EE9"
     },
-    '6:1:2': {
-      category: 'weapons',
-      id: '0x4EEA',
+    "6:1:2": {
+      "category": "weapons",
+      "id": "0x4EEA"
     },
-    '6:1:3': {
-      category: 'weapons',
-      id: '0x4EEB',
+    "6:1:3": {
+      "category": "weapons",
+      "id": "0x4EEB"
     },
-    '6:1:4': {
-      category: 'weapons',
-      id: '0x4EEC',
+    "6:1:4": {
+      "category": "weapons",
+      "id": "0x4EEC"
     },
-    '6:1:5': {
-      category: 'weapons',
-      id: '0x4EED',
+    "6:1:5": {
+      "category": "weapons",
+      "id": "0x4EED"
     },
-    '6:1:6': {
-      category: 'weapons',
-      id: '0x4EEE',
+    "6:1:6": {
+      "category": "weapons",
+      "id": "0x4EEE"
     },
-    '6:1:7': {
-      category: 'weapons',
-      id: '0x4EEF',
+    "6:1:7": {
+      "category": "weapons",
+      "id": "0x4EEF"
     },
-    '6:1:8': {
-      category: 'weapons',
-      id: '0x4EF0',
+    "6:1:8": {
+      "category": "weapons",
+      "id": "0x4EF0"
     },
-    '6:1:9': {
-      category: 'weapons',
-      id: '0x4EF1',
+    "6:1:9": {
+      "category": "weapons",
+      "id": "0x4EF1"
     },
-    '6:1:10': {
-      category: 'weapons',
-      id: '0x4EF2',
+    "6:1:10": {
+      "category": "weapons",
+      "id": "0x4EF2"
     },
-    '6:2:1': {
-      category: 'weapons',
-      id: '0x4EF3',
+    "6:2:1": {
+      "category": "weapons",
+      "id": "0x4EF3"
     },
-    '6:2:2': {
-      category: 'weapons',
-      id: '0x4EF4',
+    "6:2:2": {
+      "category": "weapons",
+      "id": "0x4EF4"
     },
-    '6:2:3': {
-      category: 'weapons',
-      id: '0x4EF5',
+    "6:2:3": {
+      "category": "weapons",
+      "id": "0x4EF5"
     },
-    '6:2:4': {
-      category: 'weapons',
-      id: '0x4EF6',
+    "6:2:4": {
+      "category": "weapons",
+      "id": "0x4EF6"
     },
-    '6:2:5': {
-      category: 'weapons',
-      id: '0x4EF7',
+    "6:2:5": {
+      "category": "weapons",
+      "id": "0x4EF7"
     },
-    '6:5:1': {
-      category: 'weapons',
-      id: '0x4EFD',
+    "6:5:1": {
+      "category": "weapons",
+      "id": "0x4EFD"
     },
-    '6:5:2': {
-      category: 'weapons',
-      id: '0x4EFE',
+    "6:5:2": {
+      "category": "weapons",
+      "id": "0x4EFE"
     },
-    '6:5:3': {
-      category: 'weapons',
-      id: '0x4EFF',
+    "6:5:3": {
+      "category": "weapons",
+      "id": "0x4EFF"
     },
-    '6:5:4': {
-      category: 'weapons',
-      id: '0x4F00',
+    "6:5:4": {
+      "category": "weapons",
+      "id": "0x4F00"
     },
-    '6:5:5': {
-      category: 'weapons',
-      id: '0x4F01',
+    "6:5:5": {
+      "category": "weapons",
+      "id": "0x4F01"
     },
-    '6:9:1': {
-      category: 'weapons',
-      id: '0x4F07',
+    "6:9:1": {
+      "category": "weapons",
+      "id": "0x4F07"
     },
-    '6:9:2': {
-      category: 'weapons',
-      id: '0x4F08',
+    "6:9:2": {
+      "category": "weapons",
+      "id": "0x4F08"
     },
-    '6:9:3': {
-      category: 'weapons',
-      id: '0x4F09',
+    "6:9:3": {
+      "category": "weapons",
+      "id": "0x4F09"
     },
-    '6:9:4': {
-      category: 'weapons',
-      id: '0x4F0A',
+    "6:9:4": {
+      "category": "weapons",
+      "id": "0x4F0A"
     },
-    '6:9:5': {
-      category: 'weapons',
-      id: '0x4F0B',
+    "6:9:5": {
+      "category": "weapons",
+      "id": "0x4F0B"
     },
-    '6:3:1': {
-      category: 'weapons',
-      id: '0x4F11',
+    "6:3:1": {
+      "category": "weapons",
+      "id": "0x4F11"
     },
-    '6:3:2': {
-      category: 'weapons',
-      id: '0x4F12',
+    "6:3:2": {
+      "category": "weapons",
+      "id": "0x4F12"
     },
-    '6:3:3': {
-      category: 'weapons',
-      id: '0x4F13',
+    "6:3:3": {
+      "category": "weapons",
+      "id": "0x4F13"
     },
-    '6:3:4': {
-      category: 'weapons',
-      id: '0x4F14',
+    "6:3:4": {
+      "category": "weapons",
+      "id": "0x4F14"
     },
-    '6:3:5': {
-      category: 'weapons',
-      id: '0x4F15',
+    "6:3:5": {
+      "category": "weapons",
+      "id": "0x4F15"
     },
-    '6:11:1': {
-      category: 'weapons',
-      id: '0x4F1B',
+    "6:11:1": {
+      "category": "weapons",
+      "id": "0x4F1B"
     },
-    '6:11:2': {
-      category: 'weapons',
-      id: '0x4F1C',
+    "6:11:2": {
+      "category": "weapons",
+      "id": "0x4F1C"
     },
-    '6:11:3': {
-      category: 'weapons',
-      id: '0x4F1D',
+    "6:11:3": {
+      "category": "weapons",
+      "id": "0x4F1D"
     },
-    '6:11:4': {
-      category: 'weapons',
-      id: '0x4F1E',
+    "6:11:4": {
+      "category": "weapons",
+      "id": "0x4F1E"
     },
-    '6:11:5': {
-      category: 'weapons',
-      id: '0x4F1F',
+    "6:11:5": {
+      "category": "weapons",
+      "id": "0x4F1F"
     },
-    '10:1:0': {
-      category: 'weapons',
-      id: '0x4F4C',
+    "10:1:0": {
+      "category": "weapons",
+      "id": "0x4F4C"
     },
-    '10:1:1': {
-      category: 'weapons',
-      id: '0x4F4D',
+    "10:1:1": {
+      "category": "weapons",
+      "id": "0x4F4D"
     },
-    '10:1:2': {
-      category: 'weapons',
-      id: '0x4F4E',
+    "10:1:2": {
+      "category": "weapons",
+      "id": "0x4F4E"
     },
-    '10:1:3': {
-      category: 'weapons',
-      id: '0x4F4F',
+    "10:1:3": {
+      "category": "weapons",
+      "id": "0x4F4F"
     },
-    '10:1:4': {
-      category: 'weapons',
-      id: '0x4F50',
+    "10:1:4": {
+      "category": "weapons",
+      "id": "0x4F50"
     },
-    '10:1:5': {
-      category: 'weapons',
-      id: '0x4F51',
+    "10:1:5": {
+      "category": "weapons",
+      "id": "0x4F51"
     },
-    '10:1:6': {
-      category: 'weapons',
-      id: '0x4F52',
+    "10:1:6": {
+      "category": "weapons",
+      "id": "0x4F52"
     },
-    '10:1:7': {
-      category: 'weapons',
-      id: '0x4F53',
+    "10:1:7": {
+      "category": "weapons",
+      "id": "0x4F53"
     },
-    '10:1:8': {
-      category: 'weapons',
-      id: '0x4F54',
+    "10:1:8": {
+      "category": "weapons",
+      "id": "0x4F54"
     },
-    '10:1:9': {
-      category: 'weapons',
-      id: '0x4F55',
+    "10:1:9": {
+      "category": "weapons",
+      "id": "0x4F55"
     },
-    '10:1:10': {
-      category: 'weapons',
-      id: '0x4F56',
+    "10:1:10": {
+      "category": "weapons",
+      "id": "0x4F56"
     },
-    '10:4:1': {
-      category: 'weapons',
-      id: '0x4F57',
+    "10:4:1": {
+      "category": "weapons",
+      "id": "0x4F57"
     },
-    '10:4:2': {
-      category: 'weapons',
-      id: '0x4F58',
+    "10:4:2": {
+      "category": "weapons",
+      "id": "0x4F58"
     },
-    '10:4:3': {
-      category: 'weapons',
-      id: '0x4F59',
+    "10:4:3": {
+      "category": "weapons",
+      "id": "0x4F59"
     },
-    '10:4:4': {
-      category: 'weapons',
-      id: '0x4F5A',
+    "10:4:4": {
+      "category": "weapons",
+      "id": "0x4F5A"
     },
-    '10:4:5': {
-      category: 'weapons',
-      id: '0x4F5B',
+    "10:4:5": {
+      "category": "weapons",
+      "id": "0x4F5B"
     },
-    '10:6:1': {
-      category: 'weapons',
-      id: '0x4F61',
+    "10:6:1": {
+      "category": "weapons",
+      "id": "0x4F61"
     },
-    '10:6:2': {
-      category: 'weapons',
-      id: '0x4F62',
+    "10:6:2": {
+      "category": "weapons",
+      "id": "0x4F62"
     },
-    '10:6:3': {
-      category: 'weapons',
-      id: '0x4F63',
+    "10:6:3": {
+      "category": "weapons",
+      "id": "0x4F63"
     },
-    '10:6:4': {
-      category: 'weapons',
-      id: '0x4F64',
+    "10:6:4": {
+      "category": "weapons",
+      "id": "0x4F64"
     },
-    '10:6:5': {
-      category: 'weapons',
-      id: '0x4F65',
+    "10:6:5": {
+      "category": "weapons",
+      "id": "0x4F65"
     },
-    '10:10:1': {
-      category: 'weapons',
-      id: '0x4F6B',
+    "10:10:1": {
+      "category": "weapons",
+      "id": "0x4F6B"
     },
-    '10:10:2': {
-      category: 'weapons',
-      id: '0x4F6C',
+    "10:10:2": {
+      "category": "weapons",
+      "id": "0x4F6C"
     },
-    '10:10:3': {
-      category: 'weapons',
-      id: '0x4F6D',
+    "10:10:3": {
+      "category": "weapons",
+      "id": "0x4F6D"
     },
-    '10:10:4': {
-      category: 'weapons',
-      id: '0x4F6E',
+    "10:10:4": {
+      "category": "weapons",
+      "id": "0x4F6E"
     },
-    '10:10:5': {
-      category: 'weapons',
-      id: '0x4F6F',
+    "10:10:5": {
+      "category": "weapons",
+      "id": "0x4F6F"
     },
-    '10:2:1': {
-      category: 'weapons',
-      id: '0x4F75',
+    "10:2:1": {
+      "category": "weapons",
+      "id": "0x4F75"
     },
-    '10:2:2': {
-      category: 'weapons',
-      id: '0x4F76',
+    "10:2:2": {
+      "category": "weapons",
+      "id": "0x4F76"
     },
-    '10:2:3': {
-      category: 'weapons',
-      id: '0x4F77',
+    "10:2:3": {
+      "category": "weapons",
+      "id": "0x4F77"
     },
-    '10:2:4': {
-      category: 'weapons',
-      id: '0x4F78',
+    "10:2:4": {
+      "category": "weapons",
+      "id": "0x4F78"
     },
-    '10:2:5': {
-      category: 'weapons',
-      id: '0x4F79',
+    "10:2:5": {
+      "category": "weapons",
+      "id": "0x4F79"
     },
-    '10:7:1': {
-      category: 'weapons',
-      id: '0x4F7F',
+    "10:7:1": {
+      "category": "weapons",
+      "id": "0x4F7F"
     },
-    '10:7:2': {
-      category: 'weapons',
-      id: '0x4F80',
+    "10:7:2": {
+      "category": "weapons",
+      "id": "0x4F80"
     },
-    '10:7:3': {
-      category: 'weapons',
-      id: '0x4F81',
+    "10:7:3": {
+      "category": "weapons",
+      "id": "0x4F81"
     },
-    '10:7:4': {
-      category: 'weapons',
-      id: '0x4F82',
+    "10:7:4": {
+      "category": "weapons",
+      "id": "0x4F82"
     },
-    '10:7:5': {
-      category: 'weapons',
-      id: '0x4F83',
+    "10:7:5": {
+      "category": "weapons",
+      "id": "0x4F83"
     },
-    '10:9:1': {
-      category: 'weapons',
-      id: '0x4F89',
+    "10:9:1": {
+      "category": "weapons",
+      "id": "0x4F89"
     },
-    '10:9:2': {
-      category: 'weapons',
-      id: '0x4F8A',
+    "10:9:2": {
+      "category": "weapons",
+      "id": "0x4F8A"
     },
-    '10:9:3': {
-      category: 'weapons',
-      id: '0x4F8B',
+    "10:9:3": {
+      "category": "weapons",
+      "id": "0x4F8B"
     },
-    '10:9:4': {
-      category: 'weapons',
-      id: '0x4F8C',
+    "10:9:4": {
+      "category": "weapons",
+      "id": "0x4F8C"
     },
-    '10:9:5': {
-      category: 'weapons',
-      id: '0x4F8D',
+    "10:9:5": {
+      "category": "weapons",
+      "id": "0x4F8D"
     },
-    '8:1:0': {
-      category: 'weapons',
-      id: '0x4FB0',
+    "8:1:0": {
+      "category": "weapons",
+      "id": "0x4FB0"
     },
-    '8:1:1': {
-      category: 'weapons',
-      id: '0x4FB1',
+    "8:1:1": {
+      "category": "weapons",
+      "id": "0x4FB1"
     },
-    '8:1:2': {
-      category: 'weapons',
-      id: '0x4FB2',
+    "8:1:2": {
+      "category": "weapons",
+      "id": "0x4FB2"
     },
-    '8:1:3': {
-      category: 'weapons',
-      id: '0x4FB3',
+    "8:1:3": {
+      "category": "weapons",
+      "id": "0x4FB3"
     },
-    '8:1:4': {
-      category: 'weapons',
-      id: '0x4FB4',
+    "8:1:4": {
+      "category": "weapons",
+      "id": "0x4FB4"
     },
-    '8:1:5': {
-      category: 'weapons',
-      id: '0x4FB5',
+    "8:1:5": {
+      "category": "weapons",
+      "id": "0x4FB5"
     },
-    '8:1:6': {
-      category: 'weapons',
-      id: '0x4FB6',
+    "8:1:6": {
+      "category": "weapons",
+      "id": "0x4FB6"
     },
-    '8:1:7': {
-      category: 'weapons',
-      id: '0x4FB7',
+    "8:1:7": {
+      "category": "weapons",
+      "id": "0x4FB7"
     },
-    '8:1:8': {
-      category: 'weapons',
-      id: '0x4FB8',
+    "8:1:8": {
+      "category": "weapons",
+      "id": "0x4FB8"
     },
-    '8:1:9': {
-      category: 'weapons',
-      id: '0x4FB9',
+    "8:1:9": {
+      "category": "weapons",
+      "id": "0x4FB9"
     },
-    '8:1:10': {
-      category: 'weapons',
-      id: '0x4FBA',
+    "8:1:10": {
+      "category": "weapons",
+      "id": "0x4FBA"
     },
-    '8:2:1': {
-      category: 'weapons',
-      id: '0x4FBB',
+    "8:2:1": {
+      "category": "weapons",
+      "id": "0x4FBB"
     },
-    '8:2:2': {
-      category: 'weapons',
-      id: '0x4FBC',
+    "8:2:2": {
+      "category": "weapons",
+      "id": "0x4FBC"
     },
-    '8:2:3': {
-      category: 'weapons',
-      id: '0x4FBD',
+    "8:2:3": {
+      "category": "weapons",
+      "id": "0x4FBD"
     },
-    '8:2:4': {
-      category: 'weapons',
-      id: '0x4FBE',
+    "8:2:4": {
+      "category": "weapons",
+      "id": "0x4FBE"
     },
-    '8:2:5': {
-      category: 'weapons',
-      id: '0x4FBF',
+    "8:2:5": {
+      "category": "weapons",
+      "id": "0x4FBF"
     },
-    '8:5:1': {
-      category: 'weapons',
-      id: '0x4FC5',
+    "8:5:1": {
+      "category": "weapons",
+      "id": "0x4FC5"
     },
-    '8:5:2': {
-      category: 'weapons',
-      id: '0x4FC6',
+    "8:5:2": {
+      "category": "weapons",
+      "id": "0x4FC6"
     },
-    '8:5:3': {
-      category: 'weapons',
-      id: '0x4FC7',
+    "8:5:3": {
+      "category": "weapons",
+      "id": "0x4FC7"
     },
-    '8:5:4': {
-      category: 'weapons',
-      id: '0x4FC8',
+    "8:5:4": {
+      "category": "weapons",
+      "id": "0x4FC8"
     },
-    '8:5:5': {
-      category: 'weapons',
-      id: '0x4FC9',
+    "8:5:5": {
+      "category": "weapons",
+      "id": "0x4FC9"
     },
-    '8:9:1': {
-      category: 'weapons',
-      id: '0x4FCF',
+    "8:9:1": {
+      "category": "weapons",
+      "id": "0x4FCF"
     },
-    '8:9:2': {
-      category: 'weapons',
-      id: '0x4FD0',
+    "8:9:2": {
+      "category": "weapons",
+      "id": "0x4FD0"
     },
-    '8:9:3': {
-      category: 'weapons',
-      id: '0x4FD1',
+    "8:9:3": {
+      "category": "weapons",
+      "id": "0x4FD1"
     },
-    '8:9:4': {
-      category: 'weapons',
-      id: '0x4FD2',
+    "8:9:4": {
+      "category": "weapons",
+      "id": "0x4FD2"
     },
-    '8:9:5': {
-      category: 'weapons',
-      id: '0x4FD3',
+    "8:9:5": {
+      "category": "weapons",
+      "id": "0x4FD3"
     },
-    '8:3:1': {
-      category: 'weapons',
-      id: '0x4FD9',
+    "8:3:1": {
+      "category": "weapons",
+      "id": "0x4FD9"
     },
-    '8:3:2': {
-      category: 'weapons',
-      id: '0x4FDA',
+    "8:3:2": {
+      "category": "weapons",
+      "id": "0x4FDA"
     },
-    '8:3:3': {
-      category: 'weapons',
-      id: '0x4FDB',
+    "8:3:3": {
+      "category": "weapons",
+      "id": "0x4FDB"
     },
-    '8:3:4': {
-      category: 'weapons',
-      id: '0x4FDC',
+    "8:3:4": {
+      "category": "weapons",
+      "id": "0x4FDC"
     },
-    '8:3:5': {
-      category: 'weapons',
-      id: '0x4FDD',
+    "8:3:5": {
+      "category": "weapons",
+      "id": "0x4FDD"
     },
-    '8:11:1': {
-      category: 'weapons',
-      id: '0x4FE3',
+    "8:11:1": {
+      "category": "weapons",
+      "id": "0x4FE3"
     },
-    '8:11:2': {
-      category: 'weapons',
-      id: '0x4FE4',
+    "8:11:2": {
+      "category": "weapons",
+      "id": "0x4FE4"
     },
-    '8:11:3': {
-      category: 'weapons',
-      id: '0x4FE5',
+    "8:11:3": {
+      "category": "weapons",
+      "id": "0x4FE5"
     },
-    '8:11:4': {
-      category: 'weapons',
-      id: '0x4FE6',
+    "8:11:4": {
+      "category": "weapons",
+      "id": "0x4FE6"
     },
-    '8:11:5': {
-      category: 'weapons',
-      id: '0x4FE7',
+    "8:11:5": {
+      "category": "weapons",
+      "id": "0x4FE7"
     },
-    '9:1:0': {
-      category: 'weapons',
-      id: '0x5014',
+    "9:1:0": {
+      "category": "weapons",
+      "id": "0x5014"
     },
-    '9:1:1': {
-      category: 'weapons',
-      id: '0x5015',
+    "9:1:1": {
+      "category": "weapons",
+      "id": "0x5015"
     },
-    '9:1:2': {
-      category: 'weapons',
-      id: '0x5016',
+    "9:1:2": {
+      "category": "weapons",
+      "id": "0x5016"
     },
-    '9:1:3': {
-      category: 'weapons',
-      id: '0x5017',
+    "9:1:3": {
+      "category": "weapons",
+      "id": "0x5017"
     },
-    '9:1:4': {
-      category: 'weapons',
-      id: '0x5018',
+    "9:1:4": {
+      "category": "weapons",
+      "id": "0x5018"
     },
-    '9:1:5': {
-      category: 'weapons',
-      id: '0x5019',
+    "9:1:5": {
+      "category": "weapons",
+      "id": "0x5019"
     },
-    '9:1:6': {
-      category: 'weapons',
-      id: '0x501A',
+    "9:1:6": {
+      "category": "weapons",
+      "id": "0x501A"
     },
-    '9:1:7': {
-      category: 'weapons',
-      id: '0x501B',
+    "9:1:7": {
+      "category": "weapons",
+      "id": "0x501B"
     },
-    '9:1:8': {
-      category: 'weapons',
-      id: '0x501C',
+    "9:1:8": {
+      "category": "weapons",
+      "id": "0x501C"
     },
-    '9:1:9': {
-      category: 'weapons',
-      id: '0x501D',
+    "9:1:9": {
+      "category": "weapons",
+      "id": "0x501D"
     },
-    '9:1:10': {
-      category: 'weapons',
-      id: '0x501E',
+    "9:1:10": {
+      "category": "weapons",
+      "id": "0x501E"
     },
-    '9:2:1': {
-      category: 'weapons',
-      id: '0x501F',
+    "9:2:1": {
+      "category": "weapons",
+      "id": "0x501F"
     },
-    '9:2:2': {
-      category: 'weapons',
-      id: '0x5020',
+    "9:2:2": {
+      "category": "weapons",
+      "id": "0x5020"
     },
-    '9:2:3': {
-      category: 'weapons',
-      id: '0x5021',
+    "9:2:3": {
+      "category": "weapons",
+      "id": "0x5021"
     },
-    '9:2:4': {
-      category: 'weapons',
-      id: '0x5022',
+    "9:2:4": {
+      "category": "weapons",
+      "id": "0x5022"
     },
-    '9:2:5': {
-      category: 'weapons',
-      id: '0x5023',
+    "9:2:5": {
+      "category": "weapons",
+      "id": "0x5023"
     },
-    '9:5:1': {
-      category: 'weapons',
-      id: '0x5029',
+    "9:5:1": {
+      "category": "weapons",
+      "id": "0x5029"
     },
-    '9:5:2': {
-      category: 'weapons',
-      id: '0x502A',
+    "9:5:2": {
+      "category": "weapons",
+      "id": "0x502A"
     },
-    '9:5:3': {
-      category: 'weapons',
-      id: '0x502B',
+    "9:5:3": {
+      "category": "weapons",
+      "id": "0x502B"
     },
-    '9:5:4': {
-      category: 'weapons',
-      id: '0x502C',
+    "9:5:4": {
+      "category": "weapons",
+      "id": "0x502C"
     },
-    '9:5:5': {
-      category: 'weapons',
-      id: '0x502D',
+    "9:5:5": {
+      "category": "weapons",
+      "id": "0x502D"
     },
-    '9:9:1': {
-      category: 'weapons',
-      id: '0x5033',
+    "9:9:1": {
+      "category": "weapons",
+      "id": "0x5033"
     },
-    '9:9:2': {
-      category: 'weapons',
-      id: '0x5034',
+    "9:9:2": {
+      "category": "weapons",
+      "id": "0x5034"
     },
-    '9:9:3': {
-      category: 'weapons',
-      id: '0x5035',
+    "9:9:3": {
+      "category": "weapons",
+      "id": "0x5035"
     },
-    '9:9:4': {
-      category: 'weapons',
-      id: '0x5036',
+    "9:9:4": {
+      "category": "weapons",
+      "id": "0x5036"
     },
-    '9:9:5': {
-      category: 'weapons',
-      id: '0x5037',
+    "9:9:5": {
+      "category": "weapons",
+      "id": "0x5037"
     },
-    '9:3:1': {
-      category: 'weapons',
-      id: '0x503D',
+    "9:3:1": {
+      "category": "weapons",
+      "id": "0x503D"
     },
-    '9:3:2': {
-      category: 'weapons',
-      id: '0x503E',
+    "9:3:2": {
+      "category": "weapons",
+      "id": "0x503E"
     },
-    '9:3:3': {
-      category: 'weapons',
-      id: '0x503F',
+    "9:3:3": {
+      "category": "weapons",
+      "id": "0x503F"
     },
-    '9:3:4': {
-      category: 'weapons',
-      id: '0x5040',
+    "9:3:4": {
+      "category": "weapons",
+      "id": "0x5040"
     },
-    '9:3:5': {
-      category: 'weapons',
-      id: '0x5041',
+    "9:3:5": {
+      "category": "weapons",
+      "id": "0x5041"
     },
-    '9:11:1': {
-      category: 'weapons',
-      id: '0x5047',
+    "9:11:1": {
+      "category": "weapons",
+      "id": "0x5047"
     },
-    '9:11:2': {
-      category: 'weapons',
-      id: '0x5048',
+    "9:11:2": {
+      "category": "weapons",
+      "id": "0x5048"
     },
-    '9:11:3': {
-      category: 'weapons',
-      id: '0x5049',
+    "9:11:3": {
+      "category": "weapons",
+      "id": "0x5049"
     },
-    '9:11:4': {
-      category: 'weapons',
-      id: '0x504A',
+    "9:11:4": {
+      "category": "weapons",
+      "id": "0x504A"
     },
-    '9:11:5': {
-      category: 'weapons',
-      id: '0x504B',
+    "9:11:5": {
+      "category": "weapons",
+      "id": "0x504B"
     },
-    '11:1:0': {
-      category: 'weapons',
-      id: '0x5078',
+    "11:1:0": {
+      "category": "weapons",
+      "id": "0x5078"
     },
-    '11:1:1': {
-      category: 'weapons',
-      id: '0x5079',
+    "11:1:1": {
+      "category": "weapons",
+      "id": "0x5079"
     },
-    '11:1:2': {
-      category: 'weapons',
-      id: '0x507A',
+    "11:1:2": {
+      "category": "weapons",
+      "id": "0x507A"
     },
-    '11:1:3': {
-      category: 'weapons',
-      id: '0x507B',
+    "11:1:3": {
+      "category": "weapons",
+      "id": "0x507B"
     },
-    '11:1:4': {
-      category: 'weapons',
-      id: '0x507C',
+    "11:1:4": {
+      "category": "weapons",
+      "id": "0x507C"
     },
-    '11:1:5': {
-      category: 'weapons',
-      id: '0x507D',
+    "11:1:5": {
+      "category": "weapons",
+      "id": "0x507D"
     },
-    '11:1:6': {
-      category: 'weapons',
-      id: '0x507E',
+    "11:1:6": {
+      "category": "weapons",
+      "id": "0x507E"
     },
-    '11:1:7': {
-      category: 'weapons',
-      id: '0x507F',
+    "11:1:7": {
+      "category": "weapons",
+      "id": "0x507F"
     },
-    '11:1:8': {
-      category: 'weapons',
-      id: '0x5080',
+    "11:1:8": {
+      "category": "weapons",
+      "id": "0x5080"
     },
-    '11:1:9': {
-      category: 'weapons',
-      id: '0x5081',
+    "11:1:9": {
+      "category": "weapons",
+      "id": "0x5081"
     },
-    '11:1:10': {
-      category: 'weapons',
-      id: '0x5082',
+    "11:1:10": {
+      "category": "weapons",
+      "id": "0x5082"
     },
-    '11:2:1': {
-      category: 'weapons',
-      id: '0x5083',
+    "11:2:1": {
+      "category": "weapons",
+      "id": "0x5083"
     },
-    '11:2:2': {
-      category: 'weapons',
-      id: '0x5084',
+    "11:2:2": {
+      "category": "weapons",
+      "id": "0x5084"
     },
-    '11:2:3': {
-      category: 'weapons',
-      id: '0x5085',
+    "11:2:3": {
+      "category": "weapons",
+      "id": "0x5085"
     },
-    '11:2:4': {
-      category: 'weapons',
-      id: '0x5086',
+    "11:2:4": {
+      "category": "weapons",
+      "id": "0x5086"
     },
-    '11:2:5': {
-      category: 'weapons',
-      id: '0x5087',
+    "11:2:5": {
+      "category": "weapons",
+      "id": "0x5087"
     },
-    '11:5:1': {
-      category: 'weapons',
-      id: '0x508D',
+    "11:5:1": {
+      "category": "weapons",
+      "id": "0x508D"
     },
-    '11:5:2': {
-      category: 'weapons',
-      id: '0x508E',
+    "11:5:2": {
+      "category": "weapons",
+      "id": "0x508E"
     },
-    '11:5:3': {
-      category: 'weapons',
-      id: '0x508F',
+    "11:5:3": {
+      "category": "weapons",
+      "id": "0x508F"
     },
-    '11:5:4': {
-      category: 'weapons',
-      id: '0x5090',
+    "11:5:4": {
+      "category": "weapons",
+      "id": "0x5090"
     },
-    '11:5:5': {
-      category: 'weapons',
-      id: '0x5091',
+    "11:5:5": {
+      "category": "weapons",
+      "id": "0x5091"
     },
-    '11:9:1': {
-      category: 'weapons',
-      id: '0x5097',
+    "11:9:1": {
+      "category": "weapons",
+      "id": "0x5097"
     },
-    '11:9:2': {
-      category: 'weapons',
-      id: '0x5098',
+    "11:9:2": {
+      "category": "weapons",
+      "id": "0x5098"
     },
-    '11:9:3': {
-      category: 'weapons',
-      id: '0x5099',
+    "11:9:3": {
+      "category": "weapons",
+      "id": "0x5099"
     },
-    '11:9:4': {
-      category: 'weapons',
-      id: '0x509A',
+    "11:9:4": {
+      "category": "weapons",
+      "id": "0x509A"
     },
-    '11:9:5': {
-      category: 'weapons',
-      id: '0x509B',
+    "11:9:5": {
+      "category": "weapons",
+      "id": "0x509B"
     },
-    '11:3:1': {
-      category: 'weapons',
-      id: '0x50A1',
+    "11:3:1": {
+      "category": "weapons",
+      "id": "0x50A1"
     },
-    '11:3:2': {
-      category: 'weapons',
-      id: '0x50A2',
+    "11:3:2": {
+      "category": "weapons",
+      "id": "0x50A2"
     },
-    '11:3:3': {
-      category: 'weapons',
-      id: '0x50A3',
+    "11:3:3": {
+      "category": "weapons",
+      "id": "0x50A3"
     },
-    '11:3:4': {
-      category: 'weapons',
-      id: '0x50A4',
+    "11:3:4": {
+      "category": "weapons",
+      "id": "0x50A4"
     },
-    '11:3:5': {
-      category: 'weapons',
-      id: '0x50A5',
+    "11:3:5": {
+      "category": "weapons",
+      "id": "0x50A5"
     },
-    '11:11:1': {
-      category: 'weapons',
-      id: '0x50AB',
+    "11:11:1": {
+      "category": "weapons",
+      "id": "0x50AB"
     },
-    '11:11:2': {
-      category: 'weapons',
-      id: '0x50AC',
+    "11:11:2": {
+      "category": "weapons",
+      "id": "0x50AC"
     },
-    '11:11:3': {
-      category: 'weapons',
-      id: '0x50AD',
+    "11:11:3": {
+      "category": "weapons",
+      "id": "0x50AD"
     },
-    '11:11:4': {
-      category: 'weapons',
-      id: '0x50AE',
+    "11:11:4": {
+      "category": "weapons",
+      "id": "0x50AE"
     },
-    '11:11:5': {
-      category: 'weapons',
-      id: '0x50AF',
+    "11:11:5": {
+      "category": "weapons",
+      "id": "0x50AF"
     },
-    '51:14:0': {
-      category: 'weapons',
-      id: '0x50DC',
+    "51:14:0": {
+      "category": "weapons",
+      "id": "0x50DC"
     },
-    '51:14:1': {
-      category: 'weapons',
-      id: '0x50DD',
+    "51:14:1": {
+      "category": "weapons",
+      "id": "0x50DD"
     },
-    '51:14:2': {
-      category: 'weapons',
-      id: '0x50DE',
+    "51:14:2": {
+      "category": "weapons",
+      "id": "0x50DE"
     },
-    '51:14:3': {
-      category: 'weapons',
-      id: '0x50DF',
+    "51:14:3": {
+      "category": "weapons",
+      "id": "0x50DF"
     },
-    '51:14:4': {
-      category: 'weapons',
-      id: '0x50E0',
+    "51:14:4": {
+      "category": "weapons",
+      "id": "0x50E0"
     },
-    '51:14:5': {
-      category: 'weapons',
-      id: '0x50E1',
+    "51:14:5": {
+      "category": "weapons",
+      "id": "0x50E1"
     },
-    '62:14:0': {
-      category: 'weapons',
-      id: '0x5140',
+    "62:14:0": {
+      "category": "weapons",
+      "id": "0x5140"
     },
-    '62:14:1': {
-      category: 'weapons',
-      id: '0x5141',
+    "62:14:1": {
+      "category": "weapons",
+      "id": "0x5141"
     },
-    '62:14:2': {
-      category: 'weapons',
-      id: '0x5142',
+    "62:14:2": {
+      "category": "weapons",
+      "id": "0x5142"
     },
-    '62:14:3': {
-      category: 'weapons',
-      id: '0x5143',
+    "62:14:3": {
+      "category": "weapons",
+      "id": "0x5143"
     },
-    '62:14:4': {
-      category: 'weapons',
-      id: '0x5144',
+    "62:14:4": {
+      "category": "weapons",
+      "id": "0x5144"
     },
-    '62:14:5': {
-      category: 'weapons',
-      id: '0x5145',
+    "62:14:5": {
+      "category": "weapons",
+      "id": "0x5145"
     },
-    '77:null:null': {
-      category: 'weapons',
-      id: '0x51A4',
+    "77:null:null": {
+      "category": "weapons",
+      "id": "0x51A4"
     },
-    '78:null:null': {
-      category: 'weapons',
-      id: '0x5208',
+    "78:null:null": {
+      "category": "weapons",
+      "id": "0x5208"
     },
-    '80:null:null': {
-      category: 'weapons',
-      id: '0x526C',
+    "80:null:null": {
+      "category": "weapons",
+      "id": "0x526C"
     },
-    '7:1:0': {
-      category: 'weapons',
-      id: '0x5334',
+    "7:1:0": {
+      "category": "weapons",
+      "id": "0x5334"
     },
-    '7:1:1': {
-      category: 'weapons',
-      id: '0x5335',
+    "7:1:1": {
+      "category": "weapons",
+      "id": "0x5335"
     },
-    '7:1:2': {
-      category: 'weapons',
-      id: '0x5336',
+    "7:1:2": {
+      "category": "weapons",
+      "id": "0x5336"
     },
-    '7:1:3': {
-      category: 'weapons',
-      id: '0x5337',
+    "7:1:3": {
+      "category": "weapons",
+      "id": "0x5337"
     },
-    '7:1:4': {
-      category: 'weapons',
-      id: '0x5338',
+    "7:1:4": {
+      "category": "weapons",
+      "id": "0x5338"
     },
-    '7:1:5': {
-      category: 'weapons',
-      id: '0x5339',
+    "7:1:5": {
+      "category": "weapons",
+      "id": "0x5339"
     },
-    '7:1:6': {
-      category: 'weapons',
-      id: '0x533A',
+    "7:1:6": {
+      "category": "weapons",
+      "id": "0x533A"
     },
-    '7:1:7': {
-      category: 'weapons',
-      id: '0x533B',
+    "7:1:7": {
+      "category": "weapons",
+      "id": "0x533B"
     },
-    '7:1:8': {
-      category: 'weapons',
-      id: '0x533C',
+    "7:1:8": {
+      "category": "weapons",
+      "id": "0x533C"
     },
-    '7:1:9': {
-      category: 'weapons',
-      id: '0x533D',
+    "7:1:9": {
+      "category": "weapons",
+      "id": "0x533D"
     },
-    '7:1:10': {
-      category: 'weapons',
-      id: '0x533E',
+    "7:1:10": {
+      "category": "weapons",
+      "id": "0x533E"
     },
-    '7:2:1': {
-      category: 'weapons',
-      id: '0x533F',
+    "7:2:1": {
+      "category": "weapons",
+      "id": "0x533F"
     },
-    '7:2:2': {
-      category: 'weapons',
-      id: '0x5340',
+    "7:2:2": {
+      "category": "weapons",
+      "id": "0x5340"
     },
-    '7:2:3': {
-      category: 'weapons',
-      id: '0x5341',
+    "7:2:3": {
+      "category": "weapons",
+      "id": "0x5341"
     },
-    '7:2:4': {
-      category: 'weapons',
-      id: '0x5342',
+    "7:2:4": {
+      "category": "weapons",
+      "id": "0x5342"
     },
-    '7:2:5': {
-      category: 'weapons',
-      id: '0x5343',
+    "7:2:5": {
+      "category": "weapons",
+      "id": "0x5343"
     },
-    '7:5:1': {
-      category: 'weapons',
-      id: '0x5349',
+    "7:5:1": {
+      "category": "weapons",
+      "id": "0x5349"
     },
-    '7:5:2': {
-      category: 'weapons',
-      id: '0x534A',
+    "7:5:2": {
+      "category": "weapons",
+      "id": "0x534A"
     },
-    '7:5:3': {
-      category: 'weapons',
-      id: '0x534B',
+    "7:5:3": {
+      "category": "weapons",
+      "id": "0x534B"
     },
-    '7:5:4': {
-      category: 'weapons',
-      id: '0x534C',
+    "7:5:4": {
+      "category": "weapons",
+      "id": "0x534C"
     },
-    '7:5:5': {
-      category: 'weapons',
-      id: '0x534D',
+    "7:5:5": {
+      "category": "weapons",
+      "id": "0x534D"
     },
-    '7:9:1': {
-      category: 'weapons',
-      id: '0x5353',
+    "7:9:1": {
+      "category": "weapons",
+      "id": "0x5353"
     },
-    '7:9:2': {
-      category: 'weapons',
-      id: '0x5354',
+    "7:9:2": {
+      "category": "weapons",
+      "id": "0x5354"
     },
-    '7:9:3': {
-      category: 'weapons',
-      id: '0x5355',
+    "7:9:3": {
+      "category": "weapons",
+      "id": "0x5355"
     },
-    '7:9:4': {
-      category: 'weapons',
-      id: '0x5356',
+    "7:9:4": {
+      "category": "weapons",
+      "id": "0x5356"
     },
-    '7:9:5': {
-      category: 'weapons',
-      id: '0x5357',
+    "7:9:5": {
+      "category": "weapons",
+      "id": "0x5357"
     },
-    '7:3:1': {
-      category: 'weapons',
-      id: '0x535D',
+    "7:3:1": {
+      "category": "weapons",
+      "id": "0x535D"
     },
-    '7:3:2': {
-      category: 'weapons',
-      id: '0x535E',
+    "7:3:2": {
+      "category": "weapons",
+      "id": "0x535E"
     },
-    '7:3:3': {
-      category: 'weapons',
-      id: '0x535F',
+    "7:3:3": {
+      "category": "weapons",
+      "id": "0x535F"
     },
-    '7:3:4': {
-      category: 'weapons',
-      id: '0x5360',
+    "7:3:4": {
+      "category": "weapons",
+      "id": "0x5360"
     },
-    '7:3:5': {
-      category: 'weapons',
-      id: '0x5361',
+    "7:3:5": {
+      "category": "weapons",
+      "id": "0x5361"
     },
-    '7:11:1': {
-      category: 'weapons',
-      id: '0x5367',
+    "7:11:1": {
+      "category": "weapons",
+      "id": "0x5367"
     },
-    '7:11:2': {
-      category: 'weapons',
-      id: '0x5368',
+    "7:11:2": {
+      "category": "weapons",
+      "id": "0x5368"
     },
-    '7:11:3': {
-      category: 'weapons',
-      id: '0x5369',
+    "7:11:3": {
+      "category": "weapons",
+      "id": "0x5369"
     },
-    '7:11:4': {
-      category: 'weapons',
-      id: '0x536A',
+    "7:11:4": {
+      "category": "weapons",
+      "id": "0x536A"
     },
-    '7:11:5': {
-      category: 'weapons',
-      id: '0x536B',
+    "7:11:5": {
+      "category": "weapons",
+      "id": "0x536B"
     },
-    '81:null:null': {
-      category: 'weapons',
-      id: '0x5398',
+    "81:null:null": {
+      "category": "weapons",
+      "id": "0x5398"
     },
-    '79:null:null': {
-      category: 'weapons',
-      id: '0x53FC',
+    "79:null:null": {
+      "category": "weapons",
+      "id": "0x53FC"
     },
-    '58:14:0': {
-      category: 'weapons',
-      id: '0x5460',
+    "58:14:0": {
+      "category": "weapons",
+      "id": "0x5460"
     },
-    '58:14:1': {
-      category: 'weapons',
-      id: '0x5461',
+    "58:14:1": {
+      "category": "weapons",
+      "id": "0x5461"
     },
-    '58:14:2': {
-      category: 'weapons',
-      id: '0x5462',
+    "58:14:2": {
+      "category": "weapons",
+      "id": "0x5462"
     },
-    '58:14:3': {
-      category: 'weapons',
-      id: '0x5463',
+    "58:14:3": {
+      "category": "weapons",
+      "id": "0x5463"
     },
-    '58:14:4': {
-      category: 'weapons',
-      id: '0x5464',
+    "58:14:4": {
+      "category": "weapons",
+      "id": "0x5464"
     },
-    '58:14:5': {
-      category: 'weapons',
-      id: '0x5465',
+    "58:14:5": {
+      "category": "weapons",
+      "id": "0x5465"
     },
-    '82:null:null': {
-      category: 'weapons',
-      id: '0x54C4',
+    "82:null:null": {
+      "category": "weapons",
+      "id": "0x54C4"
     },
-    '60:14:0': {
-      category: 'weapons',
-      id: '0x5528',
+    "60:14:0": {
+      "category": "weapons",
+      "id": "0x5528"
     },
-    '60:14:1': {
-      category: 'weapons',
-      id: '0x5529',
+    "60:14:1": {
+      "category": "weapons",
+      "id": "0x5529"
     },
-    '60:14:2': {
-      category: 'weapons',
-      id: '0x552A',
+    "60:14:2": {
+      "category": "weapons",
+      "id": "0x552A"
     },
-    '60:14:3': {
-      category: 'weapons',
-      id: '0x552B',
+    "60:14:3": {
+      "category": "weapons",
+      "id": "0x552B"
     },
-    '60:14:4': {
-      category: 'weapons',
-      id: '0x552C',
+    "60:14:4": {
+      "category": "weapons",
+      "id": "0x552C"
     },
-    '60:14:5': {
-      category: 'weapons',
-      id: '0x552D',
+    "60:14:5": {
+      "category": "weapons",
+      "id": "0x552D"
     },
-    '83:null:null': {
-      category: 'weapons',
-      id: '0x558C',
+    "83:null:null": {
+      "category": "weapons",
+      "id": "0x558C"
     },
-    '18:1:0': {
-      category: 'weapons',
-      id: '0x7530',
+    "18:1:0": {
+      "category": "weapons",
+      "id": "0x7530"
     },
-    '18:1:1': {
-      category: 'weapons',
-      id: '0x7531',
+    "18:1:1": {
+      "category": "weapons",
+      "id": "0x7531"
     },
-    '18:1:2': {
-      category: 'weapons',
-      id: '0x7532',
+    "18:1:2": {
+      "category": "weapons",
+      "id": "0x7532"
     },
-    '18:1:3': {
-      category: 'weapons',
-      id: '0x7533',
+    "18:1:3": {
+      "category": "weapons",
+      "id": "0x7533"
     },
-    '18:1:4': {
-      category: 'weapons',
-      id: '0x7534',
+    "18:1:4": {
+      "category": "weapons",
+      "id": "0x7534"
     },
-    '18:1:5': {
-      category: 'weapons',
-      id: '0x7535',
+    "18:1:5": {
+      "category": "weapons",
+      "id": "0x7535"
     },
-    '18:1:6': {
-      category: 'weapons',
-      id: '0x7536',
+    "18:1:6": {
+      "category": "weapons",
+      "id": "0x7536"
     },
-    '18:1:7': {
-      category: 'weapons',
-      id: '0x7537',
+    "18:1:7": {
+      "category": "weapons",
+      "id": "0x7537"
     },
-    '18:1:8': {
-      category: 'weapons',
-      id: '0x7538',
+    "18:1:8": {
+      "category": "weapons",
+      "id": "0x7538"
     },
-    '18:1:9': {
-      category: 'weapons',
-      id: '0x7539',
+    "18:1:9": {
+      "category": "weapons",
+      "id": "0x7539"
     },
-    '18:1:10': {
-      category: 'weapons',
-      id: '0x753A',
+    "18:1:10": {
+      "category": "weapons",
+      "id": "0x753A"
     },
-    '18:2:1': {
-      category: 'weapons',
-      id: '0x753B',
+    "18:2:1": {
+      "category": "weapons",
+      "id": "0x753B"
     },
-    '18:2:2': {
-      category: 'weapons',
-      id: '0x753C',
+    "18:2:2": {
+      "category": "weapons",
+      "id": "0x753C"
     },
-    '18:2:3': {
-      category: 'weapons',
-      id: '0x753D',
+    "18:2:3": {
+      "category": "weapons",
+      "id": "0x753D"
     },
-    '18:2:4': {
-      category: 'weapons',
-      id: '0x753E',
+    "18:2:4": {
+      "category": "weapons",
+      "id": "0x753E"
     },
-    '18:2:5': {
-      category: 'weapons',
-      id: '0x753F',
+    "18:2:5": {
+      "category": "weapons",
+      "id": "0x753F"
     },
-    '18:7:1': {
-      category: 'weapons',
-      id: '0x7545',
+    "18:7:1": {
+      "category": "weapons",
+      "id": "0x7545"
     },
-    '18:7:2': {
-      category: 'weapons',
-      id: '0x7546',
+    "18:7:2": {
+      "category": "weapons",
+      "id": "0x7546"
     },
-    '18:7:3': {
-      category: 'weapons',
-      id: '0x7547',
+    "18:7:3": {
+      "category": "weapons",
+      "id": "0x7547"
     },
-    '18:7:4': {
-      category: 'weapons',
-      id: '0x7548',
+    "18:7:4": {
+      "category": "weapons",
+      "id": "0x7548"
     },
-    '18:7:5': {
-      category: 'weapons',
-      id: '0x7549',
+    "18:7:5": {
+      "category": "weapons",
+      "id": "0x7549"
     },
-    '18:8:1': {
-      category: 'weapons',
-      id: '0x754F',
+    "18:8:1": {
+      "category": "weapons",
+      "id": "0x754F"
     },
-    '18:8:2': {
-      category: 'weapons',
-      id: '0x7550',
+    "18:8:2": {
+      "category": "weapons",
+      "id": "0x7550"
     },
-    '18:8:3': {
-      category: 'weapons',
-      id: '0x7551',
+    "18:8:3": {
+      "category": "weapons",
+      "id": "0x7551"
     },
-    '18:8:4': {
-      category: 'weapons',
-      id: '0x7552',
+    "18:8:4": {
+      "category": "weapons",
+      "id": "0x7552"
     },
-    '18:8:5': {
-      category: 'weapons',
-      id: '0x7553',
+    "18:8:5": {
+      "category": "weapons",
+      "id": "0x7553"
     },
-    '18:4:1': {
-      category: 'weapons',
-      id: '0x7559',
+    "18:4:1": {
+      "category": "weapons",
+      "id": "0x7559"
     },
-    '18:4:2': {
-      category: 'weapons',
-      id: '0x755A',
+    "18:4:2": {
+      "category": "weapons",
+      "id": "0x755A"
     },
-    '18:4:3': {
-      category: 'weapons',
-      id: '0x755B',
+    "18:4:3": {
+      "category": "weapons",
+      "id": "0x755B"
     },
-    '18:4:4': {
-      category: 'weapons',
-      id: '0x755C',
+    "18:4:4": {
+      "category": "weapons",
+      "id": "0x755C"
     },
-    '18:4:5': {
-      category: 'weapons',
-      id: '0x755D',
+    "18:4:5": {
+      "category": "weapons",
+      "id": "0x755D"
     },
-    '18:10:1': {
-      category: 'weapons',
-      id: '0x7563',
+    "18:10:1": {
+      "category": "weapons",
+      "id": "0x7563"
     },
-    '18:10:2': {
-      category: 'weapons',
-      id: '0x7564',
+    "18:10:2": {
+      "category": "weapons",
+      "id": "0x7564"
     },
-    '18:10:3': {
-      category: 'weapons',
-      id: '0x7565',
+    "18:10:3": {
+      "category": "weapons",
+      "id": "0x7565"
     },
-    '18:10:4': {
-      category: 'weapons',
-      id: '0x7566',
+    "18:10:4": {
+      "category": "weapons",
+      "id": "0x7566"
     },
-    '18:10:5': {
-      category: 'weapons',
-      id: '0x7567',
+    "18:10:5": {
+      "category": "weapons",
+      "id": "0x7567"
     },
-    '19:1:0': {
-      category: 'weapons',
-      id: '0x7594',
+    "19:1:0": {
+      "category": "weapons",
+      "id": "0x7594"
     },
-    '19:1:1': {
-      category: 'weapons',
-      id: '0x7595',
+    "19:1:1": {
+      "category": "weapons",
+      "id": "0x7595"
     },
-    '19:1:2': {
-      category: 'weapons',
-      id: '0x7596',
+    "19:1:2": {
+      "category": "weapons",
+      "id": "0x7596"
     },
-    '19:1:3': {
-      category: 'weapons',
-      id: '0x7597',
+    "19:1:3": {
+      "category": "weapons",
+      "id": "0x7597"
     },
-    '19:1:4': {
-      category: 'weapons',
-      id: '0x7598',
+    "19:1:4": {
+      "category": "weapons",
+      "id": "0x7598"
     },
-    '19:1:5': {
-      category: 'weapons',
-      id: '0x7599',
+    "19:1:5": {
+      "category": "weapons",
+      "id": "0x7599"
     },
-    '19:1:6': {
-      category: 'weapons',
-      id: '0x759A',
+    "19:1:6": {
+      "category": "weapons",
+      "id": "0x759A"
     },
-    '19:1:7': {
-      category: 'weapons',
-      id: '0x759B',
+    "19:1:7": {
+      "category": "weapons",
+      "id": "0x759B"
     },
-    '19:1:8': {
-      category: 'weapons',
-      id: '0x759C',
+    "19:1:8": {
+      "category": "weapons",
+      "id": "0x759C"
     },
-    '19:1:9': {
-      category: 'weapons',
-      id: '0x759D',
+    "19:1:9": {
+      "category": "weapons",
+      "id": "0x759D"
     },
-    '19:1:10': {
-      category: 'weapons',
-      id: '0x759E',
+    "19:1:10": {
+      "category": "weapons",
+      "id": "0x759E"
     },
-    '19:2:1': {
-      category: 'weapons',
-      id: '0x759F',
+    "19:2:1": {
+      "category": "weapons",
+      "id": "0x759F"
     },
-    '19:2:2': {
-      category: 'weapons',
-      id: '0x75A0',
+    "19:2:2": {
+      "category": "weapons",
+      "id": "0x75A0"
     },
-    '19:2:3': {
-      category: 'weapons',
-      id: '0x75A1',
+    "19:2:3": {
+      "category": "weapons",
+      "id": "0x75A1"
     },
-    '19:2:4': {
-      category: 'weapons',
-      id: '0x75A2',
+    "19:2:4": {
+      "category": "weapons",
+      "id": "0x75A2"
     },
-    '19:2:5': {
-      category: 'weapons',
-      id: '0x75A3',
+    "19:2:5": {
+      "category": "weapons",
+      "id": "0x75A3"
     },
-    '19:7:1': {
-      category: 'weapons',
-      id: '0x75A9',
+    "19:7:1": {
+      "category": "weapons",
+      "id": "0x75A9"
     },
-    '19:7:2': {
-      category: 'weapons',
-      id: '0x75AA',
+    "19:7:2": {
+      "category": "weapons",
+      "id": "0x75AA"
     },
-    '19:7:3': {
-      category: 'weapons',
-      id: '0x75AB',
+    "19:7:3": {
+      "category": "weapons",
+      "id": "0x75AB"
     },
-    '19:7:4': {
-      category: 'weapons',
-      id: '0x75AC',
+    "19:7:4": {
+      "category": "weapons",
+      "id": "0x75AC"
     },
-    '19:7:5': {
-      category: 'weapons',
-      id: '0x75AD',
+    "19:7:5": {
+      "category": "weapons",
+      "id": "0x75AD"
     },
-    '19:8:1': {
-      category: 'weapons',
-      id: '0x75B3',
+    "19:8:1": {
+      "category": "weapons",
+      "id": "0x75B3"
     },
-    '19:8:2': {
-      category: 'weapons',
-      id: '0x75B4',
+    "19:8:2": {
+      "category": "weapons",
+      "id": "0x75B4"
     },
-    '19:8:3': {
-      category: 'weapons',
-      id: '0x75B5',
+    "19:8:3": {
+      "category": "weapons",
+      "id": "0x75B5"
     },
-    '19:8:4': {
-      category: 'weapons',
-      id: '0x75B6',
+    "19:8:4": {
+      "category": "weapons",
+      "id": "0x75B6"
     },
-    '19:8:5': {
-      category: 'weapons',
-      id: '0x75B7',
+    "19:8:5": {
+      "category": "weapons",
+      "id": "0x75B7"
     },
-    '19:4:1': {
-      category: 'weapons',
-      id: '0x75BD',
+    "19:4:1": {
+      "category": "weapons",
+      "id": "0x75BD"
     },
-    '19:4:2': {
-      category: 'weapons',
-      id: '0x75BE',
+    "19:4:2": {
+      "category": "weapons",
+      "id": "0x75BE"
     },
-    '19:4:3': {
-      category: 'weapons',
-      id: '0x75BF',
+    "19:4:3": {
+      "category": "weapons",
+      "id": "0x75BF"
     },
-    '19:4:4': {
-      category: 'weapons',
-      id: '0x75C0',
+    "19:4:4": {
+      "category": "weapons",
+      "id": "0x75C0"
     },
-    '19:4:5': {
-      category: 'weapons',
-      id: '0x75C1',
+    "19:4:5": {
+      "category": "weapons",
+      "id": "0x75C1"
     },
-    '19:10:1': {
-      category: 'weapons',
-      id: '0x75C7',
+    "19:10:1": {
+      "category": "weapons",
+      "id": "0x75C7"
     },
-    '19:10:2': {
-      category: 'weapons',
-      id: '0x75C8',
+    "19:10:2": {
+      "category": "weapons",
+      "id": "0x75C8"
     },
-    '19:10:3': {
-      category: 'weapons',
-      id: '0x75C9',
+    "19:10:3": {
+      "category": "weapons",
+      "id": "0x75C9"
     },
-    '19:10:4': {
-      category: 'weapons',
-      id: '0x75CA',
+    "19:10:4": {
+      "category": "weapons",
+      "id": "0x75CA"
     },
-    '19:10:5': {
-      category: 'weapons',
-      id: '0x75CB',
+    "19:10:5": {
+      "category": "weapons",
+      "id": "0x75CB"
     },
-    '52:14:0': {
-      category: 'weapons',
-      id: '0x75F8',
+    "52:14:0": {
+      "category": "weapons",
+      "id": "0x75F8"
     },
-    '52:14:1': {
-      category: 'weapons',
-      id: '0x75F9',
+    "52:14:1": {
+      "category": "weapons",
+      "id": "0x75F9"
     },
-    '52:14:2': {
-      category: 'weapons',
-      id: '0x75FA',
+    "52:14:2": {
+      "category": "weapons",
+      "id": "0x75FA"
     },
-    '52:14:3': {
-      category: 'weapons',
-      id: '0x75FB',
+    "52:14:3": {
+      "category": "weapons",
+      "id": "0x75FB"
     },
-    '52:14:4': {
-      category: 'weapons',
-      id: '0x75FC',
+    "52:14:4": {
+      "category": "weapons",
+      "id": "0x75FC"
     },
-    '52:14:5': {
-      category: 'weapons',
-      id: '0x75FD',
+    "52:14:5": {
+      "category": "weapons",
+      "id": "0x75FD"
     },
-    '20:1:0': {
-      category: 'weapons',
-      id: '0x765C',
+    "20:1:0": {
+      "category": "weapons",
+      "id": "0x765C"
     },
-    '20:1:1': {
-      category: 'weapons',
-      id: '0x765D',
+    "20:1:1": {
+      "category": "weapons",
+      "id": "0x765D"
     },
-    '20:1:2': {
-      category: 'weapons',
-      id: '0x765E',
+    "20:1:2": {
+      "category": "weapons",
+      "id": "0x765E"
     },
-    '20:1:3': {
-      category: 'weapons',
-      id: '0x765F',
+    "20:1:3": {
+      "category": "weapons",
+      "id": "0x765F"
     },
-    '20:1:4': {
-      category: 'weapons',
-      id: '0x7660',
+    "20:1:4": {
+      "category": "weapons",
+      "id": "0x7660"
     },
-    '20:1:5': {
-      category: 'weapons',
-      id: '0x7661',
+    "20:1:5": {
+      "category": "weapons",
+      "id": "0x7661"
     },
-    '20:1:6': {
-      category: 'weapons',
-      id: '0x7662',
+    "20:1:6": {
+      "category": "weapons",
+      "id": "0x7662"
     },
-    '20:1:7': {
-      category: 'weapons',
-      id: '0x7663',
+    "20:1:7": {
+      "category": "weapons",
+      "id": "0x7663"
     },
-    '20:1:8': {
-      category: 'weapons',
-      id: '0x7664',
+    "20:1:8": {
+      "category": "weapons",
+      "id": "0x7664"
     },
-    '20:1:9': {
-      category: 'weapons',
-      id: '0x7665',
+    "20:1:9": {
+      "category": "weapons",
+      "id": "0x7665"
     },
-    '20:1:10': {
-      category: 'weapons',
-      id: '0x7666',
+    "20:1:10": {
+      "category": "weapons",
+      "id": "0x7666"
     },
-    '20:2:1': {
-      category: 'weapons',
-      id: '0x7667',
+    "20:2:1": {
+      "category": "weapons",
+      "id": "0x7667"
     },
-    '20:2:2': {
-      category: 'weapons',
-      id: '0x7668',
+    "20:2:2": {
+      "category": "weapons",
+      "id": "0x7668"
     },
-    '20:2:3': {
-      category: 'weapons',
-      id: '0x7669',
+    "20:2:3": {
+      "category": "weapons",
+      "id": "0x7669"
     },
-    '20:2:4': {
-      category: 'weapons',
-      id: '0x766A',
+    "20:2:4": {
+      "category": "weapons",
+      "id": "0x766A"
     },
-    '20:2:5': {
-      category: 'weapons',
-      id: '0x766B',
+    "20:2:5": {
+      "category": "weapons",
+      "id": "0x766B"
     },
-    '20:7:1': {
-      category: 'weapons',
-      id: '0x7671',
+    "20:7:1": {
+      "category": "weapons",
+      "id": "0x7671"
     },
-    '20:7:2': {
-      category: 'weapons',
-      id: '0x7672',
+    "20:7:2": {
+      "category": "weapons",
+      "id": "0x7672"
     },
-    '20:7:3': {
-      category: 'weapons',
-      id: '0x7673',
+    "20:7:3": {
+      "category": "weapons",
+      "id": "0x7673"
     },
-    '20:7:4': {
-      category: 'weapons',
-      id: '0x7674',
+    "20:7:4": {
+      "category": "weapons",
+      "id": "0x7674"
     },
-    '20:7:5': {
-      category: 'weapons',
-      id: '0x7675',
+    "20:7:5": {
+      "category": "weapons",
+      "id": "0x7675"
     },
-    '20:8:1': {
-      category: 'weapons',
-      id: '0x767B',
+    "20:8:1": {
+      "category": "weapons",
+      "id": "0x767B"
     },
-    '20:8:2': {
-      category: 'weapons',
-      id: '0x767C',
+    "20:8:2": {
+      "category": "weapons",
+      "id": "0x767C"
     },
-    '20:8:3': {
-      category: 'weapons',
-      id: '0x767D',
+    "20:8:3": {
+      "category": "weapons",
+      "id": "0x767D"
     },
-    '20:8:4': {
-      category: 'weapons',
-      id: '0x767E',
+    "20:8:4": {
+      "category": "weapons",
+      "id": "0x767E"
     },
-    '20:8:5': {
-      category: 'weapons',
-      id: '0x767F',
+    "20:8:5": {
+      "category": "weapons",
+      "id": "0x767F"
     },
-    '20:4:1': {
-      category: 'weapons',
-      id: '0x7685',
+    "20:4:1": {
+      "category": "weapons",
+      "id": "0x7685"
     },
-    '20:4:2': {
-      category: 'weapons',
-      id: '0x7686',
+    "20:4:2": {
+      "category": "weapons",
+      "id": "0x7686"
     },
-    '20:4:3': {
-      category: 'weapons',
-      id: '0x7687',
+    "20:4:3": {
+      "category": "weapons",
+      "id": "0x7687"
     },
-    '20:4:4': {
-      category: 'weapons',
-      id: '0x7688',
+    "20:4:4": {
+      "category": "weapons",
+      "id": "0x7688"
     },
-    '20:4:5': {
-      category: 'weapons',
-      id: '0x7689',
+    "20:4:5": {
+      "category": "weapons",
+      "id": "0x7689"
     },
-    '20:10:1': {
-      category: 'weapons',
-      id: '0x768F',
+    "20:10:1": {
+      "category": "weapons",
+      "id": "0x768F"
     },
-    '20:10:2': {
-      category: 'weapons',
-      id: '0x7690',
+    "20:10:2": {
+      "category": "weapons",
+      "id": "0x7690"
     },
-    '20:10:3': {
-      category: 'weapons',
-      id: '0x7691',
+    "20:10:3": {
+      "category": "weapons",
+      "id": "0x7691"
     },
-    '20:10:4': {
-      category: 'weapons',
-      id: '0x7692',
+    "20:10:4": {
+      "category": "weapons",
+      "id": "0x7692"
     },
-    '20:10:5': {
-      category: 'weapons',
-      id: '0x7693',
+    "20:10:5": {
+      "category": "weapons",
+      "id": "0x7693"
     },
-    '84:null:null': {
-      category: 'weapons',
-      id: '0x76C0',
+    "84:null:null": {
+      "category": "weapons",
+      "id": "0x76C0"
     },
-    '12:1:0': {
-      category: 'weapons',
-      id: '0x9C40',
+    "12:1:0": {
+      "category": "weapons",
+      "id": "0x9C40"
     },
-    '12:1:1': {
-      category: 'weapons',
-      id: '0x9C41',
+    "12:1:1": {
+      "category": "weapons",
+      "id": "0x9C41"
     },
-    '12:1:2': {
-      category: 'weapons',
-      id: '0x9C42',
+    "12:1:2": {
+      "category": "weapons",
+      "id": "0x9C42"
     },
-    '12:1:3': {
-      category: 'weapons',
-      id: '0x9C43',
+    "12:1:3": {
+      "category": "weapons",
+      "id": "0x9C43"
     },
-    '12:1:4': {
-      category: 'weapons',
-      id: '0x9C44',
+    "12:1:4": {
+      "category": "weapons",
+      "id": "0x9C44"
     },
-    '12:1:5': {
-      category: 'weapons',
-      id: '0x9C45',
+    "12:1:5": {
+      "category": "weapons",
+      "id": "0x9C45"
     },
-    '12:1:6': {
-      category: 'weapons',
-      id: '0x9C46',
+    "12:1:6": {
+      "category": "weapons",
+      "id": "0x9C46"
     },
-    '12:1:7': {
-      category: 'weapons',
-      id: '0x9C47',
+    "12:1:7": {
+      "category": "weapons",
+      "id": "0x9C47"
     },
-    '12:1:8': {
-      category: 'weapons',
-      id: '0x9C48',
+    "12:1:8": {
+      "category": "weapons",
+      "id": "0x9C48"
     },
-    '12:1:9': {
-      category: 'weapons',
-      id: '0x9C49',
+    "12:1:9": {
+      "category": "weapons",
+      "id": "0x9C49"
     },
-    '12:1:10': {
-      category: 'weapons',
-      id: '0x9C4A',
+    "12:1:10": {
+      "category": "weapons",
+      "id": "0x9C4A"
     },
-    '12:4:1': {
-      category: 'weapons',
-      id: '0x9C4B',
+    "12:4:1": {
+      "category": "weapons",
+      "id": "0x9C4B"
     },
-    '12:4:2': {
-      category: 'weapons',
-      id: '0x9C4C',
+    "12:4:2": {
+      "category": "weapons",
+      "id": "0x9C4C"
     },
-    '12:4:3': {
-      category: 'weapons',
-      id: '0x9C4D',
+    "12:4:3": {
+      "category": "weapons",
+      "id": "0x9C4D"
     },
-    '12:4:4': {
-      category: 'weapons',
-      id: '0x9C4E',
+    "12:4:4": {
+      "category": "weapons",
+      "id": "0x9C4E"
     },
-    '12:4:5': {
-      category: 'weapons',
-      id: '0x9C4F',
+    "12:4:5": {
+      "category": "weapons",
+      "id": "0x9C4F"
     },
-    '12:6:1': {
-      category: 'weapons',
-      id: '0x9C55',
+    "12:6:1": {
+      "category": "weapons",
+      "id": "0x9C55"
     },
-    '12:6:2': {
-      category: 'weapons',
-      id: '0x9C56',
+    "12:6:2": {
+      "category": "weapons",
+      "id": "0x9C56"
     },
-    '12:6:3': {
-      category: 'weapons',
-      id: '0x9C57',
+    "12:6:3": {
+      "category": "weapons",
+      "id": "0x9C57"
     },
-    '12:6:4': {
-      category: 'weapons',
-      id: '0x9C58',
+    "12:6:4": {
+      "category": "weapons",
+      "id": "0x9C58"
     },
-    '12:6:5': {
-      category: 'weapons',
-      id: '0x9C59',
+    "12:6:5": {
+      "category": "weapons",
+      "id": "0x9C59"
     },
-    '12:10:1': {
-      category: 'weapons',
-      id: '0x9C5F',
+    "12:10:1": {
+      "category": "weapons",
+      "id": "0x9C5F"
     },
-    '12:10:2': {
-      category: 'weapons',
-      id: '0x9C60',
+    "12:10:2": {
+      "category": "weapons",
+      "id": "0x9C60"
     },
-    '12:10:3': {
-      category: 'weapons',
-      id: '0x9C61',
+    "12:10:3": {
+      "category": "weapons",
+      "id": "0x9C61"
     },
-    '12:10:4': {
-      category: 'weapons',
-      id: '0x9C62',
+    "12:10:4": {
+      "category": "weapons",
+      "id": "0x9C62"
     },
-    '12:10:5': {
-      category: 'weapons',
-      id: '0x9C63',
+    "12:10:5": {
+      "category": "weapons",
+      "id": "0x9C63"
     },
-    '12:2:1': {
-      category: 'weapons',
-      id: '0x9C69',
+    "12:2:1": {
+      "category": "weapons",
+      "id": "0x9C69"
     },
-    '12:2:2': {
-      category: 'weapons',
-      id: '0x9C6A',
+    "12:2:2": {
+      "category": "weapons",
+      "id": "0x9C6A"
     },
-    '12:2:3': {
-      category: 'weapons',
-      id: '0x9C6B',
+    "12:2:3": {
+      "category": "weapons",
+      "id": "0x9C6B"
     },
-    '12:2:4': {
-      category: 'weapons',
-      id: '0x9C6C',
+    "12:2:4": {
+      "category": "weapons",
+      "id": "0x9C6C"
     },
-    '12:2:5': {
-      category: 'weapons',
-      id: '0x9C6D',
+    "12:2:5": {
+      "category": "weapons",
+      "id": "0x9C6D"
     },
-    '12:7:1': {
-      category: 'weapons',
-      id: '0x9C73',
+    "12:7:1": {
+      "category": "weapons",
+      "id": "0x9C73"
     },
-    '12:7:2': {
-      category: 'weapons',
-      id: '0x9C74',
+    "12:7:2": {
+      "category": "weapons",
+      "id": "0x9C74"
     },
-    '12:7:3': {
-      category: 'weapons',
-      id: '0x9C75',
+    "12:7:3": {
+      "category": "weapons",
+      "id": "0x9C75"
     },
-    '12:7:4': {
-      category: 'weapons',
-      id: '0x9C76',
+    "12:7:4": {
+      "category": "weapons",
+      "id": "0x9C76"
     },
-    '12:7:5': {
-      category: 'weapons',
-      id: '0x9C77',
+    "12:7:5": {
+      "category": "weapons",
+      "id": "0x9C77"
     },
-    '12:9:1': {
-      category: 'weapons',
-      id: '0x9C7D',
+    "12:9:1": {
+      "category": "weapons",
+      "id": "0x9C7D"
     },
-    '12:9:2': {
-      category: 'weapons',
-      id: '0x9C7E',
+    "12:9:2": {
+      "category": "weapons",
+      "id": "0x9C7E"
     },
-    '12:9:3': {
-      category: 'weapons',
-      id: '0x9C7F',
+    "12:9:3": {
+      "category": "weapons",
+      "id": "0x9C7F"
     },
-    '12:9:4': {
-      category: 'weapons',
-      id: '0x9C80',
+    "12:9:4": {
+      "category": "weapons",
+      "id": "0x9C80"
     },
-    '12:9:5': {
-      category: 'weapons',
-      id: '0x9C81',
+    "12:9:5": {
+      "category": "weapons",
+      "id": "0x9C81"
     },
-    '13:1:0': {
-      category: 'weapons',
-      id: '0x9CA4',
+    "13:1:0": {
+      "category": "weapons",
+      "id": "0x9CA4"
     },
-    '13:1:1': {
-      category: 'weapons',
-      id: '0x9CA5',
+    "13:1:1": {
+      "category": "weapons",
+      "id": "0x9CA5"
     },
-    '13:1:2': {
-      category: 'weapons',
-      id: '0x9CA6',
+    "13:1:2": {
+      "category": "weapons",
+      "id": "0x9CA6"
     },
-    '13:1:3': {
-      category: 'weapons',
-      id: '0x9CA7',
+    "13:1:3": {
+      "category": "weapons",
+      "id": "0x9CA7"
     },
-    '13:1:4': {
-      category: 'weapons',
-      id: '0x9CA8',
+    "13:1:4": {
+      "category": "weapons",
+      "id": "0x9CA8"
     },
-    '13:1:5': {
-      category: 'weapons',
-      id: '0x9CA9',
+    "13:1:5": {
+      "category": "weapons",
+      "id": "0x9CA9"
     },
-    '13:1:6': {
-      category: 'weapons',
-      id: '0x9CAA',
+    "13:1:6": {
+      "category": "weapons",
+      "id": "0x9CAA"
     },
-    '13:1:7': {
-      category: 'weapons',
-      id: '0x9CAB',
+    "13:1:7": {
+      "category": "weapons",
+      "id": "0x9CAB"
     },
-    '13:1:8': {
-      category: 'weapons',
-      id: '0x9CAC',
+    "13:1:8": {
+      "category": "weapons",
+      "id": "0x9CAC"
     },
-    '13:1:9': {
-      category: 'weapons',
-      id: '0x9CAD',
+    "13:1:9": {
+      "category": "weapons",
+      "id": "0x9CAD"
     },
-    '13:1:10': {
-      category: 'weapons',
-      id: '0x9CAE',
+    "13:1:10": {
+      "category": "weapons",
+      "id": "0x9CAE"
     },
-    '13:4:1': {
-      category: 'weapons',
-      id: '0x9CAF',
+    "13:4:1": {
+      "category": "weapons",
+      "id": "0x9CAF"
     },
-    '13:4:2': {
-      category: 'weapons',
-      id: '0x9CB0',
+    "13:4:2": {
+      "category": "weapons",
+      "id": "0x9CB0"
     },
-    '13:4:3': {
-      category: 'weapons',
-      id: '0x9CB1',
+    "13:4:3": {
+      "category": "weapons",
+      "id": "0x9CB1"
     },
-    '13:4:4': {
-      category: 'weapons',
-      id: '0x9CB2',
+    "13:4:4": {
+      "category": "weapons",
+      "id": "0x9CB2"
     },
-    '13:4:5': {
-      category: 'weapons',
-      id: '0x9CB3',
+    "13:4:5": {
+      "category": "weapons",
+      "id": "0x9CB3"
     },
-    '13:6:1': {
-      category: 'weapons',
-      id: '0x9CB9',
+    "13:6:1": {
+      "category": "weapons",
+      "id": "0x9CB9"
     },
-    '13:6:2': {
-      category: 'weapons',
-      id: '0x9CBA',
+    "13:6:2": {
+      "category": "weapons",
+      "id": "0x9CBA"
     },
-    '13:6:3': {
-      category: 'weapons',
-      id: '0x9CBB',
+    "13:6:3": {
+      "category": "weapons",
+      "id": "0x9CBB"
     },
-    '13:6:4': {
-      category: 'weapons',
-      id: '0x9CBC',
+    "13:6:4": {
+      "category": "weapons",
+      "id": "0x9CBC"
     },
-    '13:6:5': {
-      category: 'weapons',
-      id: '0x9CBD',
+    "13:6:5": {
+      "category": "weapons",
+      "id": "0x9CBD"
     },
-    '13:10:1': {
-      category: 'weapons',
-      id: '0x9CC3',
+    "13:10:1": {
+      "category": "weapons",
+      "id": "0x9CC3"
     },
-    '13:10:2': {
-      category: 'weapons',
-      id: '0x9CC4',
+    "13:10:2": {
+      "category": "weapons",
+      "id": "0x9CC4"
     },
-    '13:10:3': {
-      category: 'weapons',
-      id: '0x9CC5',
+    "13:10:3": {
+      "category": "weapons",
+      "id": "0x9CC5"
     },
-    '13:10:4': {
-      category: 'weapons',
-      id: '0x9CC6',
+    "13:10:4": {
+      "category": "weapons",
+      "id": "0x9CC6"
     },
-    '13:10:5': {
-      category: 'weapons',
-      id: '0x9CC7',
+    "13:10:5": {
+      "category": "weapons",
+      "id": "0x9CC7"
     },
-    '13:2:1': {
-      category: 'weapons',
-      id: '0x9CCD',
+    "13:2:1": {
+      "category": "weapons",
+      "id": "0x9CCD"
     },
-    '13:2:2': {
-      category: 'weapons',
-      id: '0x9CCE',
+    "13:2:2": {
+      "category": "weapons",
+      "id": "0x9CCE"
     },
-    '13:2:3': {
-      category: 'weapons',
-      id: '0x9CCF',
+    "13:2:3": {
+      "category": "weapons",
+      "id": "0x9CCF"
     },
-    '13:2:4': {
-      category: 'weapons',
-      id: '0x9CD0',
+    "13:2:4": {
+      "category": "weapons",
+      "id": "0x9CD0"
     },
-    '13:2:5': {
-      category: 'weapons',
-      id: '0x9CD1',
+    "13:2:5": {
+      "category": "weapons",
+      "id": "0x9CD1"
     },
-    '13:7:1': {
-      category: 'weapons',
-      id: '0x9CD7',
+    "13:7:1": {
+      "category": "weapons",
+      "id": "0x9CD7"
     },
-    '13:7:2': {
-      category: 'weapons',
-      id: '0x9CD8',
+    "13:7:2": {
+      "category": "weapons",
+      "id": "0x9CD8"
     },
-    '13:7:3': {
-      category: 'weapons',
-      id: '0x9CD9',
+    "13:7:3": {
+      "category": "weapons",
+      "id": "0x9CD9"
     },
-    '13:7:4': {
-      category: 'weapons',
-      id: '0x9CDA',
+    "13:7:4": {
+      "category": "weapons",
+      "id": "0x9CDA"
     },
-    '13:7:5': {
-      category: 'weapons',
-      id: '0x9CDB',
+    "13:7:5": {
+      "category": "weapons",
+      "id": "0x9CDB"
     },
-    '13:9:1': {
-      category: 'weapons',
-      id: '0x9CE1',
+    "13:9:1": {
+      "category": "weapons",
+      "id": "0x9CE1"
     },
-    '13:9:2': {
-      category: 'weapons',
-      id: '0x9CE2',
+    "13:9:2": {
+      "category": "weapons",
+      "id": "0x9CE2"
     },
-    '13:9:3': {
-      category: 'weapons',
-      id: '0x9CE3',
+    "13:9:3": {
+      "category": "weapons",
+      "id": "0x9CE3"
     },
-    '13:9:4': {
-      category: 'weapons',
-      id: '0x9CE4',
+    "13:9:4": {
+      "category": "weapons",
+      "id": "0x9CE4"
     },
-    '13:9:5': {
-      category: 'weapons',
-      id: '0x9CE5',
+    "13:9:5": {
+      "category": "weapons",
+      "id": "0x9CE5"
     },
-    '15:1:0': {
-      category: 'weapons',
-      id: '0x9D08',
+    "15:1:0": {
+      "category": "weapons",
+      "id": "0x9D08"
     },
-    '15:1:1': {
-      category: 'weapons',
-      id: '0x9D09',
+    "15:1:1": {
+      "category": "weapons",
+      "id": "0x9D09"
     },
-    '15:1:2': {
-      category: 'weapons',
-      id: '0x9D0A',
+    "15:1:2": {
+      "category": "weapons",
+      "id": "0x9D0A"
     },
-    '15:1:3': {
-      category: 'weapons',
-      id: '0x9D0B',
+    "15:1:3": {
+      "category": "weapons",
+      "id": "0x9D0B"
     },
-    '15:1:4': {
-      category: 'weapons',
-      id: '0x9D0C',
+    "15:1:4": {
+      "category": "weapons",
+      "id": "0x9D0C"
     },
-    '15:1:5': {
-      category: 'weapons',
-      id: '0x9D0D',
+    "15:1:5": {
+      "category": "weapons",
+      "id": "0x9D0D"
     },
-    '15:1:6': {
-      category: 'weapons',
-      id: '0x9D0E',
+    "15:1:6": {
+      "category": "weapons",
+      "id": "0x9D0E"
     },
-    '15:1:7': {
-      category: 'weapons',
-      id: '0x9D0F',
+    "15:1:7": {
+      "category": "weapons",
+      "id": "0x9D0F"
     },
-    '15:1:8': {
-      category: 'weapons',
-      id: '0x9D10',
+    "15:1:8": {
+      "category": "weapons",
+      "id": "0x9D10"
     },
-    '15:1:9': {
-      category: 'weapons',
-      id: '0x9D11',
+    "15:1:9": {
+      "category": "weapons",
+      "id": "0x9D11"
     },
-    '15:1:10': {
-      category: 'weapons',
-      id: '0x9D12',
+    "15:1:10": {
+      "category": "weapons",
+      "id": "0x9D12"
     },
-    '15:4:1': {
-      category: 'weapons',
-      id: '0x9D13',
+    "15:4:1": {
+      "category": "weapons",
+      "id": "0x9D13"
     },
-    '15:4:2': {
-      category: 'weapons',
-      id: '0x9D14',
+    "15:4:2": {
+      "category": "weapons",
+      "id": "0x9D14"
     },
-    '15:4:3': {
-      category: 'weapons',
-      id: '0x9D15',
+    "15:4:3": {
+      "category": "weapons",
+      "id": "0x9D15"
     },
-    '15:4:4': {
-      category: 'weapons',
-      id: '0x9D16',
+    "15:4:4": {
+      "category": "weapons",
+      "id": "0x9D16"
     },
-    '15:4:5': {
-      category: 'weapons',
-      id: '0x9D17',
+    "15:4:5": {
+      "category": "weapons",
+      "id": "0x9D17"
     },
-    '15:6:1': {
-      category: 'weapons',
-      id: '0x9D1D',
+    "15:6:1": {
+      "category": "weapons",
+      "id": "0x9D1D"
     },
-    '15:6:2': {
-      category: 'weapons',
-      id: '0x9D1E',
+    "15:6:2": {
+      "category": "weapons",
+      "id": "0x9D1E"
     },
-    '15:6:3': {
-      category: 'weapons',
-      id: '0x9D1F',
+    "15:6:3": {
+      "category": "weapons",
+      "id": "0x9D1F"
     },
-    '15:6:4': {
-      category: 'weapons',
-      id: '0x9D20',
+    "15:6:4": {
+      "category": "weapons",
+      "id": "0x9D20"
     },
-    '15:6:5': {
-      category: 'weapons',
-      id: '0x9D21',
+    "15:6:5": {
+      "category": "weapons",
+      "id": "0x9D21"
     },
-    '15:2:1': {
-      category: 'weapons',
-      id: '0x9D27',
+    "15:2:1": {
+      "category": "weapons",
+      "id": "0x9D27"
     },
-    '15:2:2': {
-      category: 'weapons',
-      id: '0x9D28',
+    "15:2:2": {
+      "category": "weapons",
+      "id": "0x9D28"
     },
-    '15:2:3': {
-      category: 'weapons',
-      id: '0x9D29',
+    "15:2:3": {
+      "category": "weapons",
+      "id": "0x9D29"
     },
-    '15:2:4': {
-      category: 'weapons',
-      id: '0x9D2A',
+    "15:2:4": {
+      "category": "weapons",
+      "id": "0x9D2A"
     },
-    '15:2:5': {
-      category: 'weapons',
-      id: '0x9D2B',
+    "15:2:5": {
+      "category": "weapons",
+      "id": "0x9D2B"
     },
-    '15:7:1': {
-      category: 'weapons',
-      id: '0x9D31',
+    "15:7:1": {
+      "category": "weapons",
+      "id": "0x9D31"
     },
-    '15:7:2': {
-      category: 'weapons',
-      id: '0x9D32',
+    "15:7:2": {
+      "category": "weapons",
+      "id": "0x9D32"
     },
-    '15:7:3': {
-      category: 'weapons',
-      id: '0x9D33',
+    "15:7:3": {
+      "category": "weapons",
+      "id": "0x9D33"
     },
-    '15:7:4': {
-      category: 'weapons',
-      id: '0x9D34',
+    "15:7:4": {
+      "category": "weapons",
+      "id": "0x9D34"
     },
-    '15:7:5': {
-      category: 'weapons',
-      id: '0x9D35',
+    "15:7:5": {
+      "category": "weapons",
+      "id": "0x9D35"
     },
-    '15:9:1': {
-      category: 'weapons',
-      id: '0x9D3B',
+    "15:9:1": {
+      "category": "weapons",
+      "id": "0x9D3B"
     },
-    '15:9:2': {
-      category: 'weapons',
-      id: '0x9D3C',
+    "15:9:2": {
+      "category": "weapons",
+      "id": "0x9D3C"
     },
-    '15:9:3': {
-      category: 'weapons',
-      id: '0x9D3D',
+    "15:9:3": {
+      "category": "weapons",
+      "id": "0x9D3D"
     },
-    '15:9:4': {
-      category: 'weapons',
-      id: '0x9D3E',
+    "15:9:4": {
+      "category": "weapons",
+      "id": "0x9D3E"
     },
-    '15:9:5': {
-      category: 'weapons',
-      id: '0x9D3F',
+    "15:9:5": {
+      "category": "weapons",
+      "id": "0x9D3F"
     },
-    '15:10:1': {
-      category: 'weapons',
-      id: '0x9D45',
+    "15:10:1": {
+      "category": "weapons",
+      "id": "0x9D45"
     },
-    '15:10:2': {
-      category: 'weapons',
-      id: '0x9D46',
+    "15:10:2": {
+      "category": "weapons",
+      "id": "0x9D46"
     },
-    '15:10:3': {
-      category: 'weapons',
-      id: '0x9D47',
+    "15:10:3": {
+      "category": "weapons",
+      "id": "0x9D47"
     },
-    '15:10:4': {
-      category: 'weapons',
-      id: '0x9D48',
+    "15:10:4": {
+      "category": "weapons",
+      "id": "0x9D48"
     },
-    '15:10:5': {
-      category: 'weapons',
-      id: '0x9D49',
+    "15:10:5": {
+      "category": "weapons",
+      "id": "0x9D49"
     },
-    '14:1:0': {
-      category: 'weapons',
-      id: '0x9D6C',
+    "14:1:0": {
+      "category": "weapons",
+      "id": "0x9D6C"
     },
-    '14:1:1': {
-      category: 'weapons',
-      id: '0x9D6D',
+    "14:1:1": {
+      "category": "weapons",
+      "id": "0x9D6D"
     },
-    '14:1:2': {
-      category: 'weapons',
-      id: '0x9D6E',
+    "14:1:2": {
+      "category": "weapons",
+      "id": "0x9D6E"
     },
-    '14:1:3': {
-      category: 'weapons',
-      id: '0x9D6F',
+    "14:1:3": {
+      "category": "weapons",
+      "id": "0x9D6F"
     },
-    '14:1:4': {
-      category: 'weapons',
-      id: '0x9D70',
+    "14:1:4": {
+      "category": "weapons",
+      "id": "0x9D70"
     },
-    '14:1:5': {
-      category: 'weapons',
-      id: '0x9D71',
+    "14:1:5": {
+      "category": "weapons",
+      "id": "0x9D71"
     },
-    '14:1:6': {
-      category: 'weapons',
-      id: '0x9D72',
+    "14:1:6": {
+      "category": "weapons",
+      "id": "0x9D72"
     },
-    '14:1:7': {
-      category: 'weapons',
-      id: '0x9D73',
+    "14:1:7": {
+      "category": "weapons",
+      "id": "0x9D73"
     },
-    '14:1:8': {
-      category: 'weapons',
-      id: '0x9D74',
+    "14:1:8": {
+      "category": "weapons",
+      "id": "0x9D74"
     },
-    '14:1:9': {
-      category: 'weapons',
-      id: '0x9D75',
+    "14:1:9": {
+      "category": "weapons",
+      "id": "0x9D75"
     },
-    '14:1:10': {
-      category: 'weapons',
-      id: '0x9D76',
+    "14:1:10": {
+      "category": "weapons",
+      "id": "0x9D76"
     },
-    '14:4:1': {
-      category: 'weapons',
-      id: '0x9D77',
+    "14:4:1": {
+      "category": "weapons",
+      "id": "0x9D77"
     },
-    '14:4:2': {
-      category: 'weapons',
-      id: '0x9D78',
+    "14:4:2": {
+      "category": "weapons",
+      "id": "0x9D78"
     },
-    '14:4:3': {
-      category: 'weapons',
-      id: '0x9D79',
+    "14:4:3": {
+      "category": "weapons",
+      "id": "0x9D79"
     },
-    '14:4:4': {
-      category: 'weapons',
-      id: '0x9D7A',
+    "14:4:4": {
+      "category": "weapons",
+      "id": "0x9D7A"
     },
-    '14:4:5': {
-      category: 'weapons',
-      id: '0x9D7B',
+    "14:4:5": {
+      "category": "weapons",
+      "id": "0x9D7B"
     },
-    '14:6:1': {
-      category: 'weapons',
-      id: '0x9D81',
+    "14:6:1": {
+      "category": "weapons",
+      "id": "0x9D81"
     },
-    '14:6:2': {
-      category: 'weapons',
-      id: '0x9D82',
+    "14:6:2": {
+      "category": "weapons",
+      "id": "0x9D82"
     },
-    '14:6:3': {
-      category: 'weapons',
-      id: '0x9D83',
+    "14:6:3": {
+      "category": "weapons",
+      "id": "0x9D83"
     },
-    '14:6:4': {
-      category: 'weapons',
-      id: '0x9D84',
+    "14:6:4": {
+      "category": "weapons",
+      "id": "0x9D84"
     },
-    '14:6:5': {
-      category: 'weapons',
-      id: '0x9D85',
+    "14:6:5": {
+      "category": "weapons",
+      "id": "0x9D85"
     },
-    '14:10:1': {
-      category: 'weapons',
-      id: '0x9D8B',
+    "14:10:1": {
+      "category": "weapons",
+      "id": "0x9D8B"
     },
-    '14:10:2': {
-      category: 'weapons',
-      id: '0x9D8C',
+    "14:10:2": {
+      "category": "weapons",
+      "id": "0x9D8C"
     },
-    '14:10:3': {
-      category: 'weapons',
-      id: '0x9D8D',
+    "14:10:3": {
+      "category": "weapons",
+      "id": "0x9D8D"
     },
-    '14:10:4': {
-      category: 'weapons',
-      id: '0x9D8E',
+    "14:10:4": {
+      "category": "weapons",
+      "id": "0x9D8E"
     },
-    '14:10:5': {
-      category: 'weapons',
-      id: '0x9D8F',
+    "14:10:5": {
+      "category": "weapons",
+      "id": "0x9D8F"
     },
-    '14:2:1': {
-      category: 'weapons',
-      id: '0x9D95',
+    "14:2:1": {
+      "category": "weapons",
+      "id": "0x9D95"
     },
-    '14:2:2': {
-      category: 'weapons',
-      id: '0x9D96',
+    "14:2:2": {
+      "category": "weapons",
+      "id": "0x9D96"
     },
-    '14:2:3': {
-      category: 'weapons',
-      id: '0x9D97',
+    "14:2:3": {
+      "category": "weapons",
+      "id": "0x9D97"
     },
-    '14:2:4': {
-      category: 'weapons',
-      id: '0x9D98',
+    "14:2:4": {
+      "category": "weapons",
+      "id": "0x9D98"
     },
-    '14:2:5': {
-      category: 'weapons',
-      id: '0x9D99',
+    "14:2:5": {
+      "category": "weapons",
+      "id": "0x9D99"
     },
-    '14:7:1': {
-      category: 'weapons',
-      id: '0x9D9F',
+    "14:7:1": {
+      "category": "weapons",
+      "id": "0x9D9F"
     },
-    '14:7:2': {
-      category: 'weapons',
-      id: '0x9DA0',
+    "14:7:2": {
+      "category": "weapons",
+      "id": "0x9DA0"
     },
-    '14:7:3': {
-      category: 'weapons',
-      id: '0x9DA1',
+    "14:7:3": {
+      "category": "weapons",
+      "id": "0x9DA1"
     },
-    '14:7:4': {
-      category: 'weapons',
-      id: '0x9DA2',
+    "14:7:4": {
+      "category": "weapons",
+      "id": "0x9DA2"
     },
-    '14:7:5': {
-      category: 'weapons',
-      id: '0x9DA3',
+    "14:7:5": {
+      "category": "weapons",
+      "id": "0x9DA3"
     },
-    '14:9:1': {
-      category: 'weapons',
-      id: '0x9DA9',
+    "14:9:1": {
+      "category": "weapons",
+      "id": "0x9DA9"
     },
-    '14:9:2': {
-      category: 'weapons',
-      id: '0x9DAA',
+    "14:9:2": {
+      "category": "weapons",
+      "id": "0x9DAA"
     },
-    '14:9:3': {
-      category: 'weapons',
-      id: '0x9DAB',
+    "14:9:3": {
+      "category": "weapons",
+      "id": "0x9DAB"
     },
-    '14:9:4': {
-      category: 'weapons',
-      id: '0x9DAC',
+    "14:9:4": {
+      "category": "weapons",
+      "id": "0x9DAC"
     },
-    '14:9:5': {
-      category: 'weapons',
-      id: '0x9DAD',
+    "14:9:5": {
+      "category": "weapons",
+      "id": "0x9DAD"
     },
-    '17:1:0': {
-      category: 'weapons',
-      id: '0x9DD0',
+    "17:1:0": {
+      "category": "weapons",
+      "id": "0x9DD0"
     },
-    '17:1:1': {
-      category: 'weapons',
-      id: '0x9DD1',
+    "17:1:1": {
+      "category": "weapons",
+      "id": "0x9DD1"
     },
-    '17:1:2': {
-      category: 'weapons',
-      id: '0x9DD2',
+    "17:1:2": {
+      "category": "weapons",
+      "id": "0x9DD2"
     },
-    '17:1:3': {
-      category: 'weapons',
-      id: '0x9DD3',
+    "17:1:3": {
+      "category": "weapons",
+      "id": "0x9DD3"
     },
-    '17:1:4': {
-      category: 'weapons',
-      id: '0x9DD4',
+    "17:1:4": {
+      "category": "weapons",
+      "id": "0x9DD4"
     },
-    '17:1:5': {
-      category: 'weapons',
-      id: '0x9DD5',
+    "17:1:5": {
+      "category": "weapons",
+      "id": "0x9DD5"
     },
-    '17:1:6': {
-      category: 'weapons',
-      id: '0x9DD6',
+    "17:1:6": {
+      "category": "weapons",
+      "id": "0x9DD6"
     },
-    '17:1:7': {
-      category: 'weapons',
-      id: '0x9DD7',
+    "17:1:7": {
+      "category": "weapons",
+      "id": "0x9DD7"
     },
-    '17:1:8': {
-      category: 'weapons',
-      id: '0x9DD8',
+    "17:1:8": {
+      "category": "weapons",
+      "id": "0x9DD8"
     },
-    '17:1:9': {
-      category: 'weapons',
-      id: '0x9DD9',
+    "17:1:9": {
+      "category": "weapons",
+      "id": "0x9DD9"
     },
-    '17:1:10': {
-      category: 'weapons',
-      id: '0x9DDA',
+    "17:1:10": {
+      "category": "weapons",
+      "id": "0x9DDA"
     },
-    '17:4:1': {
-      category: 'weapons',
-      id: '0x9DDB',
+    "17:4:1": {
+      "category": "weapons",
+      "id": "0x9DDB"
     },
-    '17:4:2': {
-      category: 'weapons',
-      id: '0x9DDC',
+    "17:4:2": {
+      "category": "weapons",
+      "id": "0x9DDC"
     },
-    '17:4:3': {
-      category: 'weapons',
-      id: '0x9DDD',
+    "17:4:3": {
+      "category": "weapons",
+      "id": "0x9DDD"
     },
-    '17:4:4': {
-      category: 'weapons',
-      id: '0x9DDE',
+    "17:4:4": {
+      "category": "weapons",
+      "id": "0x9DDE"
     },
-    '17:4:5': {
-      category: 'weapons',
-      id: '0x9DDF',
+    "17:4:5": {
+      "category": "weapons",
+      "id": "0x9DDF"
     },
-    '17:6:1': {
-      category: 'weapons',
-      id: '0x9DE5',
+    "17:6:1": {
+      "category": "weapons",
+      "id": "0x9DE5"
     },
-    '17:6:2': {
-      category: 'weapons',
-      id: '0x9DE6',
+    "17:6:2": {
+      "category": "weapons",
+      "id": "0x9DE6"
     },
-    '17:6:3': {
-      category: 'weapons',
-      id: '0x9DE7',
+    "17:6:3": {
+      "category": "weapons",
+      "id": "0x9DE7"
     },
-    '17:6:4': {
-      category: 'weapons',
-      id: '0x9DE8',
+    "17:6:4": {
+      "category": "weapons",
+      "id": "0x9DE8"
     },
-    '17:6:5': {
-      category: 'weapons',
-      id: '0x9DE9',
+    "17:6:5": {
+      "category": "weapons",
+      "id": "0x9DE9"
     },
-    '17:10:1': {
-      category: 'weapons',
-      id: '0x9DEF',
+    "17:10:1": {
+      "category": "weapons",
+      "id": "0x9DEF"
     },
-    '17:10:2': {
-      category: 'weapons',
-      id: '0x9DF0',
+    "17:10:2": {
+      "category": "weapons",
+      "id": "0x9DF0"
     },
-    '17:10:3': {
-      category: 'weapons',
-      id: '0x9DF1',
+    "17:10:3": {
+      "category": "weapons",
+      "id": "0x9DF1"
     },
-    '17:10:4': {
-      category: 'weapons',
-      id: '0x9DF2',
+    "17:10:4": {
+      "category": "weapons",
+      "id": "0x9DF2"
     },
-    '17:10:5': {
-      category: 'weapons',
-      id: '0x9DF3',
+    "17:10:5": {
+      "category": "weapons",
+      "id": "0x9DF3"
     },
-    '17:2:1': {
-      category: 'weapons',
-      id: '0x9DF9',
+    "17:2:1": {
+      "category": "weapons",
+      "id": "0x9DF9"
     },
-    '17:2:2': {
-      category: 'weapons',
-      id: '0x9DFA',
+    "17:2:2": {
+      "category": "weapons",
+      "id": "0x9DFA"
     },
-    '17:2:3': {
-      category: 'weapons',
-      id: '0x9DFB',
+    "17:2:3": {
+      "category": "weapons",
+      "id": "0x9DFB"
     },
-    '17:2:4': {
-      category: 'weapons',
-      id: '0x9DFC',
+    "17:2:4": {
+      "category": "weapons",
+      "id": "0x9DFC"
     },
-    '17:2:5': {
-      category: 'weapons',
-      id: '0x9DFD',
+    "17:2:5": {
+      "category": "weapons",
+      "id": "0x9DFD"
     },
-    '17:7:1': {
-      category: 'weapons',
-      id: '0x9E03',
+    "17:7:1": {
+      "category": "weapons",
+      "id": "0x9E03"
     },
-    '17:7:2': {
-      category: 'weapons',
-      id: '0x9E04',
+    "17:7:2": {
+      "category": "weapons",
+      "id": "0x9E04"
     },
-    '17:7:3': {
-      category: 'weapons',
-      id: '0x9E05',
+    "17:7:3": {
+      "category": "weapons",
+      "id": "0x9E05"
     },
-    '17:7:4': {
-      category: 'weapons',
-      id: '0x9E06',
+    "17:7:4": {
+      "category": "weapons",
+      "id": "0x9E06"
     },
-    '17:7:5': {
-      category: 'weapons',
-      id: '0x9E07',
+    "17:7:5": {
+      "category": "weapons",
+      "id": "0x9E07"
     },
-    '17:9:1': {
-      category: 'weapons',
-      id: '0x9E0D',
+    "17:9:1": {
+      "category": "weapons",
+      "id": "0x9E0D"
     },
-    '17:9:2': {
-      category: 'weapons',
-      id: '0x9E0E',
+    "17:9:2": {
+      "category": "weapons",
+      "id": "0x9E0E"
     },
-    '17:9:3': {
-      category: 'weapons',
-      id: '0x9E0F',
+    "17:9:3": {
+      "category": "weapons",
+      "id": "0x9E0F"
     },
-    '17:9:4': {
-      category: 'weapons',
-      id: '0x9E10',
+    "17:9:4": {
+      "category": "weapons",
+      "id": "0x9E10"
     },
-    '17:9:5': {
-      category: 'weapons',
-      id: '0x9E11',
+    "17:9:5": {
+      "category": "weapons",
+      "id": "0x9E11"
     },
-    '55:14:0': {
-      category: 'weapons',
-      id: '0x9E34',
+    "55:14:0": {
+      "category": "weapons",
+      "id": "0x9E34"
     },
-    '55:14:1': {
-      category: 'weapons',
-      id: '0x9E35',
+    "55:14:1": {
+      "category": "weapons",
+      "id": "0x9E35"
     },
-    '55:14:2': {
-      category: 'weapons',
-      id: '0x9E36',
+    "55:14:2": {
+      "category": "weapons",
+      "id": "0x9E36"
     },
-    '55:14:3': {
-      category: 'weapons',
-      id: '0x9E37',
+    "55:14:3": {
+      "category": "weapons",
+      "id": "0x9E37"
     },
-    '55:14:4': {
-      category: 'weapons',
-      id: '0x9E38',
+    "55:14:4": {
+      "category": "weapons",
+      "id": "0x9E38"
     },
-    '55:14:5': {
-      category: 'weapons',
-      id: '0x9E39',
+    "55:14:5": {
+      "category": "weapons",
+      "id": "0x9E39"
     },
-    '49:14:0': {
-      category: 'weapons',
-      id: '0x9E98',
+    "49:14:0": {
+      "category": "weapons",
+      "id": "0x9E98"
     },
-    '49:14:1': {
-      category: 'weapons',
-      id: '0x9E99',
+    "49:14:1": {
+      "category": "weapons",
+      "id": "0x9E99"
     },
-    '49:14:2': {
-      category: 'weapons',
-      id: '0x9E9A',
+    "49:14:2": {
+      "category": "weapons",
+      "id": "0x9E9A"
     },
-    '49:14:3': {
-      category: 'weapons',
-      id: '0x9E9B',
+    "49:14:3": {
+      "category": "weapons",
+      "id": "0x9E9B"
     },
-    '49:14:4': {
-      category: 'weapons',
-      id: '0x9E9C',
+    "49:14:4": {
+      "category": "weapons",
+      "id": "0x9E9C"
     },
-    '49:14:5': {
-      category: 'weapons',
-      id: '0x9E9D',
+    "49:14:5": {
+      "category": "weapons",
+      "id": "0x9E9D"
     },
-    '59:14:0': {
-      category: 'weapons',
-      id: '0x9EFC',
+    "59:14:0": {
+      "category": "weapons",
+      "id": "0x9EFC"
     },
-    '59:14:1': {
-      category: 'weapons',
-      id: '0x9EFD',
+    "59:14:1": {
+      "category": "weapons",
+      "id": "0x9EFD"
     },
-    '59:14:2': {
-      category: 'weapons',
-      id: '0x9EFE',
+    "59:14:2": {
+      "category": "weapons",
+      "id": "0x9EFE"
     },
-    '59:14:3': {
-      category: 'weapons',
-      id: '0x9EFF',
+    "59:14:3": {
+      "category": "weapons",
+      "id": "0x9EFF"
     },
-    '59:14:4': {
-      category: 'weapons',
-      id: '0x9F00',
+    "59:14:4": {
+      "category": "weapons",
+      "id": "0x9F00"
     },
-    '59:14:5': {
-      category: 'weapons',
-      id: '0x9F01',
+    "59:14:5": {
+      "category": "weapons",
+      "id": "0x9F01"
     },
-    '85:null:null': {
-      category: 'weapons',
-      id: '0x9FC4',
+    "85:null:null": {
+      "category": "weapons",
+      "id": "0x9FC4"
     },
-    '21:1:0': {
-      category: 'weapons',
-      id: '0xC350',
+    "21:1:0": {
+      "category": "weapons",
+      "id": "0xC350"
     },
-    '21:1:1': {
-      category: 'weapons',
-      id: '0xC351',
+    "21:1:1": {
+      "category": "weapons",
+      "id": "0xC351"
     },
-    '21:1:2': {
-      category: 'weapons',
-      id: '0xC352',
+    "21:1:2": {
+      "category": "weapons",
+      "id": "0xC352"
     },
-    '21:1:3': {
-      category: 'weapons',
-      id: '0xC353',
+    "21:1:3": {
+      "category": "weapons",
+      "id": "0xC353"
     },
-    '21:1:4': {
-      category: 'weapons',
-      id: '0xC354',
+    "21:1:4": {
+      "category": "weapons",
+      "id": "0xC354"
     },
-    '21:1:5': {
-      category: 'weapons',
-      id: '0xC355',
+    "21:1:5": {
+      "category": "weapons",
+      "id": "0xC355"
     },
-    '21:1:6': {
-      category: 'weapons',
-      id: '0xC356',
+    "21:1:6": {
+      "category": "weapons",
+      "id": "0xC356"
     },
-    '21:1:7': {
-      category: 'weapons',
-      id: '0xC357',
+    "21:1:7": {
+      "category": "weapons",
+      "id": "0xC357"
     },
-    '21:1:8': {
-      category: 'weapons',
-      id: '0xC358',
+    "21:1:8": {
+      "category": "weapons",
+      "id": "0xC358"
     },
-    '21:1:9': {
-      category: 'weapons',
-      id: '0xC359',
+    "21:1:9": {
+      "category": "weapons",
+      "id": "0xC359"
     },
-    '21:1:10': {
-      category: 'weapons',
-      id: '0xC35A',
+    "21:1:10": {
+      "category": "weapons",
+      "id": "0xC35A"
     },
-    '21:3:1': {
-      category: 'weapons',
-      id: '0xC35B',
+    "21:3:1": {
+      "category": "weapons",
+      "id": "0xC35B"
     },
-    '21:3:2': {
-      category: 'weapons',
-      id: '0xC35C',
+    "21:3:2": {
+      "category": "weapons",
+      "id": "0xC35C"
     },
-    '21:3:3': {
-      category: 'weapons',
-      id: '0xC35D',
+    "21:3:3": {
+      "category": "weapons",
+      "id": "0xC35D"
     },
-    '21:3:4': {
-      category: 'weapons',
-      id: '0xC35E',
+    "21:3:4": {
+      "category": "weapons",
+      "id": "0xC35E"
     },
-    '21:3:5': {
-      category: 'weapons',
-      id: '0xC35F',
+    "21:3:5": {
+      "category": "weapons",
+      "id": "0xC35F"
     },
-    '21:5:1': {
-      category: 'weapons',
-      id: '0xC365',
+    "21:5:1": {
+      "category": "weapons",
+      "id": "0xC365"
     },
-    '21:5:2': {
-      category: 'weapons',
-      id: '0xC366',
+    "21:5:2": {
+      "category": "weapons",
+      "id": "0xC366"
     },
-    '21:5:3': {
-      category: 'weapons',
-      id: '0xC367',
+    "21:5:3": {
+      "category": "weapons",
+      "id": "0xC367"
     },
-    '21:5:4': {
-      category: 'weapons',
-      id: '0xC368',
+    "21:5:4": {
+      "category": "weapons",
+      "id": "0xC368"
     },
-    '21:5:5': {
-      category: 'weapons',
-      id: '0xC369',
+    "21:5:5": {
+      "category": "weapons",
+      "id": "0xC369"
     },
-    '21:9:1': {
-      category: 'weapons',
-      id: '0xC36F',
+    "21:9:1": {
+      "category": "weapons",
+      "id": "0xC36F"
     },
-    '21:9:2': {
-      category: 'weapons',
-      id: '0xC370',
+    "21:9:2": {
+      "category": "weapons",
+      "id": "0xC370"
     },
-    '21:9:3': {
-      category: 'weapons',
-      id: '0xC371',
+    "21:9:3": {
+      "category": "weapons",
+      "id": "0xC371"
     },
-    '21:9:4': {
-      category: 'weapons',
-      id: '0xC372',
+    "21:9:4": {
+      "category": "weapons",
+      "id": "0xC372"
     },
-    '21:9:5': {
-      category: 'weapons',
-      id: '0xC373',
+    "21:9:5": {
+      "category": "weapons",
+      "id": "0xC373"
     },
-    '21:2:1': {
-      category: 'weapons',
-      id: '0xC379',
+    "21:2:1": {
+      "category": "weapons",
+      "id": "0xC379"
     },
-    '21:2:2': {
-      category: 'weapons',
-      id: '0xC37A',
+    "21:2:2": {
+      "category": "weapons",
+      "id": "0xC37A"
     },
-    '21:2:3': {
-      category: 'weapons',
-      id: '0xC37B',
+    "21:2:3": {
+      "category": "weapons",
+      "id": "0xC37B"
     },
-    '21:2:4': {
-      category: 'weapons',
-      id: '0xC37C',
+    "21:2:4": {
+      "category": "weapons",
+      "id": "0xC37C"
     },
-    '21:2:5': {
-      category: 'weapons',
-      id: '0xC37D',
+    "21:2:5": {
+      "category": "weapons",
+      "id": "0xC37D"
     },
-    '21:11:1': {
-      category: 'weapons',
-      id: '0xC383',
+    "21:11:1": {
+      "category": "weapons",
+      "id": "0xC383"
     },
-    '21:11:2': {
-      category: 'weapons',
-      id: '0xC384',
+    "21:11:2": {
+      "category": "weapons",
+      "id": "0xC384"
     },
-    '21:11:3': {
-      category: 'weapons',
-      id: '0xC385',
+    "21:11:3": {
+      "category": "weapons",
+      "id": "0xC385"
     },
-    '21:11:4': {
-      category: 'weapons',
-      id: '0xC386',
+    "21:11:4": {
+      "category": "weapons",
+      "id": "0xC386"
     },
-    '21:11:5': {
-      category: 'weapons',
-      id: '0xC387',
+    "21:11:5": {
+      "category": "weapons",
+      "id": "0xC387"
     },
-    '24:1:0': {
-      category: 'weapons',
-      id: '0xC418',
+    "24:1:0": {
+      "category": "weapons",
+      "id": "0xC418"
     },
-    '24:1:1': {
-      category: 'weapons',
-      id: '0xC419',
+    "24:1:1": {
+      "category": "weapons",
+      "id": "0xC419"
     },
-    '24:1:2': {
-      category: 'weapons',
-      id: '0xC41A',
+    "24:1:2": {
+      "category": "weapons",
+      "id": "0xC41A"
     },
-    '24:1:3': {
-      category: 'weapons',
-      id: '0xC41B',
+    "24:1:3": {
+      "category": "weapons",
+      "id": "0xC41B"
     },
-    '24:1:4': {
-      category: 'weapons',
-      id: '0xC41C',
+    "24:1:4": {
+      "category": "weapons",
+      "id": "0xC41C"
     },
-    '24:1:5': {
-      category: 'weapons',
-      id: '0xC41D',
+    "24:1:5": {
+      "category": "weapons",
+      "id": "0xC41D"
     },
-    '24:1:6': {
-      category: 'weapons',
-      id: '0xC41E',
+    "24:1:6": {
+      "category": "weapons",
+      "id": "0xC41E"
     },
-    '24:1:7': {
-      category: 'weapons',
-      id: '0xC41F',
+    "24:1:7": {
+      "category": "weapons",
+      "id": "0xC41F"
     },
-    '24:1:8': {
-      category: 'weapons',
-      id: '0xC420',
+    "24:1:8": {
+      "category": "weapons",
+      "id": "0xC420"
     },
-    '24:1:9': {
-      category: 'weapons',
-      id: '0xC421',
+    "24:1:9": {
+      "category": "weapons",
+      "id": "0xC421"
     },
-    '24:1:10': {
-      category: 'weapons',
-      id: '0xC422',
+    "24:1:10": {
+      "category": "weapons",
+      "id": "0xC422"
     },
-    '24:3:1': {
-      category: 'weapons',
-      id: '0xC423',
+    "24:3:1": {
+      "category": "weapons",
+      "id": "0xC423"
     },
-    '24:3:2': {
-      category: 'weapons',
-      id: '0xC424',
+    "24:3:2": {
+      "category": "weapons",
+      "id": "0xC424"
     },
-    '24:3:3': {
-      category: 'weapons',
-      id: '0xC425',
+    "24:3:3": {
+      "category": "weapons",
+      "id": "0xC425"
     },
-    '24:3:4': {
-      category: 'weapons',
-      id: '0xC426',
+    "24:3:4": {
+      "category": "weapons",
+      "id": "0xC426"
     },
-    '24:3:5': {
-      category: 'weapons',
-      id: '0xC427',
+    "24:3:5": {
+      "category": "weapons",
+      "id": "0xC427"
     },
-    '24:5:1': {
-      category: 'weapons',
-      id: '0xC42D',
+    "24:5:1": {
+      "category": "weapons",
+      "id": "0xC42D"
     },
-    '24:5:2': {
-      category: 'weapons',
-      id: '0xC42E',
+    "24:5:2": {
+      "category": "weapons",
+      "id": "0xC42E"
     },
-    '24:5:3': {
-      category: 'weapons',
-      id: '0xC42F',
+    "24:5:3": {
+      "category": "weapons",
+      "id": "0xC42F"
     },
-    '24:5:4': {
-      category: 'weapons',
-      id: '0xC430',
+    "24:5:4": {
+      "category": "weapons",
+      "id": "0xC430"
     },
-    '24:5:5': {
-      category: 'weapons',
-      id: '0xC431',
+    "24:5:5": {
+      "category": "weapons",
+      "id": "0xC431"
     },
-    '24:9:1': {
-      category: 'weapons',
-      id: '0xC437',
+    "24:9:1": {
+      "category": "weapons",
+      "id": "0xC437"
     },
-    '24:9:2': {
-      category: 'weapons',
-      id: '0xC438',
+    "24:9:2": {
+      "category": "weapons",
+      "id": "0xC438"
     },
-    '24:9:3': {
-      category: 'weapons',
-      id: '0xC439',
+    "24:9:3": {
+      "category": "weapons",
+      "id": "0xC439"
     },
-    '24:9:4': {
-      category: 'weapons',
-      id: '0xC43A',
+    "24:9:4": {
+      "category": "weapons",
+      "id": "0xC43A"
     },
-    '24:9:5': {
-      category: 'weapons',
-      id: '0xC43B',
+    "24:9:5": {
+      "category": "weapons",
+      "id": "0xC43B"
     },
-    '24:2:1': {
-      category: 'weapons',
-      id: '0xC441',
+    "24:2:1": {
+      "category": "weapons",
+      "id": "0xC441"
     },
-    '24:2:2': {
-      category: 'weapons',
-      id: '0xC442',
+    "24:2:2": {
+      "category": "weapons",
+      "id": "0xC442"
     },
-    '24:2:3': {
-      category: 'weapons',
-      id: '0xC443',
+    "24:2:3": {
+      "category": "weapons",
+      "id": "0xC443"
     },
-    '24:2:4': {
-      category: 'weapons',
-      id: '0xC444',
+    "24:2:4": {
+      "category": "weapons",
+      "id": "0xC444"
     },
-    '24:2:5': {
-      category: 'weapons',
-      id: '0xC445',
+    "24:2:5": {
+      "category": "weapons",
+      "id": "0xC445"
     },
-    '24:11:1': {
-      category: 'weapons',
-      id: '0xC44B',
+    "24:11:1": {
+      "category": "weapons",
+      "id": "0xC44B"
     },
-    '24:11:2': {
-      category: 'weapons',
-      id: '0xC44C',
+    "24:11:2": {
+      "category": "weapons",
+      "id": "0xC44C"
     },
-    '24:11:3': {
-      category: 'weapons',
-      id: '0xC44D',
+    "24:11:3": {
+      "category": "weapons",
+      "id": "0xC44D"
     },
-    '24:11:4': {
-      category: 'weapons',
-      id: '0xC44E',
+    "24:11:4": {
+      "category": "weapons",
+      "id": "0xC44E"
     },
-    '24:11:5': {
-      category: 'weapons',
-      id: '0xC44F',
+    "24:11:5": {
+      "category": "weapons",
+      "id": "0xC44F"
     },
-    '23:1:0': {
-      category: 'weapons',
-      id: '0xC47C',
+    "23:1:0": {
+      "category": "weapons",
+      "id": "0xC47C"
     },
-    '23:1:1': {
-      category: 'weapons',
-      id: '0xC47D',
+    "23:1:1": {
+      "category": "weapons",
+      "id": "0xC47D"
     },
-    '23:1:2': {
-      category: 'weapons',
-      id: '0xC47E',
+    "23:1:2": {
+      "category": "weapons",
+      "id": "0xC47E"
     },
-    '23:1:3': {
-      category: 'weapons',
-      id: '0xC47F',
+    "23:1:3": {
+      "category": "weapons",
+      "id": "0xC47F"
     },
-    '23:1:4': {
-      category: 'weapons',
-      id: '0xC480',
+    "23:1:4": {
+      "category": "weapons",
+      "id": "0xC480"
     },
-    '23:1:5': {
-      category: 'weapons',
-      id: '0xC481',
+    "23:1:5": {
+      "category": "weapons",
+      "id": "0xC481"
     },
-    '23:1:6': {
-      category: 'weapons',
-      id: '0xC482',
+    "23:1:6": {
+      "category": "weapons",
+      "id": "0xC482"
     },
-    '23:1:7': {
-      category: 'weapons',
-      id: '0xC483',
+    "23:1:7": {
+      "category": "weapons",
+      "id": "0xC483"
     },
-    '23:1:8': {
-      category: 'weapons',
-      id: '0xC484',
+    "23:1:8": {
+      "category": "weapons",
+      "id": "0xC484"
     },
-    '23:1:9': {
-      category: 'weapons',
-      id: '0xC485',
+    "23:1:9": {
+      "category": "weapons",
+      "id": "0xC485"
     },
-    '23:1:10': {
-      category: 'weapons',
-      id: '0xC486',
+    "23:1:10": {
+      "category": "weapons",
+      "id": "0xC486"
     },
-    '23:3:1': {
-      category: 'weapons',
-      id: '0xC487',
+    "23:3:1": {
+      "category": "weapons",
+      "id": "0xC487"
     },
-    '23:3:2': {
-      category: 'weapons',
-      id: '0xC488',
+    "23:3:2": {
+      "category": "weapons",
+      "id": "0xC488"
     },
-    '23:3:3': {
-      category: 'weapons',
-      id: '0xC489',
+    "23:3:3": {
+      "category": "weapons",
+      "id": "0xC489"
     },
-    '23:3:4': {
-      category: 'weapons',
-      id: '0xC48A',
+    "23:3:4": {
+      "category": "weapons",
+      "id": "0xC48A"
     },
-    '23:3:5': {
-      category: 'weapons',
-      id: '0xC48B',
+    "23:3:5": {
+      "category": "weapons",
+      "id": "0xC48B"
     },
-    '23:5:1': {
-      category: 'weapons',
-      id: '0xC491',
+    "23:5:1": {
+      "category": "weapons",
+      "id": "0xC491"
     },
-    '23:5:2': {
-      category: 'weapons',
-      id: '0xC492',
+    "23:5:2": {
+      "category": "weapons",
+      "id": "0xC492"
     },
-    '23:5:3': {
-      category: 'weapons',
-      id: '0xC493',
+    "23:5:3": {
+      "category": "weapons",
+      "id": "0xC493"
     },
-    '23:5:4': {
-      category: 'weapons',
-      id: '0xC494',
+    "23:5:4": {
+      "category": "weapons",
+      "id": "0xC494"
     },
-    '23:5:5': {
-      category: 'weapons',
-      id: '0xC495',
+    "23:5:5": {
+      "category": "weapons",
+      "id": "0xC495"
     },
-    '23:9:1': {
-      category: 'weapons',
-      id: '0xC49B',
+    "23:9:1": {
+      "category": "weapons",
+      "id": "0xC49B"
     },
-    '23:9:2': {
-      category: 'weapons',
-      id: '0xC49C',
+    "23:9:2": {
+      "category": "weapons",
+      "id": "0xC49C"
     },
-    '23:9:3': {
-      category: 'weapons',
-      id: '0xC49D',
+    "23:9:3": {
+      "category": "weapons",
+      "id": "0xC49D"
     },
-    '23:9:4': {
-      category: 'weapons',
-      id: '0xC49E',
+    "23:9:4": {
+      "category": "weapons",
+      "id": "0xC49E"
     },
-    '23:9:5': {
-      category: 'weapons',
-      id: '0xC49F',
+    "23:9:5": {
+      "category": "weapons",
+      "id": "0xC49F"
     },
-    '23:2:1': {
-      category: 'weapons',
-      id: '0xC4A5',
+    "23:2:1": {
+      "category": "weapons",
+      "id": "0xC4A5"
     },
-    '23:2:2': {
-      category: 'weapons',
-      id: '0xC4A6',
+    "23:2:2": {
+      "category": "weapons",
+      "id": "0xC4A6"
     },
-    '23:2:3': {
-      category: 'weapons',
-      id: '0xC4A7',
+    "23:2:3": {
+      "category": "weapons",
+      "id": "0xC4A7"
     },
-    '23:2:4': {
-      category: 'weapons',
-      id: '0xC4A8',
+    "23:2:4": {
+      "category": "weapons",
+      "id": "0xC4A8"
     },
-    '23:2:5': {
-      category: 'weapons',
-      id: '0xC4A9',
+    "23:2:5": {
+      "category": "weapons",
+      "id": "0xC4A9"
     },
-    '23:11:1': {
-      category: 'weapons',
-      id: '0xC4AF',
+    "23:11:1": {
+      "category": "weapons",
+      "id": "0xC4AF"
     },
-    '23:11:2': {
-      category: 'weapons',
-      id: '0xC4B0',
+    "23:11:2": {
+      "category": "weapons",
+      "id": "0xC4B0"
     },
-    '23:11:3': {
-      category: 'weapons',
-      id: '0xC4B1',
+    "23:11:3": {
+      "category": "weapons",
+      "id": "0xC4B1"
     },
-    '23:11:4': {
-      category: 'weapons',
-      id: '0xC4B2',
+    "23:11:4": {
+      "category": "weapons",
+      "id": "0xC4B2"
     },
-    '23:11:5': {
-      category: 'weapons',
-      id: '0xC4B3',
+    "23:11:5": {
+      "category": "weapons",
+      "id": "0xC4B3"
     },
-    '22:1:0': {
-      category: 'weapons',
-      id: '0xC4E0',
+    "22:1:0": {
+      "category": "weapons",
+      "id": "0xC4E0"
     },
-    '22:1:1': {
-      category: 'weapons',
-      id: '0xC4E1',
+    "22:1:1": {
+      "category": "weapons",
+      "id": "0xC4E1"
     },
-    '22:1:2': {
-      category: 'weapons',
-      id: '0xC4E2',
+    "22:1:2": {
+      "category": "weapons",
+      "id": "0xC4E2"
     },
-    '22:1:3': {
-      category: 'weapons',
-      id: '0xC4E3',
+    "22:1:3": {
+      "category": "weapons",
+      "id": "0xC4E3"
     },
-    '22:1:4': {
-      category: 'weapons',
-      id: '0xC4E4',
+    "22:1:4": {
+      "category": "weapons",
+      "id": "0xC4E4"
     },
-    '22:1:5': {
-      category: 'weapons',
-      id: '0xC4E5',
+    "22:1:5": {
+      "category": "weapons",
+      "id": "0xC4E5"
     },
-    '22:1:6': {
-      category: 'weapons',
-      id: '0xC4E6',
+    "22:1:6": {
+      "category": "weapons",
+      "id": "0xC4E6"
     },
-    '22:1:7': {
-      category: 'weapons',
-      id: '0xC4E7',
+    "22:1:7": {
+      "category": "weapons",
+      "id": "0xC4E7"
     },
-    '22:1:8': {
-      category: 'weapons',
-      id: '0xC4E8',
+    "22:1:8": {
+      "category": "weapons",
+      "id": "0xC4E8"
     },
-    '22:1:9': {
-      category: 'weapons',
-      id: '0xC4E9',
+    "22:1:9": {
+      "category": "weapons",
+      "id": "0xC4E9"
     },
-    '22:1:10': {
-      category: 'weapons',
-      id: '0xC4EA',
+    "22:1:10": {
+      "category": "weapons",
+      "id": "0xC4EA"
     },
-    '22:3:1': {
-      category: 'weapons',
-      id: '0xC4EB',
+    "22:3:1": {
+      "category": "weapons",
+      "id": "0xC4EB"
     },
-    '22:3:2': {
-      category: 'weapons',
-      id: '0xC4EC',
+    "22:3:2": {
+      "category": "weapons",
+      "id": "0xC4EC"
     },
-    '22:3:3': {
-      category: 'weapons',
-      id: '0xC4ED',
+    "22:3:3": {
+      "category": "weapons",
+      "id": "0xC4ED"
     },
-    '22:3:4': {
-      category: 'weapons',
-      id: '0xC4EE',
+    "22:3:4": {
+      "category": "weapons",
+      "id": "0xC4EE"
     },
-    '22:3:5': {
-      category: 'weapons',
-      id: '0xC4EF',
+    "22:3:5": {
+      "category": "weapons",
+      "id": "0xC4EF"
     },
-    '22:5:1': {
-      category: 'weapons',
-      id: '0xC4F5',
+    "22:5:1": {
+      "category": "weapons",
+      "id": "0xC4F5"
     },
-    '22:5:2': {
-      category: 'weapons',
-      id: '0xC4F6',
+    "22:5:2": {
+      "category": "weapons",
+      "id": "0xC4F6"
     },
-    '22:5:3': {
-      category: 'weapons',
-      id: '0xC4F7',
+    "22:5:3": {
+      "category": "weapons",
+      "id": "0xC4F7"
     },
-    '22:5:4': {
-      category: 'weapons',
-      id: '0xC4F8',
+    "22:5:4": {
+      "category": "weapons",
+      "id": "0xC4F8"
     },
-    '22:5:5': {
-      category: 'weapons',
-      id: '0xC4F9',
+    "22:5:5": {
+      "category": "weapons",
+      "id": "0xC4F9"
     },
-    '22:9:1': {
-      category: 'weapons',
-      id: '0xC4FF',
+    "22:9:1": {
+      "category": "weapons",
+      "id": "0xC4FF"
     },
-    '22:9:2': {
-      category: 'weapons',
-      id: '0xC500',
+    "22:9:2": {
+      "category": "weapons",
+      "id": "0xC500"
     },
-    '22:9:3': {
-      category: 'weapons',
-      id: '0xC501',
+    "22:9:3": {
+      "category": "weapons",
+      "id": "0xC501"
     },
-    '22:9:4': {
-      category: 'weapons',
-      id: '0xC502',
+    "22:9:4": {
+      "category": "weapons",
+      "id": "0xC502"
     },
-    '22:9:5': {
-      category: 'weapons',
-      id: '0xC503',
+    "22:9:5": {
+      "category": "weapons",
+      "id": "0xC503"
     },
-    '22:2:1': {
-      category: 'weapons',
-      id: '0xC509',
+    "22:2:1": {
+      "category": "weapons",
+      "id": "0xC509"
     },
-    '22:2:2': {
-      category: 'weapons',
-      id: '0xC50A',
+    "22:2:2": {
+      "category": "weapons",
+      "id": "0xC50A"
     },
-    '22:2:3': {
-      category: 'weapons',
-      id: '0xC50B',
+    "22:2:3": {
+      "category": "weapons",
+      "id": "0xC50B"
     },
-    '22:2:4': {
-      category: 'weapons',
-      id: '0xC50C',
+    "22:2:4": {
+      "category": "weapons",
+      "id": "0xC50C"
     },
-    '22:2:5': {
-      category: 'weapons',
-      id: '0xC50D',
+    "22:2:5": {
+      "category": "weapons",
+      "id": "0xC50D"
     },
-    '22:11:1': {
-      category: 'weapons',
-      id: '0xC513',
+    "22:11:1": {
+      "category": "weapons",
+      "id": "0xC513"
     },
-    '22:11:2': {
-      category: 'weapons',
-      id: '0xC514',
+    "22:11:2": {
+      "category": "weapons",
+      "id": "0xC514"
     },
-    '22:11:3': {
-      category: 'weapons',
-      id: '0xC515',
+    "22:11:3": {
+      "category": "weapons",
+      "id": "0xC515"
     },
-    '22:11:4': {
-      category: 'weapons',
-      id: '0xC516',
+    "22:11:4": {
+      "category": "weapons",
+      "id": "0xC516"
     },
-    '22:11:5': {
-      category: 'weapons',
-      id: '0xC517',
+    "22:11:5": {
+      "category": "weapons",
+      "id": "0xC517"
     },
-    '86:null:null': {
-      category: 'weapons',
-      id: '0xC544',
+    "86:null:null": {
+      "category": "weapons",
+      "id": "0xC544"
     },
-    '69:null:null': {
-      category: 'weapons',
-      id: '0xEA60',
+    "69:null:null": {
+      "category": "weapons",
+      "id": "0xEA60"
     },
-    '25:1:0': {
-      category: 'weapons',
-      id: '0xEAC4',
+    "25:1:0": {
+      "category": "weapons",
+      "id": "0xEAC4"
     },
-    '25:3:1': {
-      category: 'weapons',
-      id: '0xEAC5',
+    "25:3:1": {
+      "category": "weapons",
+      "id": "0xEAC5"
     },
-    '25:3:2': {
-      category: 'weapons',
-      id: '0xEAC6',
+    "25:3:2": {
+      "category": "weapons",
+      "id": "0xEAC6"
     },
-    '25:3:3': {
-      category: 'weapons',
-      id: '0xEAC7',
+    "25:3:3": {
+      "category": "weapons",
+      "id": "0xEAC7"
     },
-    '25:3:4': {
-      category: 'weapons',
-      id: '0xEAC8',
+    "25:3:4": {
+      "category": "weapons",
+      "id": "0xEAC8"
     },
-    '25:3:5': {
-      category: 'weapons',
-      id: '0xEAC9',
+    "25:3:5": {
+      "category": "weapons",
+      "id": "0xEAC9"
     },
-    '25:11:1': {
-      category: 'weapons',
-      id: '0xEACF',
+    "25:11:1": {
+      "category": "weapons",
+      "id": "0xEACF"
     },
-    '25:11:2': {
-      category: 'weapons',
-      id: '0xEAD0',
+    "25:11:2": {
+      "category": "weapons",
+      "id": "0xEAD0"
     },
-    '25:11:3': {
-      category: 'weapons',
-      id: '0xEAD1',
+    "25:11:3": {
+      "category": "weapons",
+      "id": "0xEAD1"
     },
-    '25:11:4': {
-      category: 'weapons',
-      id: '0xEAD2',
+    "25:11:4": {
+      "category": "weapons",
+      "id": "0xEAD2"
     },
-    '25:11:5': {
-      category: 'weapons',
-      id: '0xEAD3',
+    "25:11:5": {
+      "category": "weapons",
+      "id": "0xEAD3"
     },
-    '25:1:1': {
-      category: 'weapons',
-      id: '0xEAD9',
+    "25:1:1": {
+      "category": "weapons",
+      "id": "0xEAD9"
     },
-    '25:1:2': {
-      category: 'weapons',
-      id: '0xEADA',
+    "25:1:2": {
+      "category": "weapons",
+      "id": "0xEADA"
     },
-    '25:1:3': {
-      category: 'weapons',
-      id: '0xEADB',
+    "25:1:3": {
+      "category": "weapons",
+      "id": "0xEADB"
     },
-    '25:1:4': {
-      category: 'weapons',
-      id: '0xEADC',
+    "25:1:4": {
+      "category": "weapons",
+      "id": "0xEADC"
     },
-    '25:1:5': {
-      category: 'weapons',
-      id: '0xEADD',
+    "25:1:5": {
+      "category": "weapons",
+      "id": "0xEADD"
     },
-    '25:1:6': {
-      category: 'weapons',
-      id: '0xEADE',
+    "25:1:6": {
+      "category": "weapons",
+      "id": "0xEADE"
     },
-    '25:1:7': {
-      category: 'weapons',
-      id: '0xEADF',
+    "25:1:7": {
+      "category": "weapons",
+      "id": "0xEADF"
     },
-    '25:1:8': {
-      category: 'weapons',
-      id: '0xEAE0',
+    "25:1:8": {
+      "category": "weapons",
+      "id": "0xEAE0"
     },
-    '25:1:9': {
-      category: 'weapons',
-      id: '0xEAE1',
+    "25:1:9": {
+      "category": "weapons",
+      "id": "0xEAE1"
     },
-    '25:1:10': {
-      category: 'weapons',
-      id: '0xEAE2',
+    "25:1:10": {
+      "category": "weapons",
+      "id": "0xEAE2"
     },
-    '25:2:1': {
-      category: 'weapons',
-      id: '0xEAE3',
+    "25:2:1": {
+      "category": "weapons",
+      "id": "0xEAE3"
     },
-    '25:2:2': {
-      category: 'weapons',
-      id: '0xEAE4',
+    "25:2:2": {
+      "category": "weapons",
+      "id": "0xEAE4"
     },
-    '25:2:3': {
-      category: 'weapons',
-      id: '0xEAE5',
+    "25:2:3": {
+      "category": "weapons",
+      "id": "0xEAE5"
     },
-    '25:2:4': {
-      category: 'weapons',
-      id: '0xEAE6',
+    "25:2:4": {
+      "category": "weapons",
+      "id": "0xEAE6"
     },
-    '25:2:5': {
-      category: 'weapons',
-      id: '0xEAE7',
+    "25:2:5": {
+      "category": "weapons",
+      "id": "0xEAE7"
     },
-    '25:5:1': {
-      category: 'weapons',
-      id: '0xEAED',
+    "25:5:1": {
+      "category": "weapons",
+      "id": "0xEAED"
     },
-    '25:5:2': {
-      category: 'weapons',
-      id: '0xEAEE',
+    "25:5:2": {
+      "category": "weapons",
+      "id": "0xEAEE"
     },
-    '25:5:3': {
-      category: 'weapons',
-      id: '0xEAEF',
+    "25:5:3": {
+      "category": "weapons",
+      "id": "0xEAEF"
     },
-    '25:5:4': {
-      category: 'weapons',
-      id: '0xEAF0',
+    "25:5:4": {
+      "category": "weapons",
+      "id": "0xEAF0"
     },
-    '25:5:5': {
-      category: 'weapons',
-      id: '0xEAF1',
+    "25:5:5": {
+      "category": "weapons",
+      "id": "0xEAF1"
     },
-    '25:9:1': {
-      category: 'weapons',
-      id: '0xEAF7',
+    "25:9:1": {
+      "category": "weapons",
+      "id": "0xEAF7"
     },
-    '25:9:2': {
-      category: 'weapons',
-      id: '0xEAF8',
+    "25:9:2": {
+      "category": "weapons",
+      "id": "0xEAF8"
     },
-    '25:9:3': {
-      category: 'weapons',
-      id: '0xEAF9',
+    "25:9:3": {
+      "category": "weapons",
+      "id": "0xEAF9"
     },
-    '25:9:4': {
-      category: 'weapons',
-      id: '0xEAFA',
+    "25:9:4": {
+      "category": "weapons",
+      "id": "0xEAFA"
     },
-    '25:9:5': {
-      category: 'weapons',
-      id: '0xEAFB',
+    "25:9:5": {
+      "category": "weapons",
+      "id": "0xEAFB"
     },
-    '35:1:0': {
-      category: 'weapons',
-      id: '0xEB28',
+    "35:1:0": {
+      "category": "weapons",
+      "id": "0xEB28"
     },
-    '35:1:1': {
-      category: 'weapons',
-      id: '0xEB29',
+    "35:1:1": {
+      "category": "weapons",
+      "id": "0xEB29"
     },
-    '35:1:2': {
-      category: 'weapons',
-      id: '0xEB2A',
+    "35:1:2": {
+      "category": "weapons",
+      "id": "0xEB2A"
     },
-    '35:1:3': {
-      category: 'weapons',
-      id: '0xEB2B',
+    "35:1:3": {
+      "category": "weapons",
+      "id": "0xEB2B"
     },
-    '35:1:4': {
-      category: 'weapons',
-      id: '0xEB2C',
+    "35:1:4": {
+      "category": "weapons",
+      "id": "0xEB2C"
     },
-    '35:1:5': {
-      category: 'weapons',
-      id: '0xEB2D',
+    "35:1:5": {
+      "category": "weapons",
+      "id": "0xEB2D"
     },
-    '35:1:6': {
-      category: 'weapons',
-      id: '0xEB2E',
+    "35:1:6": {
+      "category": "weapons",
+      "id": "0xEB2E"
     },
-    '35:1:7': {
-      category: 'weapons',
-      id: '0xEB2F',
+    "35:1:7": {
+      "category": "weapons",
+      "id": "0xEB2F"
     },
-    '35:1:8': {
-      category: 'weapons',
-      id: '0xEB30',
+    "35:1:8": {
+      "category": "weapons",
+      "id": "0xEB30"
     },
-    '35:1:9': {
-      category: 'weapons',
-      id: '0xEB31',
+    "35:1:9": {
+      "category": "weapons",
+      "id": "0xEB31"
     },
-    '35:1:10': {
-      category: 'weapons',
-      id: '0xEB32',
+    "35:1:10": {
+      "category": "weapons",
+      "id": "0xEB32"
     },
-    '35:2:1': {
-      category: 'weapons',
-      id: '0xEB33',
+    "35:2:1": {
+      "category": "weapons",
+      "id": "0xEB33"
     },
-    '35:2:2': {
-      category: 'weapons',
-      id: '0xEB34',
+    "35:2:2": {
+      "category": "weapons",
+      "id": "0xEB34"
     },
-    '35:2:3': {
-      category: 'weapons',
-      id: '0xEB35',
+    "35:2:3": {
+      "category": "weapons",
+      "id": "0xEB35"
     },
-    '35:2:4': {
-      category: 'weapons',
-      id: '0xEB36',
+    "35:2:4": {
+      "category": "weapons",
+      "id": "0xEB36"
     },
-    '35:2:5': {
-      category: 'weapons',
-      id: '0xEB37',
+    "35:2:5": {
+      "category": "weapons",
+      "id": "0xEB37"
     },
-    '35:7:1': {
-      category: 'weapons',
-      id: '0xEB3D',
+    "35:7:1": {
+      "category": "weapons",
+      "id": "0xEB3D"
     },
-    '35:7:2': {
-      category: 'weapons',
-      id: '0xEB3E',
+    "35:7:2": {
+      "category": "weapons",
+      "id": "0xEB3E"
     },
-    '35:7:3': {
-      category: 'weapons',
-      id: '0xEB3F',
+    "35:7:3": {
+      "category": "weapons",
+      "id": "0xEB3F"
     },
-    '35:7:4': {
-      category: 'weapons',
-      id: '0xEB40',
+    "35:7:4": {
+      "category": "weapons",
+      "id": "0xEB40"
     },
-    '35:7:5': {
-      category: 'weapons',
-      id: '0xEB41',
+    "35:7:5": {
+      "category": "weapons",
+      "id": "0xEB41"
     },
-    '35:4:1': {
-      category: 'weapons',
-      id: '0xEB47',
+    "35:4:1": {
+      "category": "weapons",
+      "id": "0xEB47"
     },
-    '35:4:2': {
-      category: 'weapons',
-      id: '0xEB48',
+    "35:4:2": {
+      "category": "weapons",
+      "id": "0xEB48"
     },
-    '35:4:3': {
-      category: 'weapons',
-      id: '0xEB49',
+    "35:4:3": {
+      "category": "weapons",
+      "id": "0xEB49"
     },
-    '35:4:4': {
-      category: 'weapons',
-      id: '0xEB4A',
+    "35:4:4": {
+      "category": "weapons",
+      "id": "0xEB4A"
     },
-    '35:4:5': {
-      category: 'weapons',
-      id: '0xEB4B',
+    "35:4:5": {
+      "category": "weapons",
+      "id": "0xEB4B"
     },
-    '35:6:1': {
-      category: 'weapons',
-      id: '0xEB51',
+    "35:6:1": {
+      "category": "weapons",
+      "id": "0xEB51"
     },
-    '35:6:2': {
-      category: 'weapons',
-      id: '0xEB52',
+    "35:6:2": {
+      "category": "weapons",
+      "id": "0xEB52"
     },
-    '35:6:3': {
-      category: 'weapons',
-      id: '0xEB53',
+    "35:6:3": {
+      "category": "weapons",
+      "id": "0xEB53"
     },
-    '35:6:4': {
-      category: 'weapons',
-      id: '0xEB54',
+    "35:6:4": {
+      "category": "weapons",
+      "id": "0xEB54"
     },
-    '35:6:5': {
-      category: 'weapons',
-      id: '0xEB55',
+    "35:6:5": {
+      "category": "weapons",
+      "id": "0xEB55"
     },
-    '35:9:1': {
-      category: 'weapons',
-      id: '0xEB5B',
+    "35:9:1": {
+      "category": "weapons",
+      "id": "0xEB5B"
     },
-    '35:9:2': {
-      category: 'weapons',
-      id: '0xEB5C',
+    "35:9:2": {
+      "category": "weapons",
+      "id": "0xEB5C"
     },
-    '35:9:3': {
-      category: 'weapons',
-      id: '0xEB5D',
+    "35:9:3": {
+      "category": "weapons",
+      "id": "0xEB5D"
     },
-    '35:9:4': {
-      category: 'weapons',
-      id: '0xEB5E',
+    "35:9:4": {
+      "category": "weapons",
+      "id": "0xEB5E"
     },
-    '35:9:5': {
-      category: 'weapons',
-      id: '0xEB5F',
+    "35:9:5": {
+      "category": "weapons",
+      "id": "0xEB5F"
     },
-    '26:1:0': {
-      category: 'weapons',
-      id: '0xEB8C',
+    "26:1:0": {
+      "category": "weapons",
+      "id": "0xEB8C"
     },
-    '26:3:1': {
-      category: 'weapons',
-      id: '0xEB8D',
+    "26:3:1": {
+      "category": "weapons",
+      "id": "0xEB8D"
     },
-    '26:3:2': {
-      category: 'weapons',
-      id: '0xEB8E',
+    "26:3:2": {
+      "category": "weapons",
+      "id": "0xEB8E"
     },
-    '26:3:3': {
-      category: 'weapons',
-      id: '0xEB8F',
+    "26:3:3": {
+      "category": "weapons",
+      "id": "0xEB8F"
     },
-    '26:3:4': {
-      category: 'weapons',
-      id: '0xEB90',
+    "26:3:4": {
+      "category": "weapons",
+      "id": "0xEB90"
     },
-    '26:3:5': {
-      category: 'weapons',
-      id: '0xEB91',
+    "26:3:5": {
+      "category": "weapons",
+      "id": "0xEB91"
     },
-    '26:11:1': {
-      category: 'weapons',
-      id: '0xEB97',
+    "26:11:1": {
+      "category": "weapons",
+      "id": "0xEB97"
     },
-    '26:11:2': {
-      category: 'weapons',
-      id: '0xEB98',
+    "26:11:2": {
+      "category": "weapons",
+      "id": "0xEB98"
     },
-    '26:11:3': {
-      category: 'weapons',
-      id: '0xEB99',
+    "26:11:3": {
+      "category": "weapons",
+      "id": "0xEB99"
     },
-    '26:11:4': {
-      category: 'weapons',
-      id: '0xEB9A',
+    "26:11:4": {
+      "category": "weapons",
+      "id": "0xEB9A"
     },
-    '26:11:5': {
-      category: 'weapons',
-      id: '0xEB9B',
+    "26:11:5": {
+      "category": "weapons",
+      "id": "0xEB9B"
     },
-    '26:1:1': {
-      category: 'weapons',
-      id: '0xEBA1',
+    "26:1:1": {
+      "category": "weapons",
+      "id": "0xEBA1"
     },
-    '26:1:2': {
-      category: 'weapons',
-      id: '0xEBA2',
+    "26:1:2": {
+      "category": "weapons",
+      "id": "0xEBA2"
     },
-    '26:1:3': {
-      category: 'weapons',
-      id: '0xEBA3',
+    "26:1:3": {
+      "category": "weapons",
+      "id": "0xEBA3"
     },
-    '26:1:4': {
-      category: 'weapons',
-      id: '0xEBA4',
+    "26:1:4": {
+      "category": "weapons",
+      "id": "0xEBA4"
     },
-    '26:1:5': {
-      category: 'weapons',
-      id: '0xEBA5',
+    "26:1:5": {
+      "category": "weapons",
+      "id": "0xEBA5"
     },
-    '26:1:6': {
-      category: 'weapons',
-      id: '0xEBA6',
+    "26:1:6": {
+      "category": "weapons",
+      "id": "0xEBA6"
     },
-    '26:1:7': {
-      category: 'weapons',
-      id: '0xEBA7',
+    "26:1:7": {
+      "category": "weapons",
+      "id": "0xEBA7"
     },
-    '26:1:8': {
-      category: 'weapons',
-      id: '0xEBA8',
+    "26:1:8": {
+      "category": "weapons",
+      "id": "0xEBA8"
     },
-    '26:1:9': {
-      category: 'weapons',
-      id: '0xEBA9',
+    "26:1:9": {
+      "category": "weapons",
+      "id": "0xEBA9"
     },
-    '26:1:10': {
-      category: 'weapons',
-      id: '0xEBAA',
+    "26:1:10": {
+      "category": "weapons",
+      "id": "0xEBAA"
     },
-    '26:2:1': {
-      category: 'weapons',
-      id: '0xEBAB',
+    "26:2:1": {
+      "category": "weapons",
+      "id": "0xEBAB"
     },
-    '26:2:2': {
-      category: 'weapons',
-      id: '0xEBAC',
+    "26:2:2": {
+      "category": "weapons",
+      "id": "0xEBAC"
     },
-    '26:2:3': {
-      category: 'weapons',
-      id: '0xEBAD',
+    "26:2:3": {
+      "category": "weapons",
+      "id": "0xEBAD"
     },
-    '26:2:4': {
-      category: 'weapons',
-      id: '0xEBAE',
+    "26:2:4": {
+      "category": "weapons",
+      "id": "0xEBAE"
     },
-    '26:2:5': {
-      category: 'weapons',
-      id: '0xEBAF',
+    "26:2:5": {
+      "category": "weapons",
+      "id": "0xEBAF"
     },
-    '26:5:1': {
-      category: 'weapons',
-      id: '0xEBB5',
+    "26:5:1": {
+      "category": "weapons",
+      "id": "0xEBB5"
     },
-    '26:5:2': {
-      category: 'weapons',
-      id: '0xEBB6',
+    "26:5:2": {
+      "category": "weapons",
+      "id": "0xEBB6"
     },
-    '26:5:3': {
-      category: 'weapons',
-      id: '0xEBB7',
+    "26:5:3": {
+      "category": "weapons",
+      "id": "0xEBB7"
     },
-    '26:5:4': {
-      category: 'weapons',
-      id: '0xEBB8',
+    "26:5:4": {
+      "category": "weapons",
+      "id": "0xEBB8"
     },
-    '26:5:5': {
-      category: 'weapons',
-      id: '0xEBB9',
+    "26:5:5": {
+      "category": "weapons",
+      "id": "0xEBB9"
     },
-    '26:9:1': {
-      category: 'weapons',
-      id: '0xEBBF',
+    "26:9:1": {
+      "category": "weapons",
+      "id": "0xEBBF"
     },
-    '26:9:2': {
-      category: 'weapons',
-      id: '0xEBC0',
+    "26:9:2": {
+      "category": "weapons",
+      "id": "0xEBC0"
     },
-    '26:9:3': {
-      category: 'weapons',
-      id: '0xEBC1',
+    "26:9:3": {
+      "category": "weapons",
+      "id": "0xEBC1"
     },
-    '26:9:4': {
-      category: 'weapons',
-      id: '0xEBC2',
+    "26:9:4": {
+      "category": "weapons",
+      "id": "0xEBC2"
     },
-    '26:9:5': {
-      category: 'weapons',
-      id: '0xEBC3',
+    "26:9:5": {
+      "category": "weapons",
+      "id": "0xEBC3"
     },
-    '70:null:null': {
-      category: 'weapons',
-      id: '0xEBF0',
+    "70:null:null": {
+      "category": "weapons",
+      "id": "0xEBF0"
     },
-    '50:14:0': {
-      category: 'weapons',
-      id: '0xEC54',
+    "50:14:0": {
+      "category": "weapons",
+      "id": "0xEC54"
     },
-    '50:14:1': {
-      category: 'weapons',
-      id: '0xEC55',
+    "50:14:1": {
+      "category": "weapons",
+      "id": "0xEC55"
     },
-    '50:14:2': {
-      category: 'weapons',
-      id: '0xEC56',
+    "50:14:2": {
+      "category": "weapons",
+      "id": "0xEC56"
     },
-    '50:14:3': {
-      category: 'weapons',
-      id: '0xEC57',
+    "50:14:3": {
+      "category": "weapons",
+      "id": "0xEC57"
     },
-    '50:14:4': {
-      category: 'weapons',
-      id: '0xEC58',
+    "50:14:4": {
+      "category": "weapons",
+      "id": "0xEC58"
     },
-    '50:14:5': {
-      category: 'weapons',
-      id: '0xEC59',
+    "50:14:5": {
+      "category": "weapons",
+      "id": "0xEC59"
     },
-    '34:1:0': {
-      category: 'weapons',
-      id: '0xECB8',
+    "34:1:0": {
+      "category": "weapons",
+      "id": "0xECB8"
     },
-    '34:1:1': {
-      category: 'weapons',
-      id: '0xECB9',
+    "34:1:1": {
+      "category": "weapons",
+      "id": "0xECB9"
     },
-    '34:1:2': {
-      category: 'weapons',
-      id: '0xECBA',
+    "34:1:2": {
+      "category": "weapons",
+      "id": "0xECBA"
     },
-    '34:1:3': {
-      category: 'weapons',
-      id: '0xECBB',
+    "34:1:3": {
+      "category": "weapons",
+      "id": "0xECBB"
     },
-    '34:1:4': {
-      category: 'weapons',
-      id: '0xECBC',
+    "34:1:4": {
+      "category": "weapons",
+      "id": "0xECBC"
     },
-    '34:1:5': {
-      category: 'weapons',
-      id: '0xECBD',
+    "34:1:5": {
+      "category": "weapons",
+      "id": "0xECBD"
     },
-    '34:1:6': {
-      category: 'weapons',
-      id: '0xECBE',
+    "34:1:6": {
+      "category": "weapons",
+      "id": "0xECBE"
     },
-    '34:1:7': {
-      category: 'weapons',
-      id: '0xECBF',
+    "34:1:7": {
+      "category": "weapons",
+      "id": "0xECBF"
     },
-    '34:1:8': {
-      category: 'weapons',
-      id: '0xECC0',
+    "34:1:8": {
+      "category": "weapons",
+      "id": "0xECC0"
     },
-    '34:1:9': {
-      category: 'weapons',
-      id: '0xECC1',
+    "34:1:9": {
+      "category": "weapons",
+      "id": "0xECC1"
     },
-    '34:1:10': {
-      category: 'weapons',
-      id: '0xECC2',
+    "34:1:10": {
+      "category": "weapons",
+      "id": "0xECC2"
     },
-    '34:2:1': {
-      category: 'weapons',
-      id: '0xECC3',
+    "34:2:1": {
+      "category": "weapons",
+      "id": "0xECC3"
     },
-    '34:2:2': {
-      category: 'weapons',
-      id: '0xECC4',
+    "34:2:2": {
+      "category": "weapons",
+      "id": "0xECC4"
     },
-    '34:2:3': {
-      category: 'weapons',
-      id: '0xECC5',
+    "34:2:3": {
+      "category": "weapons",
+      "id": "0xECC5"
     },
-    '34:2:4': {
-      category: 'weapons',
-      id: '0xECC6',
+    "34:2:4": {
+      "category": "weapons",
+      "id": "0xECC6"
     },
-    '34:2:5': {
-      category: 'weapons',
-      id: '0xECC7',
+    "34:2:5": {
+      "category": "weapons",
+      "id": "0xECC7"
     },
-    '34:7:1': {
-      category: 'weapons',
-      id: '0xECCD',
+    "34:7:1": {
+      "category": "weapons",
+      "id": "0xECCD"
     },
-    '34:7:2': {
-      category: 'weapons',
-      id: '0xECCE',
+    "34:7:2": {
+      "category": "weapons",
+      "id": "0xECCE"
     },
-    '34:7:3': {
-      category: 'weapons',
-      id: '0xECCF',
+    "34:7:3": {
+      "category": "weapons",
+      "id": "0xECCF"
     },
-    '34:7:4': {
-      category: 'weapons',
-      id: '0xECD0',
+    "34:7:4": {
+      "category": "weapons",
+      "id": "0xECD0"
     },
-    '34:7:5': {
-      category: 'weapons',
-      id: '0xECD1',
+    "34:7:5": {
+      "category": "weapons",
+      "id": "0xECD1"
     },
-    '34:4:1': {
-      category: 'weapons',
-      id: '0xECD7',
+    "34:4:1": {
+      "category": "weapons",
+      "id": "0xECD7"
     },
-    '34:4:2': {
-      category: 'weapons',
-      id: '0xECD8',
+    "34:4:2": {
+      "category": "weapons",
+      "id": "0xECD8"
     },
-    '34:4:3': {
-      category: 'weapons',
-      id: '0xECD9',
+    "34:4:3": {
+      "category": "weapons",
+      "id": "0xECD9"
     },
-    '34:4:4': {
-      category: 'weapons',
-      id: '0xECDA',
+    "34:4:4": {
+      "category": "weapons",
+      "id": "0xECDA"
     },
-    '34:4:5': {
-      category: 'weapons',
-      id: '0xECDB',
+    "34:4:5": {
+      "category": "weapons",
+      "id": "0xECDB"
     },
-    '34:6:1': {
-      category: 'weapons',
-      id: '0xECE1',
+    "34:6:1": {
+      "category": "weapons",
+      "id": "0xECE1"
     },
-    '34:6:2': {
-      category: 'weapons',
-      id: '0xECE2',
+    "34:6:2": {
+      "category": "weapons",
+      "id": "0xECE2"
     },
-    '34:6:3': {
-      category: 'weapons',
-      id: '0xECE3',
+    "34:6:3": {
+      "category": "weapons",
+      "id": "0xECE3"
     },
-    '34:6:4': {
-      category: 'weapons',
-      id: '0xECE4',
+    "34:6:4": {
+      "category": "weapons",
+      "id": "0xECE4"
     },
-    '34:6:5': {
-      category: 'weapons',
-      id: '0xECE5',
+    "34:6:5": {
+      "category": "weapons",
+      "id": "0xECE5"
     },
-    '34:9:1': {
-      category: 'weapons',
-      id: '0xECEB',
+    "34:9:1": {
+      "category": "weapons",
+      "id": "0xECEB"
     },
-    '34:9:2': {
-      category: 'weapons',
-      id: '0xECEC',
+    "34:9:2": {
+      "category": "weapons",
+      "id": "0xECEC"
     },
-    '34:9:3': {
-      category: 'weapons',
-      id: '0xECED',
+    "34:9:3": {
+      "category": "weapons",
+      "id": "0xECED"
     },
-    '34:9:4': {
-      category: 'weapons',
-      id: '0xECEE',
+    "34:9:4": {
+      "category": "weapons",
+      "id": "0xECEE"
     },
-    '34:9:5': {
-      category: 'weapons',
-      id: '0xECEF',
+    "34:9:5": {
+      "category": "weapons",
+      "id": "0xECEF"
     },
-    '87:null:null': {
-      category: 'weapons',
-      id: '0xED1C',
+    "87:null:null": {
+      "category": "weapons",
+      "id": "0xED1C"
     },
-    '31:1:0': {
-      category: 'weapons',
-      id: '0x11170',
+    "31:1:0": {
+      "category": "weapons",
+      "id": "0x11170"
     },
-    '31:1:1': {
-      category: 'weapons',
-      id: '0x11171',
+    "31:1:1": {
+      "category": "weapons",
+      "id": "0x11171"
     },
-    '31:1:2': {
-      category: 'weapons',
-      id: '0x11172',
+    "31:1:2": {
+      "category": "weapons",
+      "id": "0x11172"
     },
-    '31:1:3': {
-      category: 'weapons',
-      id: '0x11173',
+    "31:1:3": {
+      "category": "weapons",
+      "id": "0x11173"
     },
-    '31:1:4': {
-      category: 'weapons',
-      id: '0x11174',
+    "31:1:4": {
+      "category": "weapons",
+      "id": "0x11174"
     },
-    '31:1:5': {
-      category: 'weapons',
-      id: '0x11175',
+    "31:1:5": {
+      "category": "weapons",
+      "id": "0x11175"
     },
-    '31:1:6': {
-      category: 'weapons',
-      id: '0x11176',
+    "31:1:6": {
+      "category": "weapons",
+      "id": "0x11176"
     },
-    '31:1:7': {
-      category: 'weapons',
-      id: '0x11177',
+    "31:1:7": {
+      "category": "weapons",
+      "id": "0x11177"
     },
-    '31:1:8': {
-      category: 'weapons',
-      id: '0x11178',
+    "31:1:8": {
+      "category": "weapons",
+      "id": "0x11178"
     },
-    '31:1:9': {
-      category: 'weapons',
-      id: '0x11179',
+    "31:1:9": {
+      "category": "weapons",
+      "id": "0x11179"
     },
-    '31:1:10': {
-      category: 'weapons',
-      id: '0x1117A',
+    "31:1:10": {
+      "category": "weapons",
+      "id": "0x1117A"
     },
-    '31:2:1': {
-      category: 'weapons',
-      id: '0x1117B',
+    "31:2:1": {
+      "category": "weapons",
+      "id": "0x1117B"
     },
-    '31:2:2': {
-      category: 'weapons',
-      id: '0x1117C',
+    "31:2:2": {
+      "category": "weapons",
+      "id": "0x1117C"
     },
-    '31:2:3': {
-      category: 'weapons',
-      id: '0x1117D',
+    "31:2:3": {
+      "category": "weapons",
+      "id": "0x1117D"
     },
-    '31:2:4': {
-      category: 'weapons',
-      id: '0x1117E',
+    "31:2:4": {
+      "category": "weapons",
+      "id": "0x1117E"
     },
-    '31:2:5': {
-      category: 'weapons',
-      id: '0x1117F',
+    "31:2:5": {
+      "category": "weapons",
+      "id": "0x1117F"
     },
-    '31:7:1': {
-      category: 'weapons',
-      id: '0x11185',
+    "31:7:1": {
+      "category": "weapons",
+      "id": "0x11185"
     },
-    '31:7:2': {
-      category: 'weapons',
-      id: '0x11186',
+    "31:7:2": {
+      "category": "weapons",
+      "id": "0x11186"
     },
-    '31:7:3': {
-      category: 'weapons',
-      id: '0x11187',
+    "31:7:3": {
+      "category": "weapons",
+      "id": "0x11187"
     },
-    '31:7:4': {
-      category: 'weapons',
-      id: '0x11188',
+    "31:7:4": {
+      "category": "weapons",
+      "id": "0x11188"
     },
-    '31:7:5': {
-      category: 'weapons',
-      id: '0x11189',
+    "31:7:5": {
+      "category": "weapons",
+      "id": "0x11189"
     },
-    '31:4:1': {
-      category: 'weapons',
-      id: '0x1118F',
+    "31:4:1": {
+      "category": "weapons",
+      "id": "0x1118F"
     },
-    '31:4:2': {
-      category: 'weapons',
-      id: '0x11190',
+    "31:4:2": {
+      "category": "weapons",
+      "id": "0x11190"
     },
-    '31:4:3': {
-      category: 'weapons',
-      id: '0x11191',
+    "31:4:3": {
+      "category": "weapons",
+      "id": "0x11191"
     },
-    '31:4:4': {
-      category: 'weapons',
-      id: '0x11192',
+    "31:4:4": {
+      "category": "weapons",
+      "id": "0x11192"
     },
-    '31:4:5': {
-      category: 'weapons',
-      id: '0x11193',
+    "31:4:5": {
+      "category": "weapons",
+      "id": "0x11193"
     },
-    '31:8:1': {
-      category: 'weapons',
-      id: '0x11199',
+    "31:8:1": {
+      "category": "weapons",
+      "id": "0x11199"
     },
-    '31:8:2': {
-      category: 'weapons',
-      id: '0x1119A',
+    "31:8:2": {
+      "category": "weapons",
+      "id": "0x1119A"
     },
-    '31:8:3': {
-      category: 'weapons',
-      id: '0x1119B',
+    "31:8:3": {
+      "category": "weapons",
+      "id": "0x1119B"
     },
-    '31:8:4': {
-      category: 'weapons',
-      id: '0x1119C',
+    "31:8:4": {
+      "category": "weapons",
+      "id": "0x1119C"
     },
-    '31:8:5': {
-      category: 'weapons',
-      id: '0x1119D',
+    "31:8:5": {
+      "category": "weapons",
+      "id": "0x1119D"
     },
-    '31:9:1': {
-      category: 'weapons',
-      id: '0x111A3',
+    "31:9:1": {
+      "category": "weapons",
+      "id": "0x111A3"
     },
-    '31:9:2': {
-      category: 'weapons',
-      id: '0x111A4',
+    "31:9:2": {
+      "category": "weapons",
+      "id": "0x111A4"
     },
-    '31:9:3': {
-      category: 'weapons',
-      id: '0x111A5',
+    "31:9:3": {
+      "category": "weapons",
+      "id": "0x111A5"
     },
-    '31:9:4': {
-      category: 'weapons',
-      id: '0x111A6',
+    "31:9:4": {
+      "category": "weapons",
+      "id": "0x111A6"
     },
-    '31:9:5': {
-      category: 'weapons',
-      id: '0x111A7',
+    "31:9:5": {
+      "category": "weapons",
+      "id": "0x111A7"
     },
-    '32:1:0': {
-      category: 'weapons',
-      id: '0x111D4',
+    "32:1:0": {
+      "category": "weapons",
+      "id": "0x111D4"
     },
-    '32:1:1': {
-      category: 'weapons',
-      id: '0x111D5',
+    "32:1:1": {
+      "category": "weapons",
+      "id": "0x111D5"
     },
-    '32:1:2': {
-      category: 'weapons',
-      id: '0x111D6',
+    "32:1:2": {
+      "category": "weapons",
+      "id": "0x111D6"
     },
-    '32:1:3': {
-      category: 'weapons',
-      id: '0x111D7',
+    "32:1:3": {
+      "category": "weapons",
+      "id": "0x111D7"
     },
-    '32:1:4': {
-      category: 'weapons',
-      id: '0x111D8',
+    "32:1:4": {
+      "category": "weapons",
+      "id": "0x111D8"
     },
-    '32:1:5': {
-      category: 'weapons',
-      id: '0x111D9',
+    "32:1:5": {
+      "category": "weapons",
+      "id": "0x111D9"
     },
-    '32:1:6': {
-      category: 'weapons',
-      id: '0x111DA',
+    "32:1:6": {
+      "category": "weapons",
+      "id": "0x111DA"
     },
-    '32:1:7': {
-      category: 'weapons',
-      id: '0x111DB',
+    "32:1:7": {
+      "category": "weapons",
+      "id": "0x111DB"
     },
-    '32:1:8': {
-      category: 'weapons',
-      id: '0x111DC',
+    "32:1:8": {
+      "category": "weapons",
+      "id": "0x111DC"
     },
-    '32:1:9': {
-      category: 'weapons',
-      id: '0x111DD',
+    "32:1:9": {
+      "category": "weapons",
+      "id": "0x111DD"
     },
-    '32:1:10': {
-      category: 'weapons',
-      id: '0x111DE',
+    "32:1:10": {
+      "category": "weapons",
+      "id": "0x111DE"
     },
-    '32:2:1': {
-      category: 'weapons',
-      id: '0x111DF',
+    "32:2:1": {
+      "category": "weapons",
+      "id": "0x111DF"
     },
-    '32:2:2': {
-      category: 'weapons',
-      id: '0x111E0',
+    "32:2:2": {
+      "category": "weapons",
+      "id": "0x111E0"
     },
-    '32:2:3': {
-      category: 'weapons',
-      id: '0x111E1',
+    "32:2:3": {
+      "category": "weapons",
+      "id": "0x111E1"
     },
-    '32:2:4': {
-      category: 'weapons',
-      id: '0x111E2',
+    "32:2:4": {
+      "category": "weapons",
+      "id": "0x111E2"
     },
-    '32:2:5': {
-      category: 'weapons',
-      id: '0x111E3',
+    "32:2:5": {
+      "category": "weapons",
+      "id": "0x111E3"
     },
-    '32:7:1': {
-      category: 'weapons',
-      id: '0x111E9',
+    "32:7:1": {
+      "category": "weapons",
+      "id": "0x111E9"
     },
-    '32:7:2': {
-      category: 'weapons',
-      id: '0x111EA',
+    "32:7:2": {
+      "category": "weapons",
+      "id": "0x111EA"
     },
-    '32:7:3': {
-      category: 'weapons',
-      id: '0x111EB',
+    "32:7:3": {
+      "category": "weapons",
+      "id": "0x111EB"
     },
-    '32:7:4': {
-      category: 'weapons',
-      id: '0x111EC',
+    "32:7:4": {
+      "category": "weapons",
+      "id": "0x111EC"
     },
-    '32:7:5': {
-      category: 'weapons',
-      id: '0x111ED',
+    "32:7:5": {
+      "category": "weapons",
+      "id": "0x111ED"
     },
-    '32:4:1': {
-      category: 'weapons',
-      id: '0x111F3',
+    "32:4:1": {
+      "category": "weapons",
+      "id": "0x111F3"
     },
-    '32:4:2': {
-      category: 'weapons',
-      id: '0x111F4',
+    "32:4:2": {
+      "category": "weapons",
+      "id": "0x111F4"
     },
-    '32:4:3': {
-      category: 'weapons',
-      id: '0x111F5',
+    "32:4:3": {
+      "category": "weapons",
+      "id": "0x111F5"
     },
-    '32:4:4': {
-      category: 'weapons',
-      id: '0x111F6',
+    "32:4:4": {
+      "category": "weapons",
+      "id": "0x111F6"
     },
-    '32:4:5': {
-      category: 'weapons',
-      id: '0x111F7',
+    "32:4:5": {
+      "category": "weapons",
+      "id": "0x111F7"
     },
-    '32:8:1': {
-      category: 'weapons',
-      id: '0x111FD',
+    "32:8:1": {
+      "category": "weapons",
+      "id": "0x111FD"
     },
-    '32:8:2': {
-      category: 'weapons',
-      id: '0x111FE',
+    "32:8:2": {
+      "category": "weapons",
+      "id": "0x111FE"
     },
-    '32:8:3': {
-      category: 'weapons',
-      id: '0x111FF',
+    "32:8:3": {
+      "category": "weapons",
+      "id": "0x111FF"
     },
-    '32:8:4': {
-      category: 'weapons',
-      id: '0x11200',
+    "32:8:4": {
+      "category": "weapons",
+      "id": "0x11200"
     },
-    '32:8:5': {
-      category: 'weapons',
-      id: '0x11201',
+    "32:8:5": {
+      "category": "weapons",
+      "id": "0x11201"
     },
-    '32:9:1': {
-      category: 'weapons',
-      id: '0x11207',
+    "32:9:1": {
+      "category": "weapons",
+      "id": "0x11207"
     },
-    '32:9:2': {
-      category: 'weapons',
-      id: '0x11208',
+    "32:9:2": {
+      "category": "weapons",
+      "id": "0x11208"
     },
-    '32:9:3': {
-      category: 'weapons',
-      id: '0x11209',
+    "32:9:3": {
+      "category": "weapons",
+      "id": "0x11209"
     },
-    '32:9:4': {
-      category: 'weapons',
-      id: '0x1120A',
+    "32:9:4": {
+      "category": "weapons",
+      "id": "0x1120A"
     },
-    '32:9:5': {
-      category: 'weapons',
-      id: '0x1120B',
+    "32:9:5": {
+      "category": "weapons",
+      "id": "0x1120B"
     },
-    '56:14:0': {
-      category: 'weapons',
-      id: '0x1129C',
+    "56:14:0": {
+      "category": "weapons",
+      "id": "0x1129C"
     },
-    '56:14:1': {
-      category: 'weapons',
-      id: '0x1129D',
+    "56:14:1": {
+      "category": "weapons",
+      "id": "0x1129D"
     },
-    '56:14:2': {
-      category: 'weapons',
-      id: '0x1129E',
+    "56:14:2": {
+      "category": "weapons",
+      "id": "0x1129E"
     },
-    '56:14:3': {
-      category: 'weapons',
-      id: '0x1129F',
+    "56:14:3": {
+      "category": "weapons",
+      "id": "0x1129F"
     },
-    '56:14:4': {
-      category: 'weapons',
-      id: '0x112A0',
+    "56:14:4": {
+      "category": "weapons",
+      "id": "0x112A0"
     },
-    '56:14:5': {
-      category: 'weapons',
-      id: '0x112A1',
+    "56:14:5": {
+      "category": "weapons",
+      "id": "0x112A1"
     },
-    '88:null:null': {
-      category: 'weapons',
-      id: '0x11300',
+    "88:null:null": {
+      "category": "weapons",
+      "id": "0x11300"
     },
-    '33:1:0': {
-      category: 'weapons',
-      id: '0x13880',
+    "33:1:0": {
+      "category": "weapons",
+      "id": "0x13880"
     },
-    '33:1:1': {
-      category: 'weapons',
-      id: '0x13881',
+    "33:1:1": {
+      "category": "weapons",
+      "id": "0x13881"
     },
-    '33:1:2': {
-      category: 'weapons',
-      id: '0x13882',
+    "33:1:2": {
+      "category": "weapons",
+      "id": "0x13882"
     },
-    '33:1:3': {
-      category: 'weapons',
-      id: '0x13883',
+    "33:1:3": {
+      "category": "weapons",
+      "id": "0x13883"
     },
-    '33:1:4': {
-      category: 'weapons',
-      id: '0x13884',
+    "33:1:4": {
+      "category": "weapons",
+      "id": "0x13884"
     },
-    '33:1:5': {
-      category: 'weapons',
-      id: '0x13885',
+    "33:1:5": {
+      "category": "weapons",
+      "id": "0x13885"
     },
-    '33:1:6': {
-      category: 'weapons',
-      id: '0x13886',
+    "33:1:6": {
+      "category": "weapons",
+      "id": "0x13886"
     },
-    '33:1:7': {
-      category: 'weapons',
-      id: '0x13887',
+    "33:1:7": {
+      "category": "weapons",
+      "id": "0x13887"
     },
-    '33:1:8': {
-      category: 'weapons',
-      id: '0x13888',
+    "33:1:8": {
+      "category": "weapons",
+      "id": "0x13888"
     },
-    '33:1:9': {
-      category: 'weapons',
-      id: '0x13889',
+    "33:1:9": {
+      "category": "weapons",
+      "id": "0x13889"
     },
-    '33:1:10': {
-      category: 'weapons',
-      id: '0x1388A',
+    "33:1:10": {
+      "category": "weapons",
+      "id": "0x1388A"
     },
-    '33:4:1': {
-      category: 'weapons',
-      id: '0x1388B',
+    "33:4:1": {
+      "category": "weapons",
+      "id": "0x1388B"
     },
-    '33:4:2': {
-      category: 'weapons',
-      id: '0x1388C',
+    "33:4:2": {
+      "category": "weapons",
+      "id": "0x1388C"
     },
-    '33:4:3': {
-      category: 'weapons',
-      id: '0x1388D',
+    "33:4:3": {
+      "category": "weapons",
+      "id": "0x1388D"
     },
-    '33:4:4': {
-      category: 'weapons',
-      id: '0x1388E',
+    "33:4:4": {
+      "category": "weapons",
+      "id": "0x1388E"
     },
-    '33:4:5': {
-      category: 'weapons',
-      id: '0x1388F',
+    "33:4:5": {
+      "category": "weapons",
+      "id": "0x1388F"
     },
-    '33:6:1': {
-      category: 'weapons',
-      id: '0x13895',
+    "33:6:1": {
+      "category": "weapons",
+      "id": "0x13895"
     },
-    '33:6:2': {
-      category: 'weapons',
-      id: '0x13896',
+    "33:6:2": {
+      "category": "weapons",
+      "id": "0x13896"
     },
-    '33:6:3': {
-      category: 'weapons',
-      id: '0x13897',
+    "33:6:3": {
+      "category": "weapons",
+      "id": "0x13897"
     },
-    '33:6:4': {
-      category: 'weapons',
-      id: '0x13898',
+    "33:6:4": {
+      "category": "weapons",
+      "id": "0x13898"
     },
-    '33:6:5': {
-      category: 'weapons',
-      id: '0x13899',
+    "33:6:5": {
+      "category": "weapons",
+      "id": "0x13899"
     },
-    '33:2:1': {
-      category: 'weapons',
-      id: '0x138A9',
+    "33:2:1": {
+      "category": "weapons",
+      "id": "0x138A9"
     },
-    '33:2:2': {
-      category: 'weapons',
-      id: '0x138AA',
+    "33:2:2": {
+      "category": "weapons",
+      "id": "0x138AA"
     },
-    '33:2:3': {
-      category: 'weapons',
-      id: '0x138AB',
+    "33:2:3": {
+      "category": "weapons",
+      "id": "0x138AB"
     },
-    '33:2:4': {
-      category: 'weapons',
-      id: '0x138AC',
+    "33:2:4": {
+      "category": "weapons",
+      "id": "0x138AC"
     },
-    '33:2:5': {
-      category: 'weapons',
-      id: '0x138AD',
+    "33:2:5": {
+      "category": "weapons",
+      "id": "0x138AD"
     },
-    '33:7:1': {
-      category: 'weapons',
-      id: '0x138B3',
+    "33:7:1": {
+      "category": "weapons",
+      "id": "0x138B3"
     },
-    '33:7:2': {
-      category: 'weapons',
-      id: '0x138B4',
+    "33:7:2": {
+      "category": "weapons",
+      "id": "0x138B4"
     },
-    '33:7:3': {
-      category: 'weapons',
-      id: '0x138B5',
+    "33:7:3": {
+      "category": "weapons",
+      "id": "0x138B5"
     },
-    '33:7:4': {
-      category: 'weapons',
-      id: '0x138B6',
+    "33:7:4": {
+      "category": "weapons",
+      "id": "0x138B6"
     },
-    '33:7:5': {
-      category: 'weapons',
-      id: '0x138B7',
+    "33:7:5": {
+      "category": "weapons",
+      "id": "0x138B7"
     },
-    '33:9:1': {
-      category: 'weapons',
-      id: '0x138BD',
+    "33:9:1": {
+      "category": "weapons",
+      "id": "0x138BD"
     },
-    '33:9:2': {
-      category: 'weapons',
-      id: '0x138BE',
+    "33:9:2": {
+      "category": "weapons",
+      "id": "0x138BE"
     },
-    '33:9:3': {
-      category: 'weapons',
-      id: '0x138BF',
+    "33:9:3": {
+      "category": "weapons",
+      "id": "0x138BF"
     },
-    '33:9:4': {
-      category: 'weapons',
-      id: '0x138C0',
+    "33:9:4": {
+      "category": "weapons",
+      "id": "0x138C0"
     },
-    '33:9:5': {
-      category: 'weapons',
-      id: '0x138C1',
+    "33:9:5": {
+      "category": "weapons",
+      "id": "0x138C1"
     },
-    '27:1:0': {
-      category: 'weapons',
-      id: '0x138E4',
+    "27:1:0": {
+      "category": "weapons",
+      "id": "0x138E4"
     },
-    '27:1:1': {
-      category: 'weapons',
-      id: '0x138E5',
+    "27:1:1": {
+      "category": "weapons",
+      "id": "0x138E5"
     },
-    '27:1:2': {
-      category: 'weapons',
-      id: '0x138E6',
+    "27:1:2": {
+      "category": "weapons",
+      "id": "0x138E6"
     },
-    '27:1:3': {
-      category: 'weapons',
-      id: '0x138E7',
+    "27:1:3": {
+      "category": "weapons",
+      "id": "0x138E7"
     },
-    '27:1:4': {
-      category: 'weapons',
-      id: '0x138E8',
+    "27:1:4": {
+      "category": "weapons",
+      "id": "0x138E8"
     },
-    '27:1:5': {
-      category: 'weapons',
-      id: '0x138E9',
+    "27:1:5": {
+      "category": "weapons",
+      "id": "0x138E9"
     },
-    '27:1:6': {
-      category: 'weapons',
-      id: '0x138EA',
+    "27:1:6": {
+      "category": "weapons",
+      "id": "0x138EA"
     },
-    '27:1:7': {
-      category: 'weapons',
-      id: '0x138EB',
+    "27:1:7": {
+      "category": "weapons",
+      "id": "0x138EB"
     },
-    '27:1:8': {
-      category: 'weapons',
-      id: '0x138EC',
+    "27:1:8": {
+      "category": "weapons",
+      "id": "0x138EC"
     },
-    '27:1:9': {
-      category: 'weapons',
-      id: '0x138ED',
+    "27:1:9": {
+      "category": "weapons",
+      "id": "0x138ED"
     },
-    '27:1:10': {
-      category: 'weapons',
-      id: '0x138EE',
+    "27:1:10": {
+      "category": "weapons",
+      "id": "0x138EE"
     },
-    '27:2:1': {
-      category: 'weapons',
-      id: '0x138EF',
+    "27:2:1": {
+      "category": "weapons",
+      "id": "0x138EF"
     },
-    '27:2:2': {
-      category: 'weapons',
-      id: '0x138F0',
+    "27:2:2": {
+      "category": "weapons",
+      "id": "0x138F0"
     },
-    '27:2:3': {
-      category: 'weapons',
-      id: '0x138F1',
+    "27:2:3": {
+      "category": "weapons",
+      "id": "0x138F1"
     },
-    '27:2:4': {
-      category: 'weapons',
-      id: '0x138F2',
+    "27:2:4": {
+      "category": "weapons",
+      "id": "0x138F2"
     },
-    '27:2:5': {
-      category: 'weapons',
-      id: '0x138F3',
+    "27:2:5": {
+      "category": "weapons",
+      "id": "0x138F3"
     },
-    '27:3:1': {
-      category: 'weapons',
-      id: '0x13903',
+    "27:3:1": {
+      "category": "weapons",
+      "id": "0x13903"
     },
-    '27:3:2': {
-      category: 'weapons',
-      id: '0x13904',
+    "27:3:2": {
+      "category": "weapons",
+      "id": "0x13904"
     },
-    '27:3:3': {
-      category: 'weapons',
-      id: '0x13905',
+    "27:3:3": {
+      "category": "weapons",
+      "id": "0x13905"
     },
-    '27:3:4': {
-      category: 'weapons',
-      id: '0x13906',
+    "27:3:4": {
+      "category": "weapons",
+      "id": "0x13906"
     },
-    '27:3:5': {
-      category: 'weapons',
-      id: '0x13907',
+    "27:3:5": {
+      "category": "weapons",
+      "id": "0x13907"
     },
-    '27:5:1': {
-      category: 'weapons',
-      id: '0x1390D',
+    "27:5:1": {
+      "category": "weapons",
+      "id": "0x1390D"
     },
-    '27:5:2': {
-      category: 'weapons',
-      id: '0x1390E',
+    "27:5:2": {
+      "category": "weapons",
+      "id": "0x1390E"
     },
-    '27:5:3': {
-      category: 'weapons',
-      id: '0x1390F',
+    "27:5:3": {
+      "category": "weapons",
+      "id": "0x1390F"
     },
-    '27:5:4': {
-      category: 'weapons',
-      id: '0x13910',
+    "27:5:4": {
+      "category": "weapons",
+      "id": "0x13910"
     },
-    '27:5:5': {
-      category: 'weapons',
-      id: '0x13911',
+    "27:5:5": {
+      "category": "weapons",
+      "id": "0x13911"
     },
-    '27:9:1': {
-      category: 'weapons',
-      id: '0x13917',
+    "27:9:1": {
+      "category": "weapons",
+      "id": "0x13917"
     },
-    '27:9:2': {
-      category: 'weapons',
-      id: '0x13918',
+    "27:9:2": {
+      "category": "weapons",
+      "id": "0x13918"
     },
-    '27:9:3': {
-      category: 'weapons',
-      id: '0x13919',
+    "27:9:3": {
+      "category": "weapons",
+      "id": "0x13919"
     },
-    '27:9:4': {
-      category: 'weapons',
-      id: '0x1391A',
+    "27:9:4": {
+      "category": "weapons",
+      "id": "0x1391A"
     },
-    '27:9:5': {
-      category: 'weapons',
-      id: '0x1391B',
+    "27:9:5": {
+      "category": "weapons",
+      "id": "0x1391B"
     },
-    '27:11:1': {
-      category: 'weapons',
-      id: '0x13921',
+    "27:11:1": {
+      "category": "weapons",
+      "id": "0x13921"
     },
-    '27:11:2': {
-      category: 'weapons',
-      id: '0x13922',
+    "27:11:2": {
+      "category": "weapons",
+      "id": "0x13922"
     },
-    '27:11:3': {
-      category: 'weapons',
-      id: '0x13923',
+    "27:11:3": {
+      "category": "weapons",
+      "id": "0x13923"
     },
-    '27:11:4': {
-      category: 'weapons',
-      id: '0x13924',
+    "27:11:4": {
+      "category": "weapons",
+      "id": "0x13924"
     },
-    '27:11:5': {
-      category: 'weapons',
-      id: '0x13925',
+    "27:11:5": {
+      "category": "weapons",
+      "id": "0x13925"
     },
-    '28:1:0': {
-      category: 'weapons',
-      id: '0x13948',
+    "28:1:0": {
+      "category": "weapons",
+      "id": "0x13948"
     },
-    '28:1:1': {
-      category: 'weapons',
-      id: '0x13949',
+    "28:1:1": {
+      "category": "weapons",
+      "id": "0x13949"
     },
-    '28:1:2': {
-      category: 'weapons',
-      id: '0x1394A',
+    "28:1:2": {
+      "category": "weapons",
+      "id": "0x1394A"
     },
-    '28:1:3': {
-      category: 'weapons',
-      id: '0x1394B',
+    "28:1:3": {
+      "category": "weapons",
+      "id": "0x1394B"
     },
-    '28:1:4': {
-      category: 'weapons',
-      id: '0x1394C',
+    "28:1:4": {
+      "category": "weapons",
+      "id": "0x1394C"
     },
-    '28:1:5': {
-      category: 'weapons',
-      id: '0x1394D',
+    "28:1:5": {
+      "category": "weapons",
+      "id": "0x1394D"
     },
-    '28:1:6': {
-      category: 'weapons',
-      id: '0x1394E',
+    "28:1:6": {
+      "category": "weapons",
+      "id": "0x1394E"
     },
-    '28:1:7': {
-      category: 'weapons',
-      id: '0x1394F',
+    "28:1:7": {
+      "category": "weapons",
+      "id": "0x1394F"
     },
-    '28:1:8': {
-      category: 'weapons',
-      id: '0x13950',
+    "28:1:8": {
+      "category": "weapons",
+      "id": "0x13950"
     },
-    '28:1:9': {
-      category: 'weapons',
-      id: '0x13951',
+    "28:1:9": {
+      "category": "weapons",
+      "id": "0x13951"
     },
-    '28:1:10': {
-      category: 'weapons',
-      id: '0x13952',
+    "28:1:10": {
+      "category": "weapons",
+      "id": "0x13952"
     },
-    '28:2:1': {
-      category: 'weapons',
-      id: '0x13953',
+    "28:2:1": {
+      "category": "weapons",
+      "id": "0x13953"
     },
-    '28:2:2': {
-      category: 'weapons',
-      id: '0x13954',
+    "28:2:2": {
+      "category": "weapons",
+      "id": "0x13954"
     },
-    '28:2:3': {
-      category: 'weapons',
-      id: '0x13955',
+    "28:2:3": {
+      "category": "weapons",
+      "id": "0x13955"
     },
-    '28:2:4': {
-      category: 'weapons',
-      id: '0x13956',
+    "28:2:4": {
+      "category": "weapons",
+      "id": "0x13956"
     },
-    '28:2:5': {
-      category: 'weapons',
-      id: '0x13957',
+    "28:2:5": {
+      "category": "weapons",
+      "id": "0x13957"
     },
-    '28:3:1': {
-      category: 'weapons',
-      id: '0x13967',
+    "28:3:1": {
+      "category": "weapons",
+      "id": "0x13967"
     },
-    '28:3:2': {
-      category: 'weapons',
-      id: '0x13968',
+    "28:3:2": {
+      "category": "weapons",
+      "id": "0x13968"
     },
-    '28:3:3': {
-      category: 'weapons',
-      id: '0x13969',
+    "28:3:3": {
+      "category": "weapons",
+      "id": "0x13969"
     },
-    '28:3:4': {
-      category: 'weapons',
-      id: '0x1396A',
+    "28:3:4": {
+      "category": "weapons",
+      "id": "0x1396A"
     },
-    '28:3:5': {
-      category: 'weapons',
-      id: '0x1396B',
+    "28:3:5": {
+      "category": "weapons",
+      "id": "0x1396B"
     },
-    '28:5:1': {
-      category: 'weapons',
-      id: '0x13971',
+    "28:5:1": {
+      "category": "weapons",
+      "id": "0x13971"
     },
-    '28:5:2': {
-      category: 'weapons',
-      id: '0x13972',
+    "28:5:2": {
+      "category": "weapons",
+      "id": "0x13972"
     },
-    '28:5:3': {
-      category: 'weapons',
-      id: '0x13973',
+    "28:5:3": {
+      "category": "weapons",
+      "id": "0x13973"
     },
-    '28:5:4': {
-      category: 'weapons',
-      id: '0x13974',
+    "28:5:4": {
+      "category": "weapons",
+      "id": "0x13974"
     },
-    '28:5:5': {
-      category: 'weapons',
-      id: '0x13975',
+    "28:5:5": {
+      "category": "weapons",
+      "id": "0x13975"
     },
-    '28:9:1': {
-      category: 'weapons',
-      id: '0x1397B',
+    "28:9:1": {
+      "category": "weapons",
+      "id": "0x1397B"
     },
-    '28:9:2': {
-      category: 'weapons',
-      id: '0x1397C',
+    "28:9:2": {
+      "category": "weapons",
+      "id": "0x1397C"
     },
-    '28:9:3': {
-      category: 'weapons',
-      id: '0x1397D',
+    "28:9:3": {
+      "category": "weapons",
+      "id": "0x1397D"
     },
-    '28:9:4': {
-      category: 'weapons',
-      id: '0x1397E',
+    "28:9:4": {
+      "category": "weapons",
+      "id": "0x1397E"
     },
-    '28:9:5': {
-      category: 'weapons',
-      id: '0x1397F',
+    "28:9:5": {
+      "category": "weapons",
+      "id": "0x1397F"
     },
-    '28:11:1': {
-      category: 'weapons',
-      id: '0x13985',
+    "28:11:1": {
+      "category": "weapons",
+      "id": "0x13985"
     },
-    '28:11:2': {
-      category: 'weapons',
-      id: '0x13986',
+    "28:11:2": {
+      "category": "weapons",
+      "id": "0x13986"
     },
-    '28:11:3': {
-      category: 'weapons',
-      id: '0x13987',
+    "28:11:3": {
+      "category": "weapons",
+      "id": "0x13987"
     },
-    '28:11:4': {
-      category: 'weapons',
-      id: '0x13988',
+    "28:11:4": {
+      "category": "weapons",
+      "id": "0x13988"
     },
-    '28:11:5': {
-      category: 'weapons',
-      id: '0x13989',
+    "28:11:5": {
+      "category": "weapons",
+      "id": "0x13989"
     },
-    '61:14:0': {
-      category: 'weapons',
-      id: '0x139AC',
+    "61:14:0": {
+      "category": "weapons",
+      "id": "0x139AC"
     },
-    '61:14:1': {
-      category: 'weapons',
-      id: '0x139AD',
+    "61:14:1": {
+      "category": "weapons",
+      "id": "0x139AD"
     },
-    '61:14:2': {
-      category: 'weapons',
-      id: '0x139AE',
+    "61:14:2": {
+      "category": "weapons",
+      "id": "0x139AE"
     },
-    '61:14:3': {
-      category: 'weapons',
-      id: '0x139AF',
+    "61:14:3": {
+      "category": "weapons",
+      "id": "0x139AF"
     },
-    '61:14:4': {
-      category: 'weapons',
-      id: '0x139B0',
+    "61:14:4": {
+      "category": "weapons",
+      "id": "0x139B0"
     },
-    '61:14:5': {
-      category: 'weapons',
-      id: '0x139B1',
+    "61:14:5": {
+      "category": "weapons",
+      "id": "0x139B1"
     },
-    '29:1:0': {
-      category: 'weapons',
-      id: '0x186A0',
+    "29:1:0": {
+      "category": "weapons",
+      "id": "0x186A0"
     },
-    '29:3:1': {
-      category: 'weapons',
-      id: '0x186A1',
+    "29:3:1": {
+      "category": "weapons",
+      "id": "0x186A1"
     },
-    '29:3:2': {
-      category: 'weapons',
-      id: '0x186A2',
+    "29:3:2": {
+      "category": "weapons",
+      "id": "0x186A2"
     },
-    '29:3:3': {
-      category: 'weapons',
-      id: '0x186A3',
+    "29:3:3": {
+      "category": "weapons",
+      "id": "0x186A3"
     },
-    '29:3:4': {
-      category: 'weapons',
-      id: '0x186A4',
+    "29:3:4": {
+      "category": "weapons",
+      "id": "0x186A4"
     },
-    '29:3:5': {
-      category: 'weapons',
-      id: '0x186A5',
+    "29:3:5": {
+      "category": "weapons",
+      "id": "0x186A5"
     },
-    '29:11:1': {
-      category: 'weapons',
-      id: '0x186AB',
+    "29:11:1": {
+      "category": "weapons",
+      "id": "0x186AB"
     },
-    '29:11:2': {
-      category: 'weapons',
-      id: '0x186AC',
+    "29:11:2": {
+      "category": "weapons",
+      "id": "0x186AC"
     },
-    '29:11:3': {
-      category: 'weapons',
-      id: '0x186AD',
+    "29:11:3": {
+      "category": "weapons",
+      "id": "0x186AD"
     },
-    '29:11:4': {
-      category: 'weapons',
-      id: '0x186AE',
+    "29:11:4": {
+      "category": "weapons",
+      "id": "0x186AE"
     },
-    '29:11:5': {
-      category: 'weapons',
-      id: '0x186AF',
+    "29:11:5": {
+      "category": "weapons",
+      "id": "0x186AF"
     },
-    '29:1:1': {
-      category: 'weapons',
-      id: '0x186B5',
+    "29:1:1": {
+      "category": "weapons",
+      "id": "0x186B5"
     },
-    '29:1:2': {
-      category: 'weapons',
-      id: '0x186B6',
+    "29:1:2": {
+      "category": "weapons",
+      "id": "0x186B6"
     },
-    '29:1:3': {
-      category: 'weapons',
-      id: '0x186B7',
+    "29:1:3": {
+      "category": "weapons",
+      "id": "0x186B7"
     },
-    '29:1:4': {
-      category: 'weapons',
-      id: '0x186B8',
+    "29:1:4": {
+      "category": "weapons",
+      "id": "0x186B8"
     },
-    '29:1:5': {
-      category: 'weapons',
-      id: '0x186B9',
+    "29:1:5": {
+      "category": "weapons",
+      "id": "0x186B9"
     },
-    '29:1:6': {
-      category: 'weapons',
-      id: '0x186BA',
+    "29:1:6": {
+      "category": "weapons",
+      "id": "0x186BA"
     },
-    '29:1:7': {
-      category: 'weapons',
-      id: '0x186BB',
+    "29:1:7": {
+      "category": "weapons",
+      "id": "0x186BB"
     },
-    '29:1:8': {
-      category: 'weapons',
-      id: '0x186BC',
+    "29:1:8": {
+      "category": "weapons",
+      "id": "0x186BC"
     },
-    '29:1:9': {
-      category: 'weapons',
-      id: '0x186BD',
+    "29:1:9": {
+      "category": "weapons",
+      "id": "0x186BD"
     },
-    '29:1:10': {
-      category: 'weapons',
-      id: '0x186BE',
+    "29:1:10": {
+      "category": "weapons",
+      "id": "0x186BE"
     },
-    '29:2:1': {
-      category: 'weapons',
-      id: '0x186BF',
+    "29:2:1": {
+      "category": "weapons",
+      "id": "0x186BF"
     },
-    '29:2:2': {
-      category: 'weapons',
-      id: '0x186C0',
+    "29:2:2": {
+      "category": "weapons",
+      "id": "0x186C0"
     },
-    '29:2:3': {
-      category: 'weapons',
-      id: '0x186C1',
+    "29:2:3": {
+      "category": "weapons",
+      "id": "0x186C1"
     },
-    '29:2:4': {
-      category: 'weapons',
-      id: '0x186C2',
+    "29:2:4": {
+      "category": "weapons",
+      "id": "0x186C2"
     },
-    '29:2:5': {
-      category: 'weapons',
-      id: '0x186C3',
+    "29:2:5": {
+      "category": "weapons",
+      "id": "0x186C3"
     },
-    '29:5:1': {
-      category: 'weapons',
-      id: '0x186C9',
+    "29:5:1": {
+      "category": "weapons",
+      "id": "0x186C9"
     },
-    '29:5:2': {
-      category: 'weapons',
-      id: '0x186CA',
+    "29:5:2": {
+      "category": "weapons",
+      "id": "0x186CA"
     },
-    '29:5:3': {
-      category: 'weapons',
-      id: '0x186CB',
+    "29:5:3": {
+      "category": "weapons",
+      "id": "0x186CB"
     },
-    '29:5:4': {
-      category: 'weapons',
-      id: '0x186CC',
+    "29:5:4": {
+      "category": "weapons",
+      "id": "0x186CC"
     },
-    '29:5:5': {
-      category: 'weapons',
-      id: '0x186CD',
+    "29:5:5": {
+      "category": "weapons",
+      "id": "0x186CD"
     },
-    '29:9:1': {
-      category: 'weapons',
-      id: '0x186D3',
+    "29:9:1": {
+      "category": "weapons",
+      "id": "0x186D3"
     },
-    '29:9:2': {
-      category: 'weapons',
-      id: '0x186D4',
+    "29:9:2": {
+      "category": "weapons",
+      "id": "0x186D4"
     },
-    '29:9:3': {
-      category: 'weapons',
-      id: '0x186D5',
+    "29:9:3": {
+      "category": "weapons",
+      "id": "0x186D5"
     },
-    '29:9:4': {
-      category: 'weapons',
-      id: '0x186D6',
+    "29:9:4": {
+      "category": "weapons",
+      "id": "0x186D6"
     },
-    '29:9:5': {
-      category: 'weapons',
-      id: '0x186D7',
+    "29:9:5": {
+      "category": "weapons",
+      "id": "0x186D7"
     },
-    '30:1:0': {
-      category: 'weapons',
-      id: '0x18704',
+    "30:1:0": {
+      "category": "weapons",
+      "id": "0x18704"
     },
-    '30:1:1': {
-      category: 'weapons',
-      id: '0x18705',
+    "30:1:1": {
+      "category": "weapons",
+      "id": "0x18705"
     },
-    '30:1:2': {
-      category: 'weapons',
-      id: '0x18706',
+    "30:1:2": {
+      "category": "weapons",
+      "id": "0x18706"
     },
-    '30:1:3': {
-      category: 'weapons',
-      id: '0x18707',
+    "30:1:3": {
+      "category": "weapons",
+      "id": "0x18707"
     },
-    '30:1:4': {
-      category: 'weapons',
-      id: '0x18708',
+    "30:1:4": {
+      "category": "weapons",
+      "id": "0x18708"
     },
-    '30:1:5': {
-      category: 'weapons',
-      id: '0x18709',
+    "30:1:5": {
+      "category": "weapons",
+      "id": "0x18709"
     },
-    '30:1:6': {
-      category: 'weapons',
-      id: '0x1870A',
+    "30:1:6": {
+      "category": "weapons",
+      "id": "0x1870A"
     },
-    '30:1:7': {
-      category: 'weapons',
-      id: '0x1870B',
+    "30:1:7": {
+      "category": "weapons",
+      "id": "0x1870B"
     },
-    '30:1:8': {
-      category: 'weapons',
-      id: '0x1870C',
+    "30:1:8": {
+      "category": "weapons",
+      "id": "0x1870C"
     },
-    '30:1:9': {
-      category: 'weapons',
-      id: '0x1870D',
+    "30:1:9": {
+      "category": "weapons",
+      "id": "0x1870D"
     },
-    '30:1:10': {
-      category: 'weapons',
-      id: '0x1870E',
+    "30:1:10": {
+      "category": "weapons",
+      "id": "0x1870E"
     },
-    '30:4:1': {
-      category: 'weapons',
-      id: '0x1870F',
+    "30:4:1": {
+      "category": "weapons",
+      "id": "0x1870F"
     },
-    '30:4:2': {
-      category: 'weapons',
-      id: '0x18710',
+    "30:4:2": {
+      "category": "weapons",
+      "id": "0x18710"
     },
-    '30:4:3': {
-      category: 'weapons',
-      id: '0x18711',
+    "30:4:3": {
+      "category": "weapons",
+      "id": "0x18711"
     },
-    '30:4:4': {
-      category: 'weapons',
-      id: '0x18712',
+    "30:4:4": {
+      "category": "weapons",
+      "id": "0x18712"
     },
-    '30:4:5': {
-      category: 'weapons',
-      id: '0x18713',
+    "30:4:5": {
+      "category": "weapons",
+      "id": "0x18713"
     },
-    '30:6:1': {
-      category: 'weapons',
-      id: '0x18719',
+    "30:6:1": {
+      "category": "weapons",
+      "id": "0x18719"
     },
-    '30:6:2': {
-      category: 'weapons',
-      id: '0x1871A',
+    "30:6:2": {
+      "category": "weapons",
+      "id": "0x1871A"
     },
-    '30:6:3': {
-      category: 'weapons',
-      id: '0x1871B',
+    "30:6:3": {
+      "category": "weapons",
+      "id": "0x1871B"
     },
-    '30:6:4': {
-      category: 'weapons',
-      id: '0x1871C',
+    "30:6:4": {
+      "category": "weapons",
+      "id": "0x1871C"
     },
-    '30:6:5': {
-      category: 'weapons',
-      id: '0x1871D',
+    "30:6:5": {
+      "category": "weapons",
+      "id": "0x1871D"
     },
-    '30:2:1': {
-      category: 'weapons',
-      id: '0x1872D',
+    "30:2:1": {
+      "category": "weapons",
+      "id": "0x1872D"
     },
-    '30:2:2': {
-      category: 'weapons',
-      id: '0x1872E',
+    "30:2:2": {
+      "category": "weapons",
+      "id": "0x1872E"
     },
-    '30:2:3': {
-      category: 'weapons',
-      id: '0x1872F',
+    "30:2:3": {
+      "category": "weapons",
+      "id": "0x1872F"
     },
-    '30:2:4': {
-      category: 'weapons',
-      id: '0x18730',
+    "30:2:4": {
+      "category": "weapons",
+      "id": "0x18730"
     },
-    '30:2:5': {
-      category: 'weapons',
-      id: '0x18731',
+    "30:2:5": {
+      "category": "weapons",
+      "id": "0x18731"
     },
-    '30:7:1': {
-      category: 'weapons',
-      id: '0x18737',
+    "30:7:1": {
+      "category": "weapons",
+      "id": "0x18737"
     },
-    '30:7:2': {
-      category: 'weapons',
-      id: '0x18738',
+    "30:7:2": {
+      "category": "weapons",
+      "id": "0x18738"
     },
-    '30:7:3': {
-      category: 'weapons',
-      id: '0x18739',
+    "30:7:3": {
+      "category": "weapons",
+      "id": "0x18739"
     },
-    '30:7:4': {
-      category: 'weapons',
-      id: '0x1873A',
+    "30:7:4": {
+      "category": "weapons",
+      "id": "0x1873A"
     },
-    '30:7:5': {
-      category: 'weapons',
-      id: '0x1873B',
+    "30:7:5": {
+      "category": "weapons",
+      "id": "0x1873B"
     },
-    '30:9:1': {
-      category: 'weapons',
-      id: '0x18741',
+    "30:9:1": {
+      "category": "weapons",
+      "id": "0x18741"
     },
-    '30:9:2': {
-      category: 'weapons',
-      id: '0x18742',
+    "30:9:2": {
+      "category": "weapons",
+      "id": "0x18742"
     },
-    '30:9:3': {
-      category: 'weapons',
-      id: '0x18743',
+    "30:9:3": {
+      "category": "weapons",
+      "id": "0x18743"
     },
-    '30:9:4': {
-      category: 'weapons',
-      id: '0x18744',
+    "30:9:4": {
+      "category": "weapons",
+      "id": "0x18744"
     },
-    '30:9:5': {
-      category: 'weapons',
-      id: '0x18745',
+    "30:9:5": {
+      "category": "weapons",
+      "id": "0x18745"
     },
-    '54:14:0': {
-      category: 'weapons',
-      id: '0x18768',
+    "54:14:0": {
+      "category": "weapons",
+      "id": "0x18768"
     },
-    '54:14:1': {
-      category: 'weapons',
-      id: '0x18769',
+    "54:14:1": {
+      "category": "weapons",
+      "id": "0x18769"
     },
-    '54:14:2': {
-      category: 'weapons',
-      id: '0x1876A',
+    "54:14:2": {
+      "category": "weapons",
+      "id": "0x1876A"
     },
-    '54:14:3': {
-      category: 'weapons',
-      id: '0x1876B',
+    "54:14:3": {
+      "category": "weapons",
+      "id": "0x1876B"
     },
-    '54:14:4': {
-      category: 'weapons',
-      id: '0x1876C',
+    "54:14:4": {
+      "category": "weapons",
+      "id": "0x1876C"
     },
-    '54:14:5': {
-      category: 'weapons',
-      id: '0x1876D',
+    "54:14:5": {
+      "category": "weapons",
+      "id": "0x1876D"
     },
-    '36:1:0': {
-      category: 'weapons',
-      id: '0x1FBD0',
+    "36:1:0": {
+      "category": "weapons",
+      "id": "0x1FBD0"
     },
-    '36:1:1': {
-      category: 'weapons',
-      id: '0x1FBD1',
+    "36:1:1": {
+      "category": "weapons",
+      "id": "0x1FBD1"
     },
-    '36:1:2': {
-      category: 'weapons',
-      id: '0x1FBD2',
+    "36:1:2": {
+      "category": "weapons",
+      "id": "0x1FBD2"
     },
-    '36:1:3': {
-      category: 'weapons',
-      id: '0x1FBD3',
+    "36:1:3": {
+      "category": "weapons",
+      "id": "0x1FBD3"
     },
-    '36:1:4': {
-      category: 'weapons',
-      id: '0x1FBD4',
+    "36:1:4": {
+      "category": "weapons",
+      "id": "0x1FBD4"
     },
-    '36:1:5': {
-      category: 'weapons',
-      id: '0x1FBD5',
+    "36:1:5": {
+      "category": "weapons",
+      "id": "0x1FBD5"
     },
-    '36:1:6': {
-      category: 'weapons',
-      id: '0x1FBD6',
+    "36:1:6": {
+      "category": "weapons",
+      "id": "0x1FBD6"
     },
-    '36:1:7': {
-      category: 'weapons',
-      id: '0x1FBD7',
+    "36:1:7": {
+      "category": "weapons",
+      "id": "0x1FBD7"
     },
-    '36:1:8': {
-      category: 'weapons',
-      id: '0x1FBD8',
+    "36:1:8": {
+      "category": "weapons",
+      "id": "0x1FBD8"
     },
-    '36:1:9': {
-      category: 'weapons',
-      id: '0x1FBD9',
+    "36:1:9": {
+      "category": "weapons",
+      "id": "0x1FBD9"
     },
-    '36:1:10': {
-      category: 'weapons',
-      id: '0x1FBDA',
+    "36:1:10": {
+      "category": "weapons",
+      "id": "0x1FBDA"
     },
-    '36:12:1': {
-      category: 'weapons',
-      id: '0x1FBE5',
+    "36:12:1": {
+      "category": "weapons",
+      "id": "0x1FBE5"
     },
-    '36:12:2': {
-      category: 'weapons',
-      id: '0x1FBE6',
+    "36:12:2": {
+      "category": "weapons",
+      "id": "0x1FBE6"
     },
-    '36:12:3': {
-      category: 'weapons',
-      id: '0x1FBE7',
+    "36:12:3": {
+      "category": "weapons",
+      "id": "0x1FBE7"
     },
-    '36:12:4': {
-      category: 'weapons',
-      id: '0x1FBE8',
+    "36:12:4": {
+      "category": "weapons",
+      "id": "0x1FBE8"
     },
-    '36:12:5': {
-      category: 'weapons',
-      id: '0x1FBE9',
+    "36:12:5": {
+      "category": "weapons",
+      "id": "0x1FBE9"
     },
-    '36:2:1': {
-      category: 'weapons',
-      id: '0x1FBEF',
+    "36:2:1": {
+      "category": "weapons",
+      "id": "0x1FBEF"
     },
-    '36:2:2': {
-      category: 'weapons',
-      id: '0x1FBF0',
+    "36:2:2": {
+      "category": "weapons",
+      "id": "0x1FBF0"
     },
-    '36:2:3': {
-      category: 'weapons',
-      id: '0x1FBF1',
+    "36:2:3": {
+      "category": "weapons",
+      "id": "0x1FBF1"
     },
-    '36:2:4': {
-      category: 'weapons',
-      id: '0x1FBF2',
+    "36:2:4": {
+      "category": "weapons",
+      "id": "0x1FBF2"
     },
-    '36:2:5': {
-      category: 'weapons',
-      id: '0x1FBF3',
+    "36:2:5": {
+      "category": "weapons",
+      "id": "0x1FBF3"
     },
-    '37:1:0': {
-      category: 'weapons',
-      id: '0x1FC34',
+    "37:1:0": {
+      "category": "weapons",
+      "id": "0x1FC34"
     },
-    '37:1:1': {
-      category: 'weapons',
-      id: '0x1FC35',
+    "37:1:1": {
+      "category": "weapons",
+      "id": "0x1FC35"
     },
-    '37:1:2': {
-      category: 'weapons',
-      id: '0x1FC36',
+    "37:1:2": {
+      "category": "weapons",
+      "id": "0x1FC36"
     },
-    '37:1:3': {
-      category: 'weapons',
-      id: '0x1FC37',
+    "37:1:3": {
+      "category": "weapons",
+      "id": "0x1FC37"
     },
-    '37:1:4': {
-      category: 'weapons',
-      id: '0x1FC38',
+    "37:1:4": {
+      "category": "weapons",
+      "id": "0x1FC38"
     },
-    '37:1:5': {
-      category: 'weapons',
-      id: '0x1FC39',
+    "37:1:5": {
+      "category": "weapons",
+      "id": "0x1FC39"
     },
-    '37:1:6': {
-      category: 'weapons',
-      id: '0x1FC3A',
+    "37:1:6": {
+      "category": "weapons",
+      "id": "0x1FC3A"
     },
-    '37:1:7': {
-      category: 'weapons',
-      id: '0x1FC3B',
+    "37:1:7": {
+      "category": "weapons",
+      "id": "0x1FC3B"
     },
-    '37:1:8': {
-      category: 'weapons',
-      id: '0x1FC3C',
+    "37:1:8": {
+      "category": "weapons",
+      "id": "0x1FC3C"
     },
-    '37:1:9': {
-      category: 'weapons',
-      id: '0x1FC3D',
+    "37:1:9": {
+      "category": "weapons",
+      "id": "0x1FC3D"
     },
-    '37:1:10': {
-      category: 'weapons',
-      id: '0x1FC3E',
+    "37:1:10": {
+      "category": "weapons",
+      "id": "0x1FC3E"
     },
-    '37:12:1': {
-      category: 'weapons',
-      id: '0x1FC49',
+    "37:12:1": {
+      "category": "weapons",
+      "id": "0x1FC49"
     },
-    '37:12:2': {
-      category: 'weapons',
-      id: '0x1FC4A',
+    "37:12:2": {
+      "category": "weapons",
+      "id": "0x1FC4A"
     },
-    '37:12:3': {
-      category: 'weapons',
-      id: '0x1FC4B',
+    "37:12:3": {
+      "category": "weapons",
+      "id": "0x1FC4B"
     },
-    '37:12:4': {
-      category: 'weapons',
-      id: '0x1FC4C',
+    "37:12:4": {
+      "category": "weapons",
+      "id": "0x1FC4C"
     },
-    '37:12:5': {
-      category: 'weapons',
-      id: '0x1FC4D',
+    "37:12:5": {
+      "category": "weapons",
+      "id": "0x1FC4D"
     },
-    '37:2:1': {
-      category: 'weapons',
-      id: '0x1FC53',
+    "37:2:1": {
+      "category": "weapons",
+      "id": "0x1FC53"
     },
-    '37:2:2': {
-      category: 'weapons',
-      id: '0x1FC54',
+    "37:2:2": {
+      "category": "weapons",
+      "id": "0x1FC54"
     },
-    '37:2:3': {
-      category: 'weapons',
-      id: '0x1FC55',
+    "37:2:3": {
+      "category": "weapons",
+      "id": "0x1FC55"
     },
-    '37:2:4': {
-      category: 'weapons',
-      id: '0x1FC56',
+    "37:2:4": {
+      "category": "weapons",
+      "id": "0x1FC56"
     },
-    '37:2:5': {
-      category: 'weapons',
-      id: '0x1FC57',
+    "37:2:5": {
+      "category": "weapons",
+      "id": "0x1FC57"
     },
-    '38:1:0': {
-      category: 'weapons',
-      id: '0x1FC98',
+    "38:1:0": {
+      "category": "weapons",
+      "id": "0x1FC98"
     },
-    '38:1:1': {
-      category: 'weapons',
-      id: '0x1FC99',
+    "38:1:1": {
+      "category": "weapons",
+      "id": "0x1FC99"
     },
-    '38:1:2': {
-      category: 'weapons',
-      id: '0x1FC9A',
+    "38:1:2": {
+      "category": "weapons",
+      "id": "0x1FC9A"
     },
-    '38:1:3': {
-      category: 'weapons',
-      id: '0x1FC9B',
+    "38:1:3": {
+      "category": "weapons",
+      "id": "0x1FC9B"
     },
-    '38:1:4': {
-      category: 'weapons',
-      id: '0x1FC9C',
+    "38:1:4": {
+      "category": "weapons",
+      "id": "0x1FC9C"
     },
-    '38:1:5': {
-      category: 'weapons',
-      id: '0x1FC9D',
+    "38:1:5": {
+      "category": "weapons",
+      "id": "0x1FC9D"
     },
-    '38:1:6': {
-      category: 'weapons',
-      id: '0x1FC9E',
+    "38:1:6": {
+      "category": "weapons",
+      "id": "0x1FC9E"
     },
-    '38:1:7': {
-      category: 'weapons',
-      id: '0x1FC9F',
+    "38:1:7": {
+      "category": "weapons",
+      "id": "0x1FC9F"
     },
-    '38:1:8': {
-      category: 'weapons',
-      id: '0x1FCA0',
+    "38:1:8": {
+      "category": "weapons",
+      "id": "0x1FCA0"
     },
-    '38:1:9': {
-      category: 'weapons',
-      id: '0x1FCA1',
+    "38:1:9": {
+      "category": "weapons",
+      "id": "0x1FCA1"
     },
-    '38:1:10': {
-      category: 'weapons',
-      id: '0x1FCA2',
+    "38:1:10": {
+      "category": "weapons",
+      "id": "0x1FCA2"
     },
-    '38:12:1': {
-      category: 'weapons',
-      id: '0x1FCAD',
+    "38:12:1": {
+      "category": "weapons",
+      "id": "0x1FCAD"
     },
-    '38:12:2': {
-      category: 'weapons',
-      id: '0x1FCAE',
+    "38:12:2": {
+      "category": "weapons",
+      "id": "0x1FCAE"
     },
-    '38:12:3': {
-      category: 'weapons',
-      id: '0x1FCAF',
+    "38:12:3": {
+      "category": "weapons",
+      "id": "0x1FCAF"
     },
-    '38:12:4': {
-      category: 'weapons',
-      id: '0x1FCB0',
+    "38:12:4": {
+      "category": "weapons",
+      "id": "0x1FCB0"
     },
-    '38:12:5': {
-      category: 'weapons',
-      id: '0x1FCB1',
+    "38:12:5": {
+      "category": "weapons",
+      "id": "0x1FCB1"
     },
-    '38:2:1': {
-      category: 'weapons',
-      id: '0x1FCB7',
+    "38:2:1": {
+      "category": "weapons",
+      "id": "0x1FCB7"
     },
-    '38:2:2': {
-      category: 'weapons',
-      id: '0x1FCB8',
+    "38:2:2": {
+      "category": "weapons",
+      "id": "0x1FCB8"
     },
-    '38:2:3': {
-      category: 'weapons',
-      id: '0x1FCB9',
+    "38:2:3": {
+      "category": "weapons",
+      "id": "0x1FCB9"
     },
-    '38:2:4': {
-      category: 'weapons',
-      id: '0x1FCBA',
+    "38:2:4": {
+      "category": "weapons",
+      "id": "0x1FCBA"
     },
-    '38:2:5': {
-      category: 'weapons',
-      id: '0x1FCBB',
+    "38:2:5": {
+      "category": "weapons",
+      "id": "0x1FCBB"
     },
-    '39:1:0': {
-      category: 'weapons',
-      id: '0x1FCFC',
+    "39:1:0": {
+      "category": "weapons",
+      "id": "0x1FCFC"
     },
-    '39:1:1': {
-      category: 'weapons',
-      id: '0x1FCFD',
+    "39:1:1": {
+      "category": "weapons",
+      "id": "0x1FCFD"
     },
-    '39:1:2': {
-      category: 'weapons',
-      id: '0x1FCFE',
+    "39:1:2": {
+      "category": "weapons",
+      "id": "0x1FCFE"
     },
-    '39:1:3': {
-      category: 'weapons',
-      id: '0x1FCFF',
+    "39:1:3": {
+      "category": "weapons",
+      "id": "0x1FCFF"
     },
-    '39:1:4': {
-      category: 'weapons',
-      id: '0x1FD00',
+    "39:1:4": {
+      "category": "weapons",
+      "id": "0x1FD00"
     },
-    '39:1:5': {
-      category: 'weapons',
-      id: '0x1FD01',
+    "39:1:5": {
+      "category": "weapons",
+      "id": "0x1FD01"
     },
-    '39:1:6': {
-      category: 'weapons',
-      id: '0x1FD02',
+    "39:1:6": {
+      "category": "weapons",
+      "id": "0x1FD02"
     },
-    '39:1:7': {
-      category: 'weapons',
-      id: '0x1FD03',
+    "39:1:7": {
+      "category": "weapons",
+      "id": "0x1FD03"
     },
-    '39:1:8': {
-      category: 'weapons',
-      id: '0x1FD04',
+    "39:1:8": {
+      "category": "weapons",
+      "id": "0x1FD04"
     },
-    '39:1:9': {
-      category: 'weapons',
-      id: '0x1FD05',
+    "39:1:9": {
+      "category": "weapons",
+      "id": "0x1FD05"
     },
-    '39:1:10': {
-      category: 'weapons',
-      id: '0x1FD06',
+    "39:1:10": {
+      "category": "weapons",
+      "id": "0x1FD06"
     },
-    '39:12:1': {
-      category: 'weapons',
-      id: '0x1FD11',
+    "39:12:1": {
+      "category": "weapons",
+      "id": "0x1FD11"
     },
-    '39:12:2': {
-      category: 'weapons',
-      id: '0x1FD12',
+    "39:12:2": {
+      "category": "weapons",
+      "id": "0x1FD12"
     },
-    '39:12:3': {
-      category: 'weapons',
-      id: '0x1FD13',
+    "39:12:3": {
+      "category": "weapons",
+      "id": "0x1FD13"
     },
-    '39:12:4': {
-      category: 'weapons',
-      id: '0x1FD14',
+    "39:12:4": {
+      "category": "weapons",
+      "id": "0x1FD14"
     },
-    '39:12:5': {
-      category: 'weapons',
-      id: '0x1FD15',
+    "39:12:5": {
+      "category": "weapons",
+      "id": "0x1FD15"
     },
-    '39:2:1': {
-      category: 'weapons',
-      id: '0x1FD1B',
+    "39:2:1": {
+      "category": "weapons",
+      "id": "0x1FD1B"
     },
-    '39:2:2': {
-      category: 'weapons',
-      id: '0x1FD1C',
+    "39:2:2": {
+      "category": "weapons",
+      "id": "0x1FD1C"
     },
-    '39:2:3': {
-      category: 'weapons',
-      id: '0x1FD1D',
+    "39:2:3": {
+      "category": "weapons",
+      "id": "0x1FD1D"
     },
-    '39:2:4': {
-      category: 'weapons',
-      id: '0x1FD1E',
+    "39:2:4": {
+      "category": "weapons",
+      "id": "0x1FD1E"
     },
-    '39:2:5': {
-      category: 'weapons',
-      id: '0x1FD1F',
+    "39:2:5": {
+      "category": "weapons",
+      "id": "0x1FD1F"
     },
-    '63:14:0': {
-      category: 'weapons',
-      id: '0x1FD60',
+    "63:14:0": {
+      "category": "weapons",
+      "id": "0x1FD60"
     },
-    '63:14:1': {
-      category: 'weapons',
-      id: '0x1FD61',
+    "63:14:1": {
+      "category": "weapons",
+      "id": "0x1FD61"
     },
-    '63:14:2': {
-      category: 'weapons',
-      id: '0x1FD62',
+    "63:14:2": {
+      "category": "weapons",
+      "id": "0x1FD62"
     },
-    '63:14:3': {
-      category: 'weapons',
-      id: '0x1FD63',
+    "63:14:3": {
+      "category": "weapons",
+      "id": "0x1FD63"
     },
-    '63:14:4': {
-      category: 'weapons',
-      id: '0x1FD64',
+    "63:14:4": {
+      "category": "weapons",
+      "id": "0x1FD64"
     },
-    '63:14:5': {
-      category: 'weapons',
-      id: '0x1FD65',
+    "63:14:5": {
+      "category": "weapons",
+      "id": "0x1FD65"
     },
-    '89:null:null': {
-      category: 'weapons',
-      id: '0x1FDC4',
+    "89:null:null": {
+      "category": "weapons",
+      "id": "0x1FDC4"
     },
-    '71:null:null': {
-      category: 'weapons',
-      id: '0x222E0',
+    "71:null:null": {
+      "category": "weapons",
+      "id": "0x222E0"
     },
-    '72:null:null': {
-      category: 'weapons',
-      id: '0x22344',
+    "72:null:null": {
+      "category": "weapons",
+      "id": "0x22344"
     },
-    '73:null:null': {
-      category: 'weapons',
-      id: '0x223A8',
+    "73:null:null": {
+      "category": "weapons",
+      "id": "0x223A8"
     },
-    '40:1:0': {
-      category: 'weapons',
-      id: '0x249F0',
+    "40:1:0": {
+      "category": "weapons",
+      "id": "0x249F0"
     },
-    '40:1:1': {
-      category: 'weapons',
-      id: '0x249F1',
+    "40:1:1": {
+      "category": "weapons",
+      "id": "0x249F1"
     },
-    '40:1:2': {
-      category: 'weapons',
-      id: '0x249F2',
+    "40:1:2": {
+      "category": "weapons",
+      "id": "0x249F2"
     },
-    '40:1:3': {
-      category: 'weapons',
-      id: '0x249F3',
+    "40:1:3": {
+      "category": "weapons",
+      "id": "0x249F3"
     },
-    '40:1:4': {
-      category: 'weapons',
-      id: '0x249F4',
+    "40:1:4": {
+      "category": "weapons",
+      "id": "0x249F4"
     },
-    '40:1:5': {
-      category: 'weapons',
-      id: '0x249F5',
+    "40:1:5": {
+      "category": "weapons",
+      "id": "0x249F5"
     },
-    '40:1:6': {
-      category: 'weapons',
-      id: '0x249F6',
+    "40:1:6": {
+      "category": "weapons",
+      "id": "0x249F6"
     },
-    '40:1:7': {
-      category: 'weapons',
-      id: '0x249F7',
+    "40:1:7": {
+      "category": "weapons",
+      "id": "0x249F7"
     },
-    '40:1:8': {
-      category: 'weapons',
-      id: '0x249F8',
+    "40:1:8": {
+      "category": "weapons",
+      "id": "0x249F8"
     },
-    '40:1:9': {
-      category: 'weapons',
-      id: '0x249F9',
+    "40:1:9": {
+      "category": "weapons",
+      "id": "0x249F9"
     },
-    '40:1:10': {
-      category: 'weapons',
-      id: '0x249FA',
+    "40:1:10": {
+      "category": "weapons",
+      "id": "0x249FA"
     },
-    '40:13:1': {
-      category: 'weapons',
-      id: '0x24A05',
+    "40:13:1": {
+      "category": "weapons",
+      "id": "0x24A05"
     },
-    '40:13:2': {
-      category: 'weapons',
-      id: '0x24A06',
+    "40:13:2": {
+      "category": "weapons",
+      "id": "0x24A06"
     },
-    '40:13:3': {
-      category: 'weapons',
-      id: '0x24A07',
+    "40:13:3": {
+      "category": "weapons",
+      "id": "0x24A07"
     },
-    '40:13:4': {
-      category: 'weapons',
-      id: '0x24A08',
+    "40:13:4": {
+      "category": "weapons",
+      "id": "0x24A08"
     },
-    '40:13:5': {
-      category: 'weapons',
-      id: '0x24A09',
+    "40:13:5": {
+      "category": "weapons",
+      "id": "0x24A09"
     },
-    '74:null:null': {
-      category: 'weapons',
-      id: '0x24A54',
+    "74:null:null": {
+      "category": "weapons",
+      "id": "0x24A54"
     },
-    '42:1:0': {
-      category: 'weapons',
-      id: '0x24AB8',
+    "42:1:0": {
+      "category": "weapons",
+      "id": "0x24AB8"
     },
-    '42:1:1': {
-      category: 'weapons',
-      id: '0x24AB9',
+    "42:1:1": {
+      "category": "weapons",
+      "id": "0x24AB9"
     },
-    '42:1:2': {
-      category: 'weapons',
-      id: '0x24ABA',
+    "42:1:2": {
+      "category": "weapons",
+      "id": "0x24ABA"
     },
-    '42:1:3': {
-      category: 'weapons',
-      id: '0x24ABB',
+    "42:1:3": {
+      "category": "weapons",
+      "id": "0x24ABB"
     },
-    '42:1:4': {
-      category: 'weapons',
-      id: '0x24ABC',
+    "42:1:4": {
+      "category": "weapons",
+      "id": "0x24ABC"
     },
-    '42:1:5': {
-      category: 'weapons',
-      id: '0x24ABD',
+    "42:1:5": {
+      "category": "weapons",
+      "id": "0x24ABD"
     },
-    '42:1:6': {
-      category: 'weapons',
-      id: '0x24ABE',
+    "42:1:6": {
+      "category": "weapons",
+      "id": "0x24ABE"
     },
-    '42:1:7': {
-      category: 'weapons',
-      id: '0x24ABF',
+    "42:1:7": {
+      "category": "weapons",
+      "id": "0x24ABF"
     },
-    '42:1:8': {
-      category: 'weapons',
-      id: '0x24AC0',
+    "42:1:8": {
+      "category": "weapons",
+      "id": "0x24AC0"
     },
-    '42:1:9': {
-      category: 'weapons',
-      id: '0x24AC1',
+    "42:1:9": {
+      "category": "weapons",
+      "id": "0x24AC1"
     },
-    '42:1:10': {
-      category: 'weapons',
-      id: '0x24AC2',
+    "42:1:10": {
+      "category": "weapons",
+      "id": "0x24AC2"
     },
-    '42:13:1': {
-      category: 'weapons',
-      id: '0x24ACD',
+    "42:13:1": {
+      "category": "weapons",
+      "id": "0x24ACD"
     },
-    '42:13:2': {
-      category: 'weapons',
-      id: '0x24ACE',
+    "42:13:2": {
+      "category": "weapons",
+      "id": "0x24ACE"
     },
-    '42:13:3': {
-      category: 'weapons',
-      id: '0x24ACF',
+    "42:13:3": {
+      "category": "weapons",
+      "id": "0x24ACF"
     },
-    '42:13:4': {
-      category: 'weapons',
-      id: '0x24AD0',
+    "42:13:4": {
+      "category": "weapons",
+      "id": "0x24AD0"
     },
-    '42:13:5': {
-      category: 'weapons',
-      id: '0x24AD1',
+    "42:13:5": {
+      "category": "weapons",
+      "id": "0x24AD1"
     },
-    '41:1:0': {
-      category: 'weapons',
-      id: '0x24B1C',
+    "41:1:0": {
+      "category": "weapons",
+      "id": "0x24B1C"
     },
-    '41:1:1': {
-      category: 'weapons',
-      id: '0x24B1D',
+    "41:1:1": {
+      "category": "weapons",
+      "id": "0x24B1D"
     },
-    '41:1:2': {
-      category: 'weapons',
-      id: '0x24B1E',
+    "41:1:2": {
+      "category": "weapons",
+      "id": "0x24B1E"
     },
-    '41:1:3': {
-      category: 'weapons',
-      id: '0x24B1F',
+    "41:1:3": {
+      "category": "weapons",
+      "id": "0x24B1F"
     },
-    '41:1:4': {
-      category: 'weapons',
-      id: '0x24B20',
+    "41:1:4": {
+      "category": "weapons",
+      "id": "0x24B20"
     },
-    '41:1:5': {
-      category: 'weapons',
-      id: '0x24B21',
+    "41:1:5": {
+      "category": "weapons",
+      "id": "0x24B21"
     },
-    '41:1:6': {
-      category: 'weapons',
-      id: '0x24B22',
+    "41:1:6": {
+      "category": "weapons",
+      "id": "0x24B22"
     },
-    '41:1:7': {
-      category: 'weapons',
-      id: '0x24B23',
+    "41:1:7": {
+      "category": "weapons",
+      "id": "0x24B23"
     },
-    '41:1:8': {
-      category: 'weapons',
-      id: '0x24B24',
+    "41:1:8": {
+      "category": "weapons",
+      "id": "0x24B24"
     },
-    '41:1:9': {
-      category: 'weapons',
-      id: '0x24B25',
+    "41:1:9": {
+      "category": "weapons",
+      "id": "0x24B25"
     },
-    '41:1:10': {
-      category: 'weapons',
-      id: '0x24B26',
+    "41:1:10": {
+      "category": "weapons",
+      "id": "0x24B26"
     },
-    '41:13:1': {
-      category: 'weapons',
-      id: '0x24B31',
+    "41:13:1": {
+      "category": "weapons",
+      "id": "0x24B31"
     },
-    '41:13:2': {
-      category: 'weapons',
-      id: '0x24B32',
+    "41:13:2": {
+      "category": "weapons",
+      "id": "0x24B32"
     },
-    '41:13:3': {
-      category: 'weapons',
-      id: '0x24B33',
+    "41:13:3": {
+      "category": "weapons",
+      "id": "0x24B33"
     },
-    '41:13:4': {
-      category: 'weapons',
-      id: '0x24B34',
+    "41:13:4": {
+      "category": "weapons",
+      "id": "0x24B34"
     },
-    '41:13:5': {
-      category: 'weapons',
-      id: '0x24B35',
+    "41:13:5": {
+      "category": "weapons",
+      "id": "0x24B35"
     },
-    '64:14:0': {
-      category: 'weapons',
-      id: '0x24B80',
+    "64:14:0": {
+      "category": "weapons",
+      "id": "0x24B80"
     },
-    '64:14:1': {
-      category: 'weapons',
-      id: '0x24B81',
+    "64:14:1": {
+      "category": "weapons",
+      "id": "0x24B81"
     },
-    '64:14:2': {
-      category: 'weapons',
-      id: '0x24B82',
+    "64:14:2": {
+      "category": "weapons",
+      "id": "0x24B82"
     },
-    '64:14:3': {
-      category: 'weapons',
-      id: '0x24B83',
+    "64:14:3": {
+      "category": "weapons",
+      "id": "0x24B83"
     },
-    '64:14:4': {
-      category: 'weapons',
-      id: '0x24B84',
+    "64:14:4": {
+      "category": "weapons",
+      "id": "0x24B84"
     },
-    '64:14:5': {
-      category: 'weapons',
-      id: '0x24B85',
+    "64:14:5": {
+      "category": "weapons",
+      "id": "0x24B85"
     },
-    '47:1:0': {
-      category: 'weapons',
-      id: '0x24BE4',
+    "47:1:0": {
+      "category": "weapons",
+      "id": "0x24BE4"
     },
-    '47:1:1': {
-      category: 'weapons',
-      id: '0x24BE5',
+    "47:1:1": {
+      "category": "weapons",
+      "id": "0x24BE5"
     },
-    '47:1:2': {
-      category: 'weapons',
-      id: '0x24BE6',
+    "47:1:2": {
+      "category": "weapons",
+      "id": "0x24BE6"
     },
-    '47:1:3': {
-      category: 'weapons',
-      id: '0x24BE7',
+    "47:1:3": {
+      "category": "weapons",
+      "id": "0x24BE7"
     },
-    '47:1:4': {
-      category: 'weapons',
-      id: '0x24BE8',
+    "47:1:4": {
+      "category": "weapons",
+      "id": "0x24BE8"
     },
-    '47:1:5': {
-      category: 'weapons',
-      id: '0x24BE9',
+    "47:1:5": {
+      "category": "weapons",
+      "id": "0x24BE9"
     },
-    '47:1:6': {
-      category: 'weapons',
-      id: '0x24BEA',
+    "47:1:6": {
+      "category": "weapons",
+      "id": "0x24BEA"
     },
-    '47:1:7': {
-      category: 'weapons',
-      id: '0x24BEB',
+    "47:1:7": {
+      "category": "weapons",
+      "id": "0x24BEB"
     },
-    '47:1:8': {
-      category: 'weapons',
-      id: '0x24BEC',
+    "47:1:8": {
+      "category": "weapons",
+      "id": "0x24BEC"
     },
-    '47:1:9': {
-      category: 'weapons',
-      id: '0x24BED',
+    "47:1:9": {
+      "category": "weapons",
+      "id": "0x24BED"
     },
-    '47:1:10': {
-      category: 'weapons',
-      id: '0x24BEE',
+    "47:1:10": {
+      "category": "weapons",
+      "id": "0x24BEE"
     },
-    '47:4:1': {
-      category: 'weapons',
-      id: '0x24BF9',
+    "47:4:1": {
+      "category": "weapons",
+      "id": "0x24BF9"
     },
-    '47:4:2': {
-      category: 'weapons',
-      id: '0x24BFA',
+    "47:4:2": {
+      "category": "weapons",
+      "id": "0x24BFA"
     },
-    '47:4:3': {
-      category: 'weapons',
-      id: '0x24BFB',
+    "47:4:3": {
+      "category": "weapons",
+      "id": "0x24BFB"
     },
-    '47:4:4': {
-      category: 'weapons',
-      id: '0x24BFC',
+    "47:4:4": {
+      "category": "weapons",
+      "id": "0x24BFC"
     },
-    '47:4:5': {
-      category: 'weapons',
-      id: '0x24BFD',
+    "47:4:5": {
+      "category": "weapons",
+      "id": "0x24BFD"
     },
-    '68:14:0': {
-      category: 'weapons',
-      id: '0x24C48',
+    "68:14:0": {
+      "category": "weapons",
+      "id": "0x24C48"
     },
-    '68:14:1': {
-      category: 'weapons',
-      id: '0x24C49',
+    "68:14:1": {
+      "category": "weapons",
+      "id": "0x24C49"
     },
-    '68:14:2': {
-      category: 'weapons',
-      id: '0x24C4A',
+    "68:14:2": {
+      "category": "weapons",
+      "id": "0x24C4A"
     },
-    '68:14:3': {
-      category: 'weapons',
-      id: '0x24C4B',
+    "68:14:3": {
+      "category": "weapons",
+      "id": "0x24C4B"
     },
-    '68:14:4': {
-      category: 'weapons',
-      id: '0x24C4C',
+    "68:14:4": {
+      "category": "weapons",
+      "id": "0x24C4C"
     },
-    '68:14:5': {
-      category: 'weapons',
-      id: '0x24C4D',
+    "68:14:5": {
+      "category": "weapons",
+      "id": "0x24C4D"
     },
-    '65:14:0': {
-      category: 'weapons',
-      id: '0x24CAC',
+    "65:14:0": {
+      "category": "weapons",
+      "id": "0x24CAC"
     },
-    '65:14:1': {
-      category: 'weapons',
-      id: '0x24CAD',
+    "65:14:1": {
+      "category": "weapons",
+      "id": "0x24CAD"
     },
-    '65:14:2': {
-      category: 'weapons',
-      id: '0x24CAE',
+    "65:14:2": {
+      "category": "weapons",
+      "id": "0x24CAE"
     },
-    '65:14:3': {
-      category: 'weapons',
-      id: '0x24CAF',
+    "65:14:3": {
+      "category": "weapons",
+      "id": "0x24CAF"
     },
-    '65:14:4': {
-      category: 'weapons',
-      id: '0x24CB0',
+    "65:14:4": {
+      "category": "weapons",
+      "id": "0x24CB0"
     },
-    '65:14:5': {
-      category: 'weapons',
-      id: '0x24CB1',
+    "65:14:5": {
+      "category": "weapons",
+      "id": "0x24CB1"
     },
-    '44:1:0': {
-      category: 'weapons',
-      id: '0x24D10',
+    "44:1:0": {
+      "category": "weapons",
+      "id": "0x24D10"
     },
-    '44:1:1': {
-      category: 'weapons',
-      id: '0x24D11',
+    "44:1:1": {
+      "category": "weapons",
+      "id": "0x24D11"
     },
-    '44:1:2': {
-      category: 'weapons',
-      id: '0x24D12',
+    "44:1:2": {
+      "category": "weapons",
+      "id": "0x24D12"
     },
-    '44:1:3': {
-      category: 'weapons',
-      id: '0x24D13',
+    "44:1:3": {
+      "category": "weapons",
+      "id": "0x24D13"
     },
-    '44:1:4': {
-      category: 'weapons',
-      id: '0x24D14',
+    "44:1:4": {
+      "category": "weapons",
+      "id": "0x24D14"
     },
-    '44:1:5': {
-      category: 'weapons',
-      id: '0x24D15',
+    "44:1:5": {
+      "category": "weapons",
+      "id": "0x24D15"
     },
-    '44:1:6': {
-      category: 'weapons',
-      id: '0x24D16',
+    "44:1:6": {
+      "category": "weapons",
+      "id": "0x24D16"
     },
-    '44:1:7': {
-      category: 'weapons',
-      id: '0x24D17',
+    "44:1:7": {
+      "category": "weapons",
+      "id": "0x24D17"
     },
-    '44:1:8': {
-      category: 'weapons',
-      id: '0x24D18',
+    "44:1:8": {
+      "category": "weapons",
+      "id": "0x24D18"
     },
-    '44:1:9': {
-      category: 'weapons',
-      id: '0x24D19',
+    "44:1:9": {
+      "category": "weapons",
+      "id": "0x24D19"
     },
-    '44:1:10': {
-      category: 'weapons',
-      id: '0x24D1A',
+    "44:1:10": {
+      "category": "weapons",
+      "id": "0x24D1A"
     },
-    '44:13:1': {
-      category: 'weapons',
-      id: '0x24D25',
+    "44:13:1": {
+      "category": "weapons",
+      "id": "0x24D25"
     },
-    '44:13:2': {
-      category: 'weapons',
-      id: '0x24D26',
+    "44:13:2": {
+      "category": "weapons",
+      "id": "0x24D26"
     },
-    '44:13:3': {
-      category: 'weapons',
-      id: '0x24D27',
+    "44:13:3": {
+      "category": "weapons",
+      "id": "0x24D27"
     },
-    '44:13:4': {
-      category: 'weapons',
-      id: '0x24D28',
+    "44:13:4": {
+      "category": "weapons",
+      "id": "0x24D28"
     },
-    '44:13:5': {
-      category: 'weapons',
-      id: '0x24D29',
+    "44:13:5": {
+      "category": "weapons",
+      "id": "0x24D29"
     },
-    '43:1:0': {
-      category: 'weapons',
-      id: '0x24D74',
+    "43:1:0": {
+      "category": "weapons",
+      "id": "0x24D74"
     },
-    '43:1:1': {
-      category: 'weapons',
-      id: '0x24D75',
+    "43:1:1": {
+      "category": "weapons",
+      "id": "0x24D75"
     },
-    '43:1:2': {
-      category: 'weapons',
-      id: '0x24D76',
+    "43:1:2": {
+      "category": "weapons",
+      "id": "0x24D76"
     },
-    '43:1:3': {
-      category: 'weapons',
-      id: '0x24D77',
+    "43:1:3": {
+      "category": "weapons",
+      "id": "0x24D77"
     },
-    '43:1:4': {
-      category: 'weapons',
-      id: '0x24D78',
+    "43:1:4": {
+      "category": "weapons",
+      "id": "0x24D78"
     },
-    '43:1:5': {
-      category: 'weapons',
-      id: '0x24D79',
+    "43:1:5": {
+      "category": "weapons",
+      "id": "0x24D79"
     },
-    '43:1:6': {
-      category: 'weapons',
-      id: '0x24D7A',
+    "43:1:6": {
+      "category": "weapons",
+      "id": "0x24D7A"
     },
-    '43:1:7': {
-      category: 'weapons',
-      id: '0x24D7B',
+    "43:1:7": {
+      "category": "weapons",
+      "id": "0x24D7B"
     },
-    '43:1:8': {
-      category: 'weapons',
-      id: '0x24D7C',
+    "43:1:8": {
+      "category": "weapons",
+      "id": "0x24D7C"
     },
-    '43:1:9': {
-      category: 'weapons',
-      id: '0x24D7D',
+    "43:1:9": {
+      "category": "weapons",
+      "id": "0x24D7D"
     },
-    '43:1:10': {
-      category: 'weapons',
-      id: '0x24D7E',
+    "43:1:10": {
+      "category": "weapons",
+      "id": "0x24D7E"
     },
-    '43:13:1': {
-      category: 'weapons',
-      id: '0x24D89',
+    "43:13:1": {
+      "category": "weapons",
+      "id": "0x24D89"
     },
-    '43:13:2': {
-      category: 'weapons',
-      id: '0x24D8A',
+    "43:13:2": {
+      "category": "weapons",
+      "id": "0x24D8A"
     },
-    '43:13:3': {
-      category: 'weapons',
-      id: '0x24D8B',
+    "43:13:3": {
+      "category": "weapons",
+      "id": "0x24D8B"
     },
-    '43:13:4': {
-      category: 'weapons',
-      id: '0x24D8C',
+    "43:13:4": {
+      "category": "weapons",
+      "id": "0x24D8C"
     },
-    '43:13:5': {
-      category: 'weapons',
-      id: '0x24D8D',
+    "43:13:5": {
+      "category": "weapons",
+      "id": "0x24D8D"
     },
-    '75:null:null': {
-      category: 'weapons',
-      id: '0x24DD8',
+    "75:null:null": {
+      "category": "weapons",
+      "id": "0x24DD8"
     },
-    '67:14:0': {
-      category: 'weapons',
-      id: '0x24E3C',
+    "67:14:0": {
+      "category": "weapons",
+      "id": "0x24E3C"
     },
-    '67:14:1': {
-      category: 'weapons',
-      id: '0x24E3D',
+    "67:14:1": {
+      "category": "weapons",
+      "id": "0x24E3D"
     },
-    '67:14:2': {
-      category: 'weapons',
-      id: '0x24E3E',
+    "67:14:2": {
+      "category": "weapons",
+      "id": "0x24E3E"
     },
-    '67:14:3': {
-      category: 'weapons',
-      id: '0x24E3F',
+    "67:14:3": {
+      "category": "weapons",
+      "id": "0x24E3F"
     },
-    '67:14:4': {
-      category: 'weapons',
-      id: '0x24E40',
+    "67:14:4": {
+      "category": "weapons",
+      "id": "0x24E40"
     },
-    '67:14:5': {
-      category: 'weapons',
-      id: '0x24E41',
+    "67:14:5": {
+      "category": "weapons",
+      "id": "0x24E41"
     },
-    '66:14:0': {
-      category: 'weapons',
-      id: '0x24EA0',
+    "66:14:0": {
+      "category": "weapons",
+      "id": "0x24EA0"
     },
-    '66:14:1': {
-      category: 'weapons',
-      id: '0x24EA1',
+    "66:14:1": {
+      "category": "weapons",
+      "id": "0x24EA1"
     },
-    '66:14:2': {
-      category: 'weapons',
-      id: '0x24EA2',
+    "66:14:2": {
+      "category": "weapons",
+      "id": "0x24EA2"
     },
-    '66:14:3': {
-      category: 'weapons',
-      id: '0x24EA3',
+    "66:14:3": {
+      "category": "weapons",
+      "id": "0x24EA3"
     },
-    '66:14:4': {
-      category: 'weapons',
-      id: '0x24EA4',
+    "66:14:4": {
+      "category": "weapons",
+      "id": "0x24EA4"
     },
-    '66:14:5': {
-      category: 'weapons',
-      id: '0x24EA5',
+    "66:14:5": {
+      "category": "weapons",
+      "id": "0x24EA5"
     },
-    '45:1:0': {
-      category: 'weapons',
-      id: '0x24F04',
+    "45:1:0": {
+      "category": "weapons",
+      "id": "0x24F04"
     },
-    '45:1:1': {
-      category: 'weapons',
-      id: '0x24F05',
+    "45:1:1": {
+      "category": "weapons",
+      "id": "0x24F05"
     },
-    '45:1:2': {
-      category: 'weapons',
-      id: '0x24F06',
+    "45:1:2": {
+      "category": "weapons",
+      "id": "0x24F06"
     },
-    '45:1:3': {
-      category: 'weapons',
-      id: '0x24F07',
+    "45:1:3": {
+      "category": "weapons",
+      "id": "0x24F07"
     },
-    '45:1:4': {
-      category: 'weapons',
-      id: '0x24F08',
+    "45:1:4": {
+      "category": "weapons",
+      "id": "0x24F08"
     },
-    '45:1:5': {
-      category: 'weapons',
-      id: '0x24F09',
+    "45:1:5": {
+      "category": "weapons",
+      "id": "0x24F09"
     },
-    '45:1:6': {
-      category: 'weapons',
-      id: '0x24F0A',
+    "45:1:6": {
+      "category": "weapons",
+      "id": "0x24F0A"
     },
-    '45:1:7': {
-      category: 'weapons',
-      id: '0x24F0B',
+    "45:1:7": {
+      "category": "weapons",
+      "id": "0x24F0B"
     },
-    '45:1:8': {
-      category: 'weapons',
-      id: '0x24F0C',
-    },
-    '45:1:9': {
-      category: 'weapons',
-      id: '0x24F0D',
-    },
-    '45:1:10': {
-      category: 'weapons',
-      id: '0x24F0E',
-    },
-    '45:13:1': {
-      category: 'weapons',
-      id: '0x24F19',
-    },
-    '45:13:2': {
-      category: 'weapons',
-      id: '0x24F1A',
-    },
-    '45:13:3': {
-      category: 'weapons',
-      id: '0x24F1B',
-    },
-    '45:13:4': {
-      category: 'weapons',
-      id: '0x24F1C',
-    },
-    '45:13:5': {
-      category: 'weapons',
-      id: '0x24F1D',
-    },
-    '46:1:0': {
-      category: 'weapons',
-      id: '0x24F68',
-    },
-    '46:1:1': {
-      category: 'weapons',
-      id: '0x24F69',
-    },
-    '46:1:2': {
-      category: 'weapons',
-      id: '0x24F6A',
-    },
-    '46:1:3': {
-      category: 'weapons',
-      id: '0x24F6B',
-    },
-    '46:1:4': {
-      category: 'weapons',
-      id: '0x24F6C',
-    },
-    '46:1:5': {
-      category: 'weapons',
-      id: '0x24F6D',
-    },
-    '46:1:6': {
-      category: 'weapons',
-      id: '0x24F6E',
-    },
-    '46:1:7': {
-      category: 'weapons',
-      id: '0x24F6F',
-    },
-    '46:1:8': {
-      category: 'weapons',
-      id: '0x24F70',
-    },
-    '46:1:9': {
-      category: 'weapons',
-      id: '0x24F71',
-    },
-    '46:1:10': {
-      category: 'weapons',
-      id: '0x24F72',
-    },
-    '46:13:1': {
-      category: 'weapons',
-      id: '0x24F7D',
-    },
-    '46:13:2': {
-      category: 'weapons',
-      id: '0x24F7E',
-    },
-    '46:13:3': {
-      category: 'weapons',
-      id: '0x24F7F',
-    },
-    '46:13:4': {
-      category: 'weapons',
-      id: '0x24F80',
-    },
-    '46:13:5': {
-      category: 'weapons',
-      id: '0x24F81',
-    },
-    '76:null:null': {
-      category: 'weapons',
-      id: '0x24FCC',
-    },
-  },
+    "45:1:8": {
+      "category": "weapons",
+      "id": "0x24F0C"
+    },
+    "45:1:9": {
+      "category": "weapons",
+      "id": "0x24F0D"
+    },
+    "45:1:10": {
+      "category": "weapons",
+      "id": "0x24F0E"
+    },
+    "45:13:1": {
+      "category": "weapons",
+      "id": "0x24F19"
+    },
+    "45:13:2": {
+      "category": "weapons",
+      "id": "0x24F1A"
+    },
+    "45:13:3": {
+      "category": "weapons",
+      "id": "0x24F1B"
+    },
+    "45:13:4": {
+      "category": "weapons",
+      "id": "0x24F1C"
+    },
+    "45:13:5": {
+      "category": "weapons",
+      "id": "0x24F1D"
+    },
+    "46:1:0": {
+      "category": "weapons",
+      "id": "0x24F68"
+    },
+    "46:1:1": {
+      "category": "weapons",
+      "id": "0x24F69"
+    },
+    "46:1:2": {
+      "category": "weapons",
+      "id": "0x24F6A"
+    },
+    "46:1:3": {
+      "category": "weapons",
+      "id": "0x24F6B"
+    },
+    "46:1:4": {
+      "category": "weapons",
+      "id": "0x24F6C"
+    },
+    "46:1:5": {
+      "category": "weapons",
+      "id": "0x24F6D"
+    },
+    "46:1:6": {
+      "category": "weapons",
+      "id": "0x24F6E"
+    },
+    "46:1:7": {
+      "category": "weapons",
+      "id": "0x24F6F"
+    },
+    "46:1:8": {
+      "category": "weapons",
+      "id": "0x24F70"
+    },
+    "46:1:9": {
+      "category": "weapons",
+      "id": "0x24F71"
+    },
+    "46:1:10": {
+      "category": "weapons",
+      "id": "0x24F72"
+    },
+    "46:13:1": {
+      "category": "weapons",
+      "id": "0x24F7D"
+    },
+    "46:13:2": {
+      "category": "weapons",
+      "id": "0x24F7E"
+    },
+    "46:13:3": {
+      "category": "weapons",
+      "id": "0x24F7F"
+    },
+    "46:13:4": {
+      "category": "weapons",
+      "id": "0x24F80"
+    },
+    "46:13:5": {
+      "category": "weapons",
+      "id": "0x24F81"
+    },
+    "76:null:null": {
+      "category": "weapons",
+      "id": "0x24FCC"
+    }
+  }
 };

@@ -31,7 +31,7 @@ const OUTPUT_PATH = path.join(DB_DIR, 'idx-upgrade-ref.js');
 // Load weapons data
 // ---------------------------------------------------------------------------
 
-/** @type {{ default: { items: Record<string, any> } }} */
+/** @type {{ default: { items: Record<string, { upgrade_ref?: [number, number | null, number | null] }> } }} */
 const weaponsMod = await import(`file://${WEAPONS_PATH}`);
 const items = weaponsMod.default.items;
 
