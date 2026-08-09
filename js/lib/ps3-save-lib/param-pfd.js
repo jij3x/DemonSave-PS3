@@ -331,9 +331,13 @@ export function parseParamPfd(data, onProgress) {
 
   log('Initializing Param.PFD stream..');
 
-  // Validate minimum buffer size for header + encrypted signature.
-  if (data.length < 96) {
-    throw new Error('PFD data too short (minimum 96 bytes for header + signature)');
+  // Validate minimum buffer size for header + encrypted signature + the three
+  // count fields. The counts (numReserved/numTotal/numUsed) live at offsets
+  // 96/104/112, so 120 bytes are required before the first table read; without
+  // this, a 96–119 byte buffer would reach readU64BE and throw a RangeError
+  // instead of a clean domain error.
+  if (data.length < 120) {
+    throw new Error('PFD data too short (minimum 120 bytes for header + signature + counts)');
   }
 
   // Magic (BE u64)

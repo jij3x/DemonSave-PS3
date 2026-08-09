@@ -17,6 +17,32 @@ import {
 import { assertBounds, assertBelow } from './bounds.js';
 
 /**
+ * Read a big-endian float32 and reject non-finite values (NaN / Infinity).
+ *
+ * Arbitrary bytes can encode a NaN or Infinity bit pattern via IEEE-754. Every
+ * float field in a DeS save (position, hair color, world/character tendency)
+ * is finite in real data, so a non-finite value signals corruption or a
+ * partially-decrypted file. Reject it here, at parse time, so the failure is
+ * loud and early.
+ *
+ * This keeps the read contract symmetric with writer.js's val(), which also
+ * throws on NaN/Infinity: without it, a save with a NaN float could be opened
+ * but never saved back.
+ *
+ * @param {Uint8Array} bytes
+ * @param {number} off
+ * @returns {number} a finite float32
+ * @throws {Error} if the value is NaN or Infinity
+ */
+function rFiniteFloat(bytes, off) {
+  const v = rSingleBE(bytes, off);
+  if (!Number.isFinite(v)) {
+    throw new Error('Unexpected data, file may be encrypted or corrupt?');
+  }
+  return v;
+}
+
+/**
  * Parse the primary USER.DAT into a form model.
  * @param {Uint8Array} bytes
  * @returns {import('./model.js').FullModel} full model with all binary internals
@@ -65,10 +91,10 @@ export function readSave(bytes) {
   if (O.POS_TABLE_BASE + posOffset + 0x18 > bytes.length) {
     throw new Error('Unexpected data, file may be encrypted or corrupt?');
   }
-  m.x = rSingleBE(bytes, O.POS_TABLE_BASE + posOffset);
-  m.y = rSingleBE(bytes, O.POS_TABLE_BASE + posOffset + 4);
-  m.z = rSingleBE(bytes, O.POS_TABLE_BASE + posOffset + 8);
-  m.rot = rSingleBE(bytes, O.POS_TABLE_BASE + posOffset + 0x14);
+  m.x = rFiniteFloat(bytes, O.POS_TABLE_BASE + posOffset);
+  m.y = rFiniteFloat(bytes, O.POS_TABLE_BASE + posOffset + 4);
+  m.z = rFiniteFloat(bytes, O.POS_TABLE_BASE + posOffset + 8);
+  m.rot = rFiniteFloat(bytes, O.POS_TABLE_BASE + posOffset + 0x14);
 
   /* ---- Vitals ---- */
   // Read as unsigned: these fields are semantically unsigned (HP/MP/Stamina
@@ -315,9 +341,9 @@ export function readSave(bytes) {
   /* ---- Spells ---- */
   m.spellSlots = rUInt32BE(bytes, O.SPELL_SLOTS);
   m.miracleSlots = rUInt32BE(bytes, O.MIRACLE_SLOTS);
-  m.hairR = rSingleBE(bytes, O.HAIR_R);
-  m.hairG = rSingleBE(bytes, O.HAIR_G);
-  m.hairB = rSingleBE(bytes, O.HAIR_B);
+  m.hairR = rFiniteFloat(bytes, O.HAIR_R);
+  m.hairG = rFiniteFloat(bytes, O.HAIR_G);
+  m.hairB = rFiniteFloat(bytes, O.HAIR_B);
 
   const spellCount = rUInt32BE(bytes, O.SPELL_COUNT);
   m.spells = [];
@@ -338,13 +364,13 @@ export function readSave(bytes) {
   }
 
   /* ---- Tendency ---- */
-  m.charTendency = rSingleBE(bytes, O.CHAR_TENDENCY);
-  m.nexusTendency = rSingleBE(bytes, O.NEXUS_TENDENCY);
-  m.w1Tendency = rSingleBE(bytes, O.W1_TENDENCY);
-  m.w2Tendency = rSingleBE(bytes, O.W2_TENDENCY);
-  m.w3Tendency = rSingleBE(bytes, O.W3_TENDENCY);
-  m.w4Tendency = rSingleBE(bytes, O.W4_TENDENCY);
-  m.w5Tendency = rSingleBE(bytes, O.W5_TENDENCY);
+  m.charTendency = rFiniteFloat(bytes, O.CHAR_TENDENCY);
+  m.nexusTendency = rFiniteFloat(bytes, O.NEXUS_TENDENCY);
+  m.w1Tendency = rFiniteFloat(bytes, O.W1_TENDENCY);
+  m.w2Tendency = rFiniteFloat(bytes, O.W2_TENDENCY);
+  m.w3Tendency = rFiniteFloat(bytes, O.W3_TENDENCY);
+  m.w4Tendency = rFiniteFloat(bytes, O.W4_TENDENCY);
+  m.w5Tendency = rFiniteFloat(bytes, O.W5_TENDENCY);
 
   /* ---- Misc ---- */
   m.clearCount = bytes[O.CLEAR_COUNT];
