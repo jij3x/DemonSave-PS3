@@ -54,46 +54,48 @@
         'vendor/fflate/esm/browser.js',
       ];
       function audit() {
+        // Dynamic import() actually parses + evaluates each module (and its
+        // sub-imports), so it surfaces syntax/runtime errors that fetch()
+        // cannot. app.js pulls in the whole graph, so importing it alone
+        // would reveal any error anywhere — but we probe each entry to
+        // isolate which one fails.
         Promise.all(
           PROBE.map(function (p) {
-            return fetch(p)
-              .then(function (r) {
-                return (
-                  p +
-                  ' -> HTTP ' +
-                  r.status +
-                  '  [type: ' +
-                  (r.headers.get('content-type') || 'none') +
-                  ']  [len: ' +
-                  (r.headers.get('content-length') || '?') +
-                  ']'
-                );
+            return import(p)
+              .then(function () {
+                return p + ' -> import OK';
               })
               .catch(function (err) {
-                return p + ' -> FETCH ERROR ' + err.message;
+                return p + ' -> import FAILED:\n  ' + ((err && (err.stack || err.message)) || String(err));
               });
           }),
         ).then(function (lines) {
-          box.textContent += '\n\n— embedded-file audit —\n' + lines.join('\n');
+          box.textContent += '\n\n— dynamic import audit (parses + evaluates) —\n' + lines.join('\n');
         });
       }
       window.addEventListener(
         'error',
         function (e) {
-          // Script/module load failure (e.g. 404) — target is the <script> tag.
           var t = e.target;
-          if (t && t.tagName === 'SCRIPT' && t.src) {
-            reveal('module-load', 'Failed to load script/module:\n  ' + t.src);
-            return;
-          }
-          // Eval error — message + source location + stack.
-          var detail = e.message || '(no message)';
-          if (e.filename) detail += '\n  at ' + e.filename + ':' + e.lineno + ':' + e.colno;
-          if (e.error && e.error.stack) detail += '\n\n' + e.error.stack;
-          reveal('error', detail);
+          var parts = [];
+          if (t && t.tagName === 'SCRIPT' && t.src) parts.push('while loading <script> ' + t.src);
+          if (e.message) parts.push(e.message);
+          if (e.filename) parts.push('  at ' + e.filename + ':' + e.lineno + ':' + e.colno);
+          if (e.error && e.error.stack) parts.push('\n' + e.error.stack);
+          reveal('error', parts.join('\n') || '(no detail — likely a 404/CORS on the module)');
         },
         true,
       );
+      // Traditional handler — sometimes captures module parse/eval errors
+      // with a clearer message than the 'error' event.
+      window.onerror = function (msg, src, line, col, err) {
+        reveal(
+          'onerror',
+          (msg || '(no msg)') +
+            (src ? '\n  at ' + src + ':' + line + ':' + col : '') +
+            (err && err.stack ? '\n\n' + err.stack : ''),
+        );
+      };
       window.addEventListener('unhandledrejection', function (e) {
         var r = e.reason;
         reveal('unhandledrejection', (r && (r.stack || r.message)) || String(r));
