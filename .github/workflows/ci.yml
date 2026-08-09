@@ -92,5 +92,41 @@ jobs:
       - name: Run integration tests
         run: npm run test:integration
 
+      - name: Generate fuzz corpus
+        run: npm run fuzz:corpus
+
+      - name: Fuzz smoke — readSave
+        run: npm run fuzz:readsave:smoke
+
+      - name: Fuzz smoke — PFD parser
+        run: npm run fuzz:pfd:smoke
+
+      - name: Fuzz smoke — SFO parser
+        run: npm run fuzz:sfo:smoke
+
+      - name: Fuzz smoke — read/write round-trip
+        run: npm run fuzz:roundtrip:smoke
+
+      - name: Fuzz smoke — openSave pipeline
+        run: npm run fuzz:pipeline:smoke
+
+      - name: Fuzz smoke — encrypted export pipeline
+        run: npm run fuzz:encexport:smoke
+
+      - name: Fuzz smoke — crypto round-trip
+        run: npm run fuzz:crypto:smoke
+
+      - name: Fuzz smoke — PFD create
+        run: npm run fuzz:pfdcreate:smoke
+
+      - name: Fuzz smoke — PFD serialize
+        run: npm run fuzz:pfdserialize:smoke
+
+      - name: Fuzz smoke — save-folder API
+        run: npm run fuzz:savefolder:smoke
+
+      - name: Fuzz smoke — SFO fields
+        run: npm run fuzz:sfofields:smoke
+
       - name: Coverage gate
         run: npm run test:coverage

@@ -20,9 +20,9 @@ import {
   createSecondaryFile,
   getExpectedModel,
   BUF_SIZE,
-} from './helpers/save-factory.js';
-import { createTmpSandbox } from './helpers/tmp-sandbox.js';
-import { assertModelsMatch } from './helpers/model-diff.js';
+} from '../test-fixtures/save-factory.js';
+import { createTmpSandbox } from './tmp-sandbox.js';
+import { assertModelsMatch } from '../test-fixtures/model-diff.js';
 
 describe('round-trip: realistic folder (full rotational variants)', () => {
   /** @type {ReturnType<typeof createTmpSandbox>[]} */

@@ -9,7 +9,7 @@
  * writer) so tests can verify the reader + writer + save-api pipeline
  * without circular dependencies.
  */
-import * as O from '../../js/des-savefile/offsets.js';
+import * as O from '../js/des-savefile/offsets.js';
 import {
   wInt32BE,
   wUInt16BE,
@@ -20,7 +20,7 @@ import {
   getParamPfdCombinedData,
   validAllParamHashes,
   encryptFile,
-} from '../../js/lib/ps3-save-lib/index.js';
+} from '../js/lib/ps3-save-lib/index.js';
 
 /** Buffer size matching real DeS save files (262,144 bytes = 256 KB). */
 export const BUF_SIZE = 0x40000;
@@ -599,6 +599,109 @@ export function createRealisticSfo(profileNumber, accountIdHex) {
   // Profile number at hardcoded game-specific offset
   sfo[0x570] = profileNumber & 0xff;
 
+  return sfo;
+}
+
+/**
+ * Build a rich PARAM.SFO carrying every entry the field accessors look up:
+ * TITLE, SUB_TITLE, DETAIL, SAVEDATA_DIRECTORY, ACCOUNT_ID, ATTRIBUTE.
+ *
+ * Used by the `sfofields` fuzz corpus so the parsed-sfo getters
+ * (`getTitle`/`getSubTitle`/`getDetail`/`getDirectoryName`/`getTitleId`/
+ * `getAccountId`) exercise their *found* branch, and so the raw-byte
+ * mutators (`removeCopyProtection`, `getSfoAccountId`, `writeSfoAccountId`)
+ * have real targets to act on.
+ *
+ * @param {number} profileNumber  byte value at offset 0x570
+ * @param {string} [accountIdHex]  32-char hex string for ACCOUNT_ID
+ * @returns {Uint8Array}
+ */
+export function createRichSfo(profileNumber, accountIdHex) {
+  const FMT_UTF8_S = 0x0400;
+  const FMT_INT32 = 0x0404;
+
+  // value === null marks a raw-bytes entry (ACCOUNT_ID); number marks INT32.
+  const entries = [
+    { key: 'TITLE', str: "Demon's Souls", fmt: FMT_UTF8_S, maxLen: 32 },
+    { key: 'SUB_TITLE', str: 'Action RPG', fmt: FMT_UTF8_S, maxLen: 32 },
+    { key: 'DETAIL', str: 'Save data', fmt: FMT_UTF8_S, maxLen: 32 },
+    { key: 'SAVEDATA_DIRECTORY', str: 'BLUS30443DEMONSS005', fmt: FMT_UTF8_S, maxLen: 32 },
+    { key: 'ACCOUNT_ID', str: null, fmt: FMT_UTF8_S, maxLen: 16 },
+    { key: 'ATTRIBUTE', int: 1, fmt: FMT_INT32, maxLen: 4 },
+  ];
+
+  const HEADER = 20;
+  const INDEX_SIZE = entries.length * 16;
+  const keyTableStart = HEADER + INDEX_SIZE;
+
+  // Key offsets (relative to keyTableStart) + total key-table length.
+  let keyCursor = 0;
+  for (const e of entries) {
+    e.keyOff = keyCursor;
+    keyCursor += e.key.length + 1; // +null terminator
+  }
+  const dataTableStart = keyTableStart + keyCursor;
+
+  // Data offsets (relative to dataTableStart) + total data-table length.
+  let dataCursor = 0;
+  for (const e of entries) {
+    e.dataOff = dataCursor;
+    dataCursor += e.maxLen;
+  }
+
+  const size = Math.max(dataTableStart + dataCursor, 0x600);
+  const sfo = new Uint8Array(size);
+  const dv = new DataView(sfo.buffer);
+
+  // Header: "\0PSF", version 1.1, table offsets, entry count (all LE).
+  sfo[0] = 0x00;
+  sfo[1] = 0x50;
+  sfo[2] = 0x53;
+  sfo[3] = 0x46;
+  dv.setUint32(4, 0x00000101, true);
+  dv.setUint32(8, keyTableStart, true);
+  dv.setUint32(12, dataTableStart, true);
+  dv.setUint32(16, entries.length, true);
+
+  // Index entries (data_fmt is stored big-endian on disk; the rest LE).
+  for (let i = 0; i < entries.length; i++) {
+    const e = entries[i];
+    const off = HEADER + i * 16;
+    const dataLen = e.fmt === FMT_INT32 ? 4 : e.str === null ? 16 : e.str.length;
+    dv.setUint16(off, e.keyOff, true);
+    dv.setUint16(off + 2, e.fmt, false);
+    dv.setUint32(off + 4, dataLen, true);
+    dv.setUint32(off + 8, e.maxLen, true);
+    dv.setUint32(off + 12, e.dataOff, true);
+  }
+
+  // Key table.
+  for (const e of entries) {
+    for (let j = 0; j < e.key.length; j++) {
+      sfo[keyTableStart + e.keyOff + j] = e.key.charCodeAt(j);
+    }
+    // null terminator already zero
+  }
+
+  // Data table.
+  for (const e of entries) {
+    const doff = dataTableStart + e.dataOff;
+    if (e.key === 'ACCOUNT_ID') {
+      if (accountIdHex) {
+        const clean = accountIdHex.replace(/[^0-9a-fA-F]/g, '').padEnd(32, '0');
+        sfo.set(fromHex(clean), doff);
+      }
+    } else if (e.fmt === FMT_INT32) {
+      dv.setUint32(doff, e.int, true);
+    } else {
+      for (let j = 0; j < e.str.length; j++) {
+        sfo[doff + j] = e.str.charCodeAt(j) & 0xff;
+      }
+    }
+  }
+
+  // Profile number at the game-specific offset.
+  sfo[0x570] = profileNumber & 0xff;
   return sfo;
 }
 
