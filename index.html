@@ -19,6 +19,61 @@
 </head>
 <body>
   <div id="app"></div>
+  <script>
+    // TEMP DIAGNOSTIC (remove once the Windows boot issue is resolved):
+    // Release Tauri builds have no devtools, so a frontend load/eval failure
+    // otherwise shows a blank window. This surfaces the real error on-screen.
+    (function () {
+      var box = document.createElement('div');
+      box.style.cssText =
+        'position:fixed;inset:0;margin:0;padding:24px;overflow:auto;' +
+        'font:13px/1.5 ui-monospace,Consolas,Menlo,monospace;white-space:pre-wrap;' +
+        'background:#1b0606;color:#ff9b9b;z-index:2147483647;display:none;';
+      document.body.appendChild(box);
+      function reveal(kind, text) {
+        console.error('[boot]', kind, text);
+        box.textContent =
+          'Frontend failed to start [' + kind + ']\n\n' + text +
+          '\n\n(window.__TAURI__=' + typeof window.__TAURI__ +
+          ', window.isTauri=' + typeof window.isTauri + ')';
+        box.style.display = 'block';
+      }
+      window.addEventListener(
+        'error',
+        function (e) {
+          // Script/module load failure (e.g. 404) — target is the <script> tag.
+          var t = e.target;
+          if (t && t.tagName === 'SCRIPT' && t.src) {
+            reveal('module-load', 'Failed to load script/module:\n  ' + t.src);
+            return;
+          }
+          // Eval error — message + source location + stack.
+          var detail = e.message || '(no message)';
+          if (e.filename) detail += '\n  at ' + e.filename + ':' + e.lineno + ':' + e.colno;
+          if (e.error && e.error.stack) detail += '\n\n' + e.error.stack;
+          reveal('error', detail);
+        },
+        true,
+      );
+      window.addEventListener('unhandledrejection', function (e) {
+        var r = e.reason;
+        reveal('unhandledrejection', (r && (r.stack || r.message)) || String(r));
+      });
+      setTimeout(function () {
+        if (
+          !document.getElementById('app').children.length &&
+          box.style.display === 'none'
+        ) {
+          reveal(
+            'timeout',
+            'No error fired but #app is still empty after 6s — likely a module ' +
+              'failed to load (404). Run `npm run tauri:dev` and check the console ' +
+              '/ Network tab to see which file.',
+          );
+        }
+      }, 6000);
+    })();
+  </script>
   <script type="module" src="js/ui/app.js"></script>
 </body>
 </html>
