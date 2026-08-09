@@ -125,6 +125,9 @@ jobs:
       - name: Fuzz smoke — save-folder API
         run: npm run fuzz:savefolder:smoke
 
+      - name: Fuzz smoke — save-api folder orchestration
+        run: npm run fuzz:saveapi:smoke
+
       - name: Fuzz smoke — SFO fields
         run: npm run fuzz:sfofields:smoke
 

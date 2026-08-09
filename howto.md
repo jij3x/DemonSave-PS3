@@ -480,7 +480,7 @@ Findings (crash / timeout / OOM) are written to `fuzz/crashes/`. To triage one:
 3. Fix the underlying missing guard, then add a minimal reconstruction to the
    matching `tests/fuzz/regression-*.test.js` so it can never regress.
 
-> CI runs `fuzz:corpus` then all eleven `fuzz:<t>:smoke` steps on every push.
+> CI runs `fuzz:corpus` then all twelve `fuzz:<t>:smoke` steps on every push.
 > The round-trip target checks **writer idempotency** (a fixed point) rather
 > than read-vs-first-write equality, which makes it immune to the writer's
 > intentional first-write normalizations (deposit `flags[0]`/`sortOrder`/
