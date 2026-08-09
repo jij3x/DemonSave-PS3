@@ -37,6 +37,36 @@
           '\n\n(window.__TAURI__=' + typeof window.__TAURI__ +
           ', window.isTauri=' + typeof window.isTauri + ')';
         box.style.display = 'block';
+        audit();
+      }
+      // Probe key files in the import graph and report which are served by the
+      // embedded frontend. The top-level <script> error blames app.js even when
+      // a deeper import (e.g. version.js) is the real 404 — this finds it.
+      var PROBE = [
+        'js/ui/app.js',
+        'js/version.js',
+        'js/ui/dom.js',
+        'js/ui/io.js',
+        'js/lib/tauri-bridge.js',
+        'js/des-savefile/save-api.js',
+        'css/styles.css',
+        'vendor/@noble/ciphers/aes.js',
+        'vendor/fflate/esm/browser.js',
+      ];
+      function audit() {
+        Promise.all(
+          PROBE.map(function (p) {
+            return fetch(p)
+              .then(function (r) {
+                return p + ' -> HTTP ' + r.status;
+              })
+              .catch(function (err) {
+                return p + ' -> FETCH ERROR ' + err.message;
+              });
+          }),
+        ).then(function (lines) {
+          box.textContent += '\n\n— embedded-file audit —\n' + lines.join('\n');
+        });
       }
       window.addEventListener(
         'error',
