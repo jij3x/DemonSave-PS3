@@ -72,7 +72,10 @@ const allTargets = Object.keys(TARGETS);
 let targets = allTargets;
 const targetsArg = val('--targets');
 if (targetsArg) {
-  const req = targetsArg.split(',').map((s) => s.trim()).filter(Boolean);
+  const req = targetsArg
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
   const bad = req.filter((t) => !allTargets.includes(t));
   if (bad.length) {
     console.error(`Unknown target(s): ${bad.join(', ')}`);
@@ -102,10 +105,8 @@ const noCorpus = flag('--no-corpus');
 /* Color (TTY only)                                                    */
 /* ------------------------------------------------------------------ */
 const useColor = process.stdout.isTTY && !process.env.NO_COLOR;
-const wrap =
-  (/** @type {string} */ code) =>
-  (/** @type {string} */ s) =>
-    useColor ? `\x1b[${code}m${s}\x1b[0m` : s;
+const wrap = (/** @type {string} */ code) => (/** @type {string} */ s) =>
+  useColor ? `\x1b[${code}m${s}\x1b[0m` : s;
 const green = wrap('32');
 const red = wrap('31');
 const dim = wrap('2');
@@ -200,14 +201,17 @@ function runOne(target, streamLive) {
 
     // Safety net: jazzer self-terminates at max_total_time=60; kill a child that
     // somehow outlives 2x that + grace so one stuck target can't hang the run.
-    const timer = setTimeout(() => {
-      try {
-        child.kill('SIGKILL');
-      } catch {
-        /* already gone */
-      }
-      finish(false, null, `outer timeout (>${SMOKE_TOTAL_TIME * 2 + 30}s)`);
-    }, (SMOKE_TOTAL_TIME * 2 + 30) * 1000);
+    const timer = setTimeout(
+      () => {
+        try {
+          child.kill('SIGKILL');
+        } catch {
+          /* already gone */
+        }
+        finish(false, null, `outer timeout (>${SMOKE_TOTAL_TIME * 2 + 30}s)`);
+      },
+      (SMOKE_TOTAL_TIME * 2 + 30) * 1000,
+    );
 
     child.on('error', (err) => finish(false, null, `spawn error: ${err.message}`));
     child.on('exit', (code, sig) => {
