@@ -253,9 +253,11 @@ The reader also performs early **encrypted/corrupt data detection**: if `invCoun
 +0x04  ItemID    UInt32  game item ID
 +0x08  Count     UInt32  stack count
 +0x0C  Idx1      UInt32  durability table key + hotbar pointer reference (validated as U16)
-+0x10  Misc1     UInt16  "sortId" — inventory menu grouping/ordering
++0x10  Misc1     UInt16  "sortId" — encodes class (sort group) + class_idx (position); class_idx is a shared sort position, not unique (see knowledge/des_save_mechanism.md §5)
 +0x12  Idx2      UInt16  display/sort order index
 +0x14  Misc2     UInt32  unknown (preserved verbatim, usually 0x01000000)
++0x18  pad1      UInt32  reserved (0x00000000 in real saves; untouched by editor)
++0x1C  pad2      UInt32  reserved (0x00000000 in real saves; untouched by editor)
 ```
 
 Durability is stored in a **parallel table** at `0x10364 + Idx1 * 8`, not within the record.
