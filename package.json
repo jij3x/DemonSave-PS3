@@ -27,6 +27,7 @@
     "serve:dev": "node tools/serve-dev.mjs",
     "build:frontend": "node tools/build-frontend.mjs",
     "fuzz:corpus": "node tools/gen-fuzz-corpus.mjs",
+    "fuzz:smoke": "node tools/fuzz-smoke-all.mjs",
     "fuzz:readsave": "node tools/fuzz.mjs readsave",
     "fuzz:readsave:smoke": "node tools/fuzz.mjs readsave --smoke",
     "fuzz:pfd": "node tools/fuzz.mjs pfd",

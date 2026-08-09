@@ -45,7 +45,7 @@ const REPO_ROOT = path.resolve(__dirname, '..');
  */
 
 /** @type {Record<string, FuzzTarget>} */
-const TARGETS = {
+export const TARGETS = {
   readsave: { sync: true, maxLen: 262144, timeout: 10 },
   pfd: { sync: true, maxLen: 65536, timeout: 10 },
   sfo: { sync: true, maxLen: 8192, timeout: 10 },
@@ -61,62 +61,76 @@ const TARGETS = {
 };
 
 /** Smoke runs are bounded to 60s (CI mode). */
-const SMOKE_TOTAL_TIME = 60;
-
-const argv = process.argv.slice(2);
-const target = argv.find((a) => !a.startsWith('-'));
-const smoke = argv.includes('--smoke');
-const dryRun = argv.includes('--dry-run');
-
-if (!target) {
-  console.error('Usage: node tools/fuzz.mjs <target> [--smoke] [--dry-run]');
-  console.error(`Targets: ${Object.keys(TARGETS).join(', ')}`);
-  process.exit(2);
-}
-
-/** @type {FuzzTarget | undefined} */
-const cfg = TARGETS[target];
-if (!cfg) {
-  console.error(`Unknown fuzz target: ${target}`);
-  console.error(`Available: ${Object.keys(TARGETS).join(', ')}`);
-  process.exit(2);
-}
+export const SMOKE_TOTAL_TIME = 60;
 
 /**
- * Build the jazzer argv. libFuzzer is order-insensitive, so flag grouping only
- * needs to read clearly; artifact_prefix is emitted last to mirror the former
- * scripts.
+ * Build the jazzer argv for a target. libFuzzer is order-insensitive, so flag
+ * grouping only needs to read clearly; artifact_prefix is emitted last.
+ *
+ * Exported (and parameterized) so other tooling — e.g. tools/fuzz-smoke-all.mjs
+ * — can resolve a target's argv without re-running this file's CLI.
+ *
+ * @param {string} target
+ * @param {FuzzTarget} cfg
+ * @param {boolean} smoke
+ * @param {string} [artifactPrefix]  libFuzzer `-artifact_prefix` (default `fuzz/crashes/`)
  * @returns {string[]}
  */
-function buildArgs() {
+export function buildFuzzArgs(target, cfg, smoke, artifactPrefix = 'fuzz/crashes/') {
   const args = [`fuzz/${target}.fuzz.js`, `fuzz/corpus/${target}`];
   if (cfg.sync) args.push('--sync');
   args.push('--', `-max_len=${cfg.maxLen}`, `-timeout=${cfg.timeout}`);
   if (smoke) args.push(`-max_total_time=${SMOKE_TOTAL_TIME}`);
-  args.push('-artifact_prefix=fuzz/crashes/');
+  args.push(`-artifact_prefix=${artifactPrefix}`);
   return args;
 }
 
-const args = buildArgs();
+// CLI entry point — only when run directly (`node tools/fuzz.mjs …`), NOT when
+// imported. tools/fuzz-smoke-all.mjs imports TARGETS/buildFuzzArgs above.
+const isMain = !!process.argv[1] && path.resolve(process.argv[1]) === __filename;
 
-if (dryRun) {
-  process.stdout.write(`jazzer ${args.join(' ')}\n`);
-  process.exit(0);
+if (isMain) {
+  const argv = process.argv.slice(2);
+  const target = argv.find((a) => !a.startsWith('-'));
+  const smoke = argv.includes('--smoke');
+  const dryRun = argv.includes('--dry-run');
+
+  if (!target) {
+    console.error('Usage: node tools/fuzz.mjs <target> [--smoke] [--dry-run]');
+    console.error(`Targets: ${Object.keys(TARGETS).join(', ')}`);
+    process.exit(2);
+  }
+
+  /** @type {FuzzTarget | undefined} */
+  const cfg = TARGETS[target];
+  if (!cfg) {
+    console.error(`Unknown fuzz target: ${target}`);
+    console.error(`Available: ${Object.keys(TARGETS).join(', ')}`);
+    process.exit(2);
+  }
+
+  const artifactPrefix = process.env.FUZZ_ARTIFACT_PREFIX || 'fuzz/crashes/';
+  const args = buildFuzzArgs(target, cfg, smoke, artifactPrefix);
+
+  if (dryRun) {
+    process.stdout.write(`jazzer ${args.join(' ')}\n`);
+    process.exit(0);
+  }
+
+  // Resolve `jazzer` from node_modules/.bin (prepended to PATH) so the wrapper
+  // works under `npm run` and when invoked directly. `shell:true` on Windows
+  // lets the `jazzer.cmd` shim resolve. Set both `PATH` and `Path` so the
+  // augmented value is authoritative on Windows (whose env var is cased `Path`).
+  const binDir = path.join(REPO_ROOT, 'node_modules', '.bin');
+  const augmentedPath = `${binDir}${path.delimiter}${process.env.PATH || ''}`;
+  const child = spawn('jazzer', args, {
+    stdio: 'inherit',
+    shell: process.platform === 'win32',
+    env: { ...process.env, PATH: augmentedPath, Path: augmentedPath },
+  });
+  child.on('error', (err) => {
+    console.error('Failed to spawn jazzer:', err.message);
+    process.exit(1);
+  });
+  child.on('exit', (code) => process.exit(code ?? 1));
 }
-
-// Resolve `jazzer` from node_modules/.bin (prepended to PATH) so the wrapper
-// works under `npm run` and when invoked directly. `shell:true` on Windows lets
-// the `jazzer.cmd` shim resolve. Set both `PATH` and `Path` so the augmented
-// value is authoritative on Windows (whose env var is cased `Path`).
-const binDir = path.join(REPO_ROOT, 'node_modules', '.bin');
-const augmentedPath = `${binDir}${path.delimiter}${process.env.PATH || ''}`;
-const child = spawn('jazzer', args, {
-  stdio: 'inherit',
-  shell: process.platform === 'win32',
-  env: { ...process.env, PATH: augmentedPath, Path: augmentedPath },
-});
-child.on('error', (err) => {
-  console.error('Failed to spawn jazzer:', err.message);
-  process.exit(1);
-});
-child.on('exit', (code) => process.exit(code ?? 1));
