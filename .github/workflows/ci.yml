@@ -1,8 +1,23 @@
 # Continuous Integration — runs on every push to main/master and every PR.
 #
 # This workflow owns all quality gates (lint, format, unit + integration tests,
-# Rust tests, coverage). It is the source of the `test` status check that branch
-# protection requires before a pull request can be merged.
+# Rust tests, fuzz smokes, coverage). Gates are split into PARALLEL jobs so the
+# JS checks never pay the Rust/webkit toolchain tax and the 12 fuzz smokes run
+# concurrently rather than serially blocking the rest:
+#   js   — lint, format, unit + integration tests, coverage
+#          (pure Node; no Rust, no apt system deps)
+#   rust — cargo test (needs Rust + the webkit/system dev libs; no npm)
+#   fuzz — one matrix runner per fuzz target (12 parallel), each running its
+#          60s smoke; extracted from js so it can't block lint/test/coverage
+#
+# Heavy installs/compiles are cached so warm runs are fast:
+#   - npm deps              → setup-node cache (root + rpcs3-mcp-server lockfiles)
+#   - webkit/system apt libs → awalsh128/cache-apt-pkgs-action
+#   - cargo registry/target → Swatinem/rust-cache (the big win: skips the full
+#                             Tauri dependency recompile)
+# The Rust toolchain is intentionally NOT cached: a static-key ~/.rustup cache
+# would freeze `stable` (restore runs before the toolchain install), and the
+# ~1m download is small next to the cached compile.
 #
 # The cross-platform build/release pipeline lives in release.yml and is
 # intentionally NOT triggered on pull requests (it's expensive and already
@@ -29,7 +44,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  # ──────────────────────────────────────────────────────────────────
+  # JS gates — lint, format, unit + integration tests, fuzz, coverage.
+  # Pure Node: no Rust toolchain, no webkit/system apt deps.
+  # ──────────────────────────────────────────────────────────────────
+  js:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
@@ -40,32 +59,15 @@ jobs:
         with:
           node-version: 24
           cache: npm
-
-      - name: Install Rust (stable)
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install Linux system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            build-essential \
-            curl \
-            wget \
-            file \
-            libxdo-dev \
-            libssl-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev
+          # Key the npm cache on BOTH lockfiles so a change to either busts it.
+          cache-dependency-path: |
+            package-lock.json
+            rpcs3-mcp-server/package-lock.json
 
       - name: Install npm dependencies
         run: npm ci || npm install
 
       - name: Install rpcs3-mcp-server dependencies
-        # rpcs3-mcp-server is a self-contained, portable package with its own
-        # lockfile and its own eslint/prettier/tsc tooling. Its deps
-        # (@modelcontextprotocol/sdk, zod, @types/node) must be present for the
-        # server's own `npm run lint` (tsc) to resolve them.
         working-directory: rpcs3-mcp-server
         run: npm ci || npm install
 
@@ -86,50 +88,89 @@ jobs:
       - name: Run unit tests
         run: npm test
 
+      - name: Run integration tests
+        run: npm run test:integration
+
+      - name: Coverage gate
+        run: npm run test:coverage
+
+  # ──────────────────────────────────────────────────────────────────
+  # Rust gates — cargo test. Needs Rust + the webkit/system dev libs;
+  # no npm/frontend (tauri_build tolerates the missing dist/ dir).
+  # ──────────────────────────────────────────────────────────────────
+  rust:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Linux system dependencies
+        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
+        with:
+          packages: |
+            libwebkit2gtk-4.1-dev
+            build-essential
+            curl
+            wget
+            file
+            libxdo-dev
+            libssl-dev
+            libayatana-appindicator3-dev
+            librsvg2-dev
+          version: 1.0
+          execute_install_scripts: true
+
+      - name: Cache cargo registry + target
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          workspaces: src-tauri
+
       - name: Run Rust unit tests
         run: cargo test --manifest-path src-tauri/Cargo.toml
 
-      - name: Run integration tests
-        run: npm run test:integration
+  # ──────────────────────────────────────────────────────────────────
+  # Fuzz gates — one parallel runner per target (matrix). Extracted from
+  # the js job so the 12 smoke steps run concurrently (~2.5 min wall) and
+  # no longer block lint/test/coverage. fail-fast is off so a crash in one
+  # target still lets the others finish for triage.
+  # ──────────────────────────────────────────────────────────────────
+  fuzz:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - readsave
+          - pfd
+          - sfo
+          - roundtrip
+          - pipeline
+          - encexport
+          - saveapi
+          - crypto
+          - pfdcreate
+          - pfdserialize
+          - savefolder
+          - sfofields
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install npm dependencies
+        run: npm ci || npm install
 
       - name: Generate fuzz corpus
         run: npm run fuzz:corpus
 
-      - name: Fuzz smoke — readSave
-        run: npm run fuzz:readsave:smoke
-
-      - name: Fuzz smoke — PFD parser
-        run: npm run fuzz:pfd:smoke
-
-      - name: Fuzz smoke — SFO parser
-        run: npm run fuzz:sfo:smoke
-
-      - name: Fuzz smoke — read/write round-trip
-        run: npm run fuzz:roundtrip:smoke
-
-      - name: Fuzz smoke — openSave pipeline
-        run: npm run fuzz:pipeline:smoke
-
-      - name: Fuzz smoke — encrypted export pipeline
-        run: npm run fuzz:encexport:smoke
-
-      - name: Fuzz smoke — crypto round-trip
-        run: npm run fuzz:crypto:smoke
-
-      - name: Fuzz smoke — PFD create
-        run: npm run fuzz:pfdcreate:smoke
-
-      - name: Fuzz smoke — PFD serialize
-        run: npm run fuzz:pfdserialize:smoke
-
-      - name: Fuzz smoke — save-folder API
-        run: npm run fuzz:savefolder:smoke
-
-      - name: Fuzz smoke — save-api folder orchestration
-        run: npm run fuzz:saveapi:smoke
-
-      - name: Fuzz smoke — SFO fields
-        run: npm run fuzz:sfofields:smoke
-
-      - name: Coverage gate
-        run: npm run test:coverage
+      - name: Fuzz smoke — ${{ matrix.target }}
+        run: npm run fuzz:${{ matrix.target }}:smoke

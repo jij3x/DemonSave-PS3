@@ -464,6 +464,7 @@ Commands (each has a `:smoke` variant bounded to 60s for CI):
 npm run fuzz:corpus          # (re)generate all seed corpora in fuzz/corpus/
 npm run fuzz:readsave        # open-ended run of one target (local)
 npm run fuzz:readsave:smoke  # bounded 60s run (CI mode — a finding fails CI)
+npm run fuzz:smoke           # run ALL 12 smokes concurrently, CPU-bound (~one smoke's wall time); per-target logs in fuzz/logs/
 npm run fuzz:cov             # replay all corpora under c8 → per-file coverage (js/ logic only; scope configured in .c8rc.json, excl. js/ui, des-db, tauri-bridge, version)
 ```
 

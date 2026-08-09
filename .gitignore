@@ -26,6 +26,7 @@ coverage/
 fuzz/corpus/
 fuzz/crashes/*
 !fuzz/crashes/.gitkeep
+fuzz/logs/
 crash-*
 timeout-*
 oom-*
