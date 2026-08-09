@@ -186,10 +186,16 @@ export const ACTIVE_QUICK_SLOT = 0x1035c;
  *   "sortId" — controls how the item is grouped and ordered in the in-game
  *   inventory menu.  It is NOT a random flag.  Patterns observed:
  *
- *     Weapons:  hi-byte = weapon class, lo-byte = item within class.
- *       0x00 bare/unarmed · 0x05 projectiles (arrows/bolts) ·
- *       0x0f curved swords · 0x10 straight swords · 0x36 bows ·
- *       0x3a talismans · 0x3f shields.
+ *     Weapons:  hi-byte = sort CLASS, lo-byte = CLASS_IDX (sort position).
+ *       class_idx is NOT a unique item id — it is a shared menu sort position:
+ *       a weapon and its upgrades share it, and the same class_idx recurs
+ *       across different classes. (category, class, class_idx) maps to a
+ *       display slot, not a unique item. See knowledge/des_save_mechanism.md
+ *       §5 for the full per-category decoding and the observed weapon-class
+ *       table.
+ *       Class examples: 0x00 bare/unarmed · 0x05 projectiles (arrows/bolts) ·
+ *       0x0f/0x10 curved swords · 0x36/0x37 bows · 0x3a crossbows/catalysts/
+ *       talismans · 0x3f parry shields · 0x42 bash shields.
  *       e.g. Arrow=0x0516, Heavy Arrow=0x0517, Kilij=0x1005,
  *       Heater Shield=0x3f17, Crescent Falchion+4=0x0ffc.
  *
@@ -226,9 +232,13 @@ export const ACTIVE_QUICK_SLOT = 0x1035c;
  *   consistently 0x01000000 for every row; its bit layout is unknown.
  *   Editing it blindly risks desync; leave as-is.
  *
- * Durability (parallel table):
- *   Current condition for weapons/armor.  Stored at 0x10364 + Idx1*8, so it
- *   is read/written via Idx1.
+ *   Durability (parallel table):
+ *     Current condition for weapons/armor.  Stored at 0x10364 + Idx1*8, so it
+ *     is read/written via Idx1.
+ *
+ *   Reserved (+0x18, +0x1C):  UInt32 each, undocumented.  Observed 0x00000000
+ *     across all records of a real BLUS30443 save.  The editor leaves them
+ *     untouched (newly-claimed slots inherit the 0xFF empty-slot template).
  */
 
 /* ---- Spells / miracles ---- */

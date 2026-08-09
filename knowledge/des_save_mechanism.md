@@ -34,6 +34,8 @@ Offset  Size  Field      Description
 +0x1C   4     pad2       Untouched by the editor (observed 0 in original saves; remains 0xFF in newly claimed slots)
 ```
 
+> The trailing 8 bytes (`+0x18`/`+0x1C`, `pad1`/`pad2`) were confirmed `0x00000000` across **all 184** records of a real BLUS30443 save. The editor leaves them untouched (newly-claimed slots inherit the `0xFF` empty-slot template).
+
 ### 2.2 Key Offsets
 
 | Constant | Offset | Notes |
@@ -387,18 +389,89 @@ The UI enforces `DEPOSIT_MAX_ENTRIES` (2048). When the limit is reached, adding 
 
 ## 5. sortId (misc1) Reference
 
-The `sortId` field controls in-game inventory menu grouping. Key patterns:
+`misc1` (record `+0x10`, UInt16 BE) is the in-game inventory **sort key**. It
+encodes a **`class`** (menu sort group) and a **`class_idx`** (position within
+that group). The encoding is category-specific — there is no single byte split
+that works for all four categories:
 
-| Category | Pattern | Examples |
-|----------|---------|---------|
-| Weapons | hi-byte = class, lo-byte = item | 0x3F17=Heater Shield, 0x0FFC=Crescent Falchion+4, 0x1005=Kilij |
-| Armor | ≈ slotType×1000 + row | 0x000C=head, 0x03F4=chest, 0x07DC=arms, 0x0BC4=legs |
-| Rings | sequential index | 0x01=Ring of Great Strength, 0x13=Cling Ring, 0x16=Thief's Ring |
-| Goods | family/type tier | 0x01=basic grass, 0x65=souls, 0xC9=demon's souls |
+| Category | `class` (sort group) | `class_idx` (position) | Decode |
+|----------|----------------------|------------------------|--------|
+| Weapons | `misc1 >> 8` | `misc1 & 0xFF` | hi/lo byte split |
+| Armor | `floor(misc1 / 1000)` (0=head, 1=chest, 2=arms, 3=legs) | `misc1 % 1000` | decimal `slotType*1000 + row` |
+| Rings | `0` (single group) | `misc1` | sequential ring index |
+| Goods | `misc1 >> 8` (0 or 1) | `misc1 & 0xFF` (tier) | hi/lo byte split |
 
-Practical advice: when adding a new item, copy `misc1` from an existing item of the same type so it sorts correctly. A wrong value won't corrupt the save, but the item may appear in an odd place.
+Worked examples: Arrow `0x0516` → weapon class `0x05`, idx `0x16`; Heater Shield
+`0x3F17` → class `0x3F`, idx `0x17`; Kilij `0x1005` → class `0x10`, idx `0x05`;
+Assassin's Mask `0x000C` → armor slot head, row 12; Black Leather `0x03F4` →
+chest, row 12; Crescent Moon Grass / Shard of Hardstone / Augite of Souls all
+`0x0001` → goods tier 1.
 
-The editor carries `misc1` through to the UI for all four inventory categories (weapons, armor, rings, goods) as an editable field. The writer writes the UI-provided value at each item's original slot position.
+### 5.1 `class` is the menu sort group, not the DB type
+
+`class` is **not** the `type_id`/`sub_type_id` from `js/des-db/`. It is purely the
+in-game menu grouping. One DB type can span several classes, and unrelated DB
+types can share a class:
+
+| `class` | Menu group | Examples (DB type) |
+|---------|------------|--------------------|
+| `0x36` / `0x37` | bows | Long Bow, Compound Short Bow (`[3/1]`) |
+| `0x3A` | crossbows + catalysts + talismans | Light/Heavy Crossbow (`[3/2]`), Wooden/Silver Catalyst (`[6/1]`), Talisman of Beasts (`[6/2]`) |
+| `0x00` vs `0x18` | dagger-base vs casting-dagger | Secret Dagger (`[1/1]`) vs Geri's Stiletto (`[1/1]`) — same DB type, different class |
+
+### 5.2 `class_idx` is a shared sort position, NOT a unique item id
+
+`class_idx` is **not unique** — neither across classes nor within a single class.
+`(category, class, class_idx)` maps to a **display slot**, and the game
+deliberately collapses related items onto the same slot.
+
+- **Reused across classes** (same idx, different weapon class), observed in one
+  BLUS30443 save: idx `0x15` ∈ {`0x05` projectiles, `0x37` bows}; idx `0x17` ∈
+  {`0x05`, `0x3F` shields}; idx `0x7B` ∈ {`0x05`, `0x08` large-swords}; idx
+  `0x99` ∈ {`0x08`, `0x3A` crossbow/catalyst}.
+- **Reused within a class** (same `class`+`class_idx`, different item):
+  - Weapons: Compound Short Bow (`0x1FC34`) and Compound Short Bow+6 (`0x1FC3A`)
+    both `0x36E3` — a base weapon and its upgrade share one sort slot.
+  - Goods: every item in a tier shares the lo-byte (e.g. Crescent Moon Grass
+    `0x3E8`, Shard of Hardstone `0x7D0`, Augite of Souls `0x63` all `0x0001`).
+    41 such goods collisions observed in this save.
+  - Armor: the four "Bare" placeholder slots (head/chest/arms/legs) all share
+    `0x0000`.
+
+### 5.3 Weapon sort classes observed (reference, non-exhaustive)
+
+Only classes the analyzed character **owns** are visible in one save; the full
+game superset is larger. From a real BLUS30443 save:
+
+| `class` | Menu group | Example |
+|---------|------------|---------|
+| `0x00` | bare / dagger-base | Bare Fists, Secret Dagger |
+| `0x05` | projectiles (arrows + bolts) | Arrow, Wooden Arrow, Bolt |
+| `0x08` | large / very-large swords | Claymore, Storm Ruler, Northern Regalia |
+| `0x0B` | very-large swords | Great Sword |
+| `0x0F` | curved swords | Crescent Falchion |
+| `0x10` | curved swords | Kilij |
+| `0x13` | katanas | Magic Sword 'Makoto' |
+| `0x17` | rapiers | Rapier |
+| `0x18` | casting daggers | Geri's Stiletto |
+| `0x1B` | axes | Crushing Battle Axe |
+| `0x23` | hammers | Mace |
+| `0x27` | fists | Claws |
+| `0x2B` | spears | Winged Spear |
+| `0x2E` / `0x2F` | poles | Halberd / Mirdan Hammer |
+| `0x36` / `0x37` | bows | Compound Short Bow / Long Bow, White Bow |
+| `0x3A` | crossbows + catalysts + talismans | Light Crossbow, Wooden Catalyst, Talisman of Beasts |
+| `0x3F` | parry shields | Heater Shield, Kite Shield |
+| `0x42` | bash shields | Large Brushwood Shield |
+
+### 5.4 Practical guidance
+
+When adding a new item, copy `misc1` from an existing item of the same kind
+(ideally the same base weapon / same tier) so it lands in the correct menu slot.
+A wrong value does not corrupt the save — the item just appears at an odd
+position. The editor carries `misc1` through to the UI for all four inventory
+categories as an editable field and writes the UI-provided value back at each
+item's original slot position.
 
 ---
 

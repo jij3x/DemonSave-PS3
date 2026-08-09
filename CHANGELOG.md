@@ -7,11 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.0] - 2026-08-07
+## [1.1.0] - 2026-08-08
 
 ### Added
 - Inline tooltips for Character and World Tendency values so each setting's
   effect is visible without leaving the editor.
+- The app version is now shown in the UI header. It is centralized from
+  `package.json` through a generated `js/version.js` that is kept in sync across
+  the JS bundle, the Tauri manifests (`Cargo.toml`, `Cargo.lock`,
+  `tauri.conf.json`), and the lockfiles.
 
 ### Changed
 - Experimental weapons are now hidden from the inventory browser.
@@ -20,8 +24,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and shared test helpers across the UI and test layers.
 - Brought `integration-tests/` under `tsc --checkJs` typechecking and tightened
   the resulting JSDoc types.
-- Brought `rpcs3-mcp-server/` under the shared ESLint, Prettier, and typecheck
-  tooling (previously ignored as a separate project).
+- Made `rpcs3-mcp-server` a self-contained, portable package with its own
+  ESLint, Prettier, and `jsconfig` configuration plus `lint`/`format` scripts,
+  decoupling it from the root toolchain so it can be developed and shipped on
+  its own.
+- Added a `tools/gen-version.mjs` version-sync step, wired into
+  `version:check`, the frontend build, and the dev server, so a single
+  `package.json` version propagates everywhere consistently.
 - Expanded branch-coverage tests and split monolithic test suites into
   dedicated per-feature files.
 
@@ -29,8 +38,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deposit entry count is now encoded as a 10-bit value split across the count
   and flag bytes, preventing truncation for large deposit lists.
 
+### Docs
+- Documented the inventory `misc1` (sortId) field's `class` / `class_idx`
+  semantics in `knowledge/des_save_mechanism.md`, `offsets.js`, and the
+  savefile README — including the per-category decoding and the finding that
+  `class_idx` is a shared menu sort position (not a unique item id).
+
 ### CI
 - Removed the release notes `body` from the draft GitHub Release step.
+- Added dedicated lint and `format:check` steps for the now-standalone
+  `rpcs3-mcp-server` package.
 
 ## [1.0.0] - 2026-08-05
 
