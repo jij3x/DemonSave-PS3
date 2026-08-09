@@ -10,11 +10,18 @@
 #   fuzz — one matrix runner per fuzz target (12 parallel), each running its
 #          60s smoke; extracted from js so it can't block lint/test/coverage
 #
+# All jobs run on ubuntu-24.04: required because @jazzer.js/fuzzer's native
+# addon (fuzzer-linux-x64.node) needs GLIBC 2.38; ubuntu-22.04 (GLIBC 2.35)
+# fails to load it. Do not downgrade.
+#
 # Heavy installs/compiles are cached so warm runs are fast:
 #   - npm deps              → setup-node cache (root + rpcs3-mcp-server lockfiles)
-#   - webkit/system apt libs → awalsh128/cache-apt-pkgs-action
 #   - cargo registry/target → Swatinem/rust-cache (the big win: skips the full
 #                             Tauri dependency recompile)
+# The webkit/system apt libs are reinstalled each run (plain apt-get). An apt
+# cache (awalsh128/cache-apt-pkgs-action) was tried but it did not restore
+# libwebkit2gtk-4.1-dev's transitive libgtk-3-dev tree, so pkg-config couldn't
+# find gdk-3.0 and the build failed.
 # The Rust toolchain is intentionally NOT cached: a static-key ~/.rustup cache
 # would freeze `stable` (restore runs before the toolchain install), and the
 # ~1m download is small next to the cached compile.
@@ -49,7 +56,7 @@ jobs:
   # Pure Node: no Rust toolchain, no webkit/system apt deps.
   # ──────────────────────────────────────────────────────────────────
   js:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -99,7 +106,7 @@ jobs:
   # no npm/frontend (tauri_build tolerates the missing dist/ dir).
   # ──────────────────────────────────────────────────────────────────
   rust:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -107,21 +114,19 @@ jobs:
       - name: Install Rust (stable)
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache Linux system dependencies
-        uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
-        with:
-          packages: |
-            libwebkit2gtk-4.1-dev
-            build-essential
-            curl
-            wget
-            file
-            libxdo-dev
-            libssl-dev
-            libayatana-appindicator3-dev
+      - name: Install Linux system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
             librsvg2-dev
-          version: 1.0
-          execute_install_scripts: true
 
       - name: Cache cargo registry + target
         uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
@@ -138,7 +143,7 @@ jobs:
   # target still lets the others finish for triage.
   # ──────────────────────────────────────────────────────────────────
   fuzz:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
