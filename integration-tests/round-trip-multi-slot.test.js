@@ -7,9 +7,9 @@
  */
 import { openSave, writeSaveData } from '../js/des-savefile/save-api.js';
 import * as O from '../js/des-savefile/offsets.js';
-import { createUnencryptedSaveFolder, getExpectedModel } from './helpers/save-factory.js';
-import { createTmpSandbox } from './helpers/tmp-sandbox.js';
-import { assertModelsMatch } from './helpers/model-diff.js';
+import { createUnencryptedSaveFolder, getExpectedModel } from '../test-fixtures/save-factory.js';
+import { createTmpSandbox } from './tmp-sandbox.js';
+import { assertModelsMatch } from '../test-fixtures/model-diff.js';
 
 describe('round-trip: multi-slot persistence', () => {
   /** @type {ReturnType<typeof createTmpSandbox>} */

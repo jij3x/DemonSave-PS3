@@ -20,6 +20,7 @@
     "js/lib/ps3-save-lib/**/*",
     "js/lib/tauri-bridge.js",
     "js/ui/**/*",
+    "fuzz/**/*",
     "tests/**/*",
     "tools/**/*",
     "integration-tests/**/*"

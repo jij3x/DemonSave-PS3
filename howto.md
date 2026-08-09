@@ -435,6 +435,61 @@ npm run test:integration
 These run round-trip tests (save → edit → re-save → re-read) using
 the configs in `jest.integration.config.js`.
 
+### Fuzzing (coverage-guided)
+
+Every untrusted-binary parser, the serializer, the save pipeline, and the
+write/encrypt path are verified by coverage-guided fuzzing with [Jazzer.js](https://github.com/CodeIntelligenceTesting/jazzer.js)
+(libFuzzer-based). Fuzzing runs as **standalone** `npx jazzer` targets —
+separate from the Jest suite — and a Jest regression test per target locks in
+findings. The clean-failure contract under test lives in the shared
+`fuzz/oracle.js`, used by both halves so they cannot disagree.
+
+| Target (`npm run fuzz:<t>`) | Fuzzes | Notable findings |
+|---|---|---|
+| `readsave` | `readSave()` USER.DAT parser | non-finite floats (NaN/Infinity) silently returned |
+| `pfd` | `parseParamPfd()` integrity envelope | min-size guard 96→120 (count fields OOB) |
+| `sfo` | `parseParamSfo()` metadata | unchecked key offset + INT32 width (DataView OOB) |
+| `roundtrip` | read→write→read idempotency | (calibration: writer's deposit normalizations are intentional) |
+| `pipeline` | full `openSave()` (decrypt-skip + read + sanitize) | — |
+| `encexport` | `open→exportEncryptedSave→open→writeSaveData→open` (write/encrypt path) | — |
+| `crypto` | `encryptFile↔decryptFile` cipher round-trip | — |
+| `pfdcreate` | `createPfdForFiles` → hash chain → serialize → parse | — |
+| `pfdserialize` | PFD serializer (parse→clone→serialize→parse) | — |
+| `savefolder` | save-folder.js API (decrypt/encrypt/rebuild/findEntry) + `rebuildParamPfd` | — |
+| `sfofields` | PARAM.SFO field getters + raw-byte mutators (ATTRIBUTE/ACCOUNT_ID) | — |
+
+Commands (each has a `:smoke` variant bounded to 60s for CI):
+
+```bash
+npm run fuzz:corpus          # (re)generate all seed corpora in fuzz/corpus/
+npm run fuzz:readsave        # open-ended run of one target (local)
+npm run fuzz:readsave:smoke  # bounded 60s run (CI mode — a finding fails CI)
+npm run fuzz:cov             # replay all corpora under c8 → per-file coverage (js/ logic only; scope configured in .c8rc.json, excl. js/ui, des-db, tauri-bridge, version)
+```
+
+Per-target Jazzer tuning (`--sync`, `-max_len`, `-timeout`) and the shared
+`-artifact_prefix`/smoke budget live in [`tools/fuzz.mjs`](tools/fuzz.mjs),
+which the `fuzz:<t>` / `fuzz:<t>:smoke` scripts invoke. Use
+`node tools/fuzz.mjs <t> --dry-run` to print the resolved jazzer command.
+
+Findings (crash / timeout / OOM) are written to `fuzz/crashes/`. To triage one:
+
+1. Replay the artifact deterministically, e.g.
+   `npx jazzer fuzz/pfd.fuzz.js fuzz/crashes/<file> --sync -- -runs=1`
+2. Minimize it: add `-minimize_crash=1 -runs=...`.
+3. Fix the underlying missing guard, then add a minimal reconstruction to the
+   matching `tests/fuzz/regression-*.test.js` so it can never regress.
+
+> CI runs `fuzz:corpus` then all eleven `fuzz:<t>:smoke` steps on every push.
+> The round-trip target checks **writer idempotency** (a fixed point) rather
+> than read-vs-first-write equality, which makes it immune to the writer's
+> intentional first-write normalizations (deposit `flags[0]`/`sortOrder`/
+> per-category durability, and the spell/deposit region overlap for impossible
+> spell counts) while still catching genuine serialization bugs. Real-save
+> read↔write fidelity is covered by the integration tests. The `encexport`
+> target uses the same idempotency framing (comparing two post-write reads
+> across the export/write-back pipeline) for the same reason.
+
 ---
 
 ## 10. Lint & Format
@@ -452,7 +507,7 @@ Runs both CSS and JS linters.
 | Command | Linter | Scope |
 |---|---|---|
 | `npm run lint:css` | Stylelint (`stylelint-config-standard`) | `css/**/*.css` |
-| `npm run lint:js` | ESLint (`@eslint/js` recommended) | `js/`, `tests/`, `tools/`, `integration-tests/` |
+| `npm run lint:js` | ESLint (`@eslint/js` recommended) | `js/`, `tests/`, `tools/`, `integration-tests/`, `fuzz/` |
 | `npm run lint:types` | TypeScript (`tsc --checkJs`) | `js/` (excl. `js/ui/`), `tools/` — JSDoc type checking, 0 errors |
 
 ### Format code
@@ -467,7 +522,7 @@ npm run format:check   # check only (CI mode — exits non-zero if changes neede
 ```
 
 Both commands target `js/**/*.js`, `tests/**/*.js`, `tools/**/*.mjs`,
-`integration-tests/**/*.js`, and top-level `*.js` files.
+`integration-tests/**/*.js`, `fuzz/**/*.js`, and top-level `*.js` files.
 
 ---
 

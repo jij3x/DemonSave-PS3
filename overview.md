@@ -417,3 +417,4 @@ tests (round-trips on real files).
 - **Gateway API** — open/write/export, multi-slot resolution, encrypted↔decrypted transitions
 - **Type safety** — `tsc --checkJs` with JSDoc annotations (0 type errors, 0 `@ts-nocheck` across all checked modules)
 - **Integration** — save → edit → re-save → re-read across multi-slot folders, all fields, realistic data, and every format combination
+- **Fuzzing** — coverage-guided fuzzing via Jazzer.js of every untrusted-binary parser (`readSave`, `parseParamPfd`, `parseParamSfo`), the read→write→read round-trip, and the full `openSave` pipeline (see [`howto.md`](howto.md) → Fuzzing). A shared oracle (`fuzz/oracle.js`) enforces that every input either yields a well-formed value or throws a clean domain `Error`. Fuzzing has already surfaced and fixed real missing-guard bugs (non-finite floats in the reader, OOB count/offset reads in the PFD/SFO parsers).

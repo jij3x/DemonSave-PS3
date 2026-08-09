@@ -21,6 +21,17 @@ tmp/
 # Test coverage
 coverage/
 
+# Fuzzing artifacts (regenerable). The corpus is produced by
+# `npm run fuzz:corpus`; crash/timeout/oom inputs are libFuzzer outputs.
+fuzz/corpus/
+fuzz/crashes/*
+!fuzz/crashes/.gitkeep
+crash-*
+timeout-*
+oom-*
+leak-*
+slow-unit-*
+
 # AI assistant working files
 .clinerules/
 .kilo/

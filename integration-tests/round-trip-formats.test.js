@@ -21,9 +21,9 @@ import {
   createEncryptedSaveFolder,
   getExpectedModel,
   toRawFilesFormat,
-} from './helpers/save-factory.js';
-import { createTmpSandbox } from './helpers/tmp-sandbox.js';
-import { assertModelsMatch } from './helpers/model-diff.js';
+} from '../test-fixtures/save-factory.js';
+import { createTmpSandbox } from './tmp-sandbox.js';
+import { assertModelsMatch } from '../test-fixtures/model-diff.js';
 
 describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
   /** @type {ReturnType<typeof createTmpSandbox>[]} */

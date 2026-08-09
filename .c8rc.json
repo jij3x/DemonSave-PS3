@@ -1,0 +1,12 @@
+{
+  "all": true,
+  "include": ["js/**/*.js"],
+  "exclude": [
+    "js/ui/**",
+    "js/des-db/**",
+    "js/lib/tauri-bridge.js",
+    "js/version.js"
+  ],
+  "reports-dir": "coverage/fuzz",
+  "reporter": ["json-summary", "json", "text-summary"]
+}

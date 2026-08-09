@@ -10,9 +10,9 @@
  */
 import { openSave, writeSaveData } from '../js/des-savefile/save-api.js';
 import { getSfoAccountId } from '../js/lib/ps3-save-lib/index.js';
-import { createUnencryptedSaveFolder, getExpectedModel } from './helpers/save-factory.js';
-import { createTmpSandbox } from './helpers/tmp-sandbox.js';
-import { assertModelsMatch, extractComparableModel } from './helpers/model-diff.js';
+import { createUnencryptedSaveFolder, getExpectedModel } from '../test-fixtures/save-factory.js';
+import { createTmpSandbox } from './tmp-sandbox.js';
+import { assertModelsMatch, extractComparableModel } from '../test-fixtures/model-diff.js';
 
 describe('round-trip: all fields (unencrypted, single slot)', () => {
   /** @type {ReturnType<typeof createTmpSandbox>} */
