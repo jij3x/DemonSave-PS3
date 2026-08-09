@@ -58,7 +58,16 @@
           PROBE.map(function (p) {
             return fetch(p)
               .then(function (r) {
-                return p + ' -> HTTP ' + r.status;
+                return (
+                  p +
+                  ' -> HTTP ' +
+                  r.status +
+                  '  [type: ' +
+                  (r.headers.get('content-type') || 'none') +
+                  ']  [len: ' +
+                  (r.headers.get('content-length') || '?') +
+                  ']'
+                );
               })
               .catch(function (err) {
                 return p + ' -> FETCH ERROR ' + err.message;
