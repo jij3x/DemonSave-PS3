@@ -1,16 +1,10 @@
 /**
  * Tauri bridge — thin wrappers around Tauri IPC commands.
  *
- * In a Tauri v2 webview the runtime injects, before any user script runs:
- *   - `window.isTauri === true`           ← canonical "are we in Tauri?" flag
- *   - `window.__TAURI_INTERNALS__.invoke` ← low-level IPC bridge used by the
- *                                          official `@tauri-apps/api`
- * When `app.withGlobalTauri` is `true`, the higher-level `window.__TAURI__`
- * API is *also* exposed, but it may be populated later than the init flag, so
- * detection and invocation prefer the always-available internals.
- *
- * This module calls the Rust-side commands defined in `src-tauri/src/lib.rs`
- * and handles base64 encoding/decoding of binary data.
+ * When the app runs inside a Tauri webview, `window.__TAURI__` is available
+ * (because `withGlobalTauri: true` is set in tauri.conf.json).  This module
+ * provides convenience functions that call the Rust-side commands defined in
+ * `src-tauri/src/lib.rs` and handle base64 encoding/decoding of binary data.
  *
  * In a regular browser (no Tauri), `isTauri()` returns false and the app
  * falls back to the standard File System Access API / drag-and-drop paths.
@@ -27,55 +21,22 @@
  */
 
 /**
- * @typedef {Object} TauriInternals
- * @property {(cmd: string, args?: Record<string, unknown>, options?: unknown) => Promise<unknown>} [invoke]
- */
-
-/**
- * @typedef {typeof window & {
- *   isTauri?: boolean,
- *   __TAURI__?: TauriGlobal,
- *   __TAURI_INTERNALS__?: TauriInternals,
- * }} TauriWindow
- */
-
-/**
- * Type-safe accessor for `window.__TAURI__` (undefined when not in Tauri, or
- * before the `withGlobalTauri` API finishes loading).
+ * Type-safe accessor for window.__TAURI__ (undefined when not in Tauri).
  * @returns {TauriGlobal | undefined}
  */
 function getTauri() {
-  return typeof window !== 'undefined' ? /** @type {TauriWindow} */ (window).__TAURI__ : undefined;
-}
-
-/**
- * Accessor for the low-level Tauri internals bridge
- * (`window.__TAURI_INTERNALS__`). Present synchronously in every Tauri v2
- * webview — this is the bridge the official `@tauri-apps/api` invokes through.
- * @returns {TauriInternals | undefined}
- */
-function getTauriInternals() {
   return typeof window !== 'undefined'
-    ? /** @type {TauriWindow} */ (window).__TAURI_INTERNALS__
+    ? /** @type {typeof window & { __TAURI__?: TauriGlobal }} */ (window).__TAURI__
     : undefined;
 }
 
 /**
  * Detect whether the app is running inside a Tauri webview.
- *
- * Uses Tauri v2's canonical `window.isTauri` flag (set synchronously by the
- * init script, before user scripts run), with fallbacks to the internals
- * bridge and the `withGlobalTauri` global for robustness across versions.
  * @returns {boolean}
  */
 export function isTauri() {
-  if (typeof window === 'undefined') return false;
-  const w = /** @type {TauriWindow} */ (window);
-  if (w.isTauri === true) return true;
-  return (
-    typeof getTauriInternals()?.invoke === 'function' ||
-    typeof getTauri()?.core?.invoke === 'function'
-  );
+  const tauri = getTauri();
+  return !!tauri && typeof tauri.core?.invoke === 'function';
 }
 
 // ── Base64 helpers (zero-dependency, handles chunking for large arrays) ──
@@ -119,18 +80,11 @@ export function base64ToBytes(b64) {
  * @returns {Promise<unknown>}
  */
 function invoke(command, args) {
-  // Preferred path: low-level internals bridge (available as soon as the
-  // webview boots, independent of `withGlobalTauri` timing).
-  const internals = getTauriInternals();
-  if (typeof internals?.invoke === 'function') {
-    return internals.invoke(command, args);
-  }
-  // Fallback: `withGlobalTauri` high-level API
   const tauri = getTauri();
-  if (typeof tauri?.core?.invoke === 'function') {
-    return tauri.core.invoke(command, args);
+  if (!tauri?.core) {
+    throw new Error(`invoke("${command}") called outside Tauri environment`);
   }
-  throw new Error(`invoke("${command}") called outside Tauri environment`);
+  return tauri.core.invoke(command, args);
 }
 
 /**

@@ -23,15 +23,11 @@ import {
 // ── Helpers for mocking the Tauri global ──
 
 /**
- * The browser `window` augmented with the optional Tauri globals the tests
+ * The browser `window` augmented with the optional Tauri global the tests
  * install/remove. `__TAURI__` is intentionally permissive — several tests
  * inject malformed shapes (missing `core`, non-function `invoke`) to verify
  * the guard logic, so no `any` cast should be needed.
- * @typedef {Window & {
- *   isTauri?: boolean,
- *   __TAURI__?: Record<string, unknown>,
- *   __TAURI_INTERNALS__?: { invoke?: (...args: unknown[]) => unknown },
- * }} MockTauriWindow
+ * @typedef {Window & { __TAURI__?: Record<string, unknown> }} MockTauriWindow
  */
 
 /** @returns {MockTauriWindow} */
@@ -48,23 +44,9 @@ function mockTauriInvoke(fn) {
   w.__TAURI__ = { core: { invoke: fn } };
 }
 
-/**
- * Install a mock `window.__TAURI_INTERNALS__` (and the `window.isTauri` flag),
- * mirroring the low-level bridge Tauri v2 injects before user scripts run.
- * @param {(command: string, args?: Record<string, unknown>) => Promise<unknown>} fn
- */
-function mockTauriInternals(fn) {
-  const w = getWindow();
-  w.isTauri = true;
-  w.__TAURI_INTERNALS__ = { invoke: fn };
-}
-
-/** Remove all Tauri globals to simulate a non-Tauri environment. */
+/** Remove `window.__TAURI__` to simulate a non-Tauri environment. */
 function clearTauri() {
-  const w = getWindow();
-  delete w.__TAURI__;
-  delete w.__TAURI_INTERNALS__;
-  delete w.isTauri;
+  delete getWindow().__TAURI__;
 }
 
 // ── Base64 helpers ──
@@ -141,67 +123,6 @@ describe('isTauri', () => {
   test('returns true when __TAURI__.core.invoke is a function', () => {
     mockTauriInvoke(() => Promise.resolve());
     expect(isTauri()).toBe(true);
-  });
-
-  test('returns true when window.isTauri === true (no __TAURI__ needed)', () => {
-    // Tauri v2 sets window.isTauri synchronously in its init script, before
-    // the withGlobalTauri `window.__TAURI__` API is necessarily populated.
-    // Detection must succeed via this flag alone.
-    clearTauri();
-    getWindow().isTauri = true;
-    expect(isTauri()).toBe(true);
-  });
-
-  test('returns true when __TAURI_INTERNALS__.invoke is a function', () => {
-    clearTauri();
-    getWindow().__TAURI_INTERNALS__ = { invoke: () => Promise.resolve() };
-    expect(isTauri()).toBe(true);
-  });
-
-  test('returns false when window.isTauri is not strictly true', () => {
-    clearTauri();
-    const w = /** @type {unknown} */ (getWindow());
-    /** @type {{ isTauri?: string }} */ (w).isTauri = 'true'; // truthy, but not === true
-    expect(isTauri()).toBe(false);
-  });
-});
-
-// ── invoke internals preference ──
-
-describe('invoke prefers __TAURI_INTERNALS__', () => {
-  afterEach(clearTauri);
-
-  test('uses __TAURI_INTERNALS__.invoke over __TAURI__.core.invoke', async () => {
-    const calls = [];
-    mockTauriInternals(async (command, args) => {
-      calls.push({ via: 'internals', command, args });
-      if (command === 'pick_directory') return ['/p', 'save'];
-      if (command === 'read_dir_files') return [];
-      throw new Error(`unexpected ${command}`);
-    });
-    // Also install the high-level global; it must NOT be used.
-    mockTauriInvoke(async () => {
-      calls.push({ via: 'global' });
-      throw new Error('high-level invoke should not be called');
-    });
-
-    await tauriOpenDirectory();
-
-    expect(calls.length).toBe(2);
-    expect(calls.every((c) => c.via === 'internals')).toBe(true);
-  });
-
-  test('falls back to __TAURI__.core.invoke when internals absent', async () => {
-    const calls = [];
-    mockTauriInvoke(async (command, args) => {
-      calls.push({ command, args });
-      if (command === 'pick_directory') return ['/p', 'save'];
-      return [];
-    });
-
-    await tauriOpenDirectory();
-
-    expect(calls.length).toBe(2);
   });
 });
 
