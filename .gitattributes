@@ -1,2 +1,10 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Version-sync tooling (tools/gen-version.mjs) parses these via regexes that
+# are line-ending sensitive. Force LF so Windows checkouts don't receive CRLF.
+/src-tauri/Cargo.toml      text eol=lf
+/src-tauri/Cargo.lock      text eol=lf
+/src-tauri/tauri.conf.json text eol=lf
+/package-lock.json         text eol=lf
+/js/version.js             text eol=lf

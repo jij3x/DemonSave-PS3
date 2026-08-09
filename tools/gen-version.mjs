@@ -73,7 +73,7 @@ const targets = [
     label: 'src-tauri/Cargo.toml',
     file: path.join(ROOT, 'src-tauri', 'Cargo.toml'),
     transform: {
-      re: /(name = "demonsave-ps3"\nversion = ")[^"]*(")/g,
+      re: /(name = "demonsave-ps3"\r?\nversion = ")[^"]*(")/g,
       replacement: `$1${version}$2`,
       expected: 1,
     },
@@ -91,7 +91,7 @@ const targets = [
     label: 'src-tauri/Cargo.lock',
     file: path.join(ROOT, 'src-tauri', 'Cargo.lock'),
     transform: {
-      re: /(name = "demonsave-ps3"\nversion = ")[^"]*(")/g,
+      re: /(name = "demonsave-ps3"\r?\nversion = ")[^"]*(")/g,
       replacement: `$1${version}$2`,
       expected: 1,
     },
@@ -100,7 +100,7 @@ const targets = [
     label: 'package-lock.json',
     file: path.join(ROOT, 'package-lock.json'),
     transform: {
-      re: /("name": "demonsave-ps3",\n\s*"version": ")[^"]*(")/g,
+      re: /("name": "demonsave-ps3",\r?\n\s*"version": ")[^"]*(")/g,
       replacement: `$1${version}$2`,
       expected: 2,
     },
@@ -155,12 +155,23 @@ try {
         }
         throw new Error(`${t.label} not found; cannot transform`);
       }
-      const next =
-        t.rewrite !== undefined
-          ? t.rewrite
-          : t.transform
-            ? applyTransform(current, t.transform.re, t.transform.replacement, t.transform.expected)
-            : current;
+      let next;
+      try {
+        next =
+          t.rewrite !== undefined
+            ? t.rewrite
+            : t.transform
+              ? applyTransform(
+                  current,
+                  t.transform.re,
+                  t.transform.replacement,
+                  t.transform.expected,
+                )
+              : current;
+      } catch (err) {
+        const reason = err instanceof Error ? err.message : String(err);
+        throw new Error(`${t.label}: ${reason}`, { cause: err });
+      }
       if (next !== current) {
         writeFileSync(t.file, next);
         console.log(`✓ wrote ${t.label} (v${version})`);
