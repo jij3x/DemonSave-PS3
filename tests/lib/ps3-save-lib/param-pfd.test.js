@@ -39,6 +39,28 @@ function makeUserPfd() {
   return createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
 }
 
+/**
+ * Assert that a byte-array field was deep-copied: pick a sentinel guaranteed to
+ * differ from the original byte, write it to the clone, then confirm the
+ * original is unchanged.
+ *
+ * This replaces the old `clone[0] = 0xff; expect(orig[0]).not.toBe(0xff)`
+ * pattern, which flaked ~1/256 runs: createPfdForFiles generates random IVs /
+ * entry keys / signature bytes, so when such a byte was already 0xff the
+ * mutation was a no-op and the assertion failed despite a correct deep copy.
+ * Capturing the original and using `(before + 1) & 0xff` is deterministic for
+ * any source value.
+ *
+ * @param {Uint8Array} original  the source field (re-read after mutation)
+ * @param {Uint8Array} clone     the cloned field (written to)
+ * @param {number} [index]       byte index to mutate and verify
+ */
+function assertByteIndependent(original, clone, index = 0) {
+  const before = original[index];
+  clone[index] = (before + 1) & 0xff; // always differs from `before`
+  expect(original[index]).toBe(before);
+}
+
 /* ------------------------------------------------------------------ */
 /* Hash helpers                                                        */
 /* ------------------------------------------------------------------ */
@@ -750,16 +772,13 @@ describe('cloneParamPfd', () => {
     expect(clone.numReserved).toBe(pfd.numReserved);
 
     // Uint8Array fields are independent copies
-    clone.headerTableIv[0] = 0xff;
-    expect(pfd.headerTableIv[0]).not.toBe(0xff);
+    assertByteIndependent(pfd.headerTableIv, clone.headerTableIv);
 
     // Entry Uint8Array fields are independent
-    clone.entries[0].key[0] = 0xff;
-    expect(pfd.entries[0].key[0]).not.toBe(0xff);
+    assertByteIndependent(pfd.entries[0].key, clone.entries[0].key);
 
     // sigTable is deep-copied
-    clone.sigTable[0][0] = 0xff;
-    expect(pfd.sigTable[0][0]).not.toBe(0xff);
+    assertByteIndependent(pfd.sigTable[0], clone.sigTable[0]);
   });
 
   test('handles null secureFileID', () => {
@@ -771,8 +790,7 @@ describe('cloneParamPfd', () => {
   test('preserves secureFileID as a copy', () => {
     const pfd = makeUserPfd();
     const clone = cloneParamPfd(pfd);
-    clone.secureFileID[0] = 0xff;
-    expect(pfd.secureFileID[0]).not.toBe(0xff);
+    assertByteIndependent(pfd.secureFileID, clone.secureFileID);
   });
 });
 
@@ -806,8 +824,15 @@ describe('validateParamPfdDetailed', () => {
 });
 
 describe('parseParamPfd corrupt-header guards', () => {
-  test('throws on too-short buffer (< 96 bytes)', () => {
+  test('throws on too-short buffer (< 120 bytes)', () => {
     expect(() => parseParamPfd(new Uint8Array(50))).toThrow(/too short/);
+  });
+
+  test('rejects a 96–119 byte buffer cleanly (no RangeError on the counts)', () => {
+    const pfd = createPfdForFiles([{ name: 'USER.DAT', size: 32 }], SECURE_ID);
+    const truncated = getParamPfdCombinedData(pfd).subarray(0, 105);
+    expect(() => parseParamPfd(truncated)).toThrow(/too short/i);
+    expect(() => parseParamPfd(truncated)).not.toThrow(/out of bounds/i);
   });
 
   test('throws on non-Uint8Array input', () => {

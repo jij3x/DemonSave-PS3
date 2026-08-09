@@ -99,6 +99,12 @@ export function parseParamSfo(data) {
     const dataOffset = dv.getUint32(off + 12, true);
 
     const nameOff = keyTableStart + keyOffset;
+    // Validate the key offset before decoding: a corrupt keyOffset (u16) added
+    // to keyTableStart can point past the buffer, which would otherwise reach
+    // decodeAscii and throw a RangeError instead of a clean domain error.
+    if (nameOff < 0 || nameOff >= data.length) {
+      throw new Error(`Invalid PARAM.SFO: entry key offset ${nameOff} points past buffer`);
+    }
     const name = decodeAscii(data, nameOff);
 
     // Validate dataLen ≤ dataMaxLen (consistency check on corrupt SFOs).
@@ -123,6 +129,15 @@ export function parseParamSfo(data) {
     } else if (dataFmt === FMT.UTF8_S) {
       value = readUtf8(data, valueOff, dataMaxLen);
     } else if (dataFmt === FMT.INT32) {
+      // INT32 reads exactly 4 bytes. The valueOff check above only guarantees
+      // `valueOff + dataMaxLen ≤ length`; a corrupt dataMaxLen < 4 would let
+      // the 4-byte getUint32 read past the buffer (DataView RangeError), so
+      // validate the 4-byte width explicitly.
+      if (valueOff + 4 > data.length) {
+        throw new Error(
+          `Invalid PARAM.SFO: entry "${name}" INT32 value at ${valueOff} needs 4 bytes (buffer ${data.length})`,
+        );
+      }
       value = String(dv.getUint32(valueOff, true));
     } else {
       value = '';
@@ -274,6 +289,14 @@ export function getSfoAttribute(rawSfo) {
   }
   const off = findParamDataOffset(rawSfo, 'ATTRIBUTE');
   if (off === null) return 0;
+  // Bounds-check the 4-byte read: findParamDataOffset only guarantees the
+  // start byte is in range, so a field near the buffer end would otherwise
+  // throw an opaque DataView RangeError on crafted/truncated SFOs.
+  if (off + 4 > rawSfo.length) {
+    throw new Error(
+      `getSfoAttribute: ATTRIBUTE at offset ${off} exceeds buffer length ${rawSfo.length} (need ${off + 4} bytes)`,
+    );
+  }
   const dv = new DataView(rawSfo.buffer, rawSfo.byteOffset, rawSfo.byteLength);
   return dv.getUint32(off, true);
 }
@@ -293,6 +316,12 @@ export function removeCopyProtection(rawSfo) {
   }
   const off = findParamDataOffset(rawSfo, 'ATTRIBUTE');
   if (off === null) return false;
+  // Bounds-check the 4-byte write (see getSfoAttribute for rationale).
+  if (off + 4 > rawSfo.length) {
+    throw new Error(
+      `removeCopyProtection: ATTRIBUTE at offset ${off} exceeds buffer length ${rawSfo.length} (need ${off + 4} bytes)`,
+    );
+  }
   const dv = new DataView(rawSfo.buffer, rawSfo.byteOffset, rawSfo.byteLength);
   dv.setUint32(off, 0, true);
   return true;
@@ -319,6 +348,13 @@ export function getSfoAccountId(rawSfo) {
   }
   const off = findParamDataOffset(rawSfo, 'ACCOUNT_ID');
   if (off === null) return '';
+  // Bounds-check the 16-byte read: subarray would silently clamp a truncated
+  // field, returning a short (wrong) hex string instead of signaling corruption.
+  if (off + 16 > rawSfo.length) {
+    throw new Error(
+      `getSfoAccountId: ACCOUNT_ID at offset ${off} exceeds buffer length ${rawSfo.length} (need ${off + 16} bytes)`,
+    );
+  }
   return toHex(rawSfo.subarray(off, off + 16));
 }
 
