@@ -1,0 +1,55 @@
+name: Feature request
+description: Suggest a new feature or an improvement
+title: "[feat]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Got an idea? Feature requests are most useful when they describe the
+        *problem* you're hitting, not just a solution. Please search existing
+        issues first to avoid duplicates.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: What's hard or impossible to do today? What are you trying to accomplish?
+      placeholder: "I want to ..., but the editor currently ..."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: What would help?
+      description: Your proposed solution, or the outcome you'd like to see.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where would this live?
+      options:
+        - UI (new editable field, control, or view)
+        - Save pipeline (reading / writing new data)
+        - Import / export (encrypted <-> decrypted, ZIP)
+        - Desktop app (Tauri)
+        - Game data (des-db)
+        - Other / not sure
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered
+      description: Optional. Other ways you tried to solve this, and why they fall short.
+    validations:
+      required: false
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmations
+      options:
+        - label: I searched existing issues for this idea.
+          required: true
+        - label: I read the [contributing guide](https://github.com/jij3x/DemonSave-PS3/blob/main/CONTRIBUTING.md).
+          required: true

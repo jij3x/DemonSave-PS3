@@ -1,0 +1,14 @@
+# https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository#configuring-the-template-chooser
+blank_issues_enabled: true
+contact_links:
+  - name: Contributing guide
+    url: https://github.com/jij3x/DemonSave-PS3/blob/main/CONTRIBUTING.md
+    about: Read the guidelines before opening an issue or pull request.
+  - name: Code of Conduct
+    url: https://github.com/jij3x/DemonSave-PS3/blob/main/CODE_OF_CONDUCT.md
+    about: This project follows the Contributor Covenant Code of Conduct.
+  - name: Report a security vulnerability
+    url: https://github.com/jij3x/DemonSave-PS3/security/advisories/new
+    about: |
+      Report save-corruption or crypto-integrity bugs privately. Do NOT open a
+      public issue for these.

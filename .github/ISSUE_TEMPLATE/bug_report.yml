@@ -1,0 +1,98 @@
+name: Bug report
+description: Report something that's broken or behaving incorrectly
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report! A couple of things first:
+        - **Do NOT attach real save data** that contains PSN / account-binding
+          info — `PARAM.SFO` carries your `ACCOUNT_ID`. Describe the scenario, or
+          reconstruct it from a fresh save.
+        - For save-path bugs (decrypt/encrypt/round-trip/PFD/SFO), tell us whether
+          the edited save still loads on hardware or RPCS3 — that's the most
+          useful detail.
+        - Please search existing issues to avoid duplicates.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected instead.
+      placeholder: "When I ... I expected ... but instead ..."
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The smallest set of steps that triggers the bug. No private save data, please.
+      placeholder: |
+        1. Open a save folder with ...
+        2. Edit ...
+        3. Save / export ...
+        4. Observe ...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      description: Where in the codebase does this look like it lives?
+      options:
+        - Save pipeline (open / write / round-trip)
+        - PFD / SFO (integrity envelope, account binding)
+        - Crypto (AES / HMAC / keys)
+        - UI (rendering, forms, tables, controls)
+        - Game data (des-db item / spell / upgrade info)
+        - Desktop app (Tauri window, file dialogs)
+        - Other / not sure
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Shown in the UI header (e.g. v1.1.0). Use "from source" if you run `npm run serve:dev`.
+      placeholder: "v1.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Where are you running it?
+      options:
+        - Browser (Chrome / Edge / other Chromium)
+        - Browser (Firefox / Safari)
+        - Tauri desktop app
+        - From source (`npm run serve:dev`)
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: save-load
+    attributes:
+      label: Did the edited save still load?
+      description: Skip this if you didn't edit a real save.
+      options:
+        - "Yes — it loaded, but something is wrong with the result"
+        - "No — the PS3 / RPCS3 rejected it"
+        - "I didn't edit / can't test on hardware"
+        - "Not applicable"
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console / error output
+      description: Paste any errors from the browser console or Tauri logs. Optional.
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmations
+      options:
+        - label: I have NOT attached real save data containing PSN / account info.
+          required: true
+        - label: I searched existing issues and read the [contributing guide](https://github.com/jij3x/DemonSave-PS3/blob/main/CONTRIBUTING.md).
+          required: true

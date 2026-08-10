@@ -160,7 +160,7 @@ wrong. That's still the job. Frankly, it's the interesting part.
 | Tokens burned | ~2 billion |
 | Effort | ~3 weeks, part-time |
 | Source | ~15k lines of app logic + ~19k lines of game data |
-| Tests | 1,000+ passing unit tests across 25+ suites with ~99% line coverage, plus 100+ integration tests |
+| Tests | 1,000+ passing unit tests across 25+ suites with ~99% line coverage, plus 80+ integration tests |
 
 ---
 

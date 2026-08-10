@@ -418,3 +418,19 @@ tests (round-trips on real files).
 - **Type safety** — `tsc --checkJs` with JSDoc annotations (0 type errors, 0 `@ts-nocheck` across all checked modules)
 - **Integration** — save → edit → re-save → re-read across multi-slot folders, all fields, realistic data, and every format combination
 - **Fuzzing** — coverage-guided fuzzing via Jazzer.js of every untrusted-binary parser (`readSave`, `parseParamPfd`, `parseParamSfo`), the read→write→read round-trip, and the full `openSave` pipeline (see [`howto.md`](howto.md) → Fuzzing). A shared oracle (`fuzz/oracle.js`) enforces that every input either yields a well-formed value or throws a clean domain `Error`. Fuzzing has already surfaced and fixed real missing-guard bugs (non-finite floats in the reader, OOB count/offset reads in the PFD/SFO parsers).
+
+---
+
+## 12. Contributing
+
+Contributions are welcome! Before opening an issue or pull request, read the
+[`CONTRIBUTING.md`](CONTRIBUTING.md) guide — it covers the development setup,
+code style (Prettier / ESLint / Stylelint / JSDoc `--checkJs`), the test and
+fuzz workflow, the generated files to avoid hand-editing, versioning, and the
+PR checklist. Note in particular the load-bearing architecture rules in
+[§3](#3-architecture-overview) and [§8](#8-design-principles): the UI imports
+only `save-api.js`, the editor core never imports `des-db`, and binary
+internals stay opaque to the UI.
+
+This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
+By participating you agree to uphold it.
