@@ -33,6 +33,10 @@ const SECURE_ID = fromHex('0123456789ABCDEFFEDCBA9876543210');
  *
  *  Pass `{ includeBackup: false }` to omit the 2USER.DAT backup variant — used to
  *  exercise the "no backup USER.DAT files" branch in writeSaveData.
+ *
+ *  @param {Uint8Array} userBytes
+ *  @param {{includeBackup?: boolean}} [opts]
+ *  @returns {Map<string, {name: string, bytes: Uint8Array}>}
  */
 function makeEncryptedSaveFiles(userBytes, { includeBackup = true } = {}) {
   const sfo = makeSfo();
@@ -106,8 +110,8 @@ describe('exportEncryptedSave (PFD membership)', () => {
 
     // Assets must be UNCHANGED (same bytes as input)
     const iconBytes = filesToWrite.get('ICON0.PNG');
-    expect(iconBytes[0]).toBe(0x89); // PNG magic byte, not encrypted
-    expect(iconBytes[1]).toBe(0x50);
+    expect(iconBytes?.[0]).toBe(0x89); // PNG magic byte, not encrypted
+    expect(iconBytes?.[1]).toBe(0x50);
 
     // PARAM.PFD must exist
     expect(filesToWrite.has('PARAM.PFD')).toBe(true);
@@ -139,8 +143,8 @@ describe('exportEncryptedSave (PFD membership)', () => {
     expect(filesToWrite.has('04USER.DAT')).toBe(true);
 
     // 2USER.DAT (backup) should be encrypted (different from original plaintext)
-    const backupEnc = filesToWrite.get('2USER.DAT');
-    const backupOrig = rawFiles.get('2user.dat').bytes;
+    const backupEnc = filesToWrite.get('2USER.DAT') ?? new Uint8Array(0);
+    const backupOrig = rawFiles.get('2user.dat')?.bytes ?? new Uint8Array(0);
     // Encrypted bytes won't match the original plaintext
     let isEncrypted = false;
     for (let i = 0; i < backupEnc.length; i++) {
@@ -185,7 +189,7 @@ describe('writeSaveData (encrypted → decrypted)', () => {
 
     // Verify USER.DAT is plaintext (parseable without decryption)
     const userBytes = filesToWrite.get('USER.DAT');
-    const result = readSave(userBytes);
+    const result = readSave(userBytes ?? new Uint8Array(0));
     expect(result.vit).toBe(99);
     expect(result.souls).toBe(1);
   });
@@ -239,7 +243,7 @@ describe('writeSaveData (encrypted → decrypted)', () => {
 
     // Verify the data is correct
     const userBytes = decFiles.get('USER.DAT');
-    const result = readSave(userBytes);
+    const result = readSave(userBytes ?? new Uint8Array(0));
     expect(result.vit).toBe(80);
   });
 
@@ -267,7 +271,7 @@ describe('writeSaveData (encrypted → decrypted)', () => {
     // in-memory data. (Was a standalone test; folded in to avoid retesting.)
     const { filesToWrite: sameSessDec } = await writeSaveData(slots1, [], profile1, '');
     expect(sameSessDec.has('USER.DAT')).toBe(true);
-    expect(readSave(sameSessDec.get('USER.DAT')).vit).toBe(60);
+    expect(readSave(sameSessDec.get('USER.DAT') ?? new Uint8Array(0)).vit).toBe(60);
 
     // Step 3: Load the encrypted save produced in step 2
     rawFiles = new Map();
@@ -339,7 +343,7 @@ describe('updateSessionAfterWrite (session state sync)', () => {
 
     // USER.DAT in file maps should now be the decrypted (plaintext) bytes
     const userBytes = session.manager.files.get('user.dat');
-    const result = readSave(userBytes);
+    const result = readSave(userBytes ?? new Uint8Array(0));
     expect(result.vit).toBe(50);
   });
 
@@ -365,7 +369,7 @@ describe('updateSessionAfterWrite (session state sync)', () => {
     expect(session.encrypted).toBe(true);
     expect(session.manager.encrypted).toBe(true);
     expect(session.manager.pfd).not.toBeNull();
-    expect(session.manager.pfd.secureFileID).toBeDefined();
+    expect(session.manager.pfd?.secureFileID).toBeDefined();
 
     // PARAM.PFD should be in file maps
     expect(session.manager.files.has('param.pfd')).toBe(true);
@@ -373,7 +377,7 @@ describe('updateSessionAfterWrite (session state sync)', () => {
 
     // USER.DAT in file maps should now be encrypted (not parseable as plaintext)
     const userBytes = session.manager.files.get('user.dat');
-    expect(() => readSave(userBytes)).toThrow();
+    expect(() => readSave(userBytes ?? new Uint8Array(0))).toThrow();
   });
 
   test('subsequent save after session sync works correctly (encrypted → decrypted → encrypted)', async () => {
@@ -391,7 +395,7 @@ describe('updateSessionAfterWrite (session state sync)', () => {
       [],
       profileNumber,
       '',
-      null,
+      undefined,
       true,
     );
     await updateSessionAfterWrite(slots, decFiles, false);
@@ -404,7 +408,7 @@ describe('updateSessionAfterWrite (session state sync)', () => {
       [],
       profileNumber,
       '',
-      null,
+      undefined,
       true,
     );
     await updateSessionAfterWrite(slots, encFiles, true);
@@ -417,11 +421,11 @@ describe('updateSessionAfterWrite (session state sync)', () => {
       [],
       profileNumber,
       '',
-      null,
+      undefined,
       true,
     );
     const userBytes = decFiles2.get('USER.DAT');
-    const result = readSave(userBytes);
+    const result = readSave(userBytes ?? new Uint8Array(0));
     expect(result.vit).toBe(65);
   });
 });
@@ -437,7 +441,7 @@ describe('openSave: decrypt-failure from encrypted save', () => {
 
     // Corrupt the encrypted USER.DAT so decryptFile fails
     // (flip some bytes in the ciphertext to break the hash validation)
-    const userBytes = rawFiles.get('user.dat').bytes;
+    const userBytes = rawFiles.get('user.dat')?.bytes ?? new Uint8Array(0);
     userBytes[0] ^= 0xff;
     userBytes[1] ^= 0xaa;
 
@@ -475,7 +479,7 @@ describe('writeSaveData: encrypted source with backup decrypt failure', () => {
     const rawFiles = makeEncryptedSaveFiles(buf);
 
     // Corrupt the backup 2USER.DAT so its decrypt fails during write
-    const backupBytes = rawFiles.get('2user.dat').bytes;
+    const backupBytes = rawFiles.get('2user.dat')?.bytes ?? new Uint8Array(0);
     backupBytes[0] ^= 0xff;
 
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
@@ -508,7 +512,7 @@ describe('decryptAndMergeSlots: corrupt secondary file (04USER.DAT)', () => {
     // Corrupt the secondary file (04USER.DAT) AFTER openSave.
     // The session stores a reference to the same Uint8Array, so mutating
     // rawFiles bytes is visible to decryptAndMergeSlots via manager.files.
-    const secondaryBytes = rawFiles.get('04user.dat').bytes;
+    const secondaryBytes = rawFiles.get('04user.dat')?.bytes ?? new Uint8Array(0);
     secondaryBytes[0] ^= 0xff;
     secondaryBytes[1] ^= 0xaa;
 
@@ -525,7 +529,7 @@ describe('decryptAndMergeSlots: corrupt secondary file (04USER.DAT)', () => {
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // Corrupt the secondary file after openSave
-    const secondaryBytes = rawFiles.get('04user.dat').bytes;
+    const secondaryBytes = rawFiles.get('04user.dat')?.bytes ?? new Uint8Array(0);
     secondaryBytes[0] ^= 0xff;
 
     // exportEncryptedSave exercises the same decryptAndMergeSlots path
@@ -544,7 +548,7 @@ describe('exportEncryptedSave: corrupt backup decrypt failure', () => {
 
     // Corrupt the backup 2USER.DAT after openSave so its decrypt fails
     // during the exportEncryptedSave backup-decrypt loop.
-    const backupBytes = rawFiles.get('2user.dat').bytes;
+    const backupBytes = rawFiles.get('2user.dat')?.bytes ?? new Uint8Array(0);
     backupBytes[0] ^= 0xff;
 
     // Export should still succeed (backup failure is logged, not thrown)
@@ -571,7 +575,7 @@ describe('writeSaveData: inPlace mode', () => {
 
     // inPlace=true on encrypted source: assets are excluded (inPlace && encrypted),
     // but USER.DAT backups are decrypted and included
-    const { filesToWrite, filesToDelete } = await writeSaveData(slots, [], 0, '', null, true);
+    const { filesToWrite, filesToDelete } = await writeSaveData(slots, [], 0, '', undefined, true);
 
     expect(filesToWrite.has('PARAM.SFO')).toBe(false); // inPlace omits SFO
     expect(filesToWrite.has('USER.DAT')).toBe(true);
@@ -589,7 +593,7 @@ describe('writeSaveData: non-array failedSlots', () => {
       const rawFiles = makeUnencryptedSaveFiles(buf);
       const { slots } = await openSave(rawFiles);
 
-      const { filesToWrite } = await writeSaveData(slots, failedSlots, 0, '');
+      const { filesToWrite } = await writeSaveData(slots, /** @type {any} */ (failedSlots), 0, '');
       expect(filesToWrite.has('USER.DAT')).toBe(true);
     },
   );
@@ -611,7 +615,7 @@ describe('exportEncryptedSave: inPlace mode', () => {
       [],
       profileNumber,
       accountId,
-      null,
+      undefined,
       true,
     );
 
@@ -630,7 +634,7 @@ describe('exportEncryptedSave: onProgress callback', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
-    const messages = [];
+    const messages = /** @type {string[]} */ ([]);
     await exportEncryptedSave(slots, [], profileNumber, accountId, (msg) => messages.push(msg));
 
     expect(messages.length).toBeGreaterThan(0);
@@ -676,13 +680,14 @@ describe('save-api: failed slot with missing primaryFile', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
-    const failedWithNullPrimary = [
-      {
-        slot: 5,
-        error: 'resolve failed',
-        primaryFile: null,
-      },
-    ];
+    const failedWithNullPrimary =
+      /** @type {{slot: number, error: string, primaryFile: string|null}[]} */ ([
+        {
+          slot: 5,
+          error: 'resolve failed',
+          primaryFile: null,
+        },
+      ]);
 
     const { filesToWrite } = await writeSaveData(
       slots,
@@ -699,14 +704,15 @@ describe('save-api: failed slot with missing primaryFile', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
-    const failedWithMissingFile = [
-      {
-        slot: 5,
-        error: 'resolve failed',
-        primaryFile: 'NONEXISTENT.DAT',
-        decryptedBytes: null,
-      },
-    ];
+    const failedWithMissingFile =
+      /** @type {{slot: number, error: string, primaryFile: string|null, decryptedBytes?: Uint8Array|null}[]} */ ([
+        {
+          slot: 5,
+          error: 'resolve failed',
+          primaryFile: 'NONEXISTENT.DAT',
+          decryptedBytes: null,
+        },
+      ]);
 
     const { filesToWrite } = await writeSaveData(
       slots,
@@ -756,7 +762,7 @@ describe('exportEncryptedSave: non-array failedSlots', () => {
 
     const { filesToWrite } = await exportEncryptedSave(
       slots,
-      failedSlots,
+      /** @type {any} */ (failedSlots),
       profileNumber,
       accountId,
     );

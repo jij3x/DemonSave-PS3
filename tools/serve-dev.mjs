@@ -23,6 +23,7 @@ const __dirname = dirname(__filename);
 const ROOT = join(__dirname, '..');
 const PORT = 1420;
 
+/** @type {Record<string, string>} */
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -39,7 +40,7 @@ const MIME_TYPES = {
 
 const server = createServer((req, res) => {
   // Parse URL, default to index.html
-  let urlPath = decodeURIComponent(req.url.split('?')[0]);
+  let urlPath = decodeURIComponent((req.url ?? '/').split('?')[0]);
   if (urlPath === '/') urlPath = '/index.html';
 
   // Prevent path traversal outside ROOT

@@ -223,6 +223,14 @@
  *   Used by the UI for deterministic equipment-inventory binding.
  */
 
+/**
+ * Inventory categories iterated by sanitizeModel/mergeModel.  Typed as a
+ * fixed union so dynamic `cat` lookups into FullModel/SanitizedModel
+ * type-check without per-site casts.
+ * @type {('weapons'|'armor'|'rings'|'goods')[]}
+ */
+const INV_CATEGORIES = ['weapons', 'armor', 'rings', 'goods'];
+
 /* ---- Sanitize: full model → UI model ---- */
 
 /**
@@ -252,11 +260,13 @@ export function sanitizeModel(fullModel) {
   // idx1 values are collected into display.invIdxByRef for the UI's
   // equipment-inventory binding.
   const invIdxByRef = new Map();
-  for (const cat of ['weapons', 'armor', 'rings', 'goods']) {
+  for (const cat of INV_CATEGORIES) {
     m[cat] = (fullModel[cat] || []).map((rec) => {
       const ref = `inv:${rec._slot}`;
       invIdxByRef.set(ref, rec.idx1);
-      const out = { _ref: ref };
+      const out = /** @type {import('./model.js').SanitizedInventoryItem} */ (
+        /** @type {unknown} */ ({ _ref: ref })
+      );
       // UI-visible on-disk fields only
       out.itemId = rec.itemId;
       out.count = rec.count;
@@ -360,7 +370,7 @@ export function mergeModel(originalFullModel, sanitizedModel, out) {
   // --- Build lookup map from original (inventory only) ---
   // Use Map to keep numeric slot keys type-safe.
   const invBySlot = new Map(); // slot number → original record
-  for (const cat of ['weapons', 'armor', 'rings', 'goods']) {
+  for (const cat of INV_CATEGORIES) {
     for (const rec of originalFullModel[cat] || []) {
       invBySlot.set(rec._slot, rec);
     }
@@ -369,9 +379,11 @@ export function mergeModel(originalFullModel, sanitizedModel, out) {
   // --- Merge inventory ---
   // Track which original slots are still kept (for deletion detection).
   const keptSlots = new Set();
-  for (const cat of ['weapons', 'armor', 'rings', 'goods']) {
+  for (const cat of INV_CATEGORIES) {
     m[cat] = (sanitizedModel[cat] || []).map((rec) => {
-      const merged = { ...rec };
+      const merged = /** @type {import('./model.js').FullInventoryItem & { _ref?: string }} */ (
+        /** @type {unknown} */ ({ ...rec })
+      );
       const ref = rec._ref;
 
       if (ref && ref.startsWith('inv:')) {

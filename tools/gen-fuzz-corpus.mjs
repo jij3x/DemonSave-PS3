@@ -117,6 +117,11 @@ function setU64BE(buf, off, val) {
 function setU16LE(buf, off, val) {
   new DataView(buf.buffer, buf.byteOffset, buf.byteLength).setUint16(off, val, true);
 }
+/**
+ * @param {Uint8Array} buf
+ * @param {number} off
+ * @param {number} val
+ */
 function setU32LE(buf, off, val) {
   new DataView(buf.buffer, buf.byteOffset, buf.byteLength).setUint32(off, val, true);
 }

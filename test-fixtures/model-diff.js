@@ -202,6 +202,9 @@ function collectModelDiff(actual, expected, floatPrecision) {
  * Only compares UI-visible fields.  idx1/idx2 are binary-internal fields
  * stripped by sanitizeModel — they are not present in the sanitized/collected
  * model and are verified separately at the binary level (editor.test.js).
+ * @param {Record<string, unknown>} actual
+ * @param {Record<string, unknown>} expected
+ * @param {string} label
  * @returns {string[]}
  */
 function collectInventoryItemDiff(actual, expected, label) {
@@ -218,6 +221,9 @@ function collectInventoryItemDiff(actual, expected, label) {
 
 /**
  * Compare a single deposit item.
+ * @param {Record<string, unknown>} actual
+ * @param {Record<string, unknown>} expected
+ * @param {string} label
  * @returns {string[]}
  */
 function collectDepositItemDiff(actual, expected, label) {
@@ -231,7 +237,7 @@ function collectDepositItemDiff(actual, expected, label) {
   }
   // flags array (7 elements)
   if (Array.isArray(expected.flags)) {
-    const aFlags = actual.flags || [];
+    const aFlags = /** @type {number[]} */ (actual.flags || []);
     for (let i = 0; i < expected.flags.length; i++) {
       if (aFlags[i] !== expected.flags[i]) {
         errors.push(`${label}.flags[${i}]: expected ${expected.flags[i]}, got ${aFlags[i]}`);
@@ -253,7 +259,7 @@ function collectDepositItemDiff(actual, expected, label) {
 export function extractComparableModel(fullModel) {
   const m = { ...fullModel };
   for (const cat of ['weapons', 'armor', 'rings', 'goods']) {
-    m[cat] = (m[cat] || []).map((rec) => {
+    m[cat] = (m[cat] || []).map((/** @type {Record<string, unknown>} */ rec) => {
       const { _slot, _ref, idx1: _idx1, idx2: _idx2, ...rest } = rec;
       return rest;
     });

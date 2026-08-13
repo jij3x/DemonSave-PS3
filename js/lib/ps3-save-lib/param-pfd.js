@@ -616,13 +616,21 @@ function sigTableBuffer(pfd) {
   return buf;
 }
 
-/** Compute the top hash: HMAC-SHA1(realkey, hashTableBuffer). */
+/**
+ * Compute the top hash: HMAC-SHA1(realkey, hashTableBuffer).
+ * @param {ParamPFD} pfd
+ * @returns {Uint8Array}
+ */
 function getTopHash(pfd) {
   const buf = hashTableBuffer(pfd);
   return hmacSha1(pfd.realkey, buf, 0, buf.length);
 }
 
-/** Compute the bottom hash: HMAC-SHA1(realkey, sigTableBuffer). */
+/**
+ * Compute the bottom hash: HMAC-SHA1(realkey, sigTableBuffer).
+ * @param {ParamPFD} pfd
+ * @returns {Uint8Array}
+ */
 function getBottomHash(pfd) {
   const buf = sigTableBuffer(pfd);
   return hmacSha1(pfd.realkey, buf, 0, buf.length);
@@ -692,7 +700,7 @@ function getBucketChainHash(entryIndex, pfd) {
  * @param {boolean} fix
  * @param {ParamPFD} pfd
  * @param {Set<string>|null} [skipSet]
- * @param {Array|null} [failures]  if provided, failure details are pushed here
+ * @param {ParamPfdFailure[]|null} [failures]  if provided, failure details are pushed here
  * @returns {boolean}
  */
 function validAllEntryHashes(fileData, fix, pfd, skipSet = null, failures = null) {
@@ -737,7 +745,7 @@ function validAllEntryHashes(fileData, fix, pfd, skipSet = null, failures = null
  *
  * @param {boolean} fix
  * @param {ParamPFD} pfd
- * @param {Array|null} [failures]
+ * @param {ParamPfdFailure[]|null} [failures]
  * @returns {boolean}
  */
 function validDHKCID2(fix, pfd, failures = null) {
@@ -783,7 +791,7 @@ function validDHKCID2(fix, pfd, failures = null) {
  *
  * @param {boolean} fix
  * @param {ParamPFD} pfd
- * @param {Array|null} [failures]
+ * @param {ParamPfdFailure[]|null} [failures]
  * @returns {boolean}
  */
 function validFileCID(fix, pfd, failures = null) {
@@ -814,7 +822,7 @@ function validFileCID(fix, pfd, failures = null) {
  * Validate/fix top hash.
  * @param {boolean} fix
  * @param {ParamPFD} pfd
- * @param {Array|null} [failures]
+ * @param {ParamPfdFailure[]|null} [failures]
  * @returns {boolean}
  */
 function validTopHash(fix, pfd, failures = null) {
@@ -834,7 +842,7 @@ function validTopHash(fix, pfd, failures = null) {
  * Validate/fix bottom hash.
  * @param {boolean} fix
  * @param {ParamPFD} pfd
- * @param {Array|null} [failures]
+ * @param {ParamPfdFailure[]|null} [failures]
  * @returns {boolean}
  */
 function validBottomHash(fix, pfd, failures = null) {
@@ -879,7 +887,7 @@ export function validAllParamHashes(fileData, fix, pfd, skipSet = null) {
  * (`entry` for per-file checks, `bucket`/`slot` for table checks,
  * `hashType` for the top/bottom hash checks).
  *
- * @typedef {{ entry?: string, bucket?: number, slot?: number, hashType?: string, reason: string }} ParamPfdFailure
+ * @typedef {{ entry?: string, bucket?: number, slot?: number, hashType?: string, hashIndex?: number, expected?: Uint8Array, actual?: Uint8Array, reason?: string }} ParamPfdFailure
  */
 
 /**
@@ -893,6 +901,7 @@ export function validAllParamHashes(fileData, fix, pfd, skipSet = null) {
  * @returns {{ valid: boolean, failures: ParamPfdFailure[] }}
  */
 export function validateParamPfdDetailed(fileData, pfd) {
+  /** @type {ParamPfdFailure[]} */
   const failures = [];
   let valid = true;
 
@@ -979,7 +988,11 @@ export function getParamPfdCombinedData(pfd) {
 /* File decrypt / encrypt                                              */
 /* ------------------------------------------------------------------ */
 
-/** Align size up to a multiple of 16. */
+/**
+ * Align size up to a multiple of 16.
+ * @param {number} size
+ * @returns {number}
+ */
 function alignedSize(size) {
   return (size + 16 - 1) & ~(16 - 1);
 }

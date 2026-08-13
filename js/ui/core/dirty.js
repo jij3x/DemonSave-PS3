@@ -50,7 +50,10 @@ const SKIP_IDS = new Set([
 
 // --- Module state ---
 
-/** Root of the dirty counter tree (slot-level). */
+/**
+ * Root of the dirty counter tree (slot-level).
+ * @type {DirtyNode|null}
+ */
 let dirtyRoot = null;
 
 /** Maps tab-content DOM elements → DirtyNode (for element→node lookup). */
@@ -68,7 +71,10 @@ const rowSoftDeletedDirty = new WeakMap();
 /** Tracks whether a new (user-inserted) row contributes to the dirty count. */
 const newRowContributesDirty = new WeakMap();
 
-/** Callback fired after each debounced dirty flush. */
+/**
+ * Callback fired after each debounced dirty flush.
+ * @type {((isDirty: boolean) => void)|null}
+ */
 let onFormDirtyChange = null;
 
 /**
@@ -377,7 +383,7 @@ export function resetAndCaptureBaseline() {
   // baselines from the old slot, causing spurious dirty marks or missed
   // transitions.
   pendingElements.clear();
-  clearTimeout(dirtyTimer);
+  clearTimeout(dirtyTimer ?? undefined);
 
   // Reset the dirty tree once (clears all counts + tab-button indicators)
   if (dirtyRoot) dirtyRoot.reset();
@@ -749,6 +755,7 @@ export function hasUnsavedChanges() {
 /** Elements changed since the last flush (collected for batch processing). */
 let pendingElements = new Set();
 
+/** @type {ReturnType<typeof setTimeout>|null} */
 let dirtyTimer = null;
 
 /**
@@ -773,7 +780,7 @@ function flushDirty() {
  */
 function scheduleDirtyCheck(el) {
   pendingElements.add(el);
-  clearTimeout(dirtyTimer);
+  clearTimeout(dirtyTimer ?? undefined);
   dirtyTimer = setTimeout(flushDirty, 150);
 }
 
@@ -791,7 +798,7 @@ function scheduleDirtyCheck(el) {
  */
 export function resetDirtyState() {
   // Cancel any pending debounced flush
-  clearTimeout(dirtyTimer);
+  clearTimeout(dirtyTimer ?? undefined);
   dirtyTimer = null;
   // Clear the pending set (replaces it with a fresh empty Set so any
   // references held by scheduled callbacks are detached)

@@ -41,7 +41,9 @@ describe('ui-setup', () => {
       /** @type {HTMLInputElement} */ (document.getElementById('hairR')).value = '1.0';
       /** @type {HTMLInputElement} */ (document.getElementById('hairG')).value = '0.0';
       /** @type {HTMLInputElement} */ (document.getElementById('hairB')).value = '0.0';
-      document.getElementById('hairR').dispatchEvent(new Event('input'));
+      /** @type {HTMLElement} */ (document.getElementById('hairR')).dispatchEvent(
+        new Event('input'),
+      );
 
       expect(sample.style.background).toBe('rgb(255, 0, 0)');
     });
@@ -67,7 +69,9 @@ describe('ui-setup', () => {
 
       // An empty value parses to NaN, which the `|| 0` defaults to 0.
       /** @type {HTMLInputElement} */ (document.getElementById('hairR')).value = '';
-      document.getElementById('hairR').dispatchEvent(new Event('input'));
+      /** @type {HTMLElement} */ (document.getElementById('hairR')).dispatchEvent(
+        new Event('input'),
+      );
 
       expect(sample.style.background).toBe('rgb(0, 0, 0)');
     });
@@ -113,7 +117,9 @@ describe('ui-setup', () => {
       warpSel.dispatchEvent(new Event('change'));
 
       expect(/** @type {HTMLInputElement} */ (document.getElementById('world')).value).toBeTruthy();
-      expect(document.getElementById('worldName').textContent).toBeTruthy();
+      expect(
+        /** @type {HTMLElement} */ (document.getElementById('worldName')).textContent,
+      ).toBeTruthy();
     });
 
     test('world input updates world name', () => {
@@ -124,11 +130,13 @@ describe('ui-setup', () => {
 
       // Set to a valid world number and dispatch input event
       /** @type {HTMLInputElement} */ (document.getElementById('world')).value = '1';
-      document.getElementById('world').dispatchEvent(new Event('input'));
+      /** @type {HTMLElement} */ (document.getElementById('world')).dispatchEvent(
+        new Event('input'),
+      );
 
       // worldName should be updated (either to the world name or empty if invalid)
       // The key is that the listener fired without throwing
-      const name = document.getElementById('worldName').textContent;
+      const name = /** @type {HTMLElement} */ (document.getElementById('worldName')).textContent;
       expect(typeof name).toBe('string');
     });
 
@@ -158,9 +166,13 @@ describe('ui-setup', () => {
       setupWarpAndWorld();
 
       /** @type {HTMLInputElement} */ (document.getElementById('world')).value = '999';
-      document.getElementById('world').dispatchEvent(new Event('input'));
+      /** @type {HTMLElement} */ (document.getElementById('world')).dispatchEvent(
+        new Event('input'),
+      );
 
-      expect(document.getElementById('worldName').textContent).toBe('');
+      expect(/** @type {HTMLElement} */ (document.getElementById('worldName')).textContent).toBe(
+        '',
+      );
     });
 
     test('attaches the warp listener even when #world is absent', () => {
@@ -338,7 +350,7 @@ describe('ui-setup', () => {
       const { group } = buildTabGroup();
       setupTabs();
 
-      const tabsContainer = group.querySelector(':scope > .tabs');
+      const tabsContainer = /** @type {HTMLElement} */ (group.querySelector(':scope > .tabs'));
       expect(tabsContainer.getAttribute('role')).toBe('tablist');
     });
 
@@ -413,14 +425,19 @@ describe('ui-setup', () => {
     test('preserves existing ARIA roles instead of overwriting them', () => {
       const { group, btnA, contentA } = buildTabGroup();
       // Pre-set roles so the "already has role" branches are taken.
-      group.querySelector(':scope > .tabs').setAttribute('role', 'tablist');
+      /** @type {HTMLElement} */ (group.querySelector(':scope > .tabs')).setAttribute(
+        'role',
+        'tablist',
+      );
       btnA.setAttribute('role', 'tab');
       contentA.setAttribute('role', 'tabpanel');
 
       setupTabs();
 
       // Roles were preserved (the auto-assign branches were skipped).
-      expect(group.querySelector(':scope > .tabs').getAttribute('role')).toBe('tablist');
+      expect(
+        /** @type {HTMLElement} */ (group.querySelector(':scope > .tabs')).getAttribute('role'),
+      ).toBe('tablist');
       expect(btnA.getAttribute('role')).toBe('tab');
       expect(contentA.getAttribute('role')).toBe('tabpanel');
     });
@@ -547,8 +564,10 @@ describe('ui-setup', () => {
 
       invWeaponBtn.click();
 
-      const tbody = document.querySelector(
-        'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody',
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector(
+          'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody',
+        )
       );
       expect(tbody.querySelectorAll('tr').length).toBe(1);
     });
@@ -559,8 +578,8 @@ describe('ui-setup', () => {
 
       invGoodsBtn.click();
 
-      const tbody = document.querySelector(
-        'table.inv-table[data-category="goods"][data-goods-type="9"] tbody',
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-category="goods"][data-goods-type="9"] tbody')
       );
       expect(tbody.querySelectorAll('tr').length).toBe(1);
     });
@@ -571,7 +590,9 @@ describe('ui-setup', () => {
 
       invArmorBtn.click();
 
-      const tbody = document.querySelector('table.inv-table[data-category="armor"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-category="armor"] tbody')
+      );
       expect(tbody.querySelectorAll('tr').length).toBe(1);
     });
 
@@ -581,7 +602,9 @@ describe('ui-setup', () => {
 
       spellAddBtn.click();
 
-      const tbody = document.querySelector('#spellsTableBody tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('#spellsTableBody tbody')
+      );
       expect(tbody.querySelectorAll('tr').length).toBe(1);
     });
 
@@ -591,8 +614,10 @@ describe('ui-setup', () => {
 
       depWeaponBtn.click();
 
-      const tbody = document.querySelector(
-        'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody',
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector(
+          'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody',
+        )
       );
       expect(tbody.querySelectorAll('tr').length).toBe(1);
     });
@@ -603,7 +628,9 @@ describe('ui-setup', () => {
 
       depArmorBtn.click();
 
-      const tbody = document.querySelector('table.dep-table[data-category="armor"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.dep-table[data-category="armor"] tbody')
+      );
       expect(tbody.querySelectorAll('tr').length).toBe(1);
     });
 
@@ -613,8 +640,10 @@ describe('ui-setup', () => {
 
       // First click adds a row
       invWeaponBtn.click();
-      const tbody = document.querySelector(
-        'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody',
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector(
+          'table.inv-table[data-category="weapons"][data-weapon-type="1"] tbody',
+        )
       );
       expect(tbody.querySelectorAll('tr').length).toBe(1);
 
@@ -628,7 +657,9 @@ describe('ui-setup', () => {
       setupAddRowButtons();
 
       // Fill a deposit table up to the global entry limit so the "full" guard fires.
-      const tbody = document.querySelector('table.dep-table[data-category="armor"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.dep-table[data-category="armor"] tbody')
+      );
       const max = getLimits().depositMaxEntries;
       for (let i = 0; i < max; i++) {
         tbody.appendChild(document.createElement('tr'));
@@ -889,8 +920,8 @@ describe('ui-setup', () => {
       document.body.appendChild(btn);
       setupAddRowButtons();
       btn.click();
-      const tbody = document.querySelector(
-        'table.dep-table[data-category="goods"][data-goods-type="9"] tbody',
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.dep-table[data-category="goods"][data-goods-type="9"] tbody')
       );
       expect(tbody.querySelectorAll('tr').length).toBe(1);
     });
@@ -898,7 +929,9 @@ describe('ui-setup', () => {
     test('spell add button gates while an unselected spell row exists', () => {
       const { spellAddBtn } = buildAddButtonDOM();
       setupAddRowButtons();
-      const tbody = document.querySelector('#spellsTableBody tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('#spellsTableBody tbody')
+      );
       const unselected = document.createElement('tr');
       const sel = document.createElement('select');
       sel.className = 'spell-name'; // no value → gate blocks
@@ -912,7 +945,9 @@ describe('ui-setup', () => {
     test('deposit add button gates while an unselected row exists', () => {
       const { depArmorBtn } = buildAddButtonDOM();
       setupAddRowButtons();
-      const tbody = document.querySelector('table.dep-table[data-category="armor"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.dep-table[data-category="armor"] tbody')
+      );
       const unselected = document.createElement('tr');
       const sel = document.createElement('select');
       sel.className = 'dep-name'; // no value → gate blocks

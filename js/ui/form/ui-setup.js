@@ -103,6 +103,7 @@ export function setupTabs() {
       /**
        * Activate a tab by index, updating aria-selected, tabindex, and
        * content visibility.
+       * @param {number} tabIndex
        */
       function activateTab(tabIndex) {
         tabs.forEach((t, i) => {
@@ -218,6 +219,7 @@ export function setupAddRowButtons() {
       // Look up max durability from des-db for weapons/armor.
       // Falls back to 200 if not found (or for non-durability categories).
       const durability = lookupMaxDurability(category, defaultItemId);
+      /** @type {{ _ref: string, itemId: (number|undefined), count: number, misc1: number, durability: number, misc2: number }} */
       const rec = {
         _ref: '',
         itemId: undefined,
@@ -302,6 +304,7 @@ export function setupAddRowButtons() {
         defaultItemId = depIds[0] ?? 0;
         tbody = document.querySelector(`table.dep-table[data-category="${category}"] tbody`);
       }
+      if (!tbody) return;
 
       // Gate: don't add another row while an unselected one exists.
       for (const tr of tbody.querySelectorAll('tr')) {
@@ -320,7 +323,7 @@ export function setupAddRowButtons() {
       }
       const isDecomposable = typeId != null && DECOMPOSED_WEAPON_TYPES.has(typeId);
 
-      if (isDecomposable) {
+      if (typeId != null && isDecomposable) {
         // Default to first base weapon, first path, first level
         const baseWeapons = getBaseWeaponsForType(typeId);
         const firstBaseId = baseWeapons[0]?.baseId ?? 0;

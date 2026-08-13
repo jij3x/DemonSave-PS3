@@ -72,13 +72,60 @@ import { refreshEquipmentDisplay } from './core/dom-helpers.js';
 import { resetDispatcher } from './core/event-dispatcher.js';
 
 /**
+ * Narrow a thrown/rejected value to an AbortError (user-cancelled picker).
+ * @param {unknown} e
+ * @returns {e is Error}
+ */
+function isAbortError(e) {
+  return e instanceof Error && e.name === 'AbortError';
+}
+
+/**
+ * Best-effort human-readable message for any thrown/rejected value.
+ * @param {unknown} e
+ * @returns {string}
+ */
+function toErrorMessage(e) {
+  return e instanceof Error ? e.message : String(e);
+}
+
+/**
+ * A single character slot entry in {@link AppState.slots}.
+ *
+ * Extends the gateway's `SaveSlot` with an app-local `dirty` flag that
+ * tracks unsaved edits per slot.
+ *
+ * @typedef {import('../des-savefile/save-api.js').SaveSlot & { dirty?: boolean }} SlotEntry
+ */
+
+/**
+ * The application state object returned by {@link createInitialState}.
+ *
+ * @typedef {Object} AppState
+ * @property {SlotEntry[]} slots  character slots loaded from openSave
+ * @property {Array<{slot: number, error: string, primaryFile: string|null}>} failedSlots
+ *   slots that failed to load
+ * @property {number} currentSlot  index into the slots array
+ * @property {number} profileNumber  SFO profile number (folder-level)
+ * @property {string} accountId  PSN account ID (folder-level, 32 hex chars or empty)
+ * @property {boolean|undefined} sourceEncrypted  original encryption state (never changes after load)
+ * @property {boolean} encryptMode  user toggle: true=encrypted output, false=decrypted output
+ * @property {SaveDirHandle|null} dirHandle  handle for write-back (Chromium FS or Tauri path shim)
+ * @property {string} dirName  save folder name (tooltip + ZIP filename)
+ * @property {boolean} loaded  true after first slot has been rendered
+ * @property {number} fileCount  number of files loaded (close button tooltip)
+ * @property {boolean} busy  true during async save/export (write-lock)
+ * @property {Uint8Array|null} sfoFingerprint  PARAM.SFO bytes from open (folder-identity check)
+ */
+
+/**
  * Create a fresh initial state object.
  *
  * Used for both the initial module load and the close-button reset,
  * so there is a single source of truth for default state — adding a new
  * field here automatically resets it on close.
  *
- * @returns {Object}
+ * @returns {AppState}
  */
 function createInitialState() {
   return {
@@ -107,7 +154,10 @@ let isInitialized = false;
 /** Guard flag: prevents drag-and-drop listeners from stacking on re-init. */
 let dragDropInitialized = false;
 
-/** Stored beforeunload handler for cleanup in destroyApp(). */
+/**
+ * Stored beforeunload handler for cleanup in destroyApp().
+ * @type {((e: BeforeUnloadEvent) => void) | null}
+ */
 let beforeUnloadHandler = null;
 
 /**
@@ -152,8 +202,13 @@ function onDirtyChange() {
   updateSlotDirtyDot();
 }
 
+/**
+ * Set the status bar message.
+ * @param {string} msg
+ */
 function setStatus(msg) {
   const el = document.getElementById('status');
+  if (!el) return;
   el.textContent = msg;
   // Show a tooltip with the full message, but ONLY when it's visually
   // truncated (overflowing the status span's max-width).  The tooltip
@@ -216,6 +271,7 @@ function commitCurrentSlot() {
  */
 function populateSlotDropdown() {
   const sel = document.getElementById('saveSlot');
+  if (!sel) return;
   sel.innerHTML = '';
 
   // Successfully loaded slots — selectable
@@ -249,7 +305,8 @@ function populateSlotDropdown() {
   }
 
   // Show the slot selector section
-  document.getElementById('slotSection').hidden = false;
+  const slotSection = document.getElementById('slotSection');
+  if (slotSection) slotSection.hidden = false;
 }
 
 /**
@@ -461,7 +518,7 @@ function setupDragAndDrop() {
       state.dirHandle = null;
       await handleOpen(rawFiles);
     } catch (err) {
-      setStatus(`Failed to open dropped save: ${err.message}`);
+      setStatus(`Failed to open dropped save: ${toErrorMessage(err)}`);
       console.error(err);
     }
   });
@@ -518,10 +575,10 @@ function setupLandingBrowse() {
         state.dirName = dirHandle?.name || '';
         await handleOpen(files);
       } catch (err) {
-        if (err.name === 'AbortError') {
+        if (isAbortError(err)) {
           setStatus('Open cancelled.');
         } else {
-          setStatus(`Failed to open save: ${err.message}`);
+          setStatus(`Failed to open save: ${toErrorMessage(err)}`);
           console.error(err);
         }
       }
@@ -552,10 +609,10 @@ function setupOpenButton() {
       state.dirName = dirHandle?.name || '';
       await handleOpen(files);
     } catch (err) {
-      if (err.name === 'AbortError') {
+      if (isAbortError(err)) {
         setStatus('Open cancelled.');
       } else {
-        setStatus(`Failed to open save: ${err.message}`);
+        setStatus(`Failed to open save: ${toErrorMessage(err)}`);
         console.error(err);
       }
     }
@@ -635,7 +692,7 @@ export async function initApp() {
   window.addEventListener('beforeunload', beforeUnloadHandler);
 
   // Slot dropdown change — instant switch to the selected slot
-  document.getElementById('saveSlot').addEventListener('change', (e) => {
+  document.getElementById('saveSlot')?.addEventListener('change', (e) => {
     const index = parseInt(/** @type {HTMLSelectElement} */ (e.target).value, 10);
     if (!isNaN(index)) {
       renderSlot(index);
@@ -643,7 +700,7 @@ export async function initApp() {
   });
 
   // Encryption toggle — flips between encrypted (locked) and decrypted (unlocked) output
-  document.getElementById('btnToggleEncrypt').addEventListener('click', () => {
+  document.getElementById('btnToggleEncrypt')?.addEventListener('click', () => {
     state.encryptMode = !state.encryptMode;
     updateEncryptToggle();
     setStatus(
@@ -654,7 +711,7 @@ export async function initApp() {
   });
 
   // Save button — overwrites save folder in-place (Chromium-based browsers only)
-  document.getElementById('btnSave').addEventListener('click', async () => {
+  document.getElementById('btnSave')?.addEventListener('click', async () => {
     if (state.busy) return;
     setBusy(true);
     try {
@@ -664,7 +721,7 @@ export async function initApp() {
         await handleOverwriteDecrypted();
       }
     } catch (err) {
-      setStatus(`Save failed: ${err.message}`);
+      setStatus(`Save failed: ${toErrorMessage(err)}`);
       console.error(err);
     } finally {
       setBusy(false);
@@ -672,7 +729,7 @@ export async function initApp() {
   });
 
   // Close button — release current save and return to landing page
-  document.getElementById('btnClose').addEventListener('click', async () => {
+  document.getElementById('btnClose')?.addEventListener('click', async () => {
     // Guard: never close while an async operation is in-flight — the
     // pending save/export may still resolve and mutate state/DOM after
     // the reset, causing corruption.
@@ -693,7 +750,8 @@ export async function initApp() {
     if (landing) landing.hidden = false;
 
     // Reset slot dropdown
-    document.getElementById('slotSection').hidden = true;
+    const slotSection = document.getElementById('slotSection');
+    if (slotSection) slotSection.hidden = true;
     const slotSel = document.getElementById('saveSlot');
     if (slotSel) slotSel.innerHTML = '';
 
@@ -714,7 +772,7 @@ export async function initApp() {
   });
 
   // Export button — downloads as ZIP (mode depends on toggle)
-  document.getElementById('btnExport').addEventListener('click', async () => {
+  document.getElementById('btnExport')?.addEventListener('click', async () => {
     if (state.busy) return;
     setBusy(true);
     try {
@@ -724,7 +782,7 @@ export async function initApp() {
         await handleExportDecrypted();
       }
     } catch (err) {
-      setStatus(`Export failed: ${err.message}`);
+      setStatus(`Export failed: ${toErrorMessage(err)}`);
       console.error(err);
     } finally {
       setBusy(false);
@@ -825,7 +883,7 @@ async function handleOpen(rawFiles) {
       );
     }
   } catch (err) {
-    setStatus(`Failed to open save: ${err.message}`);
+    setStatus(`Failed to open save: ${toErrorMessage(err)}`);
     console.error(err);
   }
 }
@@ -890,10 +948,10 @@ async function ensureDirHandle() {
     setStatus('Write access granted.');
     return true;
   } catch (err) {
-    if (err.name === 'AbortError') {
+    if (isAbortError(err)) {
       setStatus('Save cancelled.');
     } else {
-      setStatus(`Could not get write access: ${err.message}`);
+      setStatus(`Could not get write access: ${toErrorMessage(err)}`);
     }
     return false;
   }
@@ -928,12 +986,14 @@ async function handleOverwriteDecrypted() {
     true, // inPlace: only write USER.DAT variants, skip unchanged files
   );
 
+  const dirHandle = state.dirHandle;
+  if (!dirHandle) return;
   setStatus('Writing decrypted files…');
   let deleteErrMsg = '';
   try {
     // Write new files FIRST — if this fails, the save folder still has
     // its old (intact) files and is not corrupted.
-    await writeFilesToDirectory(state.dirHandle, filesToWrite);
+    await writeFilesToDirectory(dirHandle, filesToWrite);
 
     // Only after a successful write, delete stale files (e.g. PARAM.PFD
     // when decrypting).  If the delete fails, the new files are already
@@ -941,10 +1001,10 @@ async function handleOverwriteDecrypted() {
     // transitional state and the user must re-open it.
     if (filesToDelete && filesToDelete.size > 0) {
       try {
-        await deleteFilesFromDirectory(state.dirHandle, filesToDelete);
+        await deleteFilesFromDirectory(dirHandle, filesToDelete);
       } catch (delErr) {
         console.error('Post-write cleanup failed:', delErr);
-        deleteErrMsg = delErr.message;
+        deleteErrMsg = toErrorMessage(delErr);
       }
     }
 
@@ -955,7 +1015,7 @@ async function handleOverwriteDecrypted() {
     // but returns it separately as sfoBytes.
     if (!filesToWrite.has('PARAM.SFO') && sfoBytes) {
       const sfoWriteMap = new Map([['PARAM.SFO', sfoBytes]]);
-      await writeFilesToDirectory(state.dirHandle, sfoWriteMap);
+      await writeFilesToDirectory(dirHandle, sfoWriteMap);
       // Add it to filesToWrite so updateSessionAfterWrite syncs session.sfoBytes
       filesToWrite.set('PARAM.SFO', sfoBytes);
     }
@@ -992,7 +1052,7 @@ async function handleOverwriteDecrypted() {
     );
   } catch (err) {
     setStatus(
-      `Write failed: ${err.message}. ` +
+      `Write failed: ${toErrorMessage(err)}. ` +
         'Your save folder may be in an inconsistent state — ' +
         'please restore from a backup if the game cannot load it.',
     );
@@ -1092,10 +1152,10 @@ async function handleExportDecrypted() {
   try {
     handle = await pickExportDestination();
   } catch (err) {
-    if (err.name === 'AbortError') {
+    if (isAbortError(err)) {
       setStatus('Export cancelled.');
     } else {
-      setStatus(`Export failed: ${err.message}`);
+      setStatus(`Export failed: ${toErrorMessage(err)}`);
       console.error(err);
     }
     return;
@@ -1163,9 +1223,11 @@ async function handleOverwriteEncrypted() {
     }
   }
 
+  const dirHandle = state.dirHandle;
+  if (!dirHandle) return;
   setStatus('Writing encrypted files…');
   try {
-    await writeFilesToDirectory(state.dirHandle, filesToWrite);
+    await writeFilesToDirectory(dirHandle, filesToWrite);
 
     // Sync in-memory session state to match the new on-disk encryption state.
     // This parses the new PARAM.PFD, updates manager.files, rawFiles, and
@@ -1181,7 +1243,7 @@ async function handleOverwriteEncrypted() {
 
     setStatus('Save overwritten with encrypted files.');
   } catch (err) {
-    setStatus(`Write failed: ${err.message}.`);
+    setStatus(`Write failed: ${toErrorMessage(err)}.`);
     console.error(err);
   }
 }
@@ -1208,10 +1270,10 @@ async function handleExportEncrypted() {
   try {
     handle = await pickExportDestination();
   } catch (err) {
-    if (err.name === 'AbortError') {
+    if (isAbortError(err)) {
       setStatus('Export cancelled.');
     } else {
-      setStatus(`Export failed: ${err.message}`);
+      setStatus(`Export failed: ${toErrorMessage(err)}`);
       console.error(err);
     }
     return;

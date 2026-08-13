@@ -33,14 +33,23 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     sandboxes.length = 0;
   });
 
-  /** Create a tmp sandbox and track it for cleanup. */
+  /**
+   * Create a tmp sandbox and track it for cleanup.
+   * @param {string} label
+   * @returns {ReturnType<typeof createTmpSandbox>}
+   */
   function newSandbox(label) {
     const sb = createTmpSandbox(label);
     sandboxes.push(sb);
     return sb;
   }
 
-  /** Write rawFiles to disk and return the on-disk rawFiles map. */
+  /**
+   * Write rawFiles to disk and return the on-disk rawFiles map.
+   * @param {ReturnType<typeof createTmpSandbox>} sandbox
+   * @param {Map<string, {name: string, bytes: Uint8Array}>} rawFiles
+   * @returns {Map<string, {name: string, bytes: Uint8Array}>}
+   */
   function writeToDisk(sandbox, rawFiles) {
     for (const [, entry] of rawFiles) {
       sandbox.writeFile(entry.name, entry.bytes);
@@ -48,7 +57,13 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     return sandbox.readFiles();
   }
 
-  /** Write filesToWrite to disk, optionally deleting stale files first. */
+  /**
+   * Write filesToWrite to disk, optionally deleting stale files first.
+   * @param {ReturnType<typeof createTmpSandbox>} sandbox
+   * @param {Map<string, Uint8Array>} filesToWrite
+   * @param {Set<string>|string[]} [filesToDelete]
+   * @returns {Map<string, {name: string, bytes: Uint8Array}>}
+   */
   function writeOutputToDisk(sandbox, filesToWrite, filesToDelete) {
     if (filesToDelete) {
       for (const name of filesToDelete) sandbox.deleteFile(name);
@@ -83,7 +98,9 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     for (const slotNum of [1, 2, 3, 4]) {
       const slot = slots.find((s) => s.slot === slotNum);
       expect(slot).toBeDefined();
-      assertModelsMatch(slot.model, getExpectedModel(slotNum));
+      if (slot) {
+        assertModelsMatch(slot.model, getExpectedModel(slotNum));
+      }
     }
 
     // Verify files on disk are exactly 256 KB each
@@ -109,7 +126,10 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     expect(slots).toHaveLength(4);
 
     for (const slotNum of [1, 2, 3, 4]) {
-      assertModelsMatch(slots.find((s) => s.slot === slotNum).model, getExpectedModel(slotNum));
+      const slot = slots.find((s) => s.slot === slotNum);
+      if (slot) {
+        assertModelsMatch(slot.model, getExpectedModel(slotNum));
+      }
     }
   });
 
@@ -148,8 +168,10 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     // Slot 4 should ALSO load fine — resolver picked 103USER.DAT, not the stale 03USER.DAT
     const slot4 = slots.find((s) => s.slot === 4);
     expect(slot4).toBeDefined();
-    expect(slot4.session.primaryFile).toBe('103USER.DAT');
-    assertModelsMatch(slot4.model, getExpectedModel(4));
+    if (slot4) {
+      expect(slot4.session.primaryFile).toBe('103USER.DAT');
+      assertModelsMatch(slot4.model, getExpectedModel(4));
+    }
   });
 
   test('stale file does not corrupt slot 4 data through full chain', async () => {
@@ -174,8 +196,10 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
 
     // Modify slot 4
     const slot4 = slots.find((s) => s.slot === 4);
-    slot4.model.vit = 77;
-    slot4.model.name = 'StaleTest';
+    if (slot4) {
+      slot4.model.vit = 77;
+      slot4.model.name = 'StaleTest';
+    }
 
     // Export encrypted
     const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
@@ -187,8 +211,10 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
 
     const readSlot4 = readSlots.find((s) => s.slot === 4);
     expect(readSlot4).toBeDefined();
-    expect(readSlot4.model.vit).toBe(77);
-    expect(readSlot4.model.name).toBe('StaleTest');
+    if (readSlot4) {
+      expect(readSlot4.model.vit).toBe(77);
+      expect(readSlot4.model.name).toBe('StaleTest');
+    }
   });
 
   // -------------------------------------------------------------------
@@ -222,15 +248,17 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
 
     // Backup files must be encrypted (different from plaintext)
     const backupEnc = filesToWrite.get('2USER.DAT');
-    const backupOrig = rawFiles.get('2user.dat').bytes;
+    const backupOrig = rawFiles.get('2user.dat')?.bytes;
     // The re-encrypted output should differ from the original encrypted input
     // (different PFD → different encryption)
     let differs = false;
-    const minLen = Math.min(backupEnc.length, backupOrig.length);
-    for (let i = 0; i < minLen; i++) {
-      if (backupEnc[i] !== backupOrig[i]) {
-        differs = true;
-        break;
+    if (backupEnc && backupOrig) {
+      const minLen = Math.min(backupEnc.length, backupOrig.length);
+      for (let i = 0; i < minLen; i++) {
+        if (backupEnc[i] !== backupOrig[i]) {
+          differs = true;
+          break;
+        }
       }
     }
     expect(differs).toBe(true);
@@ -242,8 +270,10 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
 
     expect(encrypted).toBe(true);
     expect(readSlots).toHaveLength(2);
-    assertModelsMatch(readSlots.find((s) => s.slot === 1).model, getExpectedModel(1));
-    assertModelsMatch(readSlots.find((s) => s.slot === 2).model, getExpectedModel(2));
+    const rs1 = readSlots.find((s) => s.slot === 1);
+    const rs2 = readSlots.find((s) => s.slot === 2);
+    if (rs1) assertModelsMatch(rs1.model, getExpectedModel(1));
+    if (rs2) assertModelsMatch(rs2.model, getExpectedModel(2));
   });
 
   // -------------------------------------------------------------------
@@ -292,9 +322,11 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     // Verify all modifications survived across all slots
     for (const slotNum of [1, 2, 3, 4]) {
       const slot = s2.find((s) => s.slot === slotNum);
-      expect(slot.model.vit).toBe(slotNum * 100);
-      expect(slot.model.souls).toBe(slotNum * 10000);
-      expect(slot.model.name).toBe(`Slot${slotNum}Mod`);
+      if (slot) {
+        expect(slot.model.vit).toBe(slotNum * 100);
+        expect(slot.model.souls).toBe(slotNum * 10000);
+        expect(slot.model.name).toBe(`Slot${slotNum}Mod`);
+      }
     }
 
     // Verify assets survived
@@ -314,18 +346,21 @@ describe('round-trip: realistic folder (full rotational variants)', () => {
     const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
 
     // Modify
-    slots.find((s) => s.slot === 1).model.name = 'Alpha';
-    slots.find((s) => s.slot === 2).model.name = 'Beta';
-    slots.find((s) => s.slot === 3).model.name = 'Gamma';
+    const m1 = slots.find((s) => s.slot === 1);
+    const m2 = slots.find((s) => s.slot === 2);
+    const m3 = slots.find((s) => s.slot === 3);
+    if (m1) m1.model.name = 'Alpha';
+    if (m2) m2.model.name = 'Beta';
+    if (m3) m3.model.name = 'Gamma';
 
     const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
     const reopened = writeOutputToDisk(sb, filesToWrite);
     const { slots: readSlots } = await openSave(reopened);
 
     expect(readSlots).toHaveLength(3);
-    expect(readSlots.find((s) => s.slot === 1).model.name).toBe('Alpha');
-    expect(readSlots.find((s) => s.slot === 2).model.name).toBe('Beta');
-    expect(readSlots.find((s) => s.slot === 3).model.name).toBe('Gamma');
+    expect(readSlots.find((s) => s.slot === 1)?.model.name).toBe('Alpha');
+    expect(readSlots.find((s) => s.slot === 2)?.model.name).toBe('Beta');
+    expect(readSlots.find((s) => s.slot === 3)?.model.name).toBe('Gamma');
   });
 
   // -------------------------------------------------------------------

@@ -13,6 +13,7 @@ import { COUNT_LIMITS } from './controls.js';
 
 /**
  * Map an equipment element id to the des-db category used for name lookup.
+ * @type {Record<string, string>}
  */
 export const EQ_CATEGORY = {
   leftHand1: 'weapons',
@@ -117,7 +118,7 @@ export function getNum(id) {
 export function getEqId(id) {
   const span = $(id);
   if (!span) return 0;
-  const raw = parseInt(span.dataset.id, 10);
+  const raw = parseInt(span.dataset.id ?? '', 10);
   return isNaN(raw) ? 0 : raw >>> 0;
 }
 
@@ -197,6 +198,7 @@ export function setEquipmentText(id, val, category, resetOrig = false) {
  * completes in microseconds.
  */
 const REFRESH_DEBOUNCE_MS = 16; // ~1 frame at 60fps
+/** @type {ReturnType<typeof setTimeout>|null} */
 let _refreshTimer = null;
 
 export function refreshEquipmentDisplay() {

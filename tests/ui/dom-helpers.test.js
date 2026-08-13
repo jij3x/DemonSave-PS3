@@ -713,7 +713,7 @@ describe('dom-helpers', () => {
     test('creates a td with a number input', () => {
       const td = makeCountCell('inv-count', 5, true);
       expect(td.tagName).toBe('TD');
-      const inp = td.querySelector('input');
+      const inp = /** @type {HTMLInputElement} */ (td.querySelector('input'));
       expect(inp).toBeTruthy();
       expect(inp.type).toBe('number');
       expect(inp.value).toBe('5');
@@ -721,8 +721,12 @@ describe('dom-helpers', () => {
     });
 
     test('defaults to 0 when val is null', () => {
-      const td = makeCountCell('inv-count', null, true);
-      expect(td.querySelector('input').value).toBe('0');
+      const td = makeCountCell(
+        'inv-count',
+        /** @type {number} */ (/** @type {unknown} */ (null)),
+        true,
+      );
+      expect(/** @type {HTMLInputElement} */ (td.querySelector('input')).value).toBe('0');
     });
 
     test('hides cell when visible=false', () => {
@@ -766,15 +770,18 @@ describe('dom-helpers', () => {
     test('creates a td with a number input', () => {
       const td = makeNumCell('inv-durability', 300);
       expect(td.tagName).toBe('TD');
-      const inp = td.querySelector('input');
+      const inp = /** @type {HTMLInputElement} */ (td.querySelector('input'));
       expect(inp.type).toBe('number');
       expect(inp.value).toBe('300');
       expect(inp.className).toBe('inv-durability');
     });
 
     test('defaults to 0 for null val', () => {
-      const td = makeNumCell('inv-durability', null);
-      expect(td.querySelector('input').value).toBe('0');
+      const td = makeNumCell(
+        'inv-durability',
+        /** @type {number} */ (/** @type {unknown} */ (null)),
+      );
+      expect(/** @type {HTMLInputElement} */ (td.querySelector('input')).value).toBe('0');
     });
   });
 
@@ -856,14 +863,14 @@ describe('dom-helpers', () => {
 
     test('makeCountCell uses ammo limits when isAmmo=true', () => {
       const td = makeCountCell('inv-count', 5, true, true);
-      const inp = td.querySelector('input');
+      const inp = /** @type {HTMLInputElement} */ (td.querySelector('input'));
       expect(inp.min).toBe(String(COUNT_LIMITS.ammo.min));
       expect(inp.max).toBe(String(COUNT_LIMITS.ammo.max));
     });
 
     test('makeCountCell uses deposit limits for a dep-* class', () => {
       const td = makeCountCell('dep-count', 5, true);
-      const inp = td.querySelector('input');
+      const inp = /** @type {HTMLInputElement} */ (td.querySelector('input'));
       expect(inp.min).toBe(String(COUNT_LIMITS.deposit.min));
       expect(inp.max).toBe(String(COUNT_LIMITS.deposit.max));
     });
@@ -893,7 +900,9 @@ describe('dom-helpers', () => {
       refreshEquipmentForItems([{ itemId: String(VALID_WEAPON_ID), idx1: null, action: 'delete' }]);
 
       // No live row has the item → slot cleared.
-      expect(document.getElementById('leftHand1').dataset.id).toBe(String(0xffffffff));
+      expect(/** @type {HTMLElement} */ (document.getElementById('leftHand1')).dataset.id).toBe(
+        String(0xffffffff),
+      );
     });
 
     test('idx1 pair mismatch means the row does not count as present', () => {
@@ -903,7 +912,9 @@ describe('dom-helpers', () => {
 
       refreshEquipmentForItems([{ itemId: String(VALID_WEAPON_ID), idx1: '5', action: 'delete' }]);
 
-      expect(document.getElementById('leftHand1').dataset.id).toBe(String(0xffffffff));
+      expect(/** @type {HTMLElement} */ (document.getElementById('leftHand1')).dataset.id).toBe(
+        String(0xffffffff),
+      );
     });
   });
 
@@ -916,7 +927,9 @@ describe('dom-helpers', () => {
       ]);
 
       // idx1/origIdx1 mismatch → continue → slot stays "(none)".
-      expect(document.getElementById('leftHand1').dataset.id).toBe(String(0xffffffff));
+      expect(/** @type {HTMLElement} */ (document.getElementById('leftHand1')).dataset.id).toBe(
+        String(0xffffffff),
+      );
     });
 
     test('restores by id when idx1 is null (no pair binding)', () => {
@@ -926,7 +939,9 @@ describe('dom-helpers', () => {
         { itemId: String(VALID_WEAPON_ID), idx1: null, action: 'undelete' },
       ]);
 
-      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+      expect(/** @type {HTMLElement} */ (document.getElementById('leftHand1')).dataset.id).toBe(
+        String(VALID_WEAPON_ID),
+      );
     });
 
     test('restores when the slot has no origIdx1 but a matching origId', () => {
@@ -937,7 +952,9 @@ describe('dom-helpers', () => {
         { itemId: String(VALID_WEAPON_ID), idx1: '5', action: 'undelete' },
       ]);
 
-      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+      expect(/** @type {HTMLElement} */ (document.getElementById('leftHand1')).dataset.id).toBe(
+        String(VALID_WEAPON_ID),
+      );
     });
   });
 
@@ -957,7 +974,9 @@ describe('dom-helpers', () => {
       refreshEquipmentDisplay.flush();
 
       // Item still present → slot kept.
-      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+      expect(/** @type {HTMLElement} */ (document.getElementById('leftHand1')).dataset.id).toBe(
+        String(VALID_WEAPON_ID),
+      );
     });
 
     test('slot with curIdx1 is checked via the pair lookup (kept)', () => {
@@ -968,7 +987,9 @@ describe('dom-helpers', () => {
       refreshEquipmentDisplay.flush();
 
       // Pair still in inventory → slot kept via the pairKey branch.
-      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+      expect(/** @type {HTMLElement} */ (document.getElementById('leftHand1')).dataset.id).toBe(
+        String(VALID_WEAPON_ID),
+      );
     });
 
     test('"(none)" slot restores via the orig pair lookup', () => {
@@ -979,7 +1000,9 @@ describe('dom-helpers', () => {
       refreshEquipmentDisplay.flush();
 
       // Original pair returned → slot restored.
-      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+      expect(/** @type {HTMLElement} */ (document.getElementById('leftHand1')).dataset.id).toBe(
+        String(VALID_WEAPON_ID),
+      );
     });
 
     test('"(none)" slot with no restorable original stays "(none)"', () => {
@@ -990,7 +1013,9 @@ describe('dom-helpers', () => {
       refreshEquipmentDisplay();
       refreshEquipmentDisplay.flush();
 
-      expect(document.getElementById('leftHand1').dataset.id).toBe(String(0xffffffff));
+      expect(/** @type {HTMLElement} */ (document.getElementById('leftHand1')).dataset.id).toBe(
+        String(0xffffffff),
+      );
     });
   });
 
@@ -1025,7 +1050,9 @@ describe('dom-helpers', () => {
       sel.value = String(VALID_WEAPON_ID + 1);
       sel.dispatchEvent(new Event('change', { bubbles: true }));
 
-      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+      expect(/** @type {HTMLElement} */ (document.getElementById('leftHand1')).dataset.id).toBe(
+        String(VALID_WEAPON_ID),
+      );
     });
 
     test('does not update a slot whose idx1 does not match', () => {
@@ -1050,7 +1077,9 @@ describe('dom-helpers', () => {
       sel.dispatchEvent(new Event('change', { bubbles: true }));
 
       // idx1 mismatch → match branch false → span unchanged.
-      expect(document.getElementById('leftHand1').dataset.id).toBe(String(VALID_WEAPON_ID));
+      expect(/** @type {HTMLElement} */ (document.getElementById('leftHand1')).dataset.id).toBe(
+        String(VALID_WEAPON_ID),
+      );
     });
   });
 });

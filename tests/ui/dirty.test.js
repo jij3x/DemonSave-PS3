@@ -207,7 +207,7 @@ describe('dirty tracking', () => {
       captureBaseline();
 
       for (const id of ['warpLocation', 'saveSlot']) {
-        const el = document.getElementById(id);
+        const el = /** @type {HTMLElement} */ (document.getElementById(id));
         expect(el.dataset.orig).toBeUndefined();
       }
     });
@@ -782,6 +782,7 @@ describe('dirty tracking', () => {
   // --- Hierarchical dirty tree tests ---
 
   describe('hierarchical dirty tree', () => {
+    /** @type {HTMLDivElement} */
     let app;
 
     /**
@@ -901,6 +902,7 @@ describe('dirty tracking', () => {
   // --- Row lifecycle hook tests ---
 
   describe('row lifecycle hooks', () => {
+    /** @type {HTMLDivElement} */
     let app;
 
     beforeEach(() => {
@@ -912,7 +914,7 @@ describe('dirty tracking', () => {
       table.className = 'grid-table inv-table';
       const tbody = document.createElement('tbody');
       table.appendChild(tbody);
-      app.querySelector('.tab-content').appendChild(table);
+      /** @type {HTMLElement} */ (app.querySelector('.tab-content')).appendChild(table);
 
       const tr = document.createElement('tr');
       tr.dataset.existing = String(existing);
@@ -967,7 +969,7 @@ describe('dirty tracking', () => {
 
     test('onRowSoftDeleted clears per-cell dirty before adding deletion dirty', () => {
       const tr = makeTestRow(true);
-      const inp = tr.querySelector('input');
+      const inp = /** @type {HTMLInputElement} */ (tr.querySelector('input'));
       captureBaseline();
 
       // Make a cell dirty first
@@ -999,6 +1001,7 @@ describe('dirty tracking', () => {
   // --- Dirty callback tests ---
 
   describe('setDirtyCallback', () => {
+    /** @type {HTMLDivElement} */
     let app;
 
     beforeAll(() => jest.useFakeTimers());
@@ -1009,13 +1012,14 @@ describe('dirty tracking', () => {
     });
 
     test('callback fires with true when form becomes dirty', () => {
+      /** @type {boolean[]} */
       const calls = [];
       setDirtyCallback((isDirty) => calls.push(isDirty));
 
       const inp = document.createElement('input');
       inp.type = 'number';
       inp.value = '50';
-      app.querySelector('.tab-content').appendChild(inp);
+      /** @type {HTMLElement} */ (app.querySelector('.tab-content')).appendChild(inp);
 
       captureBaseline();
       setupDirtyListeners();
@@ -1029,13 +1033,14 @@ describe('dirty tracking', () => {
     });
 
     test('callback fires with false when form reverts to clean', () => {
+      /** @type {boolean[]} */
       const calls = [];
       setDirtyCallback((isDirty) => calls.push(isDirty));
 
       const inp = document.createElement('input');
       inp.type = 'number';
       inp.value = '50';
-      app.querySelector('.tab-content').appendChild(inp);
+      /** @type {HTMLElement} */ (app.querySelector('.tab-content')).appendChild(inp);
 
       captureBaseline();
       setupDirtyListeners();
@@ -1392,6 +1397,7 @@ describe('dirty tracking', () => {
   // --- Additional branch-coverage tests ---
 
   describe('row lifecycle edge cases', () => {
+    /** @type {HTMLDivElement} */
     let app;
 
     beforeEach(() => {
@@ -1404,7 +1410,7 @@ describe('dirty tracking', () => {
       table.className = 'grid-table inv-table';
       const tbody = document.createElement('tbody');
       table.appendChild(tbody);
-      app.querySelector('.tab-content').appendChild(table);
+      /** @type {HTMLElement} */ (app.querySelector('.tab-content')).appendChild(table);
 
       const tr = document.createElement('tr');
       tr.dataset.existing = 'false';
@@ -1421,7 +1427,7 @@ describe('dirty tracking', () => {
       table.className = 'grid-table inv-table';
       const tbody = document.createElement('tbody');
       table.appendChild(tbody);
-      app.querySelector('.tab-content').appendChild(table);
+      /** @type {HTMLElement} */ (app.querySelector('.tab-content')).appendChild(table);
 
       const tr = document.createElement('tr');
       tr.dataset.existing = 'true';
@@ -1486,7 +1492,7 @@ describe('dirty tracking', () => {
       table.className = 'grid-table inv-table';
       const tbody = document.createElement('tbody');
       table.appendChild(tbody);
-      app.querySelector('.tab-content').appendChild(table);
+      /** @type {HTMLElement} */ (app.querySelector('.tab-content')).appendChild(table);
 
       const tr = document.createElement('tr');
       tr.dataset.existing = 'true';
@@ -1536,7 +1542,9 @@ describe('dirty tracking', () => {
 
       // SKIP_IDS elements should NOT be marked dirty
       for (const id of ['warpLocation', 'saveSlot']) {
-        expect(document.getElementById(id).classList.contains('dirty')).toBe(false);
+        expect(
+          /** @type {HTMLElement} */ (document.getElementById(id)).classList.contains('dirty'),
+        ).toBe(false);
       }
     });
   });
@@ -1851,7 +1859,9 @@ describe('dirty tracking', () => {
       resetAndCaptureBaseline();
 
       for (const id of ['warpLocation', 'saveSlot']) {
-        expect(document.getElementById(id).dataset.orig).toBeUndefined();
+        expect(
+          /** @type {HTMLElement} */ (document.getElementById(id)).dataset.orig,
+        ).toBeUndefined();
       }
     });
 
@@ -2111,6 +2121,7 @@ describe('dirty tracking', () => {
     });
 
     test('fires dirty callback on transition', () => {
+      /** @type {boolean[]} */
       const calls = [];
       setDirtyCallback((isDirty) => calls.push(isDirty));
 
@@ -2123,7 +2134,9 @@ describe('dirty tracking', () => {
   // --- hasSlotChanges tests ---
 
   describe('hasSlotChanges', () => {
+    /** @type {HTMLDivElement} */
     let app;
+    /** @type {HTMLDivElement} */
     let content;
 
     beforeEach(() => {

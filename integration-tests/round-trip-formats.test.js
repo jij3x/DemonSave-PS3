@@ -34,14 +34,23 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     sandboxes.length = 0;
   });
 
-  /** Create a tmp sandbox and track it for cleanup. */
+  /**
+   * Create a tmp sandbox and track it for cleanup.
+   * @param {string} label
+   * @returns {ReturnType<typeof createTmpSandbox>}
+   */
   function newSandbox(label) {
     const sb = createTmpSandbox(label);
     sandboxes.push(sb);
     return sb;
   }
 
-  /** Write rawFiles to disk and return the on-disk rawFiles map. */
+  /**
+   * Write rawFiles to disk and return the on-disk rawFiles map.
+   * @param {ReturnType<typeof createTmpSandbox>} sandbox
+   * @param {Map<string, {name: string, bytes: Uint8Array}>} rawFiles
+   * @returns {Map<string, {name: string, bytes: Uint8Array}>}
+   */
   function writeToDisk(sandbox, rawFiles) {
     for (const [, entry] of rawFiles) {
       sandbox.writeFile(entry.name, entry.bytes);
@@ -53,6 +62,10 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
    * Write filesToWrite (Map<string, Uint8Array>) to disk and read back.
    * If filesToDelete is provided, removes those files from disk first
    * (simulating what the UI layer does when switching encrypted → decrypted).
+   * @param {ReturnType<typeof createTmpSandbox>} sandbox
+   * @param {Map<string, Uint8Array>} filesToWrite
+   * @param {Set<string>|string[]} [filesToDelete]
+   * @returns {Map<string, {name: string, bytes: Uint8Array}>}
    */
   function writeOutputToDisk(sandbox, filesToWrite, filesToDelete) {
     if (filesToDelete) {
@@ -209,6 +222,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     writeToDisk(sb, rawFiles);
 
     const diskFiles = sb.readFiles();
+    /** @type {Record<string, Uint8Array>} */
     const zipObj = {};
     for (const [, { name, bytes }] of diskFiles) {
       zipObj[name] = bytes;
@@ -234,6 +248,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     writeToDisk(sb, rawFiles);
 
     const diskFiles = sb.readFiles();
+    /** @type {Record<string, Uint8Array>} */
     const zipObj = {};
     for (const [, { name, bytes }] of diskFiles) {
       zipObj[name] = bytes;
@@ -370,7 +385,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
       [],
       profileNumber,
       accountId,
-      null,
+      undefined,
       true,
     );
     await updateSessionAfterWrite(slots, decFiles, false);
@@ -383,10 +398,10 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
       [],
       profileNumber,
       accountId,
-      null,
+      undefined,
       true,
     );
-    const userBytes = decFiles2.get('USER.DAT');
+    const userBytes = decFiles2.get('USER.DAT') ?? new Uint8Array();
     const result = readSave(userBytes);
     expect(result.vit).toBe(70);
   });
@@ -406,7 +421,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
       [],
       profileNumber,
       accountId,
-      null,
+      undefined,
       true,
     );
     await updateSessionAfterWrite(slots, encFiles, true);
@@ -420,7 +435,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
       [],
       profileNumber,
       accountId,
-      null,
+      undefined,
       true,
     );
 
@@ -447,7 +462,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const { filesToWrite: decOut } = await writeSaveData(slots, [], profileNumber, accountId);
     expect(decOut.has('USER.DAT')).toBe(true);
 
-    const userBytes = decOut.get('USER.DAT');
+    const userBytes = decOut.get('USER.DAT') ?? new Uint8Array();
     const result = readSave(userBytes);
     expect(result.vit).toBe(getExpectedModel(1).vit);
   });
@@ -468,6 +483,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
 
     const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
 
+    /** @type {Record<string, Uint8Array>} */
     const zipObj = {};
     for (const [name, bytes] of filesToWrite) {
       zipObj[name] = bytes;
@@ -511,7 +527,7 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     expect(filesToWrite.has('PIC1.PNG')).toBe(true);
 
     const iconBytes = filesToWrite.get('ICON0.PNG');
-    expect(iconBytes[0]).toBe(0x89);
+    expect(iconBytes?.[0]).toBe(0x89);
   });
 
   test('assets preserved through encrypted → decrypted write', async () => {
@@ -559,8 +575,10 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const { slots, profileNumber, accountId } = await openSave(sb.readFiles());
     expect(slots).toHaveLength(2);
 
-    slots.find((s) => s.slot === 1).model.vit = 11;
-    slots.find((s) => s.slot === 2).model.vit = 22;
+    const slot1 = slots.find((s) => s.slot === 1);
+    const slot2 = slots.find((s) => s.slot === 2);
+    if (slot1) slot1.model.vit = 11;
+    if (slot2) slot2.model.vit = 22;
 
     const { filesToWrite } = await exportEncryptedSave(slots, [], profileNumber, accountId);
 
@@ -569,8 +587,8 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     const { slots: readSlots } = await openSave(reopened);
 
     expect(readSlots).toHaveLength(2);
-    expect(readSlots.find((s) => s.slot === 1).model.vit).toBe(11);
-    expect(readSlots.find((s) => s.slot === 2).model.vit).toBe(22);
+    expect(readSlots.find((s) => s.slot === 1)?.model.vit).toBe(11);
+    expect(readSlots.find((s) => s.slot === 2)?.model.vit).toBe(22);
   });
 
   // -------------------------------------------------------------------
@@ -624,8 +642,8 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
 
     expect(filesToWrite.has('PARAM.PFD')).toBe(true);
     const pfdBytes = filesToWrite.get('PARAM.PFD');
-    expect(pfdBytes.length).toBeGreaterThan(100);
-    expect(pfdBytes[0]).toBe(0x00);
+    expect(pfdBytes?.length).toBeGreaterThan(100);
+    expect(pfdBytes?.[0]).toBe(0x00);
   });
 
   // -------------------------------------------------------------------
@@ -653,8 +671,8 @@ describe('round-trip: format combinations (encrypted/decrypted/zip)', () => {
     // Verify SFO fields in the output bytes directly
     const sfoBytes = filesToWrite.get('PARAM.SFO');
     expect(sfoBytes).toBeDefined();
-    expect(sfoBytes[0x570]).toBe(99);
-    expect(getSfoAccountId(sfoBytes)).toBe(newAccountId);
+    expect(sfoBytes?.[0x570]).toBe(99);
+    expect(getSfoAccountId(sfoBytes ?? new Uint8Array())).toBe(newAccountId);
 
     // Re-open from disk and verify all fields
     const sb2 = newSandbox('sfo-enc-change-2');

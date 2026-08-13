@@ -30,6 +30,11 @@ import {
  * @typedef {Window & { __TAURI__?: Record<string, unknown> }} MockTauriWindow
  */
 
+/**
+ * Recorded `invoke` call captured by the mock for later assertion.
+ * @typedef {{ command: string, args?: Record<string, unknown> }} InvokeCall
+ */
+
 /** @returns {MockTauriWindow} */
 function getWindow() {
   return /** @type {MockTauriWindow} */ (window);
@@ -132,6 +137,7 @@ describe('tauriOpenDirectory', () => {
   afterEach(clearTauri);
 
   test('picks directory then reads files, returning lowercase-keyed Map', async () => {
+    /** @type {InvokeCall[]} */
     const calls = [];
     mockTauriInvoke(async (command, args) => {
       calls.push({ command, args });
@@ -146,6 +152,7 @@ describe('tauriOpenDirectory', () => {
     });
 
     const result = await tauriOpenDirectory();
+    if (!result) throw new Error('tauriOpenDirectory returned null');
 
     // pick_directory called first with no args
     expect(calls[0].command).toBe('pick_directory');
@@ -164,8 +171,8 @@ describe('tauriOpenDirectory', () => {
     expect(result.files.has('param.sfo')).toBe(true);
     expect(result.files.has('userdata00.dat')).toBe(true);
     const paramEntry = result.files.get('param.sfo');
-    expect(paramEntry.name).toBe('PARAM.SFO');
-    expect(Array.from(paramEntry.bytes)).toEqual([1, 2, 3]);
+    expect(paramEntry?.name).toBe('PARAM.SFO');
+    expect(Array.from(paramEntry?.bytes ?? [])).toEqual([1, 2, 3]);
   });
 
   test('returns null when user cancels the dialog', async () => {
@@ -185,6 +192,7 @@ describe('tauriWriteFiles', () => {
   afterEach(clearTauri);
 
   test('writes each file with base64-encoded data via write_file command', async () => {
+    /** @type {InvokeCall[]} */
     const calls = [];
     mockTauriInvoke(async (command, args) => {
       calls.push({ command, args });
@@ -199,10 +207,10 @@ describe('tauriWriteFiles', () => {
 
     expect(calls).toHaveLength(2);
     expect(calls.every((c) => c.command === 'write_file')).toBe(true);
-    expect(calls[0].args.dirPath).toBe('/output/dir');
-    expect(calls[0].args.fileName).toBe('file1.dat');
-    expect(calls[0].args.dataB64).toBe(bytesToBase64(new Uint8Array([1, 2, 3])));
-    expect(calls[1].args.fileName).toBe('file2.dat');
+    expect(calls[0].args?.dirPath).toBe('/output/dir');
+    expect(calls[0].args?.fileName).toBe('file1.dat');
+    expect(calls[0].args?.dataB64).toBe(bytesToBase64(new Uint8Array([1, 2, 3])));
+    expect(calls[1].args?.fileName).toBe('file2.dat');
   });
 
   test('writes files in parallel', async () => {
@@ -245,6 +253,7 @@ describe('tauriDeleteFiles', () => {
   afterEach(clearTauri);
 
   test('deletes each file via delete_file command', async () => {
+    /** @type {InvokeCall[]} */
     const calls = [];
     mockTauriInvoke(async (command, args) => {
       calls.push({ command, args });
@@ -254,12 +263,13 @@ describe('tauriDeleteFiles', () => {
 
     expect(calls).toHaveLength(2);
     expect(calls.every((c) => c.command === 'delete_file')).toBe(true);
-    const fileNames = calls.map((c) => c.args.fileName).sort();
+    const fileNames = calls.map((c) => c.args?.fileName).sort();
     expect(fileNames).toEqual(['old.dat', 'stale.pfd']);
-    expect(calls[0].args.dirPath).toBe('/dir');
+    expect(calls[0].args?.dirPath).toBe('/dir');
   });
 
   test('accepts any iterable (e.g. array)', async () => {
+    /** @type {InvokeCall[]} */
     const calls = [];
     mockTauriInvoke(async (command, args) => {
       calls.push({ command, args });
@@ -286,8 +296,8 @@ describe('tauriPickSavePath', () => {
     const handle = await tauriPickSavePath('save.zip');
 
     expect(handle).not.toBeNull();
-    expect(handle.__tauriPath).toBe('/home/user/save.zip');
-    expect(handle.name).toBe('save.zip');
+    expect(handle?.__tauriPath).toBe('/home/user/save.zip');
+    expect(handle?.name).toBe('save.zip');
   });
 
   test('extracts name from Windows-style path', async () => {
@@ -295,8 +305,8 @@ describe('tauriPickSavePath', () => {
 
     const handle = await tauriPickSavePath('my-save.zip');
 
-    expect(handle.name).toBe('my-save.zip');
-    expect(handle.__tauriPath).toBe('C:\\Users\\test\\my-save.zip');
+    expect(handle?.name).toBe('my-save.zip');
+    expect(handle?.__tauriPath).toBe('C:\\Users\\test\\my-save.zip');
   });
 
   test('returns null when user cancels', async () => {
@@ -308,7 +318,7 @@ describe('tauriPickSavePath', () => {
     // Path ends with '/' → split produces empty last element → fallback
     mockTauriInvoke(async () => '/path/to/');
     const handle = await tauriPickSavePath('fallback.zip');
-    expect(handle.name).toBe('fallback.zip');
+    expect(handle?.name).toBe('fallback.zip');
   });
 });
 
@@ -318,6 +328,7 @@ describe('tauriWriteBytesToPath', () => {
   afterEach(clearTauri);
 
   test('writes base64-encoded data via write_bytes_to_path', async () => {
+    /** @type {InvokeCall[]} */
     const calls = [];
     mockTauriInvoke(async (command, args) => {
       calls.push({ command, args });
@@ -328,8 +339,8 @@ describe('tauriWriteBytesToPath', () => {
 
     expect(calls).toHaveLength(1);
     expect(calls[0].command).toBe('write_bytes_to_path');
-    expect(calls[0].args.path).toBe('/output/save.zip');
-    expect(calls[0].args.dataB64).toBe(bytesToBase64(data));
+    expect(calls[0].args?.path).toBe('/output/save.zip');
+    expect(calls[0].args?.dataB64).toBe(bytesToBase64(data));
   });
 });
 

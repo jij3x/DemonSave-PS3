@@ -196,12 +196,12 @@ export function writeU64BEHalves(buf, off, hi, lo) {
 
 /* ---- signed helpers ---- */
 
-/** interpret uint32 as int32 */
+/** @param {number} u @returns {number} interpret uint32 as int32 */
 export function asInt32(u) {
   return u > 0x7fffffff ? u - 0x100000000 : u;
 }
 
-/** interpret uint16 as int16 */
+/** @param {number} u @returns {number} interpret uint16 as int16 */
 export function asInt16(u) {
   return u > 0x7fff ? u - 0x10000 : u;
 }

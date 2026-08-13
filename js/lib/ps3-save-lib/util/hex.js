@@ -53,6 +53,7 @@ export function fromHex(hex) {
  * Pre-computed lookup table for fast byte-to-hex conversion.
  * Each entry is the 2-character lowercase hex string for byte value 0x00-0xFF.
  */
+/** @type {string[]} */
 const HEX_CHARS = [];
 for (let i = 0; i < 256; i++) {
   HEX_CHARS[i] = (i >>> 4).toString(16) + (i & 0xf).toString(16);

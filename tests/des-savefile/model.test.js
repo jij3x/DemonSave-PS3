@@ -143,7 +143,8 @@ describe('sanitizeModel', () => {
       const full = makeFullModel();
       const { model: sanitized } = sanitizeModel(full);
 
-      const item = sanitized[cat][index];
+      const category = /** @type {'weapons'|'armor'|'rings'|'goods'} */ (cat);
+      const item = sanitized[category][index];
       expect(item._ref).toBe(expectedRef);
       expect(item.misc1).toBe(expectedMisc1);
       expect(item.durability).toBe(expectedDurability);
@@ -155,7 +156,7 @@ describe('sanitizeModel', () => {
 
       // misc1 round-trip: sanitize → merge preserves the value
       const merged = mergeModel(full, sanitized);
-      expect(merged[cat][index].misc1).toBe(expectedMisc1);
+      expect(merged[category][index].misc1).toBe(expectedMisc1);
     },
   );
 
@@ -376,7 +377,7 @@ describe('mergeModel', () => {
     // Remove one weapon to create a deletion
     sanitized.weapons = sanitized.weapons.slice(0, 1);
 
-    const out = {};
+    const out = /** @type {{deletedSlots?: number[]}} */ ({});
     const merged = mergeModel(full, sanitized, out);
 
     // The merged model must NOT have _deletedSlots
@@ -407,26 +408,26 @@ describe('mergeModel', () => {
 describe('sanitizeModel: branch coverage', () => {
   test('handles model with null/undefined category arrays', () => {
     const full = makeFullModel();
-    full.weapons = null;
-    full.armor = undefined;
-    full.rings = null;
-    full.goods = undefined;
-    full.deposit = null;
-    full.spells = undefined;
+    full.weapons = /** @type {any} */ (null);
+    full.armor = /** @type {any} */ (undefined);
+    full.rings = /** @type {any} */ (null);
+    full.goods = /** @type {any} */ (undefined);
+    full.deposit = /** @type {any} */ (null);
+    full.spells = /** @type {any} */ (undefined);
     expect(() => sanitizeModel(full)).not.toThrow();
   });
 
   test('handles model with missing NPC flag objects', () => {
     const full = makeFullModel();
-    delete full.sageFreke;
-    delete full.thomas;
-    delete full.boldwin;
+    delete (/** @type {any} */ (full).sageFreke);
+    delete (/** @type {any} */ (full).thomas);
+    delete (/** @type {any} */ (full).boldwin);
     expect(() => sanitizeModel(full)).not.toThrow();
   });
 
   test('sanitizes deposit items without flags array', () => {
     const full = makeFullModel();
-    full.deposit[0].flags = undefined;
+    full.deposit[0].flags = /** @type {any} */ (undefined);
     setBad(full.deposit[1], 'flags', 'not-an-array');
     const { model: sanitized } = sanitizeModel(full);
     // Should get default flags array
@@ -446,21 +447,21 @@ describe('mergeModel: branch coverage', () => {
   test('handles sanitized model with null/undefined category arrays', () => {
     const full = makeFullModel();
     const { model: sanitized } = sanitizeModel(full);
-    sanitized.weapons = null;
-    sanitized.armor = undefined;
-    sanitized.rings = null;
-    sanitized.goods = undefined;
-    sanitized.deposit = null;
-    sanitized.spells = undefined;
+    sanitized.weapons = /** @type {any} */ (null);
+    sanitized.armor = /** @type {any} */ (undefined);
+    sanitized.rings = /** @type {any} */ (null);
+    sanitized.goods = /** @type {any} */ (undefined);
+    sanitized.deposit = /** @type {any} */ (null);
+    sanitized.spells = /** @type {any} */ (undefined);
     expect(() => mergeModel(full, sanitized)).not.toThrow();
   });
 
   test('handles original model with null/undefined category arrays', () => {
     const full = makeFullModel();
-    full.weapons = null;
-    full.armor = undefined;
-    full.rings = null;
-    full.goods = undefined;
+    full.weapons = /** @type {any} */ (null);
+    full.armor = /** @type {any} */ (undefined);
+    full.rings = /** @type {any} */ (null);
+    full.goods = /** @type {any} */ (undefined);
     const { model: sanitized } = sanitizeModel(makeFullModel());
     expect(() => mergeModel(full, sanitized)).not.toThrow();
   });
@@ -470,7 +471,7 @@ describe('mergeModel: branch coverage', () => {
   test.each([
     {
       label: 'no _ref',
-      make: (sanitized) => {
+      make: (/** @type {import('../../js/des-savefile/model.js').SanitizedModel} */ sanitized) => {
         sanitized.weapons.push(
           /** @type {import('../../js/des-savefile/model.js').SanitizedInventoryItem} */ (
             /** @type {unknown} */ ({
@@ -487,7 +488,7 @@ describe('mergeModel: branch coverage', () => {
     },
     {
       label: 'invalid _ref',
-      make: (sanitized) => {
+      make: (/** @type {import('../../js/des-savefile/model.js').SanitizedModel} */ sanitized) => {
         sanitized.weapons[0]._ref = 'inv:999'; // slot doesn't exist in original
         return 0;
       },

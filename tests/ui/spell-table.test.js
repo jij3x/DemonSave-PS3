@@ -9,12 +9,15 @@ import { getSpellData, SPELL_STATUS_NAMES } from '../../js/ui/core/controls.js';
 
 function setupSpellTable() {
   document.body.innerHTML = '<div id="spellsTableBody"><table><tbody></tbody></table></div>';
-  return document.querySelector('#spellsTableBody tbody');
+  return /** @type {HTMLTableSectionElement} */ (document.querySelector('#spellsTableBody tbody'));
 }
 
 describe('spell-table', () => {
+  /** @type {number} */
   let knownSpellId;
+  /** @type {string} */
   let knownSpellName;
+  /** @type {number} */
   let unknownSpellId;
 
   beforeAll(() => {
@@ -33,7 +36,9 @@ describe('spell-table', () => {
 
   describe('renderSpellTable', () => {
     test('is a no-op when the table tbody is absent', () => {
-      expect(() => renderSpellTable([{ itemId: knownSpellId, status: 0 }])).not.toThrow();
+      expect(() =>
+        renderSpellTable([{ itemId: knownSpellId, status: 0, misc1: 0, misc2: 0 }]),
+      ).not.toThrow();
       expect(document.querySelectorAll('tr').length).toBe(0);
     });
 
@@ -41,7 +46,7 @@ describe('spell-table', () => {
       const tbody = setupSpellTable();
       const stale = document.createElement('tr');
       tbody.appendChild(stale);
-      renderSpellTable([{ itemId: knownSpellId, status: 0 }]);
+      renderSpellTable([{ itemId: knownSpellId, status: 0, misc1: 0, misc2: 0 }]);
       expect(tbody.children.length).toBe(1);
       expect(tbody.contains(stale)).toBe(false);
     });

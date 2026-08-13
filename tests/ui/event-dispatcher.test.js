@@ -23,6 +23,7 @@ const SENTINEL = '__event_dispatcher_test_sentinel__';
 describe('event-dispatcher', () => {
   describe('registerChangeHandler', () => {
     test('receives change events dispatched on document', () => {
+      /** @type {string[]} */
       const calls = [];
       registerChangeHandler((e) => {
         if (/** @type {HTMLElement} */ (e.target).dataset?.[SENTINEL] === 'change') {
@@ -41,6 +42,7 @@ describe('event-dispatcher', () => {
     });
 
     test('multiple handlers fire in registration order', () => {
+      /** @type {string[]} */
       const order = [];
       registerChangeHandler(() => order.push('first'));
       registerChangeHandler(() => order.push('second'));
@@ -54,6 +56,7 @@ describe('event-dispatcher', () => {
     });
 
     test('handler that throws does not prevent subsequent handlers', () => {
+      /** @type {string[]} */
       const calls = [];
       registerChangeHandler(() => {
         throw new Error('boom');
@@ -73,6 +76,7 @@ describe('event-dispatcher', () => {
 
   describe('registerInputHandler', () => {
     test('receives input events dispatched on document', () => {
+      /** @type {string[]} */
       const calls = [];
       registerInputHandler((e) => {
         if (/** @type {HTMLElement} */ (e.target).dataset?.[SENTINEL] === 'input') {
@@ -91,6 +95,7 @@ describe('event-dispatcher', () => {
     });
 
     test('multiple input handlers fire in registration order', () => {
+      /** @type {string[]} */
       const order = [];
       registerInputHandler(() => order.push('a'));
       registerInputHandler(() => order.push('b'));
@@ -103,6 +108,7 @@ describe('event-dispatcher', () => {
     });
 
     test('input handler that throws does not prevent subsequent handlers', () => {
+      /** @type {string[]} */
       const calls = [];
       registerInputHandler(() => {
         throw new Error('boom');
@@ -134,6 +140,7 @@ describe('event-dispatcher', () => {
       // We can't assert changeCalls is empty (other handlers may push),
       // but we can verify our handler didn't fire by using a unique marker.
       const marker = '__change_only__';
+      /** @type {string[]} */
       const myCalls = [];
       registerChangeHandler((e) => {
         if (/** @type {HTMLElement} */ (e.target).dataset?.[SENTINEL] === marker) {
@@ -151,6 +158,7 @@ describe('event-dispatcher', () => {
 
     test('input handler does not fire on change event', () => {
       const marker = '__input_only__';
+      /** @type {string[]} */
       const myCalls = [];
       registerInputHandler((e) => {
         if (/** @type {HTMLElement} */ (e.target).dataset?.[SENTINEL] === marker) {

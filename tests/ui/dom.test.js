@@ -97,7 +97,7 @@ describe('el()', () => {
   });
 
   test('handles empty attrs (null/undefined)', () => {
-    const div1 = el('div', null);
+    const div1 = el('div', /** @type {Record<string, any>} */ (/** @type {unknown} */ (null)));
     const div2 = el('div', undefined);
     expect(div1.tagName).toBe('DIV');
     expect(div2.tagName).toBe('DIV');
@@ -112,13 +112,13 @@ describe('el()', () => {
 // --- icon() helper ---
 describe('icon()', () => {
   test('returns a span with icon class for valid icon name', () => {
-    const result = icon('folderOpen');
+    const result = /** @type {HTMLSpanElement} */ (icon('folderOpen'));
     expect(result).not.toBeNull();
     expect(result.className).toBe('icon');
   });
 
   test('contains inline SVG markup', () => {
-    const result = icon('save');
+    const result = /** @type {HTMLSpanElement} */ (icon('save'));
     expect(result.innerHTML).toContain('<svg');
   });
 
@@ -140,7 +140,7 @@ describe('icon()', () => {
       'restore',
     ];
     for (const name of names) {
-      const result = icon(name);
+      const result = /** @type {HTMLSpanElement} */ (icon(name));
       expect(result).not.toBeNull();
       expect(result.className).toBe('icon');
       expect(result.innerHTML).toContain('<svg');
@@ -168,8 +168,12 @@ describe('buildPage()', () => {
     buildPage();
 
     // Header
-    expect(app.querySelector('header h1').textContent).toContain('DemonSave');
-    expect(app.querySelector('header .app-version').textContent).toBe(`v${APP_VERSION}`);
+    expect(/** @type {HTMLElement} */ (app.querySelector('header h1')).textContent).toContain(
+      'DemonSave',
+    );
+    expect(/** @type {HTMLElement} */ (app.querySelector('header .app-version')).textContent).toBe(
+      `v${APP_VERSION}`,
+    );
 
     // Status element
     expect(app.querySelector('#status')).not.toBeNull();
@@ -318,8 +322,10 @@ describe('buildPage()', () => {
 
     buildPage();
 
-    const dropzone = app.querySelector('.landing-dropzone');
+    const dropzone = /** @type {HTMLElement} */ (app.querySelector('.landing-dropzone'));
     expect(dropzone).not.toBeNull();
-    expect(dropzone.querySelector('h2').textContent).toContain('Drag and drop');
+    expect(/** @type {HTMLElement} */ (dropzone.querySelector('h2')).textContent).toContain(
+      'Drag and drop',
+    );
   });
 });

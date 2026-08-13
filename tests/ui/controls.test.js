@@ -60,7 +60,7 @@ describe('controls', () => {
       buildAllSelects();
       populateCombos();
 
-      const sel = document.getElementById('hairstyle');
+      const sel = /** @type {HTMLSelectElement} */ (document.getElementById('hairstyle'));
       const opts = sel.querySelectorAll('option');
       expect(opts.length).toBe(HAIRSTYLE_IDS.length);
       expect(opts[0].value).toBe(String(HAIRSTYLE_IDS[0]));
@@ -70,7 +70,7 @@ describe('controls', () => {
       buildAllSelects();
       populateCombos();
 
-      const sel = document.getElementById('startClass');
+      const sel = /** @type {HTMLSelectElement} */ (document.getElementById('startClass'));
       const opts = sel.querySelectorAll('option');
       expect(opts.length).toBe(START_CLASSES.length);
       expect(opts[0].value).toBe('0');
@@ -81,7 +81,7 @@ describe('controls', () => {
       buildAllSelects();
       populateCombos();
 
-      const sel = document.getElementById('warpLocation');
+      const sel = /** @type {HTMLSelectElement} */ (document.getElementById('warpLocation'));
       const opts = sel.querySelectorAll('option');
       expect(opts.length).toBe(WARPS.length);
       for (let i = 0; i < WARPS.length; i++) {
@@ -143,13 +143,13 @@ describe('controls', () => {
     });
 
     test('returns empty arrays for undefined category', () => {
-      const result = getCategoryData(undefined);
+      const result = getCategoryData(/** @type {string} */ (/** @type {unknown} */ (undefined)));
       expect(result.ids).toEqual([]);
       expect(result.names).toEqual([]);
     });
 
     test('returns empty arrays for null category', () => {
-      const result = getCategoryData(null);
+      const result = getCategoryData(/** @type {string} */ (/** @type {unknown} */ (null)));
       expect(result.ids).toEqual([]);
       expect(result.names).toEqual([]);
     });
@@ -453,6 +453,11 @@ describe('controls', () => {
   });
 
   describe('SELECT_WIDTHS', () => {
+    // SELECT_WIDTHS is built with dynamic template-literal keys, so it is
+    // indexed as a Record<string, number> rather than its inferred literal type.
+    /** @type {Record<string, number>} */
+    const widths = /** @type {Record<string, number>} */ (/** @type {unknown} */ (SELECT_WIDTHS));
+
     test('has width for spells', () => {
       expect(typeof SELECT_WIDTHS.spells).toBe('number');
       expect(SELECT_WIDTHS.spells).toBeGreaterThan(0);
@@ -469,15 +474,15 @@ describe('controls', () => {
 
     test('has widths for each weapon type', () => {
       for (const { typeId } of getWeaponTypes()) {
-        expect(typeof SELECT_WIDTHS[`weapons-${typeId}`]).toBe('number');
-        expect(typeof SELECT_WIDTHS[`weapons-${typeId}-deposit`]).toBe('number');
-        expect(typeof SELECT_WIDTHS[`base-weapons-${typeId}`]).toBe('number');
+        expect(typeof widths[`weapons-${typeId}`]).toBe('number');
+        expect(typeof widths[`weapons-${typeId}-deposit`]).toBe('number');
+        expect(typeof widths[`base-weapons-${typeId}`]).toBe('number');
       }
     });
 
     test('has widths for each goods type', () => {
       for (const { typeId } of getGoodsTypes()) {
-        expect(typeof SELECT_WIDTHS[`goods-${typeId}`]).toBe('number');
+        expect(typeof widths[`goods-${typeId}`]).toBe('number');
       }
     });
 

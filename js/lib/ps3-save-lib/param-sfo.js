@@ -19,6 +19,7 @@ import { decodeAscii } from './util/ascii.js';
  * Initialized lazily on first use to support environments where TextDecoder
  * is not available at module load time.
  */
+/** @type {TextDecoder|null} */
 let _utf8Decoder = null;
 
 /**
@@ -170,6 +171,11 @@ export function parseParamSfo(data) {
 /**
  * Read a UTF-8 string from a byte buffer, stopping at the null terminator
  * or maxLen, whichever comes first.
+ *
+ * @param {Uint8Array} data
+ * @param {number} off
+ * @param {number} maxLen
+ * @returns {string}
  */
 function readUtf8(data, off, maxLen) {
   const end = Math.min(off + maxLen, data.length);
@@ -214,6 +220,7 @@ export function getAccountId(sfo) {
   return (get(sfo, 'ACCOUNT_ID') || '').toLowerCase();
 }
 
+/** @param {ReturnType<typeof parseParamSfo>} sfo @param {string} name @returns {string} */
 function get(sfo, name) {
   if (!sfo || !sfo.tables) return '';
   for (const t of sfo.tables) {

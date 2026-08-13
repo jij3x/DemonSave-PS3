@@ -75,7 +75,7 @@ export function validateName(name) {
   for (const ch of nameStr) {
     const code = ch.codePointAt(0);
     // C0 control chars (0x00-0x1F) and C1 control chars (0x7F-0x9F)
-    if ((code >= 0x00 && code <= 0x1f) || (code >= 0x7f && code <= 0x9f)) {
+    if (code != null && ((code >= 0x00 && code <= 0x1f) || (code >= 0x7f && code <= 0x9f))) {
       return {
         valid: false,
         error: `Name contains an invalid control character (code U+${code.toString(16).toUpperCase().padStart(4, '0')}).`,

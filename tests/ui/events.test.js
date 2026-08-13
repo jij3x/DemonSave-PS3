@@ -50,14 +50,23 @@ function qsa(sel) {
 // --- Mock des-db: small dataset that mimics the real API shape ---
 const MOCK_SIZE = 12;
 
+/**
+ * @param {number} base
+ * @returns {number[]}
+ */
 function makeIds(base) {
   return Array.from({ length: MOCK_SIZE }, (_, i) => base + i);
 }
 
+/**
+ * @param {string} prefix
+ * @returns {string[]}
+ */
 function makeNames(prefix) {
   return Array.from({ length: MOCK_SIZE }, (_, i) => `${prefix} ${i}`);
 }
 
+/** @type {Record<string, { ids: number[], names: string[] }>} */
 const MOCK = {
   weapons: { ids: makeIds(0x10000000), names: makeNames('Weapon') },
   armor: { ids: makeIds(0x20000000), names: makeNames('Armor') },
@@ -84,7 +93,7 @@ const MOCK_WARPS = [
   { name: 'Boletaria', world: 1, block: 1, x: 100, y: 0, z: 200, rot: 0 },
 ];
 
-// Mock upgrade path definitions (mirrors rel-upgrades.js structure)
+/** @type {Record<string, { name: string, levels: number[], note: string }>} */
 const MOCK_PATHS = {
   1: { name: 'Basic', levels: [0, 1, 2, 3, 4, 5], note: 'Basic' },
   2: { name: 'Quality', levels: [1, 2, 3, 4, 5], note: 'Quality' },
@@ -94,6 +103,7 @@ const MOCK_PATHS = {
 // Mock base weapons: each mock weapon type-1 item gets a base weapon entry.
 // Base weapon ID = idx+1 (1-based). Only type 1/2/3 items get upgrade_refs.
 // path_ids for each mock base weapon.
+/** @type {Record<string, { name: string, path_ids: number[], durability: number, note: string }>} */
 const MOCK_BASE_WEAPONS = {};
 for (let i = 0; i < MOCK_SIZE; i++) {
   MOCK_BASE_WEAPONS[String(i + 1)] = {
@@ -121,6 +131,7 @@ MOCK.weapons.names.push('Mock Crossbow');
 // Build mock upgrade_ref index: key = "baseId:pathId:level" → hex ID
 // Each base weapon (1-12) maps to the first 4 items of its type group.
 // Type 1: items 0-3 (base 1-4), Type 2: items 4-7 (base 5-8), Type 3: items 8-11 (base 9-12)
+/** @type {Record<string, { category: string, id: string }>} */
 const MOCK_REF_INDEX = {};
 {
   for (let i = 0; i < MOCK_SIZE; i++) {
@@ -151,9 +162,9 @@ jest.unstable_mockModule('../../js/des-db/index.js', () => ({
   __esModule: true,
   getCategories: () =>
     Object.freeze(['weapons', 'armor', 'rings', 'goods', 'spells', 'hairstyles']),
-  getItemIdsByCategory: (cat) => MOCK[cat]?.ids ?? [],
-  getItemNamesByCategory: (cat) => MOCK[cat]?.names ?? [],
-  getItem: (cat, id) => {
+  getItemIdsByCategory: (/** @type {string} */ cat) => MOCK[cat]?.ids ?? [],
+  getItemNamesByCategory: (/** @type {string} */ cat) => MOCK[cat]?.names ?? [],
+  getItem: (/** @type {string} */ cat, /** @type {number|string} */ id) => {
     const m = MOCK[cat];
     if (!m) throw new Error(`Unknown category: ${cat}`);
     const idx = m.ids.indexOf(typeof id === 'string' ? parseInt(id, 16) >>> 0 : id >>> 0);
@@ -193,11 +204,12 @@ jest.unstable_mockModule('../../js/des-db/index.js', () => ({
       else if (idx < 9) type = [11, 1];
       else type = [12, 3];
     }
+    /** @type {{ name: string, type: Array<number|null>, upgrade_ref?: Array<number|null> }} */
     const result = { name: m.names[idx], type };
     if (upgrade_ref) result.upgrade_ref = upgrade_ref;
     return result;
   },
-  hasItem: (cat, id) => {
+  hasItem: (/** @type {string} */ cat, /** @type {number|string} */ id) => {
     const m = MOCK[cat];
     if (!m) return false;
     const idx = m.ids.indexOf(typeof id === 'string' ? parseInt(id, 16) >>> 0 : id >>> 0);
@@ -205,36 +217,39 @@ jest.unstable_mockModule('../../js/des-db/index.js', () => ({
   },
   getStartClasses: () => MOCK_START_CLASSES,
   getWarps: () => MOCK_WARPS,
-  getWorldName: (world) => {
+  getWorldName: (/** @type {number} */ world) => {
     if (world === 0) return 'Nexus';
     if (world === 1) return 'Boletaria';
     throw new Error(`Unknown world: ${world}`);
   },
-  getAllTypes: () => [],
-  getItemDurability: (cat, _id) => {
+  getAllTypes: /** @type {() => Array<{ typeId: number, name: string }>} */ (() => []),
+  getItemDurability: (/** @type {string} */ cat, /** @type {number|string} */ _id) => {
     // Mock durability: weapons=300, armor=200, others=0
     if (cat === 'weapons') return 300;
     if (cat === 'armor') return 200;
     return 0;
   },
   // Upgrade path functions
-  getUpgradePathDef: (pathId) => {
+  getUpgradePathDef: (/** @type {number|string} */ pathId) => {
     const def = MOCK_PATHS[String(pathId)];
     if (!def) throw new Error(`Unknown path id: ${pathId}`);
     return def;
   },
-  getBaseWeapon: (baseId) => {
+  getBaseWeapon: (/** @type {number|string} */ baseId) => {
     const bw = MOCK_BASE_WEAPONS[String(baseId)];
     if (!bw) throw new Error(`Invalid base weapon id: ${baseId}`);
     return {
       name: bw.name,
-      path_ids: (bw.path_ids || []).slice().sort((a, b) => a - b),
+      path_ids: (bw.path_ids || [])
+        .slice()
+        .sort((/** @type {number} */ a, /** @type {number} */ b) => a - b),
       durability: bw.durability,
       note: bw.note,
     };
   },
-  hasBaseWeapon: (baseId) => MOCK_BASE_WEAPONS[String(baseId)] !== undefined,
-  getWeaponItemByUpgradeRef: (ref) => {
+  hasBaseWeapon: (/** @type {number|string} */ baseId) =>
+    MOCK_BASE_WEAPONS[String(baseId)] !== undefined,
+  getWeaponItemByUpgradeRef: (/** @type {Array<number|null>} */ ref) => {
     if (!Array.isArray(ref) || ref.length !== 3) {
       throw new Error(`Invalid upgrade_ref: ${JSON.stringify(ref)}`);
     }
@@ -273,7 +288,7 @@ const HAIRSTYLE_IDS = db.getItemIdsByCategory('hairstyles');
 function buildDOM() {
   document.body.innerHTML = '';
 
-  function inp(id, type = 'number') {
+  function inp(/** @type {string} */ id, type = 'number') {
     const el = document.createElement('input');
     el.type = type;
     el.id = id;
@@ -281,14 +296,14 @@ function buildDOM() {
     return el;
   }
 
-  function sel(id) {
+  function sel(/** @type {string} */ id) {
     const el = document.createElement('select');
     el.id = id;
     document.body.appendChild(el);
     return el;
   }
 
-  function chk(id) {
+  function chk(/** @type {string} */ id) {
     const el = document.createElement('input');
     el.type = 'checkbox';
     el.id = id;
@@ -496,6 +511,7 @@ function buildDOM() {
  * Simulate a user focusing a lazy-load select so its options get populated.
  * Call this before setting `.value` on an .inv-name, .dep-name, or
  * .spell-name select in tests.
+ * @param {Element} sel
  */
 function focusLazySelect(sel) {
   sel.dispatchEvent(new Event('focusin', { bubbles: true }));
@@ -654,6 +670,7 @@ function makeSanitizedModel() {
 /**
  * Create a display object matching makeSanitizedModel().
  * Equipment pointers and inventory idx1 map for deterministic binding.
+ * @returns {{ equipmentPointers: Record<string, number|undefined>, invIdxByRef: Map<string, number> }}
  */
 function makeDisplay() {
   return {
@@ -696,13 +713,13 @@ describe('UI events', () => {
   describe('populateForm / collectForm orchestration', () => {
     test('stats round-trip through the DOM', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, undefined);
+      populateForm(model, undefined, undefined);
 
       expect(byId('vit').value).toBe('50');
       expect(byId('souls').value).toBe('99999');
       expect(byId('name').value).toBe('TestChar');
 
-      const collected = collectForm();
+      const collected = /** @type {any} */ (collectForm());
       expect(collected.vit).toBe(50);
       expect(collected.souls).toBe(99999);
       expect(collected.name).toBe('TestChar');
@@ -710,9 +727,9 @@ describe('UI events', () => {
 
     test('vitals populate and round-trip through the DOM', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, undefined);
+      populateForm(model, undefined, undefined);
 
-      const collected = collectForm();
+      const collected = /** @type {any} */ (collectForm());
       expect(collected.currHP).toBe(580);
       expect(collected.maxHP).toBe(600);
       expect(collected.currMP).toBe(35);
@@ -723,36 +740,36 @@ describe('UI events', () => {
 
     test('profile number and account id populate from folderFields', () => {
       const model = makeSanitizedModel();
-      populateForm(model, null, { profileNumber: 42, accountId: '' });
+      populateForm(model, undefined, { profileNumber: 42, accountId: '' });
       expect(byId('profileNum').value).toBe('42');
     });
 
     test('undefined folderFields default profileNum to 0 and accountId to empty', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       expect(byId('profileNum').value).toBe('0');
       expect(byId('accountId').value).toBe('');
     });
 
     test('tendency round-trip', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       expect(byId('charTendency').value).toBe('50');
       expect(byId('nexusTendency').value).toBe('-20');
-      const collected = collectForm();
+      const collected = /** @type {any} */ (collectForm());
       expect(collected.charTendency).toBe(50);
       expect(collected.nexusTendency).toBe(-20);
     });
 
     test('archSealed checkbox round-trip', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       expect(byId('archSealed').checked).toBe(true);
-      expect(collectForm().archSealed).toBe(true);
+      expect(/** @type {any} */ (collectForm()).archSealed).toBe(true);
     });
 
     test('equipment text spans round-trip (known, none, unknown)', () => {
       const model = makeSanitizedModel();
       model.bolts = 0xffffffff; // (none)
       model.ring2 = 0x00abcdef; // unknown id
-      populateForm(model, null, undefined);
+      populateForm(model, undefined, undefined);
 
       expect(byId('leftHand1').textContent).toBe('Weapon 5');
       expect(byId('leftHand1').dataset.id).toBe(String(WEAPON_IDS[5]));
@@ -764,7 +781,7 @@ describe('UI events', () => {
       expect(byId('ring2').textContent).toBe('Unknown (0x00ABCDEF)');
       expect(byId('ring2').dataset.id).toBe(String(0x00abcdef));
 
-      const collected = collectForm();
+      const collected = /** @type {any} */ (collectForm());
       expect(collected.leftHand1).toBe(WEAPON_IDS[5]);
       expect(collected.bolts).toBe(0xffffffff >>> 0);
       expect(collected.ring2).toBe(0x00abcdef);
@@ -775,7 +792,7 @@ describe('UI events', () => {
   // them. The renderers/collectors themselves are unit-tested per module.
   describe('populateForm renders and collects all categories', () => {
     test('renders weapons/armor/rings/goods/spells/deposit rows with _ref', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
 
       expect(qsa('table.inv-table[data-category="weapons"] tbody tr').length).toBe(1);
       expect(qsa('table.inv-table[data-category="armor"] tbody tr').length).toBe(1);
@@ -790,8 +807,8 @@ describe('UI events', () => {
     });
 
     test('collected inventory/deposit carry the right fields, no binary internals', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
-      const collected = collectForm();
+      populateForm(makeSanitizedModel(), undefined, undefined);
+      const collected = /** @type {any} */ (collectForm());
 
       expect(collected.weapons[0]._ref).toBe('inv:0');
       expect(collected.weapons[0].misc2).toBe(0x01000000);
@@ -800,7 +817,10 @@ describe('UI events', () => {
       expect(collected.deposit[0].flags).toEqual([0x21, 0, 0, 0, 0, 0x01, 0x2c]);
 
       for (const cat of ['weapons', 'armor', 'rings', 'goods']) {
-        for (const rec of collected[cat]) {
+        const recs = /** @type {Record<string, Array<Record<string, unknown>>>} */ (
+          /** @type {unknown} */ (collected)
+        )[cat];
+        for (const rec of recs) {
           expect(rec).not.toHaveProperty('_slot');
           expect(rec).not.toHaveProperty('idx1');
           expect(rec).not.toHaveProperty('idx2');
@@ -814,26 +834,26 @@ describe('UI events', () => {
 
   describe('soft-delete reflects in collectForm across categories', () => {
     test('deleting then undeleting a row updates collection', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
 
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       row.querySelector('.row-del').click();
-      expect(collectForm().weapons).toHaveLength(0);
+      expect(/** @type {any} */ (collectForm()).weapons).toHaveLength(0);
 
       row.querySelector('.row-del').click(); // undelete
-      const collected = collectForm();
+      const collected = /** @type {any} */ (collectForm());
       expect(collected.weapons).toHaveLength(1);
       expect(collected.weapons[0]._ref).toBe('inv:0');
     });
 
     test('soft-delete excludes spells and deposit from collection', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
 
       qs('#spellsTableBody tbody tr').querySelector('.row-del').click();
-      expect(collectForm().spells).toHaveLength(0);
+      expect(/** @type {any} */ (collectForm()).spells).toHaveLength(0);
 
       qs('table.dep-table[data-category="weapons"] tbody tr').querySelector('.row-del').click();
-      expect(collectForm().deposit).toHaveLength(1); // only the goods one remains
+      expect(/** @type {any} */ (collectForm()).deposit).toHaveLength(1); // only the goods one remains
     });
   });
 
@@ -866,7 +886,7 @@ describe('UI events', () => {
           ro_idx1: 15,
         },
       ];
-      populateForm(model, null, undefined);
+      populateForm(model, undefined, undefined);
 
       const r1 = qs('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       const r1Sel = r1.querySelector('.inv-name');
@@ -894,7 +914,7 @@ describe('UI events', () => {
       expect(remaining[0]).toBe(r1);
       expect(remaining[0].querySelector('.inv-name').value).toBe(String(ITEM_IDS[0]));
 
-      const collected = collectForm();
+      const collected = /** @type {any} */ (collectForm());
       expect(collected.goods).toHaveLength(1);
       expect(collected.goods[0].itemId).toBe(ITEM_IDS[0]);
     });
@@ -921,7 +941,7 @@ describe('UI events', () => {
           ro_idx1: 16,
         },
       ];
-      populateForm(model, null, undefined);
+      populateForm(model, undefined, undefined);
 
       const rows = qsa('table.inv-table[data-category="goods"][data-goods-type="9"] tbody tr');
       const r1 = rows[0];
@@ -945,7 +965,7 @@ describe('UI events', () => {
       expect(r1.dataset.deleted).toBeUndefined();
       expect(r2.dataset.deleted).toBe('true');
 
-      const collected = collectForm();
+      const collected = /** @type {any} */ (collectForm());
       expect(collected.goods).toHaveLength(1);
       expect(collected.goods[0].itemId).toBe(ITEM_IDS[0]);
     });
@@ -966,7 +986,7 @@ describe('UI events', () => {
     ])('%s renders %s', (npc, flags, expected) => {
       const model = makeSanitizedModel();
       model[npc] = flags;
-      populateForm(model, null, undefined);
+      populateForm(model, undefined, undefined);
       expect(byId(npc).value).toBe(expected);
     });
 
@@ -975,7 +995,7 @@ describe('UI events', () => {
       delete model.sageFreke;
       delete model.thomas;
       delete model.boldwin;
-      populateForm(model, null, undefined);
+      populateForm(model, undefined, undefined);
       expect(byId('sageFreke').value).toBe('');
       expect(byId('thomas').value).toBe('');
       expect(byId('boldwin').value).toBe('');
@@ -1004,7 +1024,7 @@ describe('UI events', () => {
     });
 
     test('deleting equipped item clears the equipment slot', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       const lh1 = byId('leftHand1');
       expect(lh1.textContent).toBe('Weapon 5');
 
@@ -1031,13 +1051,13 @@ describe('UI events', () => {
     });
 
     test('equipment orig-id is tracked on initial render', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       expect(byId('leftHand1').dataset.origId).toBe(String(WEAPON_IDS[5]));
       expect(byId('ring1').dataset.origId).toBe(String(RING_IDS[0]));
     });
 
     test('changing non-equipped item does not affect equipment', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       setupEquipmentSync();
       const lh1 = byId('leftHand1');
       const originalId = lh1.dataset.id;
@@ -1092,7 +1112,7 @@ describe('UI events', () => {
   // reloads durability via the db lookup.
   describe('durability sync on item change', () => {
     test('changing weapon in inventory reloads durability from DB', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       const row = qs('table.inv-table[data-category="weapons"] tbody tr');
       const durInput = row.querySelector('.inv-durability');
       expect(durInput.value).toBe('300');
@@ -1105,7 +1125,7 @@ describe('UI events', () => {
     });
 
     test('changing ring resets durability to 0 in dataset (no durability input)', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       const row = qs('table.inv-table[data-category="rings"] tbody tr');
       expect(row.querySelector('.inv-durability')).toBeNull();
 
@@ -1134,7 +1154,7 @@ describe('UI events', () => {
     test('populateForm tolerates a missing deposit array', () => {
       const model = makeSanitizedModel();
       delete model.deposit;
-      expect(() => populateForm(model, null)).not.toThrow();
+      expect(() => populateForm(model, undefined)).not.toThrow();
     });
 
     test('populateForm skips undefined equipment pointers and missing spans', () => {
@@ -1149,7 +1169,7 @@ describe('UI events', () => {
       const vit = byId('vit');
       const parent = vit.parentNode;
       vit.remove();
-      const m = collectForm();
+      const m = /** @type {any} */ (collectForm());
       parent.appendChild(vit);
       expect(m).not.toBeNull();
       expect(m.vit).toBe(0);
@@ -1158,7 +1178,7 @@ describe('UI events', () => {
     test('collectForm defaults an empty hairstyle to 0', () => {
       populateForm(makeSanitizedModel(), makeDisplay());
       byId('hairstyle').value = '';
-      expect(collectForm().hairstyle).toBe(0);
+      expect(/** @type {any} */ (collectForm()).hairstyle).toBe(0);
     });
   });
 
@@ -1166,51 +1186,51 @@ describe('UI events', () => {
   // / collectForm — not exercised by any per-module unit test.
   describe('collectFolderFields validation', () => {
     test('returns null for invalid accountId (not 32 hex chars)', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       byId('accountId').value = 'invalid';
       expect(collectFolderFields()).toBeNull();
     });
 
     test('returns null for accountId with wrong length', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       byId('accountId').value = 'ABCDEF';
       expect(collectFolderFields()).toBeNull();
     });
 
     test('accepts empty accountId', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       byId('accountId').value = '';
-      const result = collectFolderFields();
+      const result = /** @type {any} */ (collectFolderFields());
       expect(result).not.toBeNull();
       expect(result.accountId).toBe('');
     });
 
     test('accepts valid 32-char hex accountId', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       const validHex = '0123456789abcdef0123456789abcdef';
       byId('accountId').value = validHex;
-      const result = collectFolderFields();
+      const result = /** @type {any} */ (collectFolderFields());
       expect(result).not.toBeNull();
       expect(result.accountId).toBe(validHex);
     });
 
     test('trims whitespace from accountId before validation', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       const validHex = '0123456789abcdef0123456789abcdef';
       byId('accountId').value = '  ' + validHex + '  ';
-      const result = collectFolderFields();
+      const result = /** @type {any} */ (collectFolderFields());
       expect(result).not.toBeNull();
       expect(result.accountId).toBe(validHex);
     });
 
     test('returns null for name exceeding 16 characters', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       byId('name').value = 'A'.repeat(17);
       expect(collectForm()).toBeNull();
     });
 
     test('returns null for name with control characters', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       byId('name').value = 'Test\u0001Char';
       expect(collectForm()).toBeNull();
     });
@@ -1218,25 +1238,25 @@ describe('UI events', () => {
 
   describe('getNumClamped via collectForm', () => {
     test('clamps vit to max=99', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       const inp = byId('vit');
       inp.min = '0';
       inp.max = '99';
       inp.value = '150';
-      expect(collectForm().vit).toBe(99);
+      expect(/** @type {any} */ (collectForm()).vit).toBe(99);
     });
 
     test('clamps vit to min=0', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       const inp = byId('vit');
       inp.min = '0';
       inp.max = '99';
       inp.value = '-5';
-      expect(collectForm().vit).toBe(0);
+      expect(/** @type {any} */ (collectForm()).vit).toBe(0);
     });
 
     test('profileNum is NOT clamped (SKIP_CLAMP_IDS)', () => {
-      populateForm(makeSanitizedModel(), null, undefined);
+      populateForm(makeSanitizedModel(), undefined, undefined);
       byId('profileNum').value = '300';
       expect(() => collectForm()).not.toThrow();
     });

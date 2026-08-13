@@ -21,6 +21,8 @@ describe('round-trip: multi-slot persistence', () => {
 
   /**
    * Write files to a fresh sandbox, open, and return the result.
+   * @param {Map<string, {name: string, bytes: Uint8Array}>} rawFiles
+   * @returns {Promise<Awaited<ReturnType<typeof openSave>>>}
    */
   async function setupAndOpen(rawFiles) {
     sandbox = createTmpSandbox('multi-slot');
@@ -32,11 +34,30 @@ describe('round-trip: multi-slot persistence', () => {
 
   /**
    * Write the current slots to disk and re-open from disk.
+   * @param {import('../js/des-savefile/save-api.js').SaveSlot[]} slots
+   * @param {number} profileNumber
+   * @param {string} accountId
+   * @returns {Promise<Awaited<ReturnType<typeof openSave>>>}
    */
   async function writeAndReopen(slots, profileNumber, accountId) {
     const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
     sandbox.writeFiles(filesToWrite);
     return await openSave(sandbox.readFiles());
+  }
+
+  /**
+   * Find a slot by its slot number.
+   *
+   * Each test assumes the requested slot was loaded; this throws (failing the
+   * test) when it is missing and narrows the result to a non-undefined slot.
+   * @param {import('../js/des-savefile/save-api.js').SaveSlot[]} slots
+   * @param {number} slotNumber
+   * @returns {import('../js/des-savefile/save-api.js').SaveSlot}
+   */
+  function getSlot(slots, slotNumber) {
+    const slot = slots.find((s) => s.slot === slotNumber);
+    if (!slot) throw new Error(`expected slot ${slotNumber} to be present`);
+    return slot;
   }
 
   // -------------------------------------------------------------------
@@ -50,9 +71,9 @@ describe('round-trip: multi-slot persistence', () => {
 
     expect(slots).toHaveLength(3);
 
-    const slot1 = slots.find((s) => s.slot === 1);
-    const slot2 = slots.find((s) => s.slot === 2);
-    const slot3 = slots.find((s) => s.slot === 3);
+    const slot1 = getSlot(slots, 1);
+    const slot2 = getSlot(slots, 2);
+    const slot3 = getSlot(slots, 3);
 
     expect(slot1).toBeDefined();
     expect(slot2).toBeDefined();
@@ -80,8 +101,8 @@ describe('round-trip: multi-slot persistence', () => {
     const { slots } = opened;
 
     expect(slots).toHaveLength(2);
-    assertModelsMatch(slots.find((s) => s.slot === 1).model, getExpectedModel(1));
-    assertModelsMatch(slots.find((s) => s.slot === 3).model, getExpectedModel(3));
+    assertModelsMatch(getSlot(slots, 1).model, getExpectedModel(1));
+    assertModelsMatch(getSlot(slots, 3).model, getExpectedModel(3));
   });
 
   // -------------------------------------------------------------------
@@ -92,7 +113,7 @@ describe('round-trip: multi-slot persistence', () => {
     const rawFiles = createUnencryptedSaveFolder([1, 2]);
     const opened = await setupAndOpen(rawFiles);
 
-    const slot1 = opened.slots.find((s) => s.slot === 1);
+    const slot1 = getSlot(opened.slots, 1);
 
     // Modify slot 1 heavily
     slot1.model.vit = 99;
@@ -105,8 +126,8 @@ describe('round-trip: multi-slot persistence', () => {
 
     const { slots } = await writeAndReopen(opened.slots, opened.profileNumber, opened.accountId);
 
-    const s1 = slots.find((s) => s.slot === 1);
-    const s2 = slots.find((s) => s.slot === 2);
+    const s1 = getSlot(slots, 1);
+    const s2 = getSlot(slots, 2);
 
     // Slot 1: modified values
     expect(s1.model.vit).toBe(99);
@@ -124,24 +145,24 @@ describe('round-trip: multi-slot persistence', () => {
     const opened = await setupAndOpen(rawFiles);
 
     // Give each slot a distinct vit value
-    opened.slots.find((s) => s.slot === 1).model.vit = 111;
-    opened.slots.find((s) => s.slot === 2).model.vit = 222;
-    opened.slots.find((s) => s.slot === 3).model.vit = 333;
+    getSlot(opened.slots, 1).model.vit = 111;
+    getSlot(opened.slots, 2).model.vit = 222;
+    getSlot(opened.slots, 3).model.vit = 333;
 
     // Give each a distinct name
-    opened.slots.find((s) => s.slot === 1).model.name = 'Alpha';
-    opened.slots.find((s) => s.slot === 2).model.name = 'Beta';
-    opened.slots.find((s) => s.slot === 3).model.name = 'Gamma';
+    getSlot(opened.slots, 1).model.name = 'Alpha';
+    getSlot(opened.slots, 2).model.name = 'Beta';
+    getSlot(opened.slots, 3).model.name = 'Gamma';
 
     const { slots } = await writeAndReopen(opened.slots, opened.profileNumber, opened.accountId);
 
-    expect(slots.find((s) => s.slot === 1).model.vit).toBe(111);
-    expect(slots.find((s) => s.slot === 2).model.vit).toBe(222);
-    expect(slots.find((s) => s.slot === 3).model.vit).toBe(333);
+    expect(getSlot(slots, 1).model.vit).toBe(111);
+    expect(getSlot(slots, 2).model.vit).toBe(222);
+    expect(getSlot(slots, 3).model.vit).toBe(333);
 
-    expect(slots.find((s) => s.slot === 1).model.name).toBe('Alpha');
-    expect(slots.find((s) => s.slot === 2).model.name).toBe('Beta');
-    expect(slots.find((s) => s.slot === 3).model.name).toBe('Gamma');
+    expect(getSlot(slots, 1).model.name).toBe('Alpha');
+    expect(getSlot(slots, 2).model.name).toBe('Beta');
+    expect(getSlot(slots, 3).model.name).toBe('Gamma');
   });
 
   // -------------------------------------------------------------------
@@ -153,19 +174,19 @@ describe('round-trip: multi-slot persistence', () => {
     const opened = await setupAndOpen(rawFiles);
 
     // Inventory: slot 1 weapon count, slot 2 weapon durability
-    opened.slots.find((s) => s.slot === 1).model.weapons[0].count = 77;
-    opened.slots.find((s) => s.slot === 2).model.weapons[0].durability = 1;
+    getSlot(opened.slots, 1).model.weapons[0].count = 77;
+    getSlot(opened.slots, 2).model.weapons[0].durability = 1;
     // Deposit: distinct counts per slot
-    opened.slots.find((s) => s.slot === 1).model.deposit[0].count = 33;
-    opened.slots.find((s) => s.slot === 2).model.deposit[0].count = 66;
+    getSlot(opened.slots, 1).model.deposit[0].count = 33;
+    getSlot(opened.slots, 2).model.deposit[0].count = 66;
     // Spells: distinct status per slot
-    opened.slots.find((s) => s.slot === 1).model.spells[0].status = 0;
-    opened.slots.find((s) => s.slot === 2).model.spells[0].status = 3;
+    getSlot(opened.slots, 1).model.spells[0].status = 0;
+    getSlot(opened.slots, 2).model.spells[0].status = 3;
 
     const { slots } = await writeAndReopen(opened.slots, opened.profileNumber, opened.accountId);
 
-    const s1 = slots.find((s) => s.slot === 1);
-    const s2 = slots.find((s) => s.slot === 2);
+    const s1 = getSlot(slots, 1);
+    const s2 = getSlot(slots, 2);
 
     // Inventory
     expect(s1.model.weapons[0].count).toBe(77);
@@ -188,8 +209,8 @@ describe('round-trip: multi-slot persistence', () => {
     const rawFiles = createUnencryptedSaveFolder([1, 2]);
     const opened = await setupAndOpen(rawFiles);
 
-    opened.slots.find((s) => s.slot === 1).model.name = 'Alice';
-    opened.slots.find((s) => s.slot === 2).model.name = 'Bob';
+    getSlot(opened.slots, 1).model.name = 'Alice';
+    getSlot(opened.slots, 2).model.name = 'Bob';
 
     const { filesToWrite } = await writeSaveData(
       opened.slots,
@@ -216,9 +237,9 @@ describe('round-trip: multi-slot persistence', () => {
     const rawFiles = createUnencryptedSaveFolder([1, 2, 3]);
     const opened = await setupAndOpen(rawFiles);
 
-    opened.slots.find((s) => s.slot === 1).model.world = 5;
-    opened.slots.find((s) => s.slot === 2).model.world = 7;
-    opened.slots.find((s) => s.slot === 3).model.world = 9;
+    getSlot(opened.slots, 1).model.world = 5;
+    getSlot(opened.slots, 2).model.world = 7;
+    getSlot(opened.slots, 3).model.world = 9;
 
     const { filesToWrite } = await writeSaveData(
       opened.slots,
@@ -240,9 +261,9 @@ describe('round-trip: multi-slot persistence', () => {
     const opened = await setupAndOpen(rawFiles);
 
     // Slot 1: 16-char name (maximum)
-    opened.slots.find((s) => s.slot === 1).model.name = 'ABCDEFGHIJKLMNOP';
+    getSlot(opened.slots, 1).model.name = 'ABCDEFGHIJKLMNOP';
     // Slot 2: short name
-    opened.slots.find((s) => s.slot === 2).model.name = 'Z';
+    getSlot(opened.slots, 2).model.name = 'Z';
 
     const { filesToWrite } = await writeSaveData(
       opened.slots,
@@ -272,8 +293,8 @@ describe('round-trip: multi-slot persistence', () => {
     const { slots } = await writeAndReopen(opened.slots, opened.profileNumber, opened.accountId);
 
     // All three slots must match factory values
-    assertModelsMatch(slots.find((s) => s.slot === 1).model, getExpectedModel(1));
-    assertModelsMatch(slots.find((s) => s.slot === 2).model, getExpectedModel(2));
-    assertModelsMatch(slots.find((s) => s.slot === 3).model, getExpectedModel(3));
+    assertModelsMatch(getSlot(slots, 1).model, getExpectedModel(1));
+    assertModelsMatch(getSlot(slots, 2).model, getExpectedModel(2));
+    assertModelsMatch(getSlot(slots, 3).model, getExpectedModel(3));
   });
 });

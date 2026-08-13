@@ -428,7 +428,7 @@ export function createPopulatedUserDat(slot) {
     const rec = m.deposit[i];
     const b = O.DEPOSIT_BASE + i * O.DEPOSIT_STRIDE;
 
-    let typeByte;
+    let typeByte = 0;
     switch (rec.category) {
       case 'weapons':
         typeByte = 0x00;
@@ -603,6 +603,18 @@ export function createRealisticSfo(profileNumber, accountIdHex) {
 }
 
 /**
+ * SFO index/data-table entry used while building a PARAM.SFO buffer.
+ * @typedef {Object} SfoEntry
+ * @property {string} key
+ * @property {string|null} [str]   - string value (null for raw-byte ACCOUNT_ID)
+ * @property {number} [int]        - INT32 value
+ * @property {number} fmt          - data format code
+ * @property {number} maxLen       - max field length in bytes
+ * @property {number} [keyOff]     - assigned key-table offset
+ * @property {number} [dataOff]    - assigned data-table offset
+ */
+
+/**
  * Build a rich PARAM.SFO carrying every entry the field accessors look up:
  * TITLE, SUB_TITLE, DETAIL, SAVEDATA_DIRECTORY, ACCOUNT_ID, ATTRIBUTE.
  *
@@ -621,6 +633,7 @@ export function createRichSfo(profileNumber, accountIdHex) {
   const FMT_INT32 = 0x0404;
 
   // value === null marks a raw-bytes entry (ACCOUNT_ID); number marks INT32.
+  /** @type {SfoEntry[]} */
   const entries = [
     { key: 'TITLE', str: "Demon's Souls", fmt: FMT_UTF8_S, maxLen: 32 },
     { key: 'SUB_TITLE', str: 'Action RPG', fmt: FMT_UTF8_S, maxLen: 32 },
@@ -667,33 +680,33 @@ export function createRichSfo(profileNumber, accountIdHex) {
   for (let i = 0; i < entries.length; i++) {
     const e = entries[i];
     const off = HEADER + i * 16;
-    const dataLen = e.fmt === FMT_INT32 ? 4 : e.str === null ? 16 : e.str.length;
-    dv.setUint16(off, e.keyOff, true);
+    const dataLen = e.fmt === FMT_INT32 ? 4 : e.str === null ? 16 : (e.str?.length ?? 0);
+    dv.setUint16(off, e.keyOff ?? 0, true);
     dv.setUint16(off + 2, e.fmt, false);
     dv.setUint32(off + 4, dataLen, true);
     dv.setUint32(off + 8, e.maxLen, true);
-    dv.setUint32(off + 12, e.dataOff, true);
+    dv.setUint32(off + 12, e.dataOff ?? 0, true);
   }
 
   // Key table.
   for (const e of entries) {
     for (let j = 0; j < e.key.length; j++) {
-      sfo[keyTableStart + e.keyOff + j] = e.key.charCodeAt(j);
+      sfo[keyTableStart + (e.keyOff ?? 0) + j] = e.key.charCodeAt(j);
     }
     // null terminator already zero
   }
 
   // Data table.
   for (const e of entries) {
-    const doff = dataTableStart + e.dataOff;
+    const doff = dataTableStart + (e.dataOff ?? 0);
     if (e.key === 'ACCOUNT_ID') {
       if (accountIdHex) {
         const clean = accountIdHex.replace(/[^0-9a-fA-F]/g, '').padEnd(32, '0');
         sfo.set(fromHex(clean), doff);
       }
     } else if (e.fmt === FMT_INT32) {
-      dv.setUint32(doff, e.int, true);
-    } else {
+      dv.setUint32(doff, e.int ?? 0, true);
+    } else if (e.str) {
       for (let j = 0; j < e.str.length; j++) {
         sfo[doff + j] = e.str.charCodeAt(j) & 0xff;
       }
@@ -937,7 +950,20 @@ export function createRealisticSaveFolder(slots, opts = {}) {
 }
 
 /**
+ * Options for the realistic save-folder builders.
+ * @typedef {Object} RealisticFolderOptions
+ * @property {number} [profileNumber]
+ * @property {boolean} [realisticSfo]
+ * @property {string} [accountId]
+ * @property {boolean} [encrypted]
+ * @property {boolean} [assets]
+ */
+
+/**
  * Build a realistic unencrypted folder with full rotational variants.
+ * @param {number[]} slots
+ * @param {RealisticFolderOptions} [opts]
+ * @returns {Map<string, {name: string, bytes: Uint8Array}>}
  */
 function createRealisticUnencryptedFolder(slots, opts = {}) {
   const profileNumber = opts.profileNumber ?? 42;
@@ -971,6 +997,9 @@ function createRealisticUnencryptedFolder(slots, opts = {}) {
 
 /**
  * Build a realistic encrypted folder with full rotational variants.
+ * @param {number[]} slots
+ * @param {RealisticFolderOptions} [opts]
+ * @returns {Map<string, {name: string, bytes: Uint8Array}>}
  */
 function createRealisticEncryptedFolder(slots, opts = {}) {
   const profileNumber = opts.profileNumber ?? 42;

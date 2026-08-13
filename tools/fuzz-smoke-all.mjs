@@ -87,7 +87,7 @@ if (targetsArg) {
 
 const cores = os.cpus().length;
 const concurrencyArg = val('--concurrency');
-let concurrency;
+/** @type {number} */ let concurrency;
 if (concurrencyArg !== undefined) {
   concurrency = Number.parseInt(concurrencyArg, 10);
   if (!Number.isInteger(concurrency) || concurrency < 1) {

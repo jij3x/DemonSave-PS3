@@ -82,7 +82,12 @@ function copyFile(src, relDest) {
   console.log(`   ${relDest}  (${(size / 1024).toFixed(1)} KB)`);
 }
 
-/** Recursively copy all files matching a predicate. */
+/**
+ * Recursively copy all files matching a predicate.
+ * @param {string} srcDir
+ * @param {string} destDir
+ * @param {(name: string) => boolean} predicate
+ */
 function copyDir(srcDir, destDir, predicate) {
   for (const entry of readdirSync(srcDir, { withFileTypes: true })) {
     const srcPath = join(srcDir, entry.name);

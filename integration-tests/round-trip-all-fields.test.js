@@ -40,6 +40,10 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
 
   /**
    * Write the current slots to disk and re-open from disk.
+   * @param {import('../js/des-savefile/save-api.js').SaveSlot[]} slots
+   * @param {number} profileNumber
+   * @param {string} [accountId]
+   * @returns {Promise<Awaited<ReturnType<typeof openSave>>>}
    */
   async function writeAndReopen(slots, profileNumber, accountId = opened.accountId) {
     const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
@@ -65,6 +69,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
 
     // Verify display data has equipment pointer fields (structurally separated)
     const display = opened.slots[0].display;
+    if (!display) throw new Error('expected display data to be present');
     expect(display.equipmentPointers.leftHand1).toBe(expected.leftHand1Ptr);
     expect(display.equipmentPointers.rightHand1).toBe(expected.rightHand1Ptr);
     expect(display.equipmentPointers.bolts).toBe(0xffffffff);
@@ -277,7 +282,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
     // idx1/idx2 are NOT provided — the writer assigns them (= first available
     // empty slot number, matching the game's idx1 == slot invariant).
     model.weapons.push({
-      _ref: undefined,
+      _ref: '',
       itemId: 0x00055555,
       count: 7,
       misc1: 0x0f00,
@@ -289,6 +294,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
     // The new item should appear (at some position in the array)
     const newWeapon = slots[0].model.weapons.find((w) => w.itemId === 0x00055555);
     expect(newWeapon).toBeDefined();
+    if (!newWeapon) throw new Error('expected new weapon to be present');
     expect(newWeapon.count).toBe(7);
     expect(newWeapon.durability).toBe(150);
   });
@@ -327,6 +333,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
 
     expect(w1).toBeDefined();
     expect(w2).toBeDefined();
+    if (!w1 || !w2) throw new Error('expected new weapons to be present');
 
     // idx1 should equal idx2 (game's invariant)
     expect(w1.idx1).toBe(w1.idx2);
@@ -513,6 +520,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
     expect(slots[0].model.deposit).toHaveLength(5); // factory has 4
     const newDep = slots[0].model.deposit.find((d) => d.itemId === 0x00ff0001);
     expect(newDep).toBeDefined();
+    if (!newDep) throw new Error('expected new deposit item to be present');
     expect(newDep.count).toBe(1);
     expect(newDep.category).toBe('rings');
   });
@@ -559,6 +567,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
     const { slots } = await writeAndReopen(opened.slots, opened.profileNumber);
     const newSpell = slots[0].model.spells.find((s) => s.itemId === 0x03000001);
     expect(newSpell).toBeDefined();
+    if (!newSpell) throw new Error('expected new spell to be present');
     expect(newSpell.status).toBe(3);
   });
 
@@ -1006,6 +1015,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
 
     const newWeapon = fm.weapons.find((w) => w.itemId >>> 0 === newWeaponId >>> 0);
     expect(newWeapon).toBeDefined();
+    if (!newWeapon) throw new Error('expected new weapon to be present');
 
     // idx1 must equal the slot number (the game's invariant).
     // Factory fills 7 items (slots 0–6), so the new weapon goes to slot 7.
@@ -1038,6 +1048,7 @@ describe('round-trip: all fields (unencrypted, single slot)', () => {
 
     const newRing = fm.rings.find((r) => r.itemId >>> 0 === newRingId >>> 0);
     expect(newRing).toBeDefined();
+    if (!newRing) throw new Error('expected new ring to be present');
 
     expect(newRing._slot).toBe(7);
     expect(newRing.idx1).toBe(7);

@@ -50,11 +50,15 @@ describe('constants', () => {
     });
 
     test('accepts null (coerces to empty string)', () => {
-      expect(validateName(null)).toEqual({ valid: true });
+      expect(validateName(/** @type {string} */ (/** @type {unknown} */ (null)))).toEqual({
+        valid: true,
+      });
     });
 
     test('accepts undefined (coerces to empty string)', () => {
-      expect(validateName(undefined)).toEqual({ valid: true });
+      expect(validateName(/** @type {string} */ (/** @type {unknown} */ (undefined)))).toEqual({
+        valid: true,
+      });
     });
 
     test('accepts exactly 16 characters', () => {

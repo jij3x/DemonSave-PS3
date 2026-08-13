@@ -89,7 +89,7 @@ import { assertModelsMatch, extractComparableModel } from '../test-fixtures/mode
  * undefined, a DataView out-of-range access) and must NOT be treated as clean.
  *
  * @param {unknown} e
- * @returns {boolean}
+ * @returns {e is Error}
  */
 function isCleanDomainError(e) {
   return e instanceof Error && !(e instanceof TypeError) && !(e instanceof RangeError);
@@ -1015,6 +1015,8 @@ const SF_SFO = createRealisticSfo(42, 'aabbccdd11223344aabbccdd11223344');
 const SF_BASE_USER = createPopulatedUserDat(1);
 const SF_SECONDARY = createSecondaryFile();
 
+/** @type {{files: Map<string, Uint8Array>} | null} */
+let _sfBase = null;
 /**
  * Lazily build a fixed realistic *encrypted* save folder (PFD + encrypted
  * USER.DAT/04USER.DAT + plaintext SFO) for the save-folder oracle. Built once
@@ -1022,7 +1024,6 @@ const SF_SECONDARY = createSecondaryFile();
  * (encryptBytes) never corrupt the shared base.
  * @returns {{files: Map<string, Uint8Array>}}
  */
-let _sfBase = null;
 function saveFolderBase() {
   if (_sfBase) return _sfBase;
   const pfd = createPfdForFiles(
@@ -1097,8 +1098,11 @@ export async function assertSaveFolderApiStable(newPlain) {
       throw new Error('savefolder: findEntry NOPE.DAT unexpectedly non-null');
     }
     // rebuildChanges(encryptFiles=true) → covers rebuildParamPfd.
+    // pfdBytes is guaranteed non-null here (folder is encrypted + has a PFD);
+    // the cast narrows Uint8Array|null → Uint8Array for strict type-checking
+    // without altering runtime behavior.
     const rebuilt = rebuildChanges(folder, true, noop);
-    assertPfdWellFormed(parseParamPfd(rebuilt.pfdBytes));
+    assertPfdWellFormed(parseParamPfd(/** @type {Uint8Array} */ (rebuilt.pfdBytes)));
   } catch (e) {
     if (isCleanDomainError(e)) return;
     throw e;
