@@ -47,7 +47,7 @@ for (const [abs, d] of Object.entries(cov)) {
   for (const [id, counts] of Object.entries(d.b)) {
     const bm = d.branchMap[id];
     if (!bm) continue;
-    counts.forEach((c, i) => {
+    counts.forEach((/** @type {number} */ c, /** @type {number} */ i) => {
       totalArcs++;
       if (c > 0) coveredArcs++;
       if (c === 0) {

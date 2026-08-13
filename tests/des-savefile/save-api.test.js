@@ -180,12 +180,12 @@ describe('openSave (multi-slot)', () => {
     const slot2 = slots.find((s) => s.slot === 2);
     const slot3 = slots.find((s) => s.slot === 3);
 
-    expect(slot1.model.vit).toBe(10);
-    expect(slot1.model.souls).toBe(1000);
-    expect(slot2.model.vit).toBe(20);
-    expect(slot2.model.souls).toBe(2000);
-    expect(slot3.model.vit).toBe(30);
-    expect(slot3.model.souls).toBe(3000);
+    expect(slot1?.model.vit).toBe(10);
+    expect(slot1?.model.souls).toBe(1000);
+    expect(slot2?.model.vit).toBe(20);
+    expect(slot2?.model.souls).toBe(2000);
+    expect(slot3?.model.vit).toBe(30);
+    expect(slot3?.model.souls).toBe(3000);
   });
 
   test('loads slot 4 only', async () => {
@@ -209,7 +209,7 @@ describe('openSave (multi-slot)', () => {
     });
 
     // Corrupt slot 2 by zeroing the sanity check
-    const slot2Buf = rawFiles.get('01user.dat').bytes;
+    const slot2Buf = rawFiles.get('01user.dat')?.bytes ?? new Uint8Array(0);
     wInt32BE(slot2Buf, O.SANITY_CHECK, 0);
 
     const { slots, failedSlots } = await openSave(rawFiles);
@@ -232,7 +232,7 @@ describe('openSave (multi-slot)', () => {
     });
 
     // Corrupt slot 2
-    const slot2Buf = rawFiles.get('01user.dat').bytes;
+    const slot2Buf = rawFiles.get('01user.dat')?.bytes ?? new Uint8Array(0);
     wInt32BE(slot2Buf, O.SANITY_CHECK, 0);
     // Put a marker so we can verify preservation
     slot2Buf[0x04] = 0xcd;
@@ -246,7 +246,7 @@ describe('openSave (multi-slot)', () => {
     const { filesToWrite } = await writeSaveData(slots, failedSlots, 0, '');
     const slot2Out = filesToWrite.get('01USER.DAT');
     expect(slot2Out).toBeDefined();
-    expect(slot2Out[0x04]).toBe(0xcd); // marker preserved
+    expect(slot2Out?.[0x04]).toBe(0xcd); // marker preserved
   });
 });
 
@@ -273,7 +273,7 @@ describe('writeSaveData (unencrypted, single slot)', () => {
 
     // Verify the USER.DAT bytes reflect the changes
     const userBytes = filesToWrite.get('USER.DAT');
-    const result = readSave(userBytes);
+    const result = readSave(userBytes ?? new Uint8Array(0));
     expect(result.vit).toBe(99);
     expect(result.souls).toBe(500000);
   });
@@ -287,7 +287,7 @@ describe('writeSaveData (unencrypted, single slot)', () => {
     const { filesToWrite } = await writeSaveData(slots, [], 200, '');
 
     const sfoBytes = filesToWrite.get('PARAM.SFO');
-    expect(sfoBytes[0x570]).toBe(200);
+    expect(sfoBytes?.[0x570]).toBe(200);
   });
 
   test('write round-trips without errors on blank save', async () => {
@@ -304,7 +304,7 @@ describe('writeSaveData (unencrypted, single slot)', () => {
 
     // Verify the USER.DAT is parseable
     const userBytes = filesToWrite.get('USER.DAT');
-    const result = readSave(userBytes);
+    const result = readSave(userBytes ?? new Uint8Array(0));
     expect(result).toBeDefined();
     expect(result.weapons.length).toBe(0);
   });
@@ -323,8 +323,8 @@ describe('writeSaveData (multi-slot)', () => {
     // Modify both slots
     const slot1 = slots.find((s) => s.slot === 1);
     const slot2 = slots.find((s) => s.slot === 2);
-    slot1.model.vit = 111;
-    slot2.model.vit = 222;
+    if (slot1) slot1.model.vit = 111;
+    if (slot2) slot2.model.vit = 222;
 
     const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
 
@@ -333,8 +333,8 @@ describe('writeSaveData (multi-slot)', () => {
     expect(filesToWrite.has('01USER.DAT')).toBe(true);
 
     // Verify each file reflects its own changes
-    const result1 = readSave(filesToWrite.get('USER.DAT'));
-    const result2 = readSave(filesToWrite.get('01USER.DAT'));
+    const result1 = readSave(filesToWrite.get('USER.DAT') ?? new Uint8Array(0));
+    const result2 = readSave(filesToWrite.get('01USER.DAT') ?? new Uint8Array(0));
     expect(result1.vit).toBe(111);
     expect(result2.vit).toBe(222);
   });
@@ -351,8 +351,8 @@ describe('writeSaveData (multi-slot)', () => {
     // Set character names for each slot
     const slot1 = slots.find((s) => s.slot === 1);
     const slot2 = slots.find((s) => s.slot === 2);
-    slot1.model.name = 'Alice';
-    slot2.model.name = 'Bob';
+    if (slot1) slot1.model.name = 'Alice';
+    if (slot2) slot2.model.name = 'Bob';
 
     const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
 
@@ -374,8 +374,8 @@ describe('writeSaveData (multi-slot)', () => {
     // Set distinct worlds for each slot
     const slot1 = slots.find((s) => s.slot === 1);
     const slot2 = slots.find((s) => s.slot === 2);
-    slot1.model.world = 5; // slot 0 in secondary (0-based)
-    slot2.model.world = 7; // slot 1 in secondary (0-based)
+    if (slot1) slot1.model.world = 5; // slot 0 in secondary (0-based)
+    if (slot2) slot2.model.world = 7; // slot 1 in secondary (0-based)
 
     const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
 
@@ -383,8 +383,8 @@ describe('writeSaveData (multi-slot)', () => {
     expect(secBytes).toBeDefined();
 
     // Verify each slot's world landed at its per-slot offset
-    const world0 = secBytes[O.SEC_WORLD + 0 * O.SEC_NAME_STRIDE];
-    const world1 = secBytes[O.SEC_WORLD + 1 * O.SEC_NAME_STRIDE];
+    const world0 = secBytes?.[O.SEC_WORLD + 0 * O.SEC_NAME_STRIDE];
+    const world1 = secBytes?.[O.SEC_WORLD + 1 * O.SEC_NAME_STRIDE];
     expect(world0).toBe(5); // slot 1 → idx 0
     expect(world1).toBe(7); // slot 2 → idx 1
   });
@@ -400,7 +400,14 @@ describe('writeSaveData (inPlace mode)', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId, null, true);
+    const { filesToWrite } = await writeSaveData(
+      slots,
+      [],
+      profileNumber,
+      accountId,
+      undefined,
+      true,
+    );
 
     // PARAM.SFO must NOT be in filesToWrite in inPlace mode
     expect(filesToWrite.has('PARAM.SFO')).toBe(false);
@@ -413,7 +420,14 @@ describe('writeSaveData (inPlace mode)', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId, null, false);
+    const { filesToWrite } = await writeSaveData(
+      slots,
+      [],
+      profileNumber,
+      accountId,
+      undefined,
+      false,
+    );
 
     expect(filesToWrite.has('PARAM.SFO')).toBe(true);
   });
@@ -454,7 +468,7 @@ describe('writeSaveData (inPlace mode)', () => {
     });
 
     // Corrupt slot 2
-    const slot2Buf = rawFiles.get('01user.dat').bytes;
+    const slot2Buf = rawFiles.get('01user.dat')?.bytes ?? new Uint8Array(0);
     wInt32BE(slot2Buf, O.SANITY_CHECK, 0);
 
     const { slots, failedSlots } = await openSave(rawFiles);
@@ -534,7 +548,14 @@ describe('save-api: writeSaveData inPlace + encrypted source branches', () => {
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // inPlace=true on unencrypted source — assets are skipped
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId, null, true);
+    const { filesToWrite } = await writeSaveData(
+      slots,
+      [],
+      profileNumber,
+      accountId,
+      undefined,
+      true,
+    );
     // In inPlace mode, assets are NOT written (already on disk)
     expect(filesToWrite.has('ICON0.PNG')).toBe(false);
     expect(filesToWrite.has('PIC1.PNG')).toBe(false);
@@ -550,7 +571,14 @@ describe('save-api: writeSaveData inPlace + encrypted source branches', () => {
     const { slots, profileNumber, accountId } = await openSave(rawFiles);
 
     // non-inPlace — assets ARE included
-    const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId, null, false);
+    const { filesToWrite } = await writeSaveData(
+      slots,
+      [],
+      profileNumber,
+      accountId,
+      undefined,
+      false,
+    );
     expect(filesToWrite.has('ICON0.PNG')).toBe(true);
   });
 });
@@ -566,7 +594,7 @@ describe('save-api: decryptAndMergeSlots cached bytes branch', () => {
     slots[0].model.vit = 99;
     const { filesToWrite } = await writeSaveData(slots, [], profileNumber, accountId);
     expect(filesToWrite.has('USER.DAT')).toBe(true);
-    const result = readSave(filesToWrite.get('USER.DAT'));
+    const result = readSave(filesToWrite.get('USER.DAT') ?? new Uint8Array(0));
     expect(result.vit).toBe(99);
   });
 });
@@ -601,8 +629,8 @@ describe('reloadSlotModels', () => {
     expect(slots[0].model.name).toBe('Hero');
     expect(slots[0].model.souls).toBe(77777);
     expect(slots[0].display).toBeDefined();
-    expect(slots[0].display.equipmentPointers).toBeDefined();
-    expect(slots[0].display.invIdxByRef).toBeDefined();
+    expect(slots[0].display?.equipmentPointers).toBeDefined();
+    expect(slots[0].display?.invIdxByRef).toBeDefined();
   });
 
   test('reloadSlotModels with onProgress callback', async () => {
@@ -610,7 +638,7 @@ describe('reloadSlotModels', () => {
     const rawFiles = makeUnencryptedSaveFiles(buf);
     const { slots } = await openSave(rawFiles);
 
-    const messages = [];
+    const messages = /** @type {string[]} */ ([]);
     reloadSlotModels(slots, (msg) => messages.push(msg));
 
     expect(messages.length).toBeGreaterThan(0);
@@ -655,7 +683,7 @@ describe('repeated saves without reload (new items)', () => {
     // Save #1
     const result1 = await writeSaveData(slots, [], profileNumber, accountId);
     const userBytes1 = result1.filesToWrite.get('USER.DAT');
-    const model1 = readSave(userBytes1);
+    const model1 = readSave(userBytes1 ?? new Uint8Array(0));
     expect(model1.weapons).toHaveLength(1);
 
     // reloadSlotModels (as the UI calls after every save)
@@ -668,7 +696,7 @@ describe('repeated saves without reload (new items)', () => {
     // Save #2 — without reloading from disk
     const result2 = await writeSaveData(slots, [], profileNumber, accountId);
     const userBytes2 = result2.filesToWrite.get('USER.DAT');
-    const model2 = readSave(userBytes2);
+    const model2 = readSave(userBytes2 ?? new Uint8Array(0));
 
     // The weapon must NOT be duplicated — still exactly 1
     expect(model2.weapons).toHaveLength(1);
@@ -700,7 +728,7 @@ describe('writeSaveData: sfoBytes return value', () => {
         [],
         profileNumber,
         accountId,
-        null,
+        undefined,
         inPlace,
       );
 

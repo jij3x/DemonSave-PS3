@@ -33,6 +33,11 @@ jest.unstable_mockModule('../../js/lib/tauri-bridge.js', () => ({
 // Mock fflate — its ESM browser build can't be parsed by Jest in jsdom.
 jest.unstable_mockModule('fflate', () => ({
   __esModule: true,
+  /**
+   * @param {Record<string, Uint8Array>} files
+   * @param {object} opts
+   * @param {(err: Error | null, data: Uint8Array) => void} cb
+   */
   zip: (files, opts, cb) => {
     const entries = Object.values(files);
     let totalSize = 0;
@@ -133,6 +138,36 @@ describe('capability detection', () => {
 });
 
 // --- readFilesFromDataTransfer — drag-and-drop folder reading ---
+
+/**
+ * @typedef {Object} MockFileData
+ * @property {string} name
+ * @property {number} size
+ * @property {() => Promise<ArrayBufferLike>} arrayBuffer
+ */
+
+/**
+ * @typedef {Object} MockFsEntry
+ * @property {boolean} isFile
+ * @property {boolean} isDirectory
+ * @property {string} name
+ * @property {() => { readEntries: (callback: (entries: MockFsEntry[]) => void) => void }} [createReader]
+ * @property {(cb: (file: MockFileData) => void) => void} [file]
+ */
+
+/**
+ * @typedef {Object} MockFsNode
+ * @property {string} name
+ * @property {Uint8Array} [content]
+ * @property {boolean} [isDirectory]
+ * @property {MockFsNode[]} [children]
+ */
+
+/**
+ * @typedef {Object} MockTransferItem
+ * @property {() => MockFsEntry | null} webkitGetAsEntry
+ */
+
 describe('readFilesFromDataTransfer', () => {
   /**
    * Build a FileSystemEntry-like mock from a node tree.
@@ -141,6 +176,9 @@ describe('readFilesFromDataTransfer', () => {
    * children: [...] }` where children may themselves be files or nested
    * directories (arbitrary depth). The directory reader mimics the real API
    * by returning all children on the first readEntries() call and [] after.
+   *
+   * @param {MockFsNode} node
+   * @returns {MockFsEntry}
    */
   function buildEntry(node) {
     if (node.isDirectory) {
@@ -161,6 +199,7 @@ describe('readFilesFromDataTransfer', () => {
         }),
       };
     }
+    const content = /** @type {Uint8Array} */ (node.content);
     return {
       isFile: true,
       isDirectory: false,
@@ -168,8 +207,8 @@ describe('readFilesFromDataTransfer', () => {
       file: (cb) =>
         cb({
           name: node.name,
-          size: node.content.length,
-          arrayBuffer: () => Promise.resolve(node.content.buffer),
+          size: content.length,
+          arrayBuffer: () => Promise.resolve(content.buffer),
         }),
     };
   }
@@ -177,9 +216,15 @@ describe('readFilesFromDataTransfer', () => {
   /**
    * Build a mock DataTransferItemList simulating a dropped directory
    * containing files (and optionally nested subdirectories).
+   * @param {MockFsNode[]} entries
+   * @returns {DataTransferItemList}
    */
   function makeMockItems(entries) {
-    return entries.map((entry) => ({ webkitGetAsEntry: () => buildEntry(entry) }));
+    return /** @type {DataTransferItemList} */ (
+      /** @type {unknown} */ (
+        entries.map((entry) => ({ webkitGetAsEntry: () => buildEntry(entry) }))
+      )
+    );
   }
 
   test('reads a directory entry and its files', async () => {
@@ -201,7 +246,9 @@ describe('readFilesFromDataTransfer', () => {
     expect(files.size).toBe(2);
     expect(files.has('param.sfo')).toBe(true);
     expect(files.has('userdata00.dat')).toBe(true);
-    expect(Array.from(files.get('param.sfo').bytes)).toEqual(Array.from(content));
+    expect(
+      Array.from(/** @type {{ name: string, bytes: Uint8Array }} */ (files.get('param.sfo')).bytes),
+    ).toEqual(Array.from(content));
   });
 
   test('reads individual files when no directory is dropped', async () => {
@@ -222,6 +269,7 @@ describe('readFilesFromDataTransfer', () => {
   });
 
   test('ignores items without webkitGetAsEntry', async () => {
+    /** @type {MockTransferItem[]} */
     const items = [
       { webkitGetAsEntry: () => null },
       {
@@ -251,7 +299,9 @@ describe('readFilesFromDataTransfer', () => {
     const items = makeMockItems([{ name: 'PARAM.SFO', content }]);
 
     const { files } = await readFilesFromDataTransfer(items);
-    expect(files.get('param.sfo').name).toBe('PARAM.SFO');
+    expect(/** @type {{ name: string, bytes: Uint8Array }} */ (files.get('param.sfo')).name).toBe(
+      'PARAM.SFO',
+    );
   });
 
   test('rejects files exceeding MAX_SAVE_FILE_SIZE in drag-and-drop', async () => {
@@ -302,18 +352,23 @@ describe('readFilesFromDataTransfer', () => {
     // Nested files are keyed by their relative path (webkitdirectory convention).
     expect(files.has('top.dat')).toBe(true);
     expect(files.has('sub/deep.dat')).toBe(true);
-    expect(Array.from(files.get('sub/deep.dat').bytes)).toEqual(Array.from(deepContent));
+    expect(
+      Array.from(
+        /** @type {{ name: string, bytes: Uint8Array }} */ (files.get('sub/deep.dat')).bytes,
+      ),
+    ).toEqual(Array.from(deepContent));
   });
 });
 
 // --- writeFilesToDirectory — Chromium FileSystemDirectoryHandle path ---
 describe('writeFilesToDirectory', () => {
   test('writes each file sequentially via FileSystemDirectoryHandle', async () => {
+    /** @type {Array<{ name: string, data: Uint8Array }>} */
     const written = [];
     const mockDirHandle = {
-      getFileHandle: jest.fn((name) => {
+      getFileHandle: jest.fn((/** @type {string} */ name) => {
         const writable = {
-          write: jest.fn((data) => written.push({ name, data })),
+          write: jest.fn((/** @type {Uint8Array} */ data) => written.push({ name, data })),
           close: jest.fn(),
         };
         return Promise.resolve({
@@ -349,9 +404,10 @@ describe('writeFilesToDirectory', () => {
 // --- deleteFilesFromDirectory ---
 describe('deleteFilesFromDirectory', () => {
   test('removes entries via FileSystemDirectoryHandle', async () => {
+    /** @type {string[]} */
     const removed = [];
     const mockDirHandle = {
-      removeEntry: jest.fn((name) => {
+      removeEntry: jest.fn((/** @type {string} */ name) => {
         removed.push(name);
         return Promise.resolve();
       }),
@@ -419,7 +475,7 @@ describe('downloadFilesAsZip', () => {
       const el = realCreate.call(document, tag);
       if (tag === 'a') {
         el.click = () => {
-          clickedAnchor = el;
+          clickedAnchor = /** @type {HTMLAnchorElement} */ (el);
         };
       }
       return el;
@@ -428,7 +484,7 @@ describe('downloadFilesAsZip', () => {
     await downloadFilesAsZip(files, 'my-save.zip');
 
     expect(clickedAnchor).not.toBeNull();
-    expect(clickedAnchor.download).toBe('my-save.zip');
+    expect(/** @type {HTMLAnchorElement} */ (clickedAnchor).download).toBe('my-save.zip');
 
     spy.mockRestore();
   });
@@ -442,7 +498,7 @@ describe('downloadFilesAsZip', () => {
       const el = realCreate.call(document, tag);
       if (tag === 'a') {
         el.click = () => {
-          clickedAnchor = el;
+          clickedAnchor = /** @type {HTMLAnchorElement} */ (el);
         };
       }
       return el;
@@ -450,7 +506,7 @@ describe('downloadFilesAsZip', () => {
 
     await downloadFilesAsZip(files);
 
-    expect(clickedAnchor.download).toBe('des_save.zip');
+    expect(/** @type {HTMLAnchorElement} */ (clickedAnchor).download).toBe('des_save.zip');
 
     spy.mockRestore();
   });
@@ -478,7 +534,7 @@ describe('downloadFilesAsZip', () => {
 
     // Verify the blob was created and contains data
     expect(capturedBlob).not.toBeNull();
-    expect(capturedBlob.type).toBe('application/zip');
+    expect(/** @type {Blob} */ (capturedBlob).type).toBe('application/zip');
 
     URL.createObjectURL = origCreate;
     spy.mockRestore();
@@ -586,11 +642,12 @@ describe('pickZipFile', () => {
 // --- writeZipToHandle ---
 describe('writeZipToHandle', () => {
   test('writes ZIP bytes to a Chromium FileSystemFileHandle', async () => {
+    /** @type {Uint8Array[]} */
     const written = [];
     const mockFileHandle = {
       createWritable: () =>
         Promise.resolve({
-          write: (data) => {
+          write: (/** @type {Uint8Array} */ data) => {
             written.push(data);
           },
           close: () => Promise.resolve(),
@@ -629,6 +686,8 @@ describe('writeZipToHandle', () => {
 /**
  * Create a mock FileSystemDirectoryHandle whose values() returns a proper
  * async iterable over the given entries.
+ * @param {Array<{ kind: string, name: string, getFile: () => Promise<MockFileData> }>} entries
+ * @returns {{ values: () => AsyncIterable<{ kind: string, name: string, getFile: () => Promise<MockFileData> }> }}
  */
 function makeMockDirHandle(entries) {
   return {

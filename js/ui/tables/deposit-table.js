@@ -36,6 +36,17 @@ import { registerChangeHandler, registerInputHandler } from '../core/event-dispa
 import { DEFAULT_DEPOSIT_FLAGS } from '../core/constants.js';
 
 /**
+ * @typedef {Object} DepositRecord
+ * @property {string} category
+ * @property {number} itemId
+ * @property {number} count
+ * @property {number} [durability]
+ * @property {number} [unknown1]
+ * @property {number} [sortOrder]
+ * @property {number[]} [flags]
+ */
+
+/**
  * Weapon types that use the decomposed Base Weapon / Path / Level layout
  * in the deposit (Thomas's Storage) tab.
  */
@@ -54,7 +65,7 @@ const DECOMPOSED_WEAPON_TYPES = new Set([1, 2, 3]);
  * an extra option in the Base Weapon select; their Path and Level selects
  * stay empty.
  *
- * @param {Array} records  [{category, itemId, count, unknown1, sortOrder, flags}]
+ * @param {DepositRecord[]} records  [{category, itemId, count, unknown1, sortOrder, flags}]
  */
 export function renderDeposit(records) {
   // Clear all deposit tables (weapons and goods span multiple per-type tables).
@@ -113,6 +124,7 @@ export function renderDeposit(records) {
  * @param {boolean} [isExisting=true]  true if loaded from save file,
  *   false if user-inserted via the Add button. Determines soft vs. hard
  *   delete behavior.
+ * @param {number|null} [typeIdHint=null]  optional type hint for new rows
  * @returns {HTMLTableRowElement}
  */
 export function makeDepositRow(category, rec, isExisting = true, typeIdHint = null) {
@@ -235,7 +247,7 @@ function populatePathSelect(pathSel, baseId, selectedPathId) {
 /**
  * Populate the level <select> with valid levels for a given upgrade path.
  * @param {HTMLSelectElement} levelSel
- * @param {number} pathId
+ * @param {number|null} pathId
  * @param {number|null} [selectedLevel]  level to pre-select
  */
 function populateLevelSelect(levelSel, pathId, selectedLevel) {
@@ -309,7 +321,7 @@ export function makeDepositWeaponRow(typeId, rec, isExisting = true) {
 
   const baseWeapons = getBaseWeaponsForType(typeId);
   // Fixed width fits the longest base weapon name (pre-computed at load).
-  baseSel.style.width = `${SELECT_WIDTHS[`base-weapons-${typeId}`]}px`;
+  baseSel.style.width = `${/** @type {Record<string, number>} */ (SELECT_WIDTHS)[`base-weapons-${typeId}`]}px`;
   // Track which base IDs are already in the dropdown.
   const seenBaseIds = new Set();
   for (const { baseId: bid, name } of baseWeapons) {
@@ -455,6 +467,7 @@ export function setupDepositWeaponSync() {
       const baseId = parseInt(sel.value, 10);
       const pathSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.dep-path'));
       const levelSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.dep-level'));
+      if (!pathSel || !levelSel) return;
 
       // Repopulate paths for the new base weapon
       populatePathSelect(pathSel, baseId, null);
@@ -499,6 +512,7 @@ export function setupDepositWeaponSync() {
     if (sel.classList.contains('dep-path')) {
       const levelSel = /** @type {HTMLSelectElement|null} */ (tr.querySelector('.dep-level'));
       const pathId = parseInt(sel.value, 10);
+      if (!levelSel) return;
       populateLevelSelect(levelSel, pathId, null);
 
       // Update path tooltip for the newly-selected path.
@@ -530,7 +544,7 @@ export function setupDepositWeaponSync() {
  *
  * Soft-deleted rows (data-deleted="true") are skipped.
  *
- * @returns {Array}
+ * @returns {DepositRecord[]}
  */
 export function collectDeposit() {
   const records = [];
@@ -558,7 +572,7 @@ export function collectDeposit() {
           const hiddenInput = /** @type {HTMLInputElement|null} */ (
             tr.querySelector('.dep-item-id')
           );
-          itemId = parseInt(hiddenInput?.value, 10) || 0;
+          itemId = parseInt(hiddenInput?.value ?? '', 10) || 0;
         } else {
           itemId = parseInt(nameSel.value, 10) || 0;
         }
@@ -569,11 +583,12 @@ export function collectDeposit() {
           tr.querySelector('.inv-dep-durability')
         );
         const count = parseCountValue(countInput, COUNT_LIMITS.deposit.min);
-        const durVal = parseInt(durInput?.value ?? tr.dataset.durability, 10);
+        const durVal = parseInt(durInput?.value ?? tr.dataset.durability ?? '', 10);
 
         // Read binary fields from hidden dataset attributes.
         // New items added via the UI leave these empty; mergeModel assigns
         // structural defaults for them.
+        /** @type {DepositRecord} */
         const rec = {
           category,
           itemId,
@@ -581,14 +596,14 @@ export function collectDeposit() {
           durability: isNaN(durVal) ? undefined : durVal,
         };
         if (tr.dataset.unknown1 !== '') {
-          rec.unknown1 = parseInt(tr.dataset.unknown1, 10) || 0;
+          rec.unknown1 = parseInt(tr.dataset.unknown1 ?? '', 10) || 0;
         }
         if (tr.dataset.sortOrder !== '') {
-          rec.sortOrder = parseInt(tr.dataset.sortOrder, 10) || 0;
+          rec.sortOrder = parseInt(tr.dataset.sortOrder ?? '', 10) || 0;
         }
         if (tr.dataset.flags !== '') {
           try {
-            rec.flags = JSON.parse(tr.dataset.flags);
+            rec.flags = JSON.parse(tr.dataset.flags ?? '');
           } catch {
             rec.flags = [...DEFAULT_DEPOSIT_FLAGS];
           }

@@ -174,7 +174,7 @@ describe('createEncryptedEntryKey', () => {
 
 describe('createPfdForFiles edge cases', () => {
   test('throws for null secureFileId', () => {
-    expect(() => createPfdForFiles([], null)).toThrow('SecureFileID must be 16 bytes');
+    expect(() => createPfdForFiles([], bad(null))).toThrow('SecureFileID must be 16 bytes');
   });
 
   test('throws for wrong-length secureFileId', () => {
@@ -259,6 +259,7 @@ describe('parseParamPfd error handling', () => {
     pfd.hashEntries = new Array(16).fill(0xffffffffffffffffn);
     pfd.sigTable = new Array(16).fill(new Uint8Array(20));
     const data = getParamPfdCombinedData(pfd);
+    /** @type {string[]} */
     const messages = [];
     parseParamPfd(data, (msg) => messages.push(msg));
     expect(messages.length).toBeGreaterThan(0);
@@ -479,7 +480,7 @@ describe('rebuildParamPfd', () => {
     // The updated file should be encrypted (different from plaintext).
     // fileUpdates keys are lowercase (consistent with fileData map).
     const encFile = fileUpdates.get('user.dat');
-    expect(toHex(encFile)).not.toBe(toHex(new Uint8Array(48).fill(0x99)));
+    expect(toHex(encFile ?? new Uint8Array())).not.toBe(toHex(new Uint8Array(48).fill(0x99)));
   });
 
   test('skips already-valid files during rebuild', () => {
@@ -790,6 +791,10 @@ describe('cloneParamPfd', () => {
   test('preserves secureFileID as a copy', () => {
     const pfd = makeUserPfd();
     const clone = cloneParamPfd(pfd);
+    // makeUserPfd() always sets SECURE_ID, so both fields are non-null here.
+    if (!pfd.secureFileID || !clone.secureFileID) {
+      throw new Error('test fixture: secureFileID unexpectedly null');
+    }
     assertByteIndependent(pfd.secureFileID, clone.secureFileID);
   });
 });
@@ -1117,6 +1122,7 @@ describe('getBucketChainHash: null and corrupt chains', () => {
 });
 
 describe('Secure RNG unavailable', () => {
+  /** @type {Crypto} */
   let originalCrypto;
   beforeEach(() => {
     originalCrypto = global.crypto;
@@ -1269,21 +1275,24 @@ describe('createPfdForFiles: hash collision chain construction', () => {
   test('builds additionEntry chain when multiple files share a bucket', () => {
     // Brute-force search for 3 filenames that collide in the same bucket.
     const numReserved = 114n; // createPfdForFiles uses max(114, n*8) for ≤14 files
+    /** @type {Map<number, string[]>} */
     const bucketNames = new Map();
+    /** @type {string[]|null} */
     let found = null;
     for (let i = 0; i < 2000 && !found; i++) {
       const name = `COLLIDE${i}.DAT`;
       const bucket = Number(calculateHashTableEntryIndex(name, numReserved));
       if (!bucketNames.has(bucket)) bucketNames.set(bucket, []);
-      bucketNames.get(bucket).push(name);
-      if (bucketNames.get(bucket).length >= 3) {
-        found = bucketNames.get(bucket).slice(0, 3);
+      const names = bucketNames.get(bucket) ?? [];
+      names.push(name);
+      if (names.length >= 3) {
+        found = names.slice(0, 3);
       }
     }
     expect(found).not.toBeNull(); // ensure we found colliding names
 
     const pfd = createPfdForFiles(
-      found.map((n) => ({ name: n, size: 16 })),
+      (found ?? []).map((n) => ({ name: n, size: 16 })),
       SECURE_ID,
     );
 
@@ -1361,7 +1370,7 @@ describe('validateParamPfdDetailed: specific failure types', () => {
 
     const result = validateParamPfdDetailed(fileData, pfd);
     expect(result.valid).toBe(false);
-    expect(result.failures.some((f) => f.reason.includes('not found'))).toBe(true);
+    expect(result.failures.some((f) => f.reason?.includes('not found'))).toBe(true);
   });
 });
 

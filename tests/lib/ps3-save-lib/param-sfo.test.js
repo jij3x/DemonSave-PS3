@@ -217,8 +217,8 @@ describe('convenience accessors', () => {
   });
 
   test('get returns empty for null/undefined sfo', () => {
-    expect(getTitle(null)).toBe('');
-    expect(getTitle(undefined)).toBe('');
+    expect(getTitle(bad(null))).toBe('');
+    expect(getTitle(bad(undefined))).toBe('');
   });
 
   test('get returns empty for missing key', () => {
@@ -370,11 +370,11 @@ describe('findParamDataOffset guards', () => {
   });
 
   test('getSfoAccountId throws on non-Uint8Array', () => {
-    expect(() => getSfoAccountId(null)).toThrow(TypeError);
+    expect(() => getSfoAccountId(bad(null))).toThrow(TypeError);
   });
 
   test('writeSfoAccountId throws on non-Uint8Array', () => {
-    expect(() => writeSfoAccountId(null, 'aabb')).toThrow(TypeError);
+    expect(() => writeSfoAccountId(bad(null), 'aabb')).toThrow(TypeError);
   });
 
   test('getSfoAttribute throws on non-Uint8Array', () => {

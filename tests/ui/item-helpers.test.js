@@ -36,7 +36,7 @@ describe('item-helpers', () => {
     });
 
     test('returns 1 for undefined itemId', () => {
-      expect(getWeaponTypeId(undefined)).toBe(1);
+      expect(getWeaponTypeId(/** @type {number} */ (/** @type {unknown} */ (undefined)))).toBe(1);
     });
 
     test('returns 1 for itemId 0', () => {
@@ -58,7 +58,7 @@ describe('item-helpers', () => {
     });
 
     test('returns 9 for undefined itemId', () => {
-      expect(getGoodsTypeId(undefined)).toBe(9);
+      expect(getGoodsTypeId(/** @type {number} */ (/** @type {unknown} */ (undefined)))).toBe(9);
     });
 
     test('returns 9 for itemId 0', () => {
@@ -115,7 +115,9 @@ describe('item-helpers', () => {
     });
 
     test('returns null for undefined itemId', () => {
-      expect(getItemNote('weapons', undefined)).toBeNull();
+      expect(
+        getItemNote('weapons', /** @type {number} */ (/** @type {unknown} */ (undefined))),
+      ).toBeNull();
     });
 
     test('returns null for unknown item ID (catch block)', () => {
@@ -219,7 +221,7 @@ describe('item-helpers', () => {
   });
 
   describe('applyItemSelectWidth', () => {
-    function makeSelectWithCat(cat) {
+    function makeSelectWithCat(/** @type {string} */ cat) {
       const sel = document.createElement('select');
       sel.dataset.lazyCat = cat;
       return sel;

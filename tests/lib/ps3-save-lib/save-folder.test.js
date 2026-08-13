@@ -21,6 +21,7 @@ import {
   fromHex,
   toHex,
 } from '../../../js/lib/ps3-save-lib/index.js';
+import { bad } from '../../helpers.js';
 
 /**
  * Build a synthetic PFD with PARAM.SFO + USER.DAT entries,
@@ -117,6 +118,8 @@ function buildEncryptedSave() {
  * Build files map for encrypted tests — excludes param.sfo because
  * the encrypted SFO bytes lack the plaintext \0PSF header that
  * parseParamSfo expects. (createSaveFolder handles null sfo gracefully.)
+ * @param {ReturnType<typeof buildEncryptedSave>} fix
+ * @returns {Map<string, Uint8Array>}
  */
 function buildEncryptedFiles(fix) {
   return new Map([
@@ -147,7 +150,7 @@ describe('createSaveFolder (unencrypted mode)', () => {
       ['user.dat', new Uint8Array([1, 2, 3])],
       ['param.sfo', sfo],
     ]);
-    const mgr = await createSaveFolder(files, null);
+    const mgr = await createSaveFolder(files, bad(null));
     expect(mgr.encrypted).toBe(false);
     expect(mgr.pfd).toBe(null);
     expect(mgr.sfo).not.toBe(null);
@@ -155,7 +158,7 @@ describe('createSaveFolder (unencrypted mode)', () => {
 
   test('creates folder with no PARAM.SFO either', async () => {
     const files = new Map([['user.dat', new Uint8Array([1, 2, 3])]]);
-    const mgr = await createSaveFolder(files, null);
+    const mgr = await createSaveFolder(files, bad(null));
     expect(mgr.encrypted).toBe(false);
     expect(mgr.pfd).toBe(null);
     expect(mgr.sfo).toBe(null);
@@ -164,13 +167,14 @@ describe('createSaveFolder (unencrypted mode)', () => {
   test('calls onProgress callback', async () => {
     const files = new Map([['user.dat', new Uint8Array([1, 2, 3])]]);
     const messages = [];
-    await createSaveFolder(files, null, (msg) => messages.push(msg));
+    await createSaveFolder(files, bad(null), (msg) => messages.push(msg));
     expect(messages.length).toBeGreaterThan(0);
   });
 });
 
 describe('decryptToBytes / encryptBytes (unencrypted)', () => {
   const files = new Map([['user.dat', new Uint8Array([10, 20, 30])]]);
+  /** @type {{pfd: null, files: Map<string, Uint8Array>, encrypted: boolean}} */
   const mgr = { pfd: null, files, encrypted: false };
 
   test('decryptToBytes returns raw bytes', () => {
@@ -185,7 +189,7 @@ describe('decryptToBytes / encryptBytes (unencrypted)', () => {
     const newBytes = new Uint8Array([40, 50, 60]);
     const result = encryptBytes(mgr, 'USER.DAT', newBytes);
     expect(Array.from(result)).toEqual([40, 50, 60]);
-    expect(Array.from(mgr.files.get('user.dat'))).toEqual([40, 50, 60]);
+    expect(Array.from(mgr.files.get('user.dat') ?? new Uint8Array())).toEqual([40, 50, 60]);
   });
 });
 
@@ -239,7 +243,7 @@ describe('createSaveFolder (encrypted mode)', () => {
   test('works without SecureFileID (null)', async () => {
     const fix = buildEncryptedSave();
     const files = buildEncryptedFiles(fix);
-    const mgr = await createSaveFolder(files, null);
+    const mgr = await createSaveFolder(files, bad(null));
     expect(mgr.encrypted).toBe(true);
     expect(mgr.pfd).not.toBe(null);
   });
@@ -266,7 +270,7 @@ describe('decryptToBytes / encryptBytes (encrypted)', () => {
     for (let i = 0; i < 32; i++) newPlain[i] = (i * 3 + 1) & 0xff;
     const enc = encryptBytes(mgr, 'USER.DAT', newPlain);
     expect(enc.length).toBeGreaterThanOrEqual(32);
-    expect(toHex(mgr.files.get('user.dat'))).toBe(toHex(enc));
+    expect(toHex(mgr.files.get('user.dat') ?? new Uint8Array())).toBe(toHex(enc));
   });
 });
 
@@ -335,6 +339,6 @@ describe('findEntry', () => {
     const mgr = await createSaveFolder(buildEncryptedFiles(fix), fix.secureFileId);
     const entry = findEntry(mgr, 'USER.DAT');
     expect(entry).not.toBe(null);
-    expect(entry.fileName).toBe('USER.DAT');
+    expect(entry?.fileName).toBe('USER.DAT');
   });
 });

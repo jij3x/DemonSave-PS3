@@ -153,6 +153,7 @@ export async function openDirectoryViaFSAccess() {
  */
 function readAllEntries(reader) {
   return new Promise((resolve, reject) => {
+    /** @type {FileSystemEntry[]} */
     const all = [];
     const readBatch = () => {
       reader.readEntries((entries) => {
@@ -300,6 +301,13 @@ export async function writeFilesToDirectory(dirHandle, filesToWrite) {
   await Promise.all(promises);
 }
 
+/**
+ * Write a single file into a Chromium FileSystemDirectoryHandle.
+ *
+ * @param {Record<string, any>} dirHandle  Chromium FileSystemDirectoryHandle
+ * @param {string} name                     file name
+ * @param {Uint8Array} bytes                file contents
+ */
 async function writeSingleFile(dirHandle, name, bytes) {
   const fileHandle = await dirHandle.getFileHandle(name, { create: true });
   const writable = await fileHandle.createWritable();
@@ -330,7 +338,7 @@ export async function deleteFilesFromDirectory(dirHandle, fileNames) {
       await dirHandle.removeEntry(name);
     } catch (err) {
       // File may not exist — ignore NotFoundError
-      if (err.name !== 'NotFoundError') {
+      if (!(err instanceof Error && err.name === 'NotFoundError')) {
         throw err;
       }
     }
@@ -372,15 +380,7 @@ export async function buildZipAsync(files) {
 }
 
 /**
- * Download a Map of files as a single ZIP archive.
- *
- * Uses async compression ({@link buildZipAsync}) so the UI is not blocked.
- *
- * @param {Map<string, Uint8Array>} files  filename → bytes
- * @param {string} zipName  download filename (default: des_save.zip)
- * @returns {Promise<void>}
- */
-/** Active blob URLs awaiting revocation.  Tracked so they can be cleaned up
+ * Active blob URLs awaiting revocation.  Tracked so they can be cleaned up
  * on page unload to avoid leaks (setTimeout-based revocation may not fire
  * if the page closes first). */
 const activeBlobUrls = new Set();
@@ -395,6 +395,15 @@ if (typeof window !== 'undefined') {
   });
 }
 
+/**
+ * Download a Map of files as a single ZIP archive.
+ *
+ * Uses async compression ({@link buildZipAsync}) so the UI is not blocked.
+ *
+ * @param {Map<string, Uint8Array>} files  filename → bytes
+ * @param {string} [zipName]  download filename (default: des_save.zip)
+ * @returns {Promise<void>}
+ */
 export async function downloadFilesAsZip(files, zipName = 'des_save.zip') {
   const zipBytes = await buildZipAsync(files);
   const blob = new Blob([/** @type {BlobPart} */ (/** @type {unknown} */ (zipBytes))], {

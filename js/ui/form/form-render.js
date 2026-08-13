@@ -302,7 +302,12 @@ export function collectForm() {
     armor: collectInventory('armor'),
     rings: collectInventory('rings'),
     goods: collectInventory('goods'),
-    deposit: collectDeposit(),
+    // collectDeposit() omits the binary fields (unknown1/sortOrder/flags)
+    // for new rows; mergeModel() assigns them downstream, so the collected
+    // shape is a partial SanitizedDepositItem at this pre-merge boundary.
+    deposit: /** @type {import('../../des-savefile/model.js').SanitizedDepositItem[]} */ (
+      collectDeposit()
+    ),
 
     spellSlots: getNumClamped('spellSlots'),
     miracleSlots: getNumClamped('miracleSlots'),

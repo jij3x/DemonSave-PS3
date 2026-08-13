@@ -13,8 +13,13 @@ import {
 } from '../core/item-helpers.js';
 
 /**
+ * Collected spell record — alias of the canonical model type.
+ * @typedef {import('../../des-savefile/model.js').SpellRecord} SpellRecord
+ */
+
+/**
  * Render spell rows from the save model into the spell table.
- * @param {Array} spells  [{itemId, status, misc1, misc2}]
+ * @param {SpellRecord[]} spells  [{itemId, status, misc1, misc2}]
  */
 export function renderSpellTable(spells) {
   const tbody = document.querySelector('#spellsTableBody tbody');
@@ -120,10 +125,11 @@ export function makeSpellRow(sp, isExisting = true) {
  *
  * Soft-deleted rows (data-deleted="true") are skipped.
  *
- * @returns {Array}
+ * @returns {SpellRecord[]}
  */
 export function collectSpells() {
   const tbody = document.querySelector('#spellsTableBody tbody');
+  if (!tbody) return [];
   const spells = [];
   for (const tr of tbody.querySelectorAll('tr')) {
     // Skip soft-deleted rows
@@ -143,7 +149,7 @@ export function collectSpells() {
       itemId: parseInt(spellNameSel?.value ?? '', 10) || 0,
       status: parseInt(spellStatusSel?.value ?? '', 10) || 0,
       misc1: parseInt(spellMisc1Inp?.value ?? '', 10) || 0,
-      misc2: parseInt(tr.dataset.misc2, 10) || 0,
+      misc2: parseInt(tr.dataset.misc2 ?? '', 10) || 0,
     });
   }
   return spells;

@@ -49,7 +49,7 @@ import { assertBounds } from './bounds.js';
  *
  * Throws on anything else — callers (UI collectForm, mergeModel) are
  * expected to provide valid numeric input.
- * @param {number|string} x
+ * @param {number|string|undefined} x
  * @returns {number}
  */
 function val(x) {
@@ -77,7 +77,7 @@ function val(x) {
  * Validate a value fits in an unsigned 8-bit field [0, 0xFF].
  * Rejects non-integer values (e.g. 3.5) to prevent silent truncation by
  * bitwise operations in the write helpers.
- * @param {number|string} x
+ * @param {number|string|undefined} x
  * @returns {number} validated integer
  */
 function assertU8(x) {
@@ -92,7 +92,7 @@ function assertU8(x) {
  * Validate a value fits in an unsigned 16-bit field [0, 0xFFFF].
  * Rejects non-integer values (e.g. 3.5) to prevent silent truncation by
  * bitwise operations in the write helpers.
- * @param {number|string} x
+ * @param {number|string|undefined} x
  * @returns {number} validated integer
  */
 function assertU16(x) {
@@ -107,7 +107,7 @@ function assertU16(x) {
  * Validate a value fits in an unsigned 32-bit field [0, 0xFFFFFFFF].
  * Rejects non-integer values (e.g. 3.5) to prevent silent truncation by
  * bitwise operations in the write helpers.
- * @param {number|string} x
+ * @param {number|string|undefined} x
  * @returns {number} validated integer
  */
 function assertU32(x) {
@@ -252,6 +252,10 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
   /**
    * Write a single inventory record's fields at the given base offset.
    * All fields are range-validated per their byte widths.
+   *
+   * @param {number} b  base byte offset of the inventory record
+   * @param {import('./model.js').FullInventoryItem} rec  inventory record
+   * @param {number} type  type-byte word (category high-nibble)
    */
   const writeInvFields = (b, rec, type) => {
     wUInt32BE(bytes, b + 0, type); // Type (not user data)
@@ -272,6 +276,8 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
    * durability table.  Bounds-checked: throws if idx1 produces an offset
    * outside the buffer (prevents silent OOB no-ops from corrupt or
    * user-entered idx1 values).
+   *
+   * @param {import('./model.js').FullInventoryItem} rec  inventory record
    */
   const writeDurability = (rec) => {
     const idx1 = assertU16(rec.idx1) & 0xffff;
@@ -316,6 +322,8 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
    * Reads the slot's original idx1 from the buffer BEFORE the record is
    * cleared, then zeros the parallel durability entry so no stale data
    * persists for orphaned idx1 values.
+   *
+   * @param {number} slotBase  base byte offset of the inventory record
    */
   const clearDurabilityForSlot = (slotBase) => {
     const oldIdx1 = rUInt32BE(bytes, slotBase + 0x0c) & 0xffff;
@@ -749,9 +757,9 @@ export function writeSaveInPlace(bytes, m, deletedSlots) {
  */
 export function writeSave(inputBytes, m, deletedSlots) {
   if (!inputBytes) {
-    throw new Error(
-      `Save buffer too small (${inputBytes ? inputBytes.length : 0} bytes, need ≥ ${O.MIN_SAVE_SIZE})`,
-    );
+    // inputBytes is falsy here (undefined/null despite the typed param); the
+    // reported length is therefore 0, matching the original ternary's result.
+    throw new Error(`Save buffer too small (0 bytes, need ≥ ${O.MIN_SAVE_SIZE})`);
   }
   const bytes = inputBytes.slice();
   return writeSaveInPlace(bytes, m, deletedSlots);

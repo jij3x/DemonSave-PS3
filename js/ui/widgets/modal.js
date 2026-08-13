@@ -44,6 +44,7 @@ function setupModalLifecycle(overlay, dialog, onKey) {
    * Focus trap: keep Tab/Shift+Tab cycling within the dialog.
    * Prevents focus from reaching elements behind the overlay.
    */
+  /** @param {KeyboardEvent} e */
   function trapFocus(e) {
     if (e.key !== 'Tab') return;
     const focusable = dialog.querySelectorAll(
@@ -101,8 +102,10 @@ export function showConfirm(message, opts = {}) {
     const { title = 'Confirm', confirmText = 'OK', cancelText = 'Cancel', danger = false } = opts;
 
     let resolved = false;
+    /** @type {() => void} */
     let teardown;
 
+    /** @param {boolean} result */
     function close(result) {
       if (resolved) return;
       resolved = true;
@@ -110,6 +113,7 @@ export function showConfirm(message, opts = {}) {
       resolve(result);
     }
 
+    /** @param {KeyboardEvent} e */
     function onKey(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -149,6 +153,7 @@ export function showAlert(message, opts = {}) {
     const { title = 'Notice', okText = 'OK' } = opts;
 
     let resolved = false;
+    /** @type {() => void} */
     let teardown;
 
     function close() {
@@ -158,6 +163,7 @@ export function showAlert(message, opts = {}) {
       resolve();
     }
 
+    /** @param {KeyboardEvent} e */
     function onKey(e) {
       if (e.key === 'Enter' || e.key === 'Escape') {
         e.preventDefault();

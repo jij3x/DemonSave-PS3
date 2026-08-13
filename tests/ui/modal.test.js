@@ -8,10 +8,20 @@ export {};
 
 const { showConfirm, showAlert } = await import('../../js/ui/widgets/modal.js');
 
+/**
+ * Typed querySelector — returns any to avoid Element|null narrowing errors
+ * on .querySelector/.querySelectorAll/.getAttribute access in this suite.
+ * @param {string} sel
+ * @returns {any}
+ */
+function qs(sel) {
+  return document.querySelector(sel);
+}
+
 describe('modal — showConfirm', () => {
   test('resolves true when confirm button is clicked', async () => {
     const promise = showConfirm('Discard changes?');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     expect(overlay).not.toBeNull();
 
     const confirmBtn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary'));
@@ -25,7 +35,7 @@ describe('modal — showConfirm', () => {
 
   test('resolves false when cancel button is clicked', async () => {
     const promise = showConfirm('Discard changes?');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
 
     const cancelBtn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-secondary'));
     cancelBtn.click();
@@ -56,7 +66,7 @@ describe('modal — showConfirm', () => {
       confirmText: 'Delete',
       cancelText: 'Keep',
     });
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
 
     expect(overlay.querySelector('.modal-title').textContent).toBe('Warning');
     const buttons = overlay.querySelectorAll('button');
@@ -70,7 +80,7 @@ describe('modal — showConfirm', () => {
 
   test('applies danger class when danger option is set', async () => {
     const promise = showConfirm('Delete?', { danger: true });
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
 
     expect(overlay.querySelector('.modal-btn-danger')).not.toBeNull();
 
@@ -80,7 +90,7 @@ describe('modal — showConfirm', () => {
 
   test('does not resolve twice (double-click safety)', async () => {
     const promise = showConfirm('Confirm?');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     const confirmBtn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary'));
 
     confirmBtn.click();
@@ -95,7 +105,7 @@ describe('modal — showConfirm', () => {
 describe('modal — showAlert', () => {
   test('resolves when OK button is clicked', async () => {
     const promise = showAlert('Deposit is full.');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     expect(overlay).not.toBeNull();
 
     const okBtn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary'));
@@ -123,7 +133,7 @@ describe('modal — showAlert', () => {
 
   test('uses custom title', async () => {
     const promise = showAlert('Error!', { title: 'Something went wrong' });
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
 
     expect(overlay.querySelector('.modal-title').textContent).toBe('Something went wrong');
 
@@ -133,7 +143,7 @@ describe('modal — showAlert', () => {
 
   test('has only one button (OK)', async () => {
     const promise = showAlert('Message');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
 
     const buttons = overlay.querySelectorAll('button');
     expect(buttons).toHaveLength(1);
@@ -144,7 +154,7 @@ describe('modal — showAlert', () => {
 
   test('does not resolve twice (double-click safety)', async () => {
     const promise = showAlert('Notice.');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     const okBtn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary'));
 
     okBtn.click(); // first close → resolves + tears down
@@ -158,7 +168,7 @@ describe('modal — showAlert', () => {
 describe('modal — accessibility', () => {
   test('dialog has role and aria-modal attributes', async () => {
     const promise = showConfirm('Confirm?');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     const dialog = overlay.querySelector('.modal');
 
     expect(dialog.getAttribute('role')).toBe('dialog');
@@ -170,7 +180,7 @@ describe('modal — accessibility', () => {
 
   test('dialog has aria-labelledby pointing to title', async () => {
     const promise = showAlert('Test message');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     const dialog = overlay.querySelector('.modal');
     const titleId = dialog.getAttribute('aria-labelledby');
     const titleEl = dialog.querySelector('.modal-title');
@@ -190,7 +200,7 @@ describe('modal — focus trap', () => {
       confirmText: 'OK',
       cancelText: 'Cancel',
     });
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     const buttons = overlay.querySelectorAll('button');
     const lastBtn = buttons[buttons.length - 1];
 
@@ -209,7 +219,7 @@ describe('modal — focus trap', () => {
 
   test('Shift+Tab on first button focuses last button', async () => {
     const promise = showConfirm('Confirm?');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     const buttons = overlay.querySelectorAll('button');
     const firstBtn = buttons[0];
 
@@ -227,7 +237,7 @@ describe('modal — focus trap', () => {
 
   test('Tab in middle does not wrap', async () => {
     const promise = showConfirm('Confirm?');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     const buttons = overlay.querySelectorAll('button');
 
     // Focus first button (not last), press Tab without shift → no wrap
@@ -244,7 +254,7 @@ describe('modal — focus trap', () => {
 
   test('non-Tab key is ignored by focus trap', async () => {
     const promise = showConfirm('Confirm?');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     const buttons = overlay.querySelectorAll('button');
 
     buttons[0].focus();
@@ -271,7 +281,7 @@ describe('modal — focus trap', () => {
 describe('modal — overlay click', () => {
   test('showAlert: clicking overlay dismisses the dialog', async () => {
     const promise = showAlert('Click outside.');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
 
     // Click directly on the overlay (not on the dialog)
     overlay.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -282,7 +292,7 @@ describe('modal — overlay click', () => {
 
   test('showAlert: clicking inside the dialog does NOT dismiss', async () => {
     const promise = showAlert('Click inside.');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     const dialog = overlay.querySelector('.modal');
 
     // Click on the dialog itself (not the overlay)
@@ -298,7 +308,7 @@ describe('modal — overlay click', () => {
 
   test('showConfirm: clicking overlay does NOT dismiss (destructive guard)', async () => {
     const promise = showConfirm('No overlay dismiss.');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
 
     overlay.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
@@ -313,7 +323,7 @@ describe('modal — overlay click', () => {
 describe('modal — custom options', () => {
   test('showAlert uses custom okText', async () => {
     const promise = showAlert('Message', { okText: 'Got it' });
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
 
     const btn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary'));
     expect(btn.textContent).toBe('Got it');
@@ -324,7 +334,7 @@ describe('modal — custom options', () => {
 
   test('showAlert uses custom title', async () => {
     const promise = showAlert('Message', { title: 'Info' });
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
 
     expect(overlay.querySelector('.modal-title').textContent).toBe('Info');
 
@@ -343,7 +353,7 @@ describe('modal — focus restoration', () => {
     expect(document.activeElement).toBe(trigger);
 
     const promise = showConfirm('Confirm?');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
 
     // Close the dialog
     /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary')).click();
@@ -357,7 +367,7 @@ describe('modal — focus restoration', () => {
     // jsdom does implement requestAnimationFrame, so the auto-focus callback
     // fires. We just verify the primary button gets focused.
     const promise = showConfirm('Auto-focus test?');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     const primaryBtn = /** @type {HTMLElement} */ (overlay.querySelector('.modal-btn-primary'));
 
     // Wait for rAF to fire (jsdom queues it as a microtask)
@@ -371,7 +381,7 @@ describe('modal — focus restoration', () => {
 
   test('auto-focus is skipped (no crash) when the primary button is absent', async () => {
     const promise = showAlert('No primary.');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     const dialog = overlay.querySelector('.modal');
 
     // Remove the primary button BEFORE the rAF autofocus fires.
@@ -389,7 +399,7 @@ describe('modal — focus restoration', () => {
   test('dialog with no focusable elements does not crash on Tab', async () => {
     // Build a custom dialog with no buttons/inputs
     const promise = showAlert('No focusable.');
-    const overlay = document.querySelector('.modal-overlay');
+    const overlay = qs('.modal-overlay');
     const dialog = overlay.querySelector('.modal');
 
     // Remove all buttons to make focusable.length === 0

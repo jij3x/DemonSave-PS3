@@ -30,6 +30,12 @@ function deepFreeze(obj) {
   return deepFreezeInternal(obj, new WeakSet());
 }
 
+/**
+ * @template T
+ * @param {T} obj
+ * @param {WeakSet<object>} seen
+ * @returns {T}
+ */
 function deepFreezeInternal(obj, seen) {
   if (obj === null || typeof obj !== 'object') return obj;
   if (Object.isFrozen(obj)) return obj;
@@ -70,6 +76,7 @@ const WEAPON_TYPES = [
  * Unknown items (not in the DB) are also excluded — they can't be classified,
  * so they don't appear in type-filtered dropdowns.
  */
+/** @type {Record<number, {ids: number[], names: string[]}>} */
 const WEAPON_TYPE_DATA = {};
 for (const { typeId } of WEAPON_TYPES) {
   WEAPON_TYPE_DATA[typeId] = { ids: [], names: [] };
@@ -100,6 +107,7 @@ for (let i = 0; i < WEAPON_IDS.length; i++) {
  * WEAPON_TYPE_DATA), so the two structures are functionally identical;
  * the deposit variant is retained for its dedicated code path and width key.
  */
+/** @type {Record<number, {ids: number[], names: string[]}>} */
 const DEPOSIT_WEAPON_TYPE_DATA = {};
 for (const { typeId } of WEAPON_TYPES) {
   DEPOSIT_WEAPON_TYPE_DATA[typeId] = { ids: [], names: [] };
@@ -148,6 +156,7 @@ const GOODS_TYPES = [
  * flat ITEM_IDS/ITEM_NAMES arrays, using getItem().type[0] to classify
  * each goods item.
  */
+/** @type {Record<number, {ids: number[], names: string[]}>} */
 const GOODS_TYPE_DATA = {};
 for (const { typeId } of GOODS_TYPES) {
   GOODS_TYPE_DATA[typeId] = { ids: [], names: [] };
@@ -209,6 +218,7 @@ export function populateCombos() {
 
   // Warp locations (positional index — warps have no game ID)
   const warpSel = document.getElementById('warpLocation');
+  if (!warpSel) return;
   for (let i = 0; i < WARPS.length; i++) {
     const opt = document.createElement('option');
     opt.value = String(i);
@@ -383,6 +393,7 @@ export function getGoodsTypeData(typeId) {
  * upgrade_ref entry (e.g. [baseId, pathIds[0], 0]) in the weapons DB and
  * reading item.type[0].
  */
+/** @type {Record<number, Array<{baseId: number, name: string}>>} */
 const BASE_WEAPONS_BY_TYPE = { 1: [], 2: [], 3: [] };
 {
   // Build from WEAPON_TYPE_DATA: for each weapon in the type-filtered list
@@ -441,7 +452,7 @@ export function getPathsForBaseWeapon(baseId) {
  * Resolve the upgrade_ref [baseId, pathId, level] for a given weapon itemId.
  * Returns null if the item has no upgrade_ref.
  * @param {number} itemId
- * @returns {[number, number, number]|null}
+ * @returns {[number, number | null, number | null]|null}
  */
 export function getUpgradeRefForItemId(itemId) {
   try {
@@ -457,8 +468,8 @@ export function getUpgradeRefForItemId(itemId) {
 /**
  * Recompose a hex item ID from a [baseId, pathId, level] upgrade_ref.
  * @param {number} baseId
- * @param {number} pathId
- * @param {number} level
+ * @param {number|null} pathId
+ * @param {number|null} level
  * @returns {number|null}  unsigned integer item ID, or null if not found
  */
 export function resolveItemIdFromRef(baseId, pathId, level) {
@@ -501,6 +512,8 @@ const SELECT_WIDTH_OVERHEAD = 40;
  * Created once and reused across all namesToWidth() calls to avoid
  * repeated canvas/context allocations during module load (~15 calls).
  * Null in non-DOM environments (e.g. jsdom tests).
+ *
+ * @type {CanvasRenderingContext2D|null}
  */
 let _measureCtx = null;
 
@@ -577,6 +590,8 @@ function namesToWidth(names) {
  *   'base-weapons-{typeId}'                       — deposit decomposed base weapon
  *   'path'                                        — upgrade path names (max across all)
  *   'level'                                       — upgrade level strings (max across all)
+ *
+ * @type {Record<string, number>}
  */
 export const SELECT_WIDTHS = {};
 

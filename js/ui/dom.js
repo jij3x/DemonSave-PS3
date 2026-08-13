@@ -46,6 +46,7 @@ function el(tag, attrs = {}, ...children) {
 }
 
 /* --- SVG line-art icons (monochrome, stroke = currentColor) --- */
+/** @type {Record<string, string>} */
 const ICONS = {
   folderOpen:
     '<path d="M3 7v10a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1H12L10 6H4a1 1 0 0 0-1 1z"/>',
@@ -119,6 +120,7 @@ const COL_MIN_WIDTH_DELETE = 40; /* 28px button + 12px padding */
 function fieldset(legendText, ...children) {
   const isObj = typeof legendText === 'object' && legendText !== null;
   const text = isObj ? legendText.text : legendText;
+  /** @type {Record<string, any>} */
   const legendAttrs = { textContent: text };
   if (isObj && legendText.tooltip) legendAttrs['data-tooltip'] = legendText.tooltip;
   return /** @type {HTMLFieldSetElement} */ (
@@ -132,7 +134,7 @@ function fieldset(legendText, ...children) {
  * @param {string} id          id for the label element (or '' to skip)
  * @param {string} labelText   text shown before the child element
  * @param {Node} child         the input/select/etc. element
- * @param {Object} [opts]      { hidden, 'data-tooltip' }
+ * @param {{ hidden?: boolean, 'data-tooltip'?: string }} [opts]  { hidden, 'data-tooltip' }
  * @returns {HTMLLabelElement}
  */
 function label(id, labelText, child, opts = {}) {
@@ -179,10 +181,11 @@ function selectInput(id, className, options, extraAttrs = {}) {
  * Create a `<label class="checkbox">` wrapping a checkbox input and text.
  * @param {string} id
  * @param {string} labelText
- * @param {Object} [opts]  { 'data-tooltip' }
+ * @param {{ 'data-tooltip'?: string }} [opts]  { 'data-tooltip' }
  * @returns {HTMLLabelElement}
  */
 function checkboxInput(id, labelText, opts = {}) {
+  /** @type {Record<string, any>} */
   const attrs = { className: 'checkbox' };
   if (opts['data-tooltip']) attrs['data-tooltip'] = opts['data-tooltip'];
   return /** @type {HTMLLabelElement} */ (
@@ -264,6 +267,8 @@ const INVENTORY_WARNING =
  * Weapon types (Weapon=1, Shield=2, Bow=3, Ammo=4, Casting Tool=6) are
  * laid as peers alongside Armor, Rings, and Goods — no parent "Weapons"
  * tab.  Each tab has its own header+body table pair.
+ *
+ * @param {string} addBtnClass  CSS class added to each Add button
  */
 function invSubTabs(addBtnClass) {
   const tabsDiv = el('div', { className: 'tabs' });
@@ -608,6 +613,20 @@ function depSubTabs() {
   return el('div', { className: 'sub-tab-container' }, tabGroup, actionsDiv);
 }
 
+/**
+ * Build a single inventory/deposit category tab: a sized table with column
+ * headers, wrapped in a tab panel that is hidden unless it is the default.
+ *
+ * @param {string} category        des-db category ('weapons'|'armor'|'rings'|'goods')
+ * @param {string} tablePrefix     'inv' or 'dep' (table CSS class prefix)
+ * @param {boolean} hasMisc1       reserved (unused; kept for call-site symmetry)
+ * @param {string} itemLabel       text label for the first column header
+ * @param {Array<string | { text: string, tooltip?: string }>} columnHeaders
+ *   column header cells (string or {text, tooltip}); a trailing '' is the
+ *   delete-button column
+ * @param {{ tabName?: string, weaponType?: number, goodsType?: number, decomposed?: boolean, noCount?: boolean }} [opts]
+ * @returns {HTMLElement}
+ */
 function invCategoryTab(category, tablePrefix, hasMisc1, itemLabel, columnHeaders, opts = {}) {
   const tabName = opts.tabName || category;
   const weaponType = opts.weaponType;
@@ -623,7 +642,7 @@ function invCategoryTab(category, tablePrefix, hasMisc1, itemLabel, columnHeader
   if (isDecomposed && weaponType != null) {
     colWidths.push(SELECT_WIDTHS[`base-weapons-${weaponType}`] + 12);
   } else {
-    colWidths.push(selectWidthFor(category, weaponType ?? goodsType, isDeposit) + 12);
+    colWidths.push(selectWidthFor(category, weaponType ?? goodsType ?? null, isDeposit) + 12);
   }
 
   // Remaining columns

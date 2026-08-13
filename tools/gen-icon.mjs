@@ -30,14 +30,43 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ICONS_DIR = join(__dirname, '..', 'src-tauri', 'icons');
 
 // ─── Math helpers ────────────────────────────────────────────────────
+/**
+ * @param {number} v
+ * @param {number} a
+ * @param {number} b
+ * @returns {number}
+ */
 const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+/**
+ * @param {number} a
+ * @param {number} b
+ * @param {number} t
+ * @returns {number}
+ */
 const lerp = (a, b, t) => a + (b - a) * t;
+/**
+ * @param {number} a
+ * @param {number} b
+ * @param {number} x
+ * @returns {number}
+ */
 function smoothstep(a, b, x) {
   const t = clamp((x - a) / (b - a), 0, 1);
   return t * t * (3 - 2 * t);
 }
+/**
+ * @param {number} x
+ * @param {number} sigma
+ * @returns {number}
+ */
 const gauss = (x, sigma) => Math.exp(-(x * x) / (2 * sigma * sigma));
 // antialiased "inside half-width hw" coverage at coordinate x (centered 0)
+/**
+ * @param {number} hw
+ * @param {number} x
+ * @param {number} [ew=0.009]
+ * @returns {number}
+ */
 const aaHW = (hw, x, ew = 0.009) => clamp((hw - Math.abs(x)) / ew + 0.5, 0, 1);
 
 // ─── Medallion geometry ──────────────────────────────────────────────
@@ -62,6 +91,11 @@ const POMMEL_P = -0.38;
 const BLADE_HW0 = 0.046;
 
 // Returns additive [r,g,b] for one sword at local (p,q).
+/**
+ * @param {number} p
+ * @param {number} q
+ * @returns {number[]}
+ */
 function drawSword(p, q) {
   let R = 0,
     G = 0,
@@ -138,6 +172,12 @@ function drawSword(p, q) {
 // Draw one sword tilted by angle θ (blade tip direction from straight up,
 // positive = tip leans toward +u). du,dv = sample point relative to center.
 // Screen coords: u right, v down, so "up" = -v.
+/**
+ * @param {number} du
+ * @param {number} dv
+ * @param {number} theta
+ * @returns {number[]}
+ */
 function drawTiltedSword(du, dv, theta) {
   const s = Math.sin(theta);
   const c = Math.cos(theta);
@@ -147,6 +187,11 @@ function drawTiltedSword(du, dv, theta) {
 }
 
 // ─── Squircle tile mask (superellipse, antialiased) ──────────────────
+/**
+ * @param {number} u
+ * @param {number} v
+ * @returns {number}
+ */
 function squircleCover(u, v) {
   const n = 5;
   const f = Math.abs(u) ** n + Math.abs(v) ** n;
@@ -157,6 +202,11 @@ function squircleCover(u, v) {
 }
 
 // ─── Compose the full crest at one sample point (u,v ∈ [-1,1]) ───────
+/**
+ * @param {number} u
+ * @param {number} v
+ * @returns {number[]}
+ */
 function sample(u, v) {
   const cover = squircleCover(u, v);
   if (cover <= 0) return [0, 0, 0, 0];
@@ -273,6 +323,10 @@ function sample(u, v) {
 }
 
 // ─── Render master RGBA buffer at a given size (3×3 supersampled) ─────
+/**
+ * @param {number} size
+ * @returns {Uint8Array}
+ */
 function renderMaster(size) {
   const out = new Uint8Array(size * size * 4);
   const ss = 3;
@@ -307,6 +361,12 @@ function renderMaster(size) {
 }
 
 // ─── Box-average downscale (requires srcSize % dstSize === 0) ────────
+/**
+ * @param {Uint8Array} src
+ * @param {number} srcSize
+ * @param {number} dstSize
+ * @returns {Uint8Array}
+ */
 function boxDownscale(src, srcSize, dstSize) {
   if (srcSize === dstSize) return src;
   const ratio = srcSize / dstSize;
@@ -353,6 +413,10 @@ const CRC_TABLE = (() => {
   }
   return t;
 })();
+/**
+ * @param {Uint8Array} buf
+ * @returns {number}
+ */
 function crc32(buf) {
   let c = 0xffffffff;
   for (let i = 0; i < buf.length; i++) c = CRC_TABLE[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
@@ -360,6 +424,11 @@ function crc32(buf) {
 }
 
 // ─── PNG encoder (8-bit RGBA, filter type 0 per row) ─────────────────
+/**
+ * @param {string} type
+ * @param {Uint8Array} data
+ * @returns {Buffer}
+ */
 function pngChunk(type, data) {
   const typeBuf = Buffer.from(type, 'ascii');
   const dataBuf = Buffer.from(data);
@@ -369,6 +438,12 @@ function pngChunk(type, data) {
   crc.writeUInt32BE(crc32(Buffer.concat([typeBuf, dataBuf])), 0);
   return Buffer.concat([len, typeBuf, dataBuf, crc]);
 }
+/**
+ * @param {number} width
+ * @param {number} height
+ * @param {Uint8Array} rgba
+ * @returns {Buffer}
+ */
 function encodePNG(width, height, rgba) {
   const sig = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
   const ihdr = Buffer.alloc(13);
@@ -395,6 +470,10 @@ function encodePNG(width, height, rgba) {
 }
 
 // ─── ICO encoder (PNG-encoded entries) ───────────────────────────────
+/**
+ * @param {{ width: number, png: Uint8Array }[]} images
+ * @returns {Buffer}
+ */
 function encodeICO(images) {
   const count = images.length;
   const header = Buffer.alloc(6);
@@ -422,6 +501,10 @@ function encodeICO(images) {
 }
 
 // ─── ICNS encoder (macOS) ────────────────────────────────────────────
+/**
+ * @param {{ type: string, png: Uint8Array }[]} entries
+ * @returns {Buffer}
+ */
 function encodeICNS(entries) {
   const parts = [];
   for (const e of entries) {

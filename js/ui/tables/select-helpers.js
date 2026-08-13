@@ -415,6 +415,7 @@ export function setupLazySelects() {
   if (root.dataset.lazySelectsInit === 'true') return;
   root.dataset.lazySelectsInit = 'true';
 
+  /** @param {Event} e */
   const handler = (e) => {
     const sel = e.target;
     if (!(sel instanceof HTMLSelectElement)) return;
@@ -496,7 +497,11 @@ function softDeleteRow(tr) {
         ? span.dataset.origId === _origItemId && span.dataset.roIdx1 === _origIdx1
         : span.dataset.origId === _origItemId;
       if (origMatches && span.dataset.id !== _origItemId) {
-        setEquipmentText(eqId, parseInt(_origItemId, 10), EQ_CATEGORY[eqId]);
+        setEquipmentText(
+          eqId,
+          parseInt(_origItemId, 10),
+          /** @type {Record<string, string>} */ (EQ_CATEGORY)[eqId],
+        );
       }
     }
   }
@@ -621,6 +626,10 @@ function setupRowDeleteHandler() {
   });
 }
 
+/**
+ * @param {HTMLTableRowElement} tr  the row this button belongs to
+ * @returns {HTMLButtonElement}
+ */
 export function makeRowDeleteButton(tr) {
   // Ensure the delegated click handler is attached (idempotent).
   setupRowDeleteHandler();

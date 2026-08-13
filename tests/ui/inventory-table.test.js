@@ -21,6 +21,11 @@ const IDS = {
 };
 
 // Build a table with data-* attributes from a plain object.
+/**
+ * @param {string} category
+ * @param {Record<string, number>} [attrs]
+ * @returns {HTMLTableElement}
+ */
 function typedTable(category, attrs = {}) {
   const table = document.createElement('table');
   table.className = 'inv-table';
@@ -178,7 +183,9 @@ describe('inventory-table', () => {
       renderInventory('weapons', [
         { itemId: IDS.weapon, _ref: 'r', misc1: 0, durability: 50, count: 1 },
       ]);
-      const tb1 = document.querySelector('table.inv-table[data-weapon-type="1"] tbody');
+      const tb1 = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-weapon-type="1"] tbody')
+      );
       expect(tb1.querySelectorAll('tr').length).toBe(1);
     });
 
@@ -188,20 +195,34 @@ describe('inventory-table', () => {
       renderInventory('weapons', [
         { itemId: IDS.shield, _ref: 'r', misc1: 0, durability: 50, count: 1 },
       ]);
-      const tb1 = document.querySelector('table.inv-table[data-weapon-type="1"] tbody');
+      const tb1 = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-weapon-type="1"] tbody')
+      );
       expect(tb1.querySelectorAll('tr').length).toBe(1);
     });
 
     test('goods: no fallback table means the record is dropped silently', () => {
       // No goods tables at all; item is type 12 → type-12 missing, type-9 fallback missing.
-      renderInventory('goods', [{ itemId: IDS.good, _ref: 'r', misc1: 0, count: 1 }]);
+      renderInventory(
+        'goods',
+        /** @type {import('../../js/ui/tables/inventory-table.js').InventoryRecord[]} */ (
+          /** @type {unknown} */ ([{ itemId: IDS.good, _ref: 'r', misc1: 0, count: 1 }])
+        ),
+      );
       expect(document.querySelectorAll('tr').length).toBe(0);
     });
 
     test('goods: falls back to the type-9 table when the item type table is absent', () => {
       typedTable('goods', { goodsType: 9 });
-      renderInventory('goods', [{ itemId: IDS.good, _ref: 'r', misc1: 0, count: 1 }]);
-      const tb = document.querySelector('table.inv-table[data-goods-type="9"] tbody');
+      renderInventory(
+        'goods',
+        /** @type {import('../../js/ui/tables/inventory-table.js').InventoryRecord[]} */ (
+          /** @type {unknown} */ ([{ itemId: IDS.good, _ref: 'r', misc1: 0, count: 1 }])
+        ),
+      );
+      const tb = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-goods-type="9"] tbody')
+      );
       expect(tb.querySelectorAll('tr').length).toBe(1);
     });
 
@@ -214,7 +235,12 @@ describe('inventory-table', () => {
 
     test('goods: routes into its own type table when present', () => {
       typedTable('goods', { goodsType: 12 });
-      renderInventory('goods', [{ itemId: IDS.good, _ref: 'r', misc1: 0, count: 1 }]);
+      renderInventory(
+        'goods',
+        /** @type {import('../../js/ui/tables/inventory-table.js').InventoryRecord[]} */ (
+          /** @type {unknown} */ ([{ itemId: IDS.good, _ref: 'r', misc1: 0, count: 1 }])
+        ),
+      );
       expect(document.querySelectorAll('tr').length).toBe(1);
     });
 
@@ -229,7 +255,9 @@ describe('inventory-table', () => {
 
     test('clears existing rows before rendering', () => {
       typedTable('armor');
-      const tbody = document.querySelector('table.inv-table[data-category="armor"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-category="armor"] tbody')
+      );
       tbody.appendChild(document.createElement('tr'));
       renderInventory('armor', [
         { itemId: IDS.armor, _ref: 'r', misc1: 0, durability: 10, count: 1 },
@@ -245,7 +273,9 @@ describe('inventory-table', () => {
 
     test('round-trips an armor row (split misc1 reassembly)', () => {
       typedTable('armor');
-      const tbody = document.querySelector('table.inv-table[data-category="armor"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-category="armor"] tbody')
+      );
       tbody.appendChild(
         makeInventoryRow('armor', {
           itemId: IDS.armor,
@@ -266,7 +296,9 @@ describe('inventory-table', () => {
 
     test('round-trips a rings row (single misc1)', () => {
       typedTable('rings');
-      const tbody = document.querySelector('table.inv-table[data-category="rings"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-category="rings"] tbody')
+      );
       tbody.appendChild(
         makeInventoryRow('rings', { itemId: IDS.ring, _ref: 'r', misc1: 9, misc2: 2, count: 1 }),
       );
@@ -277,7 +309,9 @@ describe('inventory-table', () => {
 
     test('round-trips a goods row', () => {
       typedTable('goods', { goodsType: 12 });
-      const tbody = document.querySelector('table.inv-table[data-goods-type="12"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-goods-type="12"] tbody')
+      );
       tbody.appendChild(
         makeInventoryRow('goods', { itemId: IDS.good, _ref: 'r', misc1: 3, misc2: 0, count: 5 }),
       );
@@ -289,7 +323,9 @@ describe('inventory-table', () => {
 
     test('skips soft-deleted rows', () => {
       typedTable('armor');
-      const tbody = document.querySelector('table.inv-table[data-category="armor"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-category="armor"] tbody')
+      );
       const live = makeInventoryRow('armor', {
         itemId: IDS.armor,
         _ref: 'r',
@@ -312,14 +348,18 @@ describe('inventory-table', () => {
 
     test('skips rows whose inv-name select has no value (placeholder)', () => {
       typedTable('rings');
-      const tbody = document.querySelector('table.inv-table[data-category="rings"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-category="rings"] tbody')
+      );
       tbody.appendChild(makeInventoryRow('rings', { itemId: 0, misc1: 0, count: 1 })); // new row, placeholder
       expect(collectInventory('rings')).toEqual([]);
     });
 
     test('defaults misc1 to 0 for a single-layout row missing the misc1 input', () => {
       typedTable('rings');
-      const tbody = document.querySelector('table.inv-table[data-category="rings"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-category="rings"] tbody')
+      );
       const tr = document.createElement('tr');
       const sel = document.createElement('select');
       sel.className = 'inv-name';
@@ -336,7 +376,9 @@ describe('inventory-table', () => {
 
     test('parses an item id of 0 without throwing', () => {
       typedTable('armor');
-      const tbody = document.querySelector('table.inv-table[data-category="armor"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.inv-table[data-category="armor"] tbody')
+      );
       const tr = document.createElement('tr');
       const sel = document.createElement('select');
       sel.className = 'inv-name';

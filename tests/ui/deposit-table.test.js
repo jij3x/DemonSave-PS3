@@ -30,6 +30,12 @@ const GOOD_ID = 6;
 // list" branch when rendered in a type-1 decomposed row.
 const SHIELD_ID = getWeaponTypeData(2).ids[0];
 
+/**
+ * Build a deposit table with the given category and dataset attributes.
+ * @param {string} category
+ * @param {Record<string, number>} [attrs]
+ * @returns {HTMLTableElement}
+ */
 function depTable(category, attrs = {}) {
   const table = document.createElement('table');
   table.className = 'dep-table';
@@ -41,7 +47,8 @@ function depTable(category, attrs = {}) {
   return table;
 }
 
-function fire(el, type) {
+/** Dispatch a bubbling event of the given type on the element. */
+function fire(/** @type {Element} */ el, /** @type {string} */ type) {
   el.dispatchEvent(new Event(type, { bubbles: true }));
 }
 
@@ -56,9 +63,9 @@ describe('deposit-table', () => {
       depTable('armor');
       renderDeposit([{ category: 'armor', itemId: ARMOR_ID, count: 1, durability: 50 }]);
       expect(
-        document
-          .querySelector('table.dep-table[data-category="armor"] tbody')
-          .querySelectorAll('tr').length,
+        /** @type {HTMLTableSectionElement} */ (
+          document.querySelector('table.dep-table[data-category="armor"] tbody')
+        ).querySelectorAll('tr').length,
       ).toBe(1);
     });
 
@@ -77,7 +84,9 @@ describe('deposit-table', () => {
       depTable('weapons', { weaponType: 1 });
       // SHIELD_ID is type 2; only the type-1 table exists → fallback branch.
       renderDeposit([{ category: 'weapons', itemId: SHIELD_ID, count: 1, durability: 50 }]);
-      const tb1 = document.querySelector('table.dep-table[data-weapon-type="1"] tbody');
+      const tb1 = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.dep-table[data-weapon-type="1"] tbody')
+      );
       expect(tb1.querySelectorAll('tr').length).toBe(1);
     });
 
@@ -85,7 +94,9 @@ describe('deposit-table', () => {
       depTable('goods', { goodsType: 9 });
       // GOOD_ID (6) is type 12; only the type-9 table exists → fallback branch.
       renderDeposit([{ category: 'goods', itemId: GOOD_ID, count: 1 }]);
-      const tb9 = document.querySelector('table.dep-table[data-goods-type="9"] tbody');
+      const tb9 = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.dep-table[data-goods-type="9"] tbody')
+      );
       expect(tb9.querySelectorAll('tr').length).toBe(1);
     });
   });
@@ -208,7 +219,7 @@ describe('deposit-table', () => {
       // absent from the type-1 base-weapon list → the extra-option branch.
       const tr = makeDepositWeaponRow(1, { itemId: SHIELD_ID, count: 1, durability: 50 });
       const baseSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-base-weapon'));
-      const expectedBase = getUpgradeRefForItemId(SHIELD_ID)[0];
+      const expectedBase = /** @type {number} */ (getUpgradeRefForItemId(SHIELD_ID)?.[0]);
       const selected = baseSel.selectedOptions[0];
       expect(selected).toBeTruthy();
       expect(selected.value).toBe(String(expectedBase));
@@ -220,7 +231,9 @@ describe('deposit-table', () => {
   describe('collectDeposit', () => {
     test('round-trips an armor row including binary fields', () => {
       depTable('armor');
-      document.querySelector('table.dep-table[data-category="armor"] tbody').appendChild(
+      /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.dep-table[data-category="armor"] tbody')
+      ).appendChild(
         makeDepositRow('armor', {
           itemId: ARMOR_ID,
           count: 1,
@@ -230,7 +243,9 @@ describe('deposit-table', () => {
           flags: [1, 2],
         }),
       );
-      const armor = collectDeposit().find((r) => r.category === 'armor');
+      const armor = /** @type {import('../../js/ui/tables/deposit-table.js').DepositRecord} */ (
+        collectDeposit().find((r) => r.category === 'armor')
+      );
       expect(armor.itemId).toBe(ARMOR_ID);
       expect(armor.durability).toBe(50);
       expect(armor.unknown1).toBe(7);
@@ -240,7 +255,9 @@ describe('deposit-table', () => {
 
     test('skips soft-deleted rows', () => {
       depTable('armor');
-      const tbody = document.querySelector('table.dep-table[data-category="armor"] tbody');
+      const tbody = /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.dep-table[data-category="armor"] tbody')
+      );
       tbody.appendChild(makeDepositRow('armor', { itemId: ARMOR_ID, count: 1 }));
       const dead = makeDepositRow('armor', { itemId: ARMOR_ID + 1, count: 1 });
       dead.dataset.deleted = 'true';
@@ -250,17 +267,19 @@ describe('deposit-table', () => {
 
     test('skips placeholder rows (empty dep-name value)', () => {
       depTable('armor');
-      document
-        .querySelector('table.dep-table[data-category="armor"] tbody')
-        .appendChild(makeDepositRow('armor', { itemId: 0, count: 1 }, false));
+      /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.dep-table[data-category="armor"] tbody')
+      ).appendChild(makeDepositRow('armor', { itemId: 0, count: 1 }, false));
       expect(collectDeposit().filter((r) => r.category === 'armor')).toHaveLength(0);
     });
 
     test('collects a decomposed weapon row via its hidden item-id input', () => {
       depTable('weapons', { weaponType: 1 });
-      document
-        .querySelector('table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody')
-        .appendChild(makeDepositWeaponRow(1, { itemId: WEAPON_ID, count: 1, durability: 60 }));
+      /** @type {HTMLTableSectionElement} */ (
+        document.querySelector(
+          'table.dep-table[data-category="weapons"][data-weapon-type="1"] tbody',
+        )
+      ).appendChild(makeDepositWeaponRow(1, { itemId: WEAPON_ID, count: 1, durability: 60 }));
       const weapons = collectDeposit().filter((r) => r.category === 'weapons');
       expect(weapons).toHaveLength(1);
       expect(weapons[0].itemId).toBe(WEAPON_ID);
@@ -271,8 +290,12 @@ describe('deposit-table', () => {
       depTable('armor');
       const tr = makeDepositRow('armor', { itemId: ARMOR_ID, count: 1 });
       tr.dataset.flags = 'not-json';
-      document.querySelector('table.dep-table[data-category="armor"] tbody').appendChild(tr);
-      const armor = collectDeposit().find((r) => r.category === 'armor');
+      /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.dep-table[data-category="armor"] tbody')
+      ).appendChild(tr);
+      const armor = /** @type {import('../../js/ui/tables/deposit-table.js').DepositRecord} */ (
+        collectDeposit().find((r) => r.category === 'armor')
+      );
       expect(armor.flags).toEqual(DEFAULT_DEPOSIT_FLAGS);
     });
 
@@ -280,8 +303,12 @@ describe('deposit-table', () => {
       depTable('rings');
       const tr = makeDepositRow('rings', { itemId: RING_ID, count: 1 });
       delete tr.dataset.durability;
-      document.querySelector('table.dep-table[data-category="rings"] tbody').appendChild(tr);
-      const ring = collectDeposit().find((r) => r.category === 'rings');
+      /** @type {HTMLTableSectionElement} */ (
+        document.querySelector('table.dep-table[data-category="rings"] tbody')
+      ).appendChild(tr);
+      const ring = /** @type {import('../../js/ui/tables/deposit-table.js').DepositRecord} */ (
+        collectDeposit().find((r) => r.category === 'rings')
+      );
       expect(ring.durability).toBeUndefined();
     });
   });
@@ -370,7 +397,7 @@ describe('deposit-table', () => {
       setupDepositWeaponSync();
     });
 
-    function attachRow(tr) {
+    function attachRow(/** @type {HTMLTableRowElement} */ tr) {
       const tbody = document.createElement('tbody');
       tbody.appendChild(tr);
       document.body.appendChild(tbody);
@@ -381,48 +408,54 @@ describe('deposit-table', () => {
       const tr = attachRow(
         makeDepositWeaponRow(1, { itemId: WEAPON_ID, count: 1, durability: 50 }),
       );
-      const baseSel = tr.querySelector('.dep-base-weapon');
+      const baseSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-base-weapon'));
       baseSel.value = '2'; // Parrying Dagger
       fire(baseSel, 'change');
-      const pathSel = tr.querySelector('.dep-path');
-      const levelSel = tr.querySelector('.dep-level');
+      const pathSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-path'));
+      const levelSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-level'));
       expect(pathSel.options.length).toBe(getPathsForBaseWeapon(2).length);
       expect(levelSel.options.length).toBeGreaterThan(0);
-      expect(tr.querySelector('.dep-item-id').value).not.toBe('');
+      expect(/** @type {HTMLInputElement} */ (tr.querySelector('.dep-item-id')).value).not.toBe('');
     });
 
     test('changing the path repopulates the level select', () => {
       const tr = attachRow(
         makeDepositWeaponRow(1, { itemId: WEAPON_ID, count: 1, durability: 50 }),
       );
-      const pathSel = tr.querySelector('.dep-path');
+      const pathSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-path'));
       pathSel.value = '2'; // Quality
       fire(pathSel, 'change');
-      expect(tr.querySelector('.dep-level').options.length).toBeGreaterThan(0);
+      expect(
+        /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-level')).options.length,
+      ).toBeGreaterThan(0);
     });
 
     test('changing the level recomposes the hidden item id', () => {
       const tr = attachRow(
         makeDepositWeaponRow(1, { itemId: WEAPON_ID, count: 1, durability: 50 }),
       );
-      const levelSel = tr.querySelector('.dep-level');
-      const before = tr.querySelector('.dep-item-id').value;
+      const levelSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-level'));
+      const before = /** @type {HTMLInputElement} */ (tr.querySelector('.dep-item-id')).value;
       levelSel.value = '5';
       fire(levelSel, 'change');
-      expect(tr.querySelector('.dep-item-id').value).not.toBe(before);
+      expect(/** @type {HTMLInputElement} */ (tr.querySelector('.dep-item-id')).value).not.toBe(
+        before,
+      );
     });
 
     test('changing the base to the placeholder is a no-op', () => {
       const tr = attachRow(makeDepositWeaponRow(1, { itemId: 0, count: 1 }, false));
-      const baseSel = tr.querySelector('.dep-base-weapon');
-      const before = tr.querySelector('.dep-item-id').value;
+      const baseSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-base-weapon'));
+      const before = /** @type {HTMLInputElement} */ (tr.querySelector('.dep-item-id')).value;
       fire(baseSel, 'change');
-      expect(tr.querySelector('.dep-item-id').value).toBe(before);
+      expect(/** @type {HTMLInputElement} */ (tr.querySelector('.dep-item-id')).value).toBe(before);
     });
 
     test('ignores changes on non-decomposed rows', () => {
       const tr = attachRow(makeDepositRow('armor', { itemId: ARMOR_ID, count: 1 }));
-      expect(() => fire(tr.querySelector('.dep-name'), 'change')).not.toThrow();
+      expect(() =>
+        fire(/** @type {HTMLElement} */ (tr.querySelector('.dep-name')), 'change'),
+      ).not.toThrow();
     });
 
     test('ignores change events from non-select elements', () => {
@@ -435,14 +468,14 @@ describe('deposit-table', () => {
       const tr = attachRow(
         makeDepositWeaponRow(1, { itemId: WEAPON_ID, count: 1, durability: 50 }),
       );
-      const baseSel = tr.querySelector('.dep-base-weapon');
+      const baseSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-base-weapon'));
       // A base id with no entry in rel-upgrades → getPathsForBaseWeapon returns [].
       const bogus = document.createElement('option');
       bogus.value = '999999';
       baseSel.appendChild(bogus);
       baseSel.value = '999999';
-      const pathSel = tr.querySelector('.dep-path');
-      const levelSel = tr.querySelector('.dep-level');
+      const pathSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-path'));
+      const levelSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-level'));
       pathSel.setAttribute('data-tooltip', 'stale');
 
       fire(baseSel, 'change');
@@ -457,7 +490,7 @@ describe('deposit-table', () => {
       const tr = attachRow(
         makeDepositWeaponRow(1, { itemId: WEAPON_ID, count: 1, durability: 50 }),
       );
-      const pathSel = tr.querySelector('.dep-path');
+      const pathSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-path'));
       const ph = document.createElement('option');
       ph.value = '';
       pathSel.appendChild(ph);
@@ -473,12 +506,12 @@ describe('deposit-table', () => {
       const tr = attachRow(
         makeDepositWeaponRow(1, { itemId: WEAPON_ID, count: 1, durability: 50 }),
       );
-      const pathSel = tr.querySelector('.dep-path');
+      const pathSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-path'));
       const bogus = document.createElement('option');
       bogus.value = '9999'; // not a real path → getUpgradePathDef throws
       pathSel.appendChild(bogus);
       pathSel.value = '9999';
-      const levelSel = tr.querySelector('.dep-level');
+      const levelSel = /** @type {HTMLSelectElement} */ (tr.querySelector('.dep-level'));
 
       expect(() => fire(pathSel, 'change')).not.toThrow();
       // populateLevelSelect's try/catch swallows the throw → no options added.

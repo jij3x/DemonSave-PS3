@@ -62,17 +62,41 @@ import {
  */
 
 /**
+ * @typedef {Object} CryptoJob
+ * @property {string} op            'decrypt' | 'encrypt'
+ * @property {string} fileName      PFD entry name
+ * @property {Uint8Array} data      ciphertext (decrypt) or plaintext (encrypt)
+ * @property {import('../lib/ps3-save-lib/param-pfd.js').ParamPFD} pfd
+ * @property {boolean} [skipValidation]  encrypt-only: bypass double-encrypt guard
+ */
+
+/**
+ * @typedef {Object} CryptoResult
+ * @property {boolean} ok
+ * @property {Uint8Array} [result]  decrypted/encrypted bytes (when ok)
+ * @property {Error} [error]        failure cause (when !ok)
+ */
+
+/**
  * DeS-specific profile number byte offset in PARAM.SFO.
  * (Game-specific — not part of the generic SFO format.)
  */
 const DES_PROFILE_OFFSET = 0x570;
 
-/** Read the DeS profile number from raw SFO bytes. */
+/**
+ * Read the DeS profile number from raw SFO bytes.
+ * @param {Uint8Array} rawSfo
+ * @returns {number}
+ */
 function readProfileNumber(rawSfo) {
   return rawSfo[DES_PROFILE_OFFSET];
 }
 
-/** Write the DeS profile number into raw SFO bytes (in place). */
+/**
+ * Write the DeS profile number into raw SFO bytes (in place).
+ * @param {Uint8Array} rawSfo
+ * @param {number} val
+ */
 function writeProfileNumber(rawSfo, val) {
   rawSfo[DES_PROFILE_OFFSET] = val & 0xff;
 }
@@ -108,7 +132,15 @@ function yieldToEventLoop() {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
+/**
+ * Run a batch of decrypt/encrypt jobs sequentially, yielding to the event
+ * loop between each so the UI can repaint.
+ *
+ * @param {CryptoJob[]} jobs
+ * @returns {Promise<CryptoResult[]>} one result per job, in order
+ */
 async function runCryptoJobs(jobs) {
+  /** @type {CryptoResult[]} */
   const results = [];
   for (const job of jobs) {
     // Yield between jobs so the browser can repaint / process events.
@@ -121,7 +153,7 @@ async function runCryptoJobs(jobs) {
           : encryptFile(job.data, job.fileName, job.pfd, job.skipValidation ?? false);
       results.push({ ok: true, result });
     } catch (err) {
-      results.push({ ok: false, error: err });
+      results.push({ ok: false, error: /** @type {Error} */ (err) });
     }
   }
   return results;
@@ -135,7 +167,7 @@ async function runCryptoJobs(jobs) {
  *
  * @param {SaveManager} manager  save folder context (has .pfd, .files, .encrypted)
  * @param {string[]} fileNames  entry names to decrypt
- * @returns {Promise<Array<{ok: boolean, result?: Uint8Array, error?: Error}>>}
+ * @returns {Promise<CryptoResult[]>}
  */
 async function decryptFilesFromManager(manager, fileNames) {
   // Unencrypted saves: just copy bytes (no crypto, instant)
@@ -147,14 +179,33 @@ async function decryptFilesFromManager(manager, fileNames) {
     });
   }
 
-  // Encrypted saves: decrypt each file sequentially
-  const jobs = fileNames.map((name) => ({
-    op: 'decrypt',
-    fileName: name,
-    data: manager.files.get(name.toLowerCase()),
-    pfd: manager.pfd,
-  }));
-  return runCryptoJobs(jobs);
+  // Encrypted saves: decrypt each file sequentially.
+  // manager.pfd is guaranteed non-null here (the unencrypted/null-pfd case
+  // returned above); capture it in a const so the narrowing carries into
+  // the job-building closure below.
+  const pfd = manager.pfd;
+  // fileNames derive from rawFiles (which populated manager.files), so each
+  // lookup is expected to resolve.  A miss mirrors the unencrypted branch:
+  // an {ok:false} result in the same position, preserving the caller's 1:1
+  // positional mapping between fileNames and results.
+  const encJobs = [];
+  const missingIdx = new Set();
+  for (let i = 0; i < fileNames.length; i++) {
+    const name = fileNames[i];
+    const data = manager.files.get(name.toLowerCase());
+    if (data) {
+      encJobs.push({ op: 'decrypt', fileName: name, data, pfd });
+    } else {
+      missingIdx.add(i);
+    }
+  }
+  const encResults = await runCryptoJobs(encJobs);
+  let ri = 0;
+  return fileNames.map((name, i) =>
+    missingIdx.has(i)
+      ? { ok: false, error: new Error(`${name} not found in save`) }
+      : encResults[ri++],
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -299,7 +350,12 @@ export async function openSave(rawFiles, onProgress) {
   const manager = await createSaveFolder(fileMap, SECURE_ID, log);
 
   // Read SFO-level data once (shared across all slots).
-  const sfoBytes = rawFiles.get('param.sfo').bytes.slice();
+  const sfoEntry = rawFiles.get('param.sfo');
+  if (!sfoEntry) {
+    // Unreachable: 'param.sfo' presence is verified above.
+    throw new Error('No PARAM.SFO found. Is this a PS3 save folder?');
+  }
+  const sfoBytes = sfoEntry.bytes.slice();
   const profileNumber = readProfileNumber(sfoBytes);
   const accountId = getSfoAccountId(sfoBytes);
 
@@ -318,8 +374,9 @@ export async function openSave(rawFiles, onProgress) {
         secondaryFile: resolved.secondary,
       });
     } catch (resolveErr) {
-      log(`Warning: slot ${saveSlot} files could not be resolved: ${resolveErr.message}`);
-      failedSlots.push({ slot: saveSlot, error: resolveErr.message, primaryFile: null });
+      const resolveMsg = resolveErr instanceof Error ? resolveErr.message : String(resolveErr);
+      log(`Warning: slot ${saveSlot} files could not be resolved: ${resolveMsg}`);
+      failedSlots.push({ slot: saveSlot, error: resolveMsg, primaryFile: null });
     }
   }
 
@@ -335,18 +392,28 @@ export async function openSave(rawFiles, onProgress) {
     const result = decryptResults[i];
 
     if (!result.ok) {
-      log(`Warning: slot ${info.saveSlot} could not be decrypted: ${result.error.message}`);
+      // result.error is always set when ok=false (runCryptoJobs and the
+      // missing-file path both attach it); the ?? is unreachable but keeps
+      // the type sound.
+      const decryptMsg = result.error?.message ?? 'Unknown decrypt error';
+      log(`Warning: slot ${info.saveSlot} could not be decrypted: ${decryptMsg}`);
       failedSlots.push({
         slot: info.saveSlot,
-        error: result.error.message,
+        error: decryptMsg,
         primaryFile: info.primaryFile,
       });
       continue;
     }
 
+    // result.ok is true here, so result.result is present (set by runCryptoJobs).
+    const decrypted = result.result;
+    if (!decrypted) {
+      throw new Error(`Slot ${info.saveSlot} decryption produced no data`);
+    }
+
     try {
       log(`Parsing slot ${info.saveSlot}…`);
-      const fullModel = readSave(result.result);
+      const fullModel = readSave(decrypted);
 
       // Sanitize for UI (strip binary internals).  Folder-level SFO fields
       // (accountId, profileNumber) are returned separately — not attached
@@ -365,17 +432,18 @@ export async function openSave(rawFiles, onProgress) {
         encrypted: manager.encrypted,
         // Cache the decrypted plaintext so subsequent saves can reuse it
         // instead of re-decrypting (avoids double AES-CBC on save).
-        decryptedBytes: result.result,
+        decryptedBytes: decrypted,
       };
 
       slots.push({ slot: info.saveSlot, session, model, display });
     } catch (err) {
-      log(`Warning: slot ${info.saveSlot} could not be loaded: ${err.message}`);
+      const loadMsg = err instanceof Error ? err.message : String(err);
+      log(`Warning: slot ${info.saveSlot} could not be loaded: ${loadMsg}`);
       failedSlots.push({
         slot: info.saveSlot,
-        error: err.message,
+        error: loadMsg,
         primaryFile: info.primaryFile,
-        decryptedBytes: result.result,
+        decryptedBytes: decrypted,
       });
     }
   }
@@ -438,9 +506,9 @@ async function decryptAndMergeSlots(slots, failed, manager, rawFiles, log) {
   for (const item of items) {
     const cached =
       item.type === 'primary'
-        ? item.session.decryptedBytes
+        ? item.session?.decryptedBytes
         : item.type === 'failed'
-          ? item.failedSlot.decryptedBytes
+          ? item.failedSlot?.decryptedBytes
           : null; // secondary is never cached
     if (cached) {
       cachedByFileName.set(item.fileName, cached);
@@ -491,10 +559,13 @@ async function decryptAndMergeSlots(slots, failed, manager, rawFiles, log) {
 
     if (item.type === 'primary') {
       const { model, session } = item;
+      // Primary items always carry session + model; the guard preserves the
+      // per-iteration logic (the skip is unreachable for primary items).
+      if (!session || !model) continue;
       log(`Preparing slot ${session.saveSlot}…`);
       // Pass `out` bag to mergeModel to collect deletedSlots without
       // polluting the model with private fields.
-      const mergeOut = {};
+      const mergeOut = /** @type {{deletedSlots?: number[]}} */ ({});
       const mergedModel = mergeModel(session.fullModel, model, mergeOut);
       // writeSaveInPlace mutates userBytes directly.  This is safe here
       // because the caller owns this buffer reference — for cached primary
@@ -518,7 +589,7 @@ async function decryptAndMergeSlots(slots, failed, manager, rawFiles, log) {
       const origName = rawFiles.get(session.primaryFile.toLowerCase())?.name || session.primaryFile;
       processedFiles.set(origName.toLowerCase(), { name: origName, bytes: writtenBytes });
     } else if (item.type === 'failed') {
-      log(`Preserving failed slot ${item.failedSlot.slot} (${item.fileName}) unchanged…`);
+      log(`Preserving failed slot ${item.failedSlot?.slot} (${item.fileName}) unchanged…`);
       const origName = rawFiles.get(item.fileName.toLowerCase())?.name || item.fileName;
       processedFiles.set(origName.toLowerCase(), { name: origName, bytes: userBytes });
     } else if (item.type === 'secondary') {
@@ -756,10 +827,16 @@ export async function exportEncryptedSave(
       const result = backupResults[i];
       const name = backupEncryptedNames[i];
       if (result.ok) {
-        fileList.push({ name, size: result.result.length });
-        plaintextFiles.set(name.toLowerCase(), result.result);
+        // result.result is present when ok; the guard keeps the type sound.
+        const bytes = result.result;
+        if (bytes) {
+          fileList.push({ name, size: bytes.length });
+          plaintextFiles.set(name.toLowerCase(), bytes);
+        }
       } else {
-        log(`Warning: failed to decrypt backup ${name}: ${result.error.message}`);
+        log(
+          `Warning: failed to decrypt backup ${name}: ${result.error?.message ?? 'Unknown error'}`,
+        );
       }
     }
   }
@@ -801,7 +878,9 @@ export async function exportEncryptedSave(
   for (let i = 0; i < validJobs.length; i++) {
     const result = encryptResults[i];
     if (!result.ok) {
-      throw new Error(`Failed to encrypt ${validJobs[i].fileName}: ${result.error.message}`);
+      throw new Error(
+        `Failed to encrypt ${validJobs[i].fileName}: ${result.error?.message ?? 'Unknown error'}`,
+      );
     }
     const lowerName = validJobs[i].fileName.toLowerCase();
     encryptedFiles.set(lowerName, result.result);

@@ -52,7 +52,7 @@ export function bytesToBase64(bytes) {
   let binary = '';
   for (let i = 0; i < bytes.length; i += CHUNK) {
     const slice = bytes.subarray(i, i + CHUNK);
-    binary += String.fromCharCode.apply(null, slice);
+    binary += String.fromCharCode(...slice);
   }
   return btoa(binary);
 }

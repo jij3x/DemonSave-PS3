@@ -11,6 +11,50 @@ import relUpgradesData from '../../js/des-db/rel-upgrades.js';
 import relTypesData from '../../js/des-db/rel-types.js';
 import { bad } from '../helpers.js';
 
+/* ---- JSDoc type definitions (shapes inferred from des-db data modules) ---- */
+
+/**
+ * A weapons.js items entry. `type` is `[type_id, sub_type_id]`; `upgrade_ref`,
+ * `durability`, and `note` are optional (present only on some entry kinds).
+ * @typedef {Object} WeaponEntry
+ * @property {string} name
+ * @property {number[]} type
+ * @property {(number|null)[]} [upgrade_ref]
+ * @property {number} [durability]
+ * @property {string} [note]
+ */
+
+/**
+ * A weapons.js entry known to carry an `upgrade_ref` triple
+ * `[base_weapon_id, path_id, level]` (each value may be null).
+ * @typedef {WeaponEntry & { upgrade_ref: (number|null)[] }} UpgradableWeapon
+ */
+
+/**
+ * A rel-upgrades.js base_weapons entry. `path_ids` is absent for the
+ * non-upgradable base weapons (69-89).
+ * @typedef {Object} UpgradeBase
+ * @property {string} name
+ * @property {number[]} [path_ids]
+ * @property {number} [durability]
+ * @property {string} [note]
+ */
+
+/**
+ * A rel-upgrades.js paths entry.
+ * @typedef {Object} UpgradePath
+ * @property {string} name
+ * @property {number[]} levels
+ * @property {string} [note]
+ */
+
+/**
+ * A rel-types.js type entry. `sub_types` is keyed by integer sub_type_id.
+ * @typedef {Object} TypeEntry
+ * @property {string} name
+ * @property {Object<string, {name: string}>} sub_types
+ */
+
 describe('des-db: getCategories', () => {
   test('returns expected category list', () => {
     const cats = db.getCategories();
@@ -189,9 +233,13 @@ describe('des-db: getWeaponItemByUpgradeRef', () => {
   });
 
   test('throws on non-array input', () => {
-    expect(() => db.getWeaponItemByUpgradeRef(null)).toThrow('Invalid upgrade_ref');
+    expect(() => db.getWeaponItemByUpgradeRef(/** @type {any} */ (null))).toThrow(
+      'Invalid upgrade_ref',
+    );
     expect(() => db.getWeaponItemByUpgradeRef(bad('1:1:0'))).toThrow('Invalid upgrade_ref');
-    expect(() => db.getWeaponItemByUpgradeRef(undefined)).toThrow('Invalid upgrade_ref');
+    expect(() => db.getWeaponItemByUpgradeRef(/** @type {any} */ (undefined))).toThrow(
+      'Invalid upgrade_ref',
+    );
   });
 
   test('throws on truncated array (fewer than 3 elements)', () => {
@@ -375,16 +423,22 @@ describe('des-db: read-only enforcement', () => {
 /* ------------------------------------------------------------------ */
 
 describe('des-db: upgrade_ref integrity', () => {
+  /** @type {Record<string, UpgradeBase>} */
   const baseWeapons = relUpgradesData.base_weapons;
+  /** @type {Record<string, UpgradePath>} */
   const upgradePaths = relUpgradesData.paths;
+  /** @type {Record<string, WeaponEntry>} */
   const weapons = weaponsData.items;
 
   /** Collect all entries that have an upgrade_ref field. */
   function getEntriesWithUpgradeRef() {
+    /** @type {{hexId: string, entry: UpgradableWeapon}[]} */
     const result = [];
     for (const [hexId, entry] of Object.entries(weapons)) {
+      // The guard guarantees upgrade_ref is present; cast carries that into
+      // the collected entry type (TS does not narrow the whole object).
       if (entry.upgrade_ref !== undefined) {
-        result.push({ hexId, entry });
+        result.push({ hexId, entry: /** @type {UpgradableWeapon} */ (entry) });
       }
     }
     return result;
@@ -565,6 +619,7 @@ describe('des-db: upgrade_ref integrity', () => {
 /* ------------------------------------------------------------------ */
 
 describe('des-db: type integrity', () => {
+  /** @type {Record<string, TypeEntry>} */
   const types = relTypesData.types;
 
   /** Collect all typed items from categories that have a 'type' field. */
@@ -770,8 +825,9 @@ describe('des-db: _resolveWeaponDurability edge cases', () => {
   });
 
   test('returns null when upgrade_ref[0] is null', () => {
+    /** @type {{ upgrade_ref: (number|null)[] }} */
     const item = { upgrade_ref: [null, null, null] };
-    expect(db._resolveWeaponDurability(item, {})).toBeNull();
+    expect(db._resolveWeaponDurability(/** @type {any} */ (item), {})).toBeNull();
   });
 
   test('returns null when base weapon key is not found', () => {

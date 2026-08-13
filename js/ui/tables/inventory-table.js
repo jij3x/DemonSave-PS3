@@ -24,10 +24,26 @@ import {
 } from '../core/item-helpers.js';
 
 /**
+ * Collected inventory record — same shape as the canonical sanitized item
+ * (`_ref` is always set, defaulting to '' for new rows).
+ * @typedef {import('../../des-savefile/model.js').SanitizedInventoryItem} InventoryRecord
+ */
+
+/**
+ * @typedef {Object} Misc1Layout
+ * @property {boolean} [split]
+ * @property {string} [hiClass]
+ * @property {string} [loClass]
+ * @property {string} [visible]
+ * @property {string} [singleClass]
+ */
+
+/**
  * Per-category misc1 layout.
  * - 'split'  = weapons/armor: exposed as two inputs (hi-byte Class + lo-byte Class Idx)
  * - 'single' = rings/goods:  exposed as a single input (sort/category value)
  */
+/** @type {Record<string, Misc1Layout>} */
 const MISC1_LAYOUT = {
   weapons: { split: true, hiClass: 'inv-misc1hi', loClass: 'inv-misc1lo' },
   armor: { split: true, hiClass: 'inv-misc1hi', loClass: 'inv-misc1lo' },
@@ -42,7 +58,7 @@ const MISC1_LAYOUT = {
  * based on each item's type.  All other categories use a single table.
  *
  * @param {'weapons'|'armor'|'rings'|'goods'} category
- * @param {Array} records
+ * @param {InventoryRecord[]} records
  * @param {Map<string, number>} [invIdxByRef]  display-only map from _ref → idx1
  */
 export function renderInventory(category, records, invIdxByRef) {
@@ -254,7 +270,7 @@ export function makeInventoryRow(category, rec, typeIdHint = null, invIdxByRef) 
     tr.appendChild(makeCountCell('inv-count', rec.count, showCount, false));
     // Hidden field — preserved via dataset for round-trip fidelity
     tr.dataset.misc2 = String(rec.misc2 ?? 0);
-    tr.appendChild(makeNumCell(layout.singleClass, rec.misc1));
+    tr.appendChild(makeNumCell(layout.singleClass ?? '', rec.misc1));
     if (showDurability) {
       tr.appendChild(makeNumCell('inv-durability', rec.durability));
     } else {
@@ -279,7 +295,7 @@ export function makeInventoryRow(category, rec, typeIdHint = null, invIdxByRef) 
  *
  * Reassembles misc1 from visible inputs or hidden data attributes.
  * @param {'weapons'|'armor'|'rings'|'goods'} category
- * @returns {Array}
+ * @returns {InventoryRecord[]}
  */
 export function collectInventory(category) {
   // Weapons and goods span multiple per-type tables — collect from all of them.
@@ -322,17 +338,18 @@ export function collectInventory(category) {
       }
       const durInput = /** @type {HTMLInputElement|null} */ (tr.querySelector('.inv-durability'));
       const countInput = /** @type {HTMLInputElement|null} */ (tr.querySelector('.inv-count'));
+      /** @type {InventoryRecord} */
       const rec = {
         _ref: tr.dataset.ref || '',
         itemId: parseInt(nameSel.value, 10) || 0,
         // Count may be hidden (non-counted types) — default to 1 when absent.
         count: parseCountValue(countInput, COUNT_LIMITS.inventory.min),
         misc1,
-        durability: parseInt(durInput?.value ?? tr.dataset.durability, 10) || 0,
+        durability: parseInt(durInput?.value ?? tr.dataset.durability ?? '', 10) || 0,
       };
       // misc2 is hidden (read from dataset).  idx1/idx2 are NOT collected
       // here — they are binary-internal, restored by mergeModel via _ref.
-      rec.misc2 = parseInt(tr.dataset.misc2, 10) || 0;
+      rec.misc2 = parseInt(tr.dataset.misc2 ?? '', 10) || 0;
       records.push(rec);
     }
   }

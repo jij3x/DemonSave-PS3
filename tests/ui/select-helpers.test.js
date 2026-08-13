@@ -49,7 +49,7 @@ describe('select-helpers', () => {
     test('adds a disabled hidden placeholder option', () => {
       const sel = document.createElement('select');
       prependPlaceholder(sel);
-      const opt = sel.querySelector('option');
+      const opt = /** @type {HTMLOptionElement} */ (sel.querySelector('option'));
       expect(opt.value).toBe('');
       expect(opt.textContent).toBe('— Select —');
       expect(opt.disabled).toBe(true);

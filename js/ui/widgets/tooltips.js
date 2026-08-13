@@ -13,9 +13,13 @@
  *   - Cross-browser: uses only standard DOM APIs
  */
 
+/** @type {HTMLDivElement | null} */
 let tooltipEl = null;
+/** @type {ReturnType<typeof setTimeout> | null} */
 let hideTimer = null;
+/** @type {ReturnType<typeof setTimeout> | null} */
 let showTimer = null;
+/** @type {HTMLElement | null} */
 let _linkedTarget = null;
 
 const SHOW_DELAY = 400; // ms before tooltip appears (match native feel)
@@ -37,12 +41,13 @@ let tooltipsInitialized = false;
  * The listener is attached on-demand (only while a tooltip is showing) to
  * avoid firing on every scroll event in the nested scrollable table bodies.
  */
+/** @type {(() => void) | null} */
 let scrollHideHandler = null;
 
 function attachScrollHide() {
   if (scrollHideHandler) return;
   scrollHideHandler = () => {
-    clearTimeout(showTimer);
+    clearTimeout(showTimer ?? undefined);
     hideTooltip();
   };
   document.addEventListener('scroll', scrollHideHandler, true);
@@ -72,27 +77,29 @@ function ensureTooltipEl() {
  */
 function showTooltip(target) {
   ensureTooltipEl();
+  const tip = tooltipEl;
+  if (!tip) return;
   const text = target.getAttribute('data-tooltip');
   if (!text) {
     hideTooltip();
     return;
   }
 
-  tooltipEl.textContent = text;
+  tip.textContent = text;
   // Assign a unique ID and link the tooltip to the target via
   // aria-describedby so screen readers can access the tooltip text.
-  tooltipEl.id = 'custom-tooltip';
-  tooltipEl.setAttribute('role', 'tooltip');
+  tip.id = 'custom-tooltip';
+  tip.setAttribute('role', 'tooltip');
   target.setAttribute('aria-describedby', 'custom-tooltip');
   _linkedTarget = target;
 
   // Temporarily make it visible to measure dimensions
-  tooltipEl.style.display = 'block';
-  tooltipEl.style.visibility = 'hidden';
-  tooltipEl.style.left = '0px';
-  tooltipEl.style.top = '0px';
+  tip.style.display = 'block';
+  tip.style.visibility = 'hidden';
+  tip.style.left = '0px';
+  tip.style.top = '0px';
 
-  const tipRect = tooltipEl.getBoundingClientRect();
+  const tipRect = tip.getBoundingClientRect();
   let targetRect = target.getBoundingClientRect();
   // If the target has display:contents (e.g. sidebar labels), its rect
   // is zero-size. Fall back to a child input/select for positioning.
@@ -113,7 +120,7 @@ function showTooltip(target) {
   const EDGE_PADDING = 12;
 
   const tipW = tipRect.width;
-  const tipH = tooltipEl.offsetHeight || tipRect.height;
+  const tipH = tip.offsetHeight || tipRect.height;
 
   // --- Horizontal: center on target, clamp within app ---
   let left = targetRect.left + targetRect.width / 2 - tipW / 2;
@@ -152,9 +159,9 @@ function showTooltip(target) {
     top = appRect.top + EDGE_PADDING;
   }
 
-  tooltipEl.style.left = `${Math.round(left)}px`;
-  tooltipEl.style.top = `${Math.round(top)}px`;
-  tooltipEl.style.visibility = 'visible';
+  tip.style.left = `${Math.round(left)}px`;
+  tip.style.top = `${Math.round(top)}px`;
+  tip.style.visibility = 'visible';
   // Attach scroll listener only while a tooltip is visible.
   attachScrollHide();
 }
@@ -192,8 +199,8 @@ export function initTooltips() {
     const target = /** @type {Element} */ (e.target).closest('[data-tooltip]');
     if (!target) return;
 
-    clearTimeout(hideTimer);
-    clearTimeout(showTimer);
+    clearTimeout(hideTimer ?? undefined);
+    clearTimeout(showTimer ?? undefined);
 
     showTimer = setTimeout(() => {
       // Suppress tooltip when the element is marked "if-truncated" but the
@@ -214,7 +221,7 @@ export function initTooltips() {
     const related = /** @type {Node} */ (e.relatedTarget);
     if (related && target.contains(related)) return;
 
-    clearTimeout(showTimer);
+    clearTimeout(showTimer ?? undefined);
     hideTimer = setTimeout(() => {
       hideTooltip();
     }, HIDE_DELAY);
@@ -223,7 +230,7 @@ export function initTooltips() {
   // Hide on Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      clearTimeout(showTimer);
+      clearTimeout(showTimer ?? undefined);
       hideTooltip();
     }
   });
@@ -232,7 +239,7 @@ export function initTooltips() {
   // the tooltip immediately since they've taken the action.
   document.addEventListener('mousedown', (e) => {
     if (/** @type {Element} */ (e.target).closest('[data-tooltip]')) {
-      clearTimeout(showTimer);
+      clearTimeout(showTimer ?? undefined);
       hideTooltip();
     }
   });

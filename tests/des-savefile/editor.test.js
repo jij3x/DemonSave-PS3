@@ -54,9 +54,10 @@ describe('reader: inventory parsing', () => {
     wUInt32BE(buf, O.INV_COUNT, 1);
     writeInvRecord(buf, 0, type, id, count, 0, 0, 0, 0x01000000);
     const m = readSave(buf);
-    expect(m[cat]).toHaveLength(1);
-    expect(m[cat][0].itemId).toBe(id);
-    expect(m[cat][0].count).toBe(count);
+    const category = /** @type {'weapons'|'armor'|'rings'|'goods'} */ (cat);
+    expect(m[category]).toHaveLength(1);
+    expect(m[category][0].itemId).toBe(id);
+    expect(m[category][0].count).toBe(count);
   });
 
   test('throws on unknown inventory type', () => {
@@ -413,7 +414,7 @@ describe('writer: inventory in-place update', () => {
     m.weapons.push({
       itemId: WEAPON_IDS[2],
       count: 1,
-      _slot: undefined,
+      _slot: /** @type {any} */ (undefined),
       idx1: 999,
       misc1: 0,
       idx2: 999,
@@ -580,7 +581,7 @@ describe('writer: deposit edge cases', () => {
         count: 1,
         unknown1: 0,
         sortOrder: 0,
-        durability: null,
+        durability: /** @type {any} */ (null),
         flags: [],
       },
     ];
@@ -634,7 +635,7 @@ describe('writer: deposit edge cases', () => {
         itemId: WEAPON_IDS[2],
         count: 1,
         durability: 300,
-        unknown1: null,
+        unknown1: /** @type {any} */ (null),
         sortOrder: 0,
         flags: [0x21, 0, 0, 0, 0, 0x01, 0x2c],
       },
@@ -655,7 +656,7 @@ describe('writer: deposit edge cases', () => {
         durability: 300,
         unknown1: 0,
         sortOrder: 0,
-        flags: undefined,
+        flags: /** @type {any} */ (undefined),
       },
     ];
     buf = writeSave(buf, m);
@@ -776,7 +777,8 @@ describe('writer: range validation', () => {
   ])('throws on U8 $label', ({ field, value }) => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m[field] = value;
+    const fieldName = /** @type {'world'|'gender'} */ (field);
+    m[fieldName] = value;
     expect(() => writeSave(buf, m)).toThrow(/out of range \[0, 255\]/);
   });
 
@@ -791,7 +793,7 @@ describe('writer: range validation', () => {
     m.weapons.push({
       itemId: WEAPON_IDS[2],
       count: 1,
-      _slot: undefined,
+      _slot: /** @type {any} */ (undefined),
       idx1: 0,
       misc1,
       idx2: 0,
@@ -809,7 +811,8 @@ describe('writer: range validation', () => {
   ])('throws on U32 $label', ({ field, value }) => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m[field] = value;
+    const fieldName = /** @type {'vit'} */ (field);
+    m[fieldName] = value;
     expect(() => writeSave(buf, m)).toThrow(/out of range \[0, 4294967295\]/);
   });
 
@@ -1387,7 +1390,9 @@ describe('writer: buffer guards', () => {
   );
 
   test('writeSave throws on null input', () => {
-    expect(() => writeSave(null, EMPTY_MODEL)).toThrow(/Save buffer too small/);
+    expect(() => writeSave(/** @type {any} */ (null), EMPTY_MODEL)).toThrow(
+      /Save buffer too small/,
+    );
   });
 
   test('writeSave throws on too-small buffer', () => {
@@ -1403,7 +1408,9 @@ describe('writer: buffer guards', () => {
   });
 
   test('writeSaveInPlace throws on null bytes', () => {
-    expect(() => writeSaveInPlace(null, EMPTY_MODEL)).toThrow(/Save buffer too small/);
+    expect(() => writeSaveInPlace(/** @type {any} */ (null), EMPTY_MODEL)).toThrow(
+      /Save buffer too small/,
+    );
   });
 
   test('writeSaveInPlace throws on too-small buffer', () => {
@@ -1453,7 +1460,7 @@ describe('writer: inventory edge cases', () => {
     m.weapons.push({
       itemId: WEAPON_IDS[5],
       count: 1,
-      _slot: undefined,
+      _slot: /** @type {any} */ (undefined),
       idx1: 999,
       misc1: 0,
       idx2: 0,
@@ -1469,7 +1476,7 @@ describe('writer: inventory edge cases', () => {
     m.rings.push({
       itemId: RING_IDS[1],
       count: 1,
-      _slot: undefined,
+      _slot: /** @type {any} */ (undefined),
       idx1: 10,
       misc1: 0x13,
       idx2: 0,
@@ -1479,7 +1486,7 @@ describe('writer: inventory edge cases', () => {
     m.goods.push({
       itemId: ITEM_IDS[2],
       count: 50,
-      _slot: undefined,
+      _slot: /** @type {any} */ (undefined),
       idx1: 20,
       misc1: 0x01,
       idx2: 0,
@@ -1522,7 +1529,7 @@ describe('writer: inventory edge cases', () => {
     m.armor.push({
       itemId: ARMOR_IDS[0],
       count: 1,
-      _slot: undefined,
+      _slot: /** @type {any} */ (undefined),
       idx1: 3,
       misc1: 0x000c,
       idx2: 0,
@@ -1545,7 +1552,7 @@ describe('writer: inventory edge cases', () => {
     m.weapons.push({
       itemId: WEAPON_IDS[5],
       count: 1,
-      _slot: undefined,
+      _slot: /** @type {any} */ (undefined),
       idx1: 1,
       misc1: 0x1016,
       idx2: 1,
@@ -1588,6 +1595,7 @@ describe('writer: deletedSlots clearing', () => {
     writeInvRecord(buf, 0, 0x00000000, WEAPON_IDS[2], 1, 5, 0x1016, 0, 0x01000000);
     wUInt32BE(buf, O.DURABILITY_BASE + 5 * 8, 300);
 
+    /** @type {import('../../js/des-savefile/model.js').FullModel} */
     const emptyModel = { ...readSave(buf), weapons: [], armor: [], rings: [], goods: [] };
     buf = writeSave(buf, emptyModel, [0]);
 
@@ -1722,7 +1730,7 @@ describe('reader: position table OOB', () => {
 
 describe('reader: bounds checks', () => {
   test('reader throws on null bytes', () => {
-    expect(() => readSave(null)).toThrow(/Save buffer too small/);
+    expect(() => readSave(/** @type {any} */ (null))).toThrow(/Save buffer too small/);
   });
 
   test('reader handles large spellCount within bounds (no throw)', () => {
@@ -1744,24 +1752,24 @@ describe('writer: null/undefined category arrays', () => {
   test('handles model with null inventory categories', () => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m.weapons = null;
-    m.armor = undefined;
-    m.rings = null;
-    m.goods = undefined;
+    m.weapons = /** @type {any} */ (null);
+    m.armor = /** @type {any} */ (undefined);
+    m.rings = /** @type {any} */ (null);
+    m.goods = /** @type {any} */ (undefined);
     expect(() => writeSave(buf, m)).not.toThrow();
   });
 
   test('handles model with null deposit array', () => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m.deposit = null;
+    m.deposit = /** @type {any} */ (null);
     expect(() => writeSave(buf, m)).not.toThrow();
   });
 
   test('handles model with undefined deposit array', () => {
     let buf = makeBlankSave();
     const m = readSave(buf);
-    m.deposit = undefined;
+    m.deposit = /** @type {any} */ (undefined);
     expect(() => writeSave(buf, m)).not.toThrow();
   });
 });
@@ -1797,9 +1805,9 @@ describe('writer: idx1 = slot invariant for newly added items', () => {
     const m2 = readSave(buf);
     const newWeapon = m2.weapons.find((w) => w.itemId === WEAPON_IDS[3] >>> 0);
     expect(newWeapon).toBeDefined();
-    expect(newWeapon.idx1).toBe(newWeapon._slot);
-    expect(newWeapon.idx1).not.toBe(2 + 100);
-    expect(rUInt32BE(buf, O.DURABILITY_BASE + newWeapon._slot * 8)).toBe(250);
+    expect(newWeapon?.idx1).toBe(newWeapon?._slot);
+    expect(newWeapon?.idx1).not.toBe(2 + 100);
+    expect(rUInt32BE(buf, O.DURABILITY_BASE + (newWeapon?._slot ?? 0) * 8)).toBe(250);
   });
 
   test('new weapon equipped via editor gets correct hotbar pointer', () => {
@@ -1876,7 +1884,7 @@ describe('writer: _slot null safety', () => {
     m.weapons.push({
       itemId: WEAPON_IDS[2],
       count: 1,
-      _slot: null, // null, not undefined
+      _slot: /** @type {any} */ (null), // null, not undefined
       idx1: 0,
       misc1: 0,
       idx2: 0,
