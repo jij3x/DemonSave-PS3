@@ -27,6 +27,7 @@ to run it. There are multiple build paths depending on what you want:
 13. [Build artifact reference](#13-build-artifact-reference)
 14. [Troubleshooting](#14-troubleshooting)
 15. [Containerized development (Docker / Dev Container)](#15-containerized-development-docker--dev-container)
+16. [Containerized cross-compile build (Docker)](#16-containerized-cross-compile-build-docker)
 
 ---
 
@@ -255,8 +256,10 @@ This sets `LIBGL_ALWAYS_SOFTWARE=1` and
 ## 7. Build the Tauri desktop app (production)
 
 Builds a native desktop installer for the **current platform**.
-Tauri **cannot cross-compile** — you must build on the target OS
-(or use [CI](#12-ci--releases-github-actions)).
+Tauri can cross-compile **Windows** from Linux (see
+[§16](#16-containerized-cross-compile-build-docker)), but **macOS** builds
+must run on Apple hardware — build natively, use CI, or use the
+cross-compile container below.
 
 ### Quick build (all bundle types for the current OS)
 
@@ -554,8 +557,9 @@ This also runs automatically as a `pretest:db` hook before
 ## 12. CI / Releases (GitHub Actions)
 
 The workflow at `.github/workflows/release.yml` automates
-cross-platform builds. Tauri cannot cross-compile, so each platform
-builds on its own runner in parallel.
+cross-platform builds. macOS requires Apple hardware, so CI builds
+each platform on its own runner in parallel — also the fastest path
+for the Linux and Windows installers.
 
 ### Triggers
 
@@ -624,9 +628,10 @@ Where every build output lands:
 | Tauri — macOS `.dmg` | `src-tauri/target/release/bundle/dmg/*.dmg` |
 | Generated DB index | `js/des-db/idx-upgrade-ref.js` |
 | Test coverage | `coverage/` (if generated) |
+| Cross-compile container (`./docker/build.sh`) | `build-output/linux-installer-*`, `build-output/linux-portable-*`, `build-output/windows-portable-*` |
 
 Ignored by git (see `.gitignore`): `node_modules/`, `dist/`,
-`src-tauri/target/`, `src-tauri/gen/`, `coverage/`, `tmp/`.
+`build-output/`, `src-tauri/target/`, `src-tauri/gen/`, `coverage/`, `tmp/`.
 
 ---
 
@@ -696,8 +701,9 @@ Then re-run the build.
 
 ### Can't cross-compile
 
-Tauri **cannot** cross-compile. Each platform must be built on its
-own OS. Options:
+macOS builds genuinely require Apple hardware. **Windows does not**: the
+cross-compile builder container ([§16](#16-containerized-cross-compile-build-docker))
+produces the portable `.exe` from any host with Docker. Options:
 
 1. Build natively on each OS you own.
 2. Use the included GitHub Actions workflow (push a tag — see
@@ -705,8 +711,12 @@ own OS. Options:
 3. Use a VM or remote machine for the target OS.
 4. Use the dev container ([§15](#15-containerized-development-docker--dev-container))
    to build the **Linux** native app without installing anything locally.
-   (Windows `.exe` and macOS builds must use CI or their native OS —
-   Tauri cannot cross-compile from Linux.)
+5. Use the builder container ([§16](#16-containerized-cross-compile-build-docker))
+   to build the **Windows** portable `.exe` (and the Linux artifacts) from
+   any host — including a Linux desktop or WSL2.
+
+macOS `.app`/`.dmg` is the one true exception: it needs Apple frameworks
+and stays CI-only (or a native Mac).
 
 ---
 
@@ -800,8 +810,9 @@ XQuartz/VcXsrv). For day-to-day JS work, the browser dev server
 
 - **What's in the container**: every Node workflow, `cargo test`, and the
   **Linux** Tauri desktop build (`.deb`/`.rpm`/raw binary).
-- **Windows `.exe`**: not built in this dev container — use CI (push a
-  release tag) or a native Windows host.
+- **Windows `.exe`**: not built in this dev container — use the
+  [builder container](#16-containerized-cross-compile-build-docker) (§16),
+  CI (push a release tag), or a native Windows host.
 - **macOS `.app`/`.dmg`**: cannot be built on Linux at all (Apple frameworks) —
   CI only.
 - **Host file ownership**: the container runs as UID 1000 (`vscode`). On
@@ -809,3 +820,50 @@ XQuartz/VcXsrv). For day-to-day JS work, the browser dev server
   is not UID 1000, bind-mount files written by the container will be owned by
   1000 — readable, and writable if world-writable. Use
   `docker compose run --user $(id -u):$(id -g)` to override if needed.
+
+---
+
+## 16. Containerized cross-compile build (Docker)
+
+Produce **Linux and Windows release artifacts from any host with Docker** —
+no Node, Rust, MSVC, or webview libs installed locally (works from Linux,
+macOS, Windows/WSL2 Docker Desktop). This is a separate, heavier image from
+the §15 dev container: it carries the MSVC cross toolchain (xwin SDK splat,
+clang/lld, a Microsoft EULA step accepted at image build), so it's a batch
+artifact producer, not a daily driver.
+
+```bash
+./docker/build.sh linux      # .deb + .rpm + portable .tar.gz (x86_64)
+./docker/build.sh windows    # portable .exe zip (x86_64 MSVC cross)
+./docker/build.sh all        # both (default)
+```
+
+Artifacts land in `./build-output/` (gitignored) with CI-identical
+version-stamped names:
+
+| Target | Output |
+|---|---|
+| `linux` | `linux-installer-DemonSave-PS3_<VER>_amd64.deb`, `linux-installer-DemonSave-PS3-<VER>-1.x86_64.rpm`, `linux-portable-demonsave-ps3_<VER>.tar.gz` |
+| `windows` | `windows-portable-demonsave-ps3_<VER>.zip` (flat, versioned `.exe` inside) |
+
+The first run builds the `demonsave-ps3-builder` image (~10 min: Ubuntu 22.04
+digest-pinned base — the same glibc 2.35 floor as the CI Linux legs — plus
+Node 24, Rust stable, and the pinned cargo-xwin/xwin toolchain that downloads
+and splats the MSVC CRT + Windows SDK). Subsequent runs reuse cached layers.
+Named volumes (`builder_*`) keep `node_modules`, the Rust `target/` dir, and
+the cargo registry warm — a re-run is much faster than a cold build
+(~1.5 min vs ~6 min for `linux` on a typical laptop).
+
+The Windows binary is a genuine MSVC-ABI build (`x86_64-pc-windows-msvc`,
+linked with `lld-link` against the xwin SDK splat) — ABI-identical to what CI
+produces on `windows-latest`.
+
+### Scope
+
+| Artifact | In container? | Where else |
+|---|---|---|
+| Linux `.deb` / `.rpm` / portable | yes | CI, native build |
+| Windows portable `.exe` | yes | CI, native Windows |
+| Windows NSIS installer | no — CI-owned (`windows-latest`) | CI |
+| macOS `.app` / `.dmg` | no — impossible on Linux (Apple frameworks) | CI, native Mac |
+| Windows / Linux ARM64 | no — x64 only | (CI ARM64 runners exist if ever needed) |

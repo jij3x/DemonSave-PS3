@@ -1,0 +1,17 @@
+# Installed to /usr/local/cargo/config.toml by docker/Dockerfile.
+#
+# Cross-link wiring for x86_64-pc-windows-msvc builds on a Linux host:
+#   - lld-link (symlinked to the distro lld in the image) as the linker,
+#     since link.exe is Windows-only.
+#   - -Lnative paths point at the xwin MSVC CRT + Windows SDK splat baked
+#     into the image at /opt/xwin (layout verified at image build time).
+#
+# Target-scoped on purpose: the [target.x86_64-pc-windows-msvc] table has no
+# effect on native Linux builds, so the same CARGO_HOME serves both.
+[target.x86_64-pc-windows-msvc]
+linker = "lld-link"
+rustflags = [
+  "-Lnative=/opt/xwin/crt/lib/x86_64",
+  "-Lnative=/opt/xwin/sdk/lib/um/x86_64",
+  "-Lnative=/opt/xwin/sdk/lib/ucrt/x86_64",
+]
