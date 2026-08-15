@@ -1,5 +1,7 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Auto detect text files, normalize to LF in the index, and check out LF on
+# every platform (overrides core.autocrlf on Windows) so host editors and the
+# Linux dev container always see identical line endings.
+* text=auto eol=lf
 
 # Version-sync tooling (tools/gen-version.mjs) parses these via regexes that
 # are line-ending sensitive. Force LF so Windows checkouts don't receive CRLF.

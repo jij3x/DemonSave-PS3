@@ -75,6 +75,17 @@ cd DemonSave-PS3
 npm install        # or: npm ci for reproducible installs
 ```
 
+**Windows users:** clone inside the WSL2 filesystem (e.g. `~/src/DemonSave-PS3`,
+reachable from Windows at `\\wsl$\<distro>\...`), not `/mnt/c/...`. The repo
+pins LF checkouts (`.gitattributes`) so bash scripts and Prettier behave inside
+the Linux dev container; WSL-ext4 clones also keep dev-container bind mounts
+fast — `/mnt/c` is 9p-over-NTFS (slow `npm ci`/Jest, flaky file watching).
+Refresh an old CRLF working tree with:
+
+```bash
+git ls-files -z | xargs -0 rm -f && git checkout -f .   # or just re-clone
+```
+
 ### Develop in a container (no host installs)
 
 Prefer not to install Node, Rust, or system webview libraries locally? The repo
