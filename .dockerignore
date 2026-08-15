@@ -1,0 +1,16 @@
+# The dev container image only installs toolchains (it never COPYs the repo),
+# so the build context is functionally unused — but Docker still ships the whole
+# context to the daemon first. Exclude the large gitignored trees so `docker
+# compose build` stays fast.
+node_modules
+**/node_modules
+src-tauri/target
+src-tauri/gen
+dist
+coverage
+fuzz/corpus
+fuzz/logs
+fuzz/crashes
+.git
+tmp
+build-output

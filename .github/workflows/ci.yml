@@ -9,6 +9,10 @@
 #   rust — cargo test (needs Rust + the webkit/system dev libs; no npm)
 #   fuzz — one matrix runner per fuzz target (12 parallel), each running its
 #          60s smoke; extracted from js so it can't block lint/test/coverage
+#   container — builds the .devcontainer image and runs lint + unit tests inside
+#          it, ONLY when .devcontainer/ / docker-compose.yml / .dockerignore
+#          change. Guards the "develop with zero host installs" path against
+#          Dockerfile/compose drift (heavy: full image build).
 #
 # All jobs run on ubuntu-24.04: required because @jazzer.js/fuzzer's native
 # addon (fuzzer-linux-x64.node) needs GLIBC 2.38; ubuntu-22.04 (GLIBC 2.35)
@@ -179,3 +183,71 @@ jobs:
 
       - name: Fuzz smoke — ${{ matrix.target }}
         run: npm run fuzz:${{ matrix.target }}:smoke
+
+  # ──────────────────────────────────────────────────────────────────
+  # Dev-container gate — builds the .devcontainer image and runs the JS
+  # gates (lint + unit tests) INSIDE it, so Dockerfile / compose drift can't
+  # silently break the "develop with zero host installs" path. Heavy (full
+  # image build), so it only runs when the container definition changes, and
+  # the build uses the GitHub Actions layer cache so repeat runs are fast.
+  # ──────────────────────────────────────────────────────────────────
+  container:
+    runs-on: ubuntu-24.04
+    # dorny/paths-filter lists PR changed files via the GitHub API on
+    # pull_request events; the workflow-level contents:read alone 403s there.
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Detect container-file changes
+        id: changes
+        uses: dorny/paths-filter@0e4a8c6effa4802afeda77dc8d303f8176d7dfad # v3.0.4
+        with:
+          filters: |
+            container:
+              - '.devcontainer/**'
+              - 'docker-compose.yml'
+              - '.dockerignore'
+
+      - name: Set up Docker Buildx
+        if: steps.changes.outputs.container == 'true'
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
+      # Built via build-push-action (not plain `docker compose build`) for the
+      # GHA layer cache; compose picks the loaded image up by its `image:` name.
+      - name: Build dev container image (GHA-cached)
+        if: steps.changes.outputs.container == 'true'
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          context: .
+          file: .devcontainer/Dockerfile
+          push: false
+          load: true
+          tags: demonsave-ps3-dev:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # The checkout is owned by the runner user (uid 1001) but compose runs
+      # as the image's `vscode` user (uid 1000); post-create.sh rewrites
+      # generated files (js/des-db/idx-upgrade-ref.js) inside the bind mount,
+      # which EACCESes without this.
+      - name: Make workspace writable by the container user
+        if: steps.changes.outputs.container == 'true'
+        run: sudo chown -R 1000:1000 .
+
+      - name: Start container + bootstrap deps
+        if: steps.changes.outputs.container == 'true'
+        run: |
+          docker compose up -d --wait
+          docker compose exec -T app bash .devcontainer/post-create.sh
+
+      - name: Lint (inside container)
+        if: steps.changes.outputs.container == 'true'
+        run: docker compose exec -T app npm run lint
+
+      - name: Unit tests (inside container)
+        if: steps.changes.outputs.container == 'true'
+        run: docker compose exec -T app npm test

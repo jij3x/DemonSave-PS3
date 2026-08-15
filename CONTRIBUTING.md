@@ -75,6 +75,34 @@ cd DemonSave-PS3
 npm install        # or: npm ci for reproducible installs
 ```
 
+### Develop in a container (no host installs)
+
+Prefer not to install Node, Rust, or system webview libraries locally? The repo
+ships a full-stack dev container (VS Code / GitHub Codespaces) plus a matching
+`docker-compose.yml` for CLI use. It carries Node 24, Rust (stable), and the
+WebKitGTK build libs — the same toolchain CI uses (Ubuntu 24.04, glibc ≥ 2.38,
+which the Jazzer fuzz targets require).
+
+**VS Code / Codespaces** — open the repo and run the *Dev Containers: Reopen in
+Container* command. Deps install automatically; the dev server auto-forwards on
+port 1420.
+
+**CLI** —
+
+```bash
+docker compose build
+docker compose up -d
+docker compose exec app bash .devcontainer/post-create.sh   # first-time setup
+docker compose exec app npm run serve:dev                    # http://localhost:1420
+docker compose exec app npm test
+docker compose exec app npm run lint
+```
+
+See [`howto.md`](howto.md) §15 for the full command reference, including the
+Linux Tauri desktop build and the optional `tauri:dev` GUI recipe. (Windows
+and macOS builds remain CI-only or native-host — Tauri can't cross-compile
+from Linux.)
+
 ### Run the editor locally
 
 ```bash
