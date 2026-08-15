@@ -126,6 +126,25 @@ describe('reader: deposit parsing', () => {
     expect(m.deposit).toHaveLength(1);
     expect(m.deposit[0].category).toBe('weapons');
   });
+
+  test('skips empty (0xFF) deposit holes before reaching DEPOSIT_COUNT', () => {
+    let buf = makeBlankSave();
+    fillDepositEmpty(buf);
+
+    // Valid weapon entry at index 1 — index 0 stays an empty 0xFF hole.
+    const b1 = O.DEPOSIT_BASE + 1 * O.DEPOSIT_STRIDE;
+    wUInt8(buf, b1 + 4, 0x00); // weapon
+    buf[b1 + 5] = 0x00;
+    buf[b1 + 6] = 0x27;
+    buf[b1 + 7] = 0x10; // itemId = 0x2710
+    buf[b1 + 12] = 1; // count
+    wUInt32BE(buf, O.DEPOSIT_COUNT, 1);
+
+    const m = readSave(buf);
+    expect(m.deposit).toHaveLength(1);
+    expect(m.deposit[0].category).toBe('weapons');
+    expect(m.deposit[0].itemId).toBe(0x2710);
+  });
 });
 
 describe('reader: error handling', () => {
@@ -447,6 +466,17 @@ describe('writer: spell round-trip', () => {
     setBad(m, 'spells', [{ itemId: SPELL_IDS[0], status: 'Bogus', misc1: 0, misc2: 0 }]);
     expect(() => writeSave(buf, m)).toThrow(/invalid numeric string/);
   });
+
+  test('clears stale spell records when new count is smaller (bounds-guarded)', () => {
+    let buf = makeBlankSave();
+    const m = readSave(buf);
+    // Simulate a stale huge SPELL_COUNT on disk (written after the read, so
+    // the reader doesn't reject it).  The writer's stale-record clearing
+    // loop must hit the buffer-end guard and break instead of overflowing.
+    wUInt32BE(buf, O.SPELL_COUNT, 0x7fffffff);
+    buf = writeSave(buf, m);
+    expect(rUInt32BE(buf, O.SPELL_COUNT)).toBe(0);
+  });
 });
 
 /* ========================================================================
@@ -548,6 +578,23 @@ describe('writer: deposit edge cases', () => {
       },
     ];
     expect(() => writeSave(buf, m)).toThrow(/exceeds 24-bit limit/);
+  });
+
+  test('throws when deposit count exceeds 10-bit field', () => {
+    let buf = makeBlankSave();
+    const m = readSave(buf);
+    // Count is a 10-bit value [0, 1023] (UI caps at 999) — 1024 must throw.
+    m.deposit = [
+      {
+        category: 'rings',
+        itemId: RING_IDS[1],
+        count: 1024,
+        unknown1: 0,
+        sortOrder: 0,
+        flags: [0x21, 0, 0, 0, 0, 0, 0],
+      },
+    ];
+    expect(() => writeSave(buf, m)).toThrow(/Deposit count 1024 out of range/);
   });
 
   test('deposit weapon uses Tier 2 durability fallback from flags', () => {
