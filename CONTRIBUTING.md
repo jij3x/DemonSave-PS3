@@ -99,9 +99,11 @@ docker compose exec app npm run lint
 ```
 
 See [`howto.md`](howto.md) §15 for the full command reference, including the
-Linux Tauri desktop build and the optional `tauri:dev` GUI recipe. (Windows
-and macOS builds remain CI-only or native-host — Tauri can't cross-compile
-from Linux.)
+Linux Tauri desktop build and the optional `tauri:dev` GUI recipe. Need the
+**Windows portable `.exe`** or local release artifacts? The separate
+cross-compile builder container does that with Docker alone:
+`./docker/build.sh windows` ([`howto.md`](howto.md) §16). macOS remains
+CI-only or native-Mac — it can't be built on Linux.
 
 ### Run the editor locally
 
