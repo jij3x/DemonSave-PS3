@@ -1,0 +1,59 @@
+# DemonSave-PS3 — containerized development environment.
+#
+# Single runtime definition shared by:
+#   - VS Code / GitHub Codespaces dev container  (.devcontainer/devcontainer.json
+#     references this file)
+#   - CLI users                                    (docker compose ...)
+#
+# Build context is the repo root so the bind mount and the image see the same
+# tree. The image only contains toolchains (see .devcontainer/Dockerfile); source
+# is bind-mounted here so host editors and the container share the exact same
+# files — preserving the project's no-build property (the source file IS the
+# running file; nothing is compiled/bundled into the runtime path).
+#
+# Quick start (CLI):
+#   docker compose build
+#   docker compose up -d                                   # keep-alive container
+#   docker compose exec app bash .devcontainer/post-create.sh   # first-time setup
+#   docker compose exec app npm run serve:dev              # → http://localhost:1420
+#   docker compose exec app npm test
+#   docker compose exec app npm run lint
+#   docker compose down                                    # stop (keeps volumes)
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    # Explicit tag so CI's cached build-push-action output is picked up by
+    # `docker compose up` without rebuilding (compose skips build when the
+    # image already exists).
+    image: demonsave-ps3-dev:latest
+    working_dir: /workspaces/DemonSave-PS3
+    user: vscode
+    # Keep the container alive so any `docker compose exec app <cmd>` works.
+    # Start the dev server on demand: docker compose exec app npm run serve:dev
+    command: sleep infinity
+    ports:
+      # Dev server. tools/serve-dev.mjs binds ALL interfaces inside the
+      # container, so publish on localhost only — a bare "1420:1420" would
+      # expose the unauthenticated static server to the whole LAN. VS Code /
+      # Codespaces port forwarding works without a host-published port.
+      - "127.0.0.1:1420:1420"
+    volumes:
+      # Source: bind-mounted, shared with the host (host editors see the same files).
+      - .:/workspaces/DemonSave-PS3
+      # Shadow node_modules + the Rust target cache with named volumes so the
+      # container keeps its OWN platform-correct copies (esbuild / Jazzer ship
+      # native binaries; target/ is a huge regenerable build cache). This also
+      # avoids permission conflicts with any stale host-owned copy (e.g. a
+      # root-owned src-tauri/target from a prior native build). The mount points
+      # are pre-chowned in the Dockerfile so the non-root `vscode` user can write.
+      - node_modules:/workspaces/DemonSave-PS3/node_modules
+      - mcp_node_modules:/workspaces/DemonSave-PS3/rpcs3-mcp-server/node_modules
+      - cargo_target:/workspaces/DemonSave-PS3/src-tauri/target
+
+volumes:
+  node_modules:
+  mcp_node_modules:
+  cargo_target:

@@ -173,6 +173,8 @@ The README is the front door. The actual rooms are:
   understand how it works.
 - [`howto.md`](howto.md) — build, run, test, package, and release, for both
   browser and desktop.
+- Develop in a container with zero host installs (VS Code / Codespaces /
+  `docker compose`) — see [`howto.md`](howto.md) §15.
 - [`js/lib/ps3-save-lib/README.md`](js/lib/ps3-save-lib/README.md),
   [`js/des-savefile/README.md`](js/des-savefile/README.md), and
   [`js/des-db/README.md`](js/des-db/README.md) — the module-level deep dives.

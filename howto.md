@@ -26,6 +26,7 @@ to run it. There are multiple build paths depending on what you want:
 12. [CI / Releases (GitHub Actions)](#12-ci--releases-github-actions)
 13. [Build artifact reference](#13-build-artifact-reference)
 14. [Troubleshooting](#14-troubleshooting)
+15. [Containerized development (Docker / Dev Container)](#15-containerized-development-docker--dev-container)
 
 ---
 
@@ -333,7 +334,8 @@ src-tauri/target/release/demonsave-ps3.exe
 
 This is the standalone `.exe` with no installer wrapper.
 
-> **CI releases ship the NSIS installer and portable `.exe`.**
+> **CI releases ship the NSIS installer and a portable `.zip`**
+> (containing the versioned `.exe`).
 > Build in a native Windows environment (PowerShell, CMD, or Git
 > Bash). Building from WSL2 produces a Linux binary, not a Windows
 > one.
@@ -559,8 +561,10 @@ builds on its own runner in parallel.
 
 | Event | What happens |
 |---|---|
-| Push to `main` / `master` | Runs lint + unit tests (Linux runner). Build artifacts are uploaded as CI artifacts. |
 | Tag push (`v*`, e.g. `v1.0.0`) | Builds all platforms in parallel and creates a **draft GitHub Release** with downloadable installers. |
+| Manual run, `mode=test` (default) | Same builds + version-staged assets, uploaded as **workflow-run artifacts** (`release-*`) — no release. Works on any branch or tag. |
+| Manual run, `mode=release` | Identical to a tag push. Must be dispatched **on a `v*` tag ref** (fails fast otherwise). |
+| Push / PR merge to `main` | Nothing — quality gates live in the CI workflow (`ci.yml`). |
 
 ### Cut a release
 
@@ -569,15 +573,30 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
+The tag must match the app version in `package.json` (synced into
+`tauri.conf.json` by `tools/gen-version.mjs`) — a mismatched tag fails the
+build instead of shipping assets stamped with the wrong version.
+
+### Test asset generation without a release
+
+```bash
+gh workflow run Release.yml --ref main -f mode=test
+```
+
+(or Actions → Release → Run workflow → mode `test`). The run page then
+carries the `release-*` artifacts with the exact version-stamped files a
+release would attach. Dispatching on a tag ref also enforces the
+tag/version match; on a branch it is skipped.
+
 ### Build matrix (tag push)
 
 | Job | Runner | Output | Release asset prefix |
 |---|---|---|---|
 | Tauri (Linux installers) | `ubuntu-22.04` | `.deb`, `.rpm` | `linux-installer-*` |
 | Tauri (Linux portable) | `ubuntu-22.04` | `.tar.gz` (compressed binary) | `linux-portable-*` |
-| Tauri (Windows) | `windows-latest` | NSIS `.exe` + portable `.exe` | `windows-*` |
+| Tauri (Windows) | `windows-latest` | NSIS `.exe` + portable `.zip` | `windows-*` |
 | Tauri (macOS) | `macos-latest` | Zipped `.app` + `.dmg` (Apple Silicon only) | `macos-*` |
-| Browser ZIP | `ubuntu-22.04` | `demonsave_ps3_html.zip` | `browser-*` |
+| Browser ZIP | `ubuntu-22.04` | `demonsave_ps3_html_<VER>.zip` | `browser-*` |
 | Release | `ubuntu-22.04` | Draft GitHub Release | (collects all prefixed assets) |
 
 A dedicated `release` job downloads all staged assets and attaches
@@ -684,3 +703,109 @@ own OS. Options:
 2. Use the included GitHub Actions workflow (push a tag — see
    [CI / Releases](#12-ci--releases-github-actions)).
 3. Use a VM or remote machine for the target OS.
+4. Use the dev container ([§15](#15-containerized-development-docker--dev-container))
+   to build the **Linux** native app without installing anything locally.
+   (Windows `.exe` and macOS builds must use CI or their native OS —
+   Tauri cannot cross-compile from Linux.)
+
+---
+
+## 15. Containerized development (Docker / Dev Container)
+
+Everything in sections 1–14, with **zero host installs**. The repo ships a
+full-stack dev container — Node 24, Rust (stable), and the WebKitGTK/system
+build libs on Ubuntu 24.04 (glibc 2.39, which satisfies the Jazzer fuzz
+native addon's GLIBC ≥ 2.38 requirement — the same reason CI pins
+`ubuntu-24.04`). All you need is Docker, or VS Code / GitHub Codespaces.
+
+Files:
+
+| File | Purpose |
+|---|---|
+| `.devcontainer/Dockerfile` | The image (single source of truth). |
+| `docker-compose.yml` | Runtime config shared by the dev container and CLI. |
+| `.devcontainer/devcontainer.json` | VS Code / Codespaces wiring. |
+| `.devcontainer/post-create.sh` | First-run dep install + code-gen. |
+
+The image installs **toolchains only** — the source is bind-mounted, preserving
+the project's no-build property (the source file IS the running file).
+`node_modules` (both roots) and `src-tauri/target` are kept in Docker named
+volumes so the host never provides them and a stale host-owned copy can't break
+the non-root build. `dist/`, `coverage/`, and `fuzz/corpus` write through to the
+host (gitignored).
+
+### VS Code / GitHub Codespaces
+
+Open the repo and run **Dev Containers: Reopen in Container**. Deps install
+automatically, extensions (ESLint, Prettier, Stylelint, Tauri, rust-analyzer)
+load, and the dev server auto-forwards on port 1420.
+
+### CLI (Docker Compose)
+
+```bash
+docker compose build                                           # build the image
+docker compose up -d                                           # keep-alive container
+docker compose exec app bash .devcontainer/post-create.sh      # first-time setup
+```
+
+Then run any task with `docker compose exec app …`:
+
+| Task | Command |
+|---|---|
+| Dev server (→ http://localhost:1420) | `docker compose exec app npm run serve:dev` |
+| Unit tests | `docker compose exec app npm test` |
+| Integration tests | `docker compose exec app npm run test:integration` |
+| Lint (css + js + types) | `docker compose exec app npm run lint` |
+| Format check | `docker compose exec app npm run format:check` |
+| Fuzz smokes | `docker compose exec app npm run fuzz:smoke` |
+| Browser ZIP | `docker compose exec app node tools/pack-html-dist.mjs` |
+| Tauri frontend (`dist/`) | `docker compose exec app npm run build:frontend` |
+| Rust unit tests | `docker compose exec app cargo test --manifest-path src-tauri/Cargo.toml` |
+| Linux desktop binary | `docker compose exec app npx tauri build --no-bundle` |
+
+Stop with `docker compose down` (the named volumes persist, so the next
+`up` reuses the warm `node_modules`/`target` caches).
+
+### Grabbing the Linux binary
+
+`tauri build` writes into the `src-tauri/target` **volume**, not the host. Copy
+the artifact out:
+
+```bash
+docker compose cp app:/workspaces/DemonSave-PS3/src-tauri/target/release/demonsave-ps3 ./
+```
+
+### Optional: `tauri:dev` with a GUI window (Linux host only)
+
+`tauri:dev` opens a live webview window and needs a display — not wired up by
+default. On a Linux host with an X11 session you can opt in:
+
+```bash
+# Grant X access to YOUR user only (a bare `xhost +local:` would hand the
+# whole container keystroke-injection / screen-capture access to the host X
+# server). Revoke it again afterwards.
+xhost +SI:localuser:$(id -un)
+docker compose run --rm --service-ports \
+  -e DISPLAY=$DISPLAY \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
+  app npm run tauri:dev
+xhost -SI:localuser:$(id -un)
+```
+
+This is best-effort and Linux-host-only (macOS/Windows hosts would need
+XQuartz/VcXsrv). For day-to-day JS work, the browser dev server
+(`serve:dev` on port 1420) is functionally identical and works everywhere.
+
+### Notes / scope
+
+- **What's in the container**: every Node workflow, `cargo test`, and the
+  **Linux** Tauri desktop build (`.deb`/`.rpm`/raw binary).
+- **Windows `.exe`**: not built in this dev container — use CI (push a
+  release tag) or a native Windows host.
+- **macOS `.app`/`.dmg`**: cannot be built on Linux at all (Apple frameworks) —
+  CI only.
+- **Host file ownership**: the container runs as UID 1000 (`vscode`). On
+  macOS/Windows Docker Desktop this is transparent; on a Linux host whose user
+  is not UID 1000, bind-mount files written by the container will be owned by
+  1000 — readable, and writable if world-writable. Use
+  `docker compose run --user $(id -u):$(id -g)` to override if needed.
