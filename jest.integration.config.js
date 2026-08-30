@@ -10,6 +10,7 @@ export default {
   testEnvironment: 'node',
   // Allow ESM source files (js/**/*.js) to be imported in tests.
   transform: {},
-  testMatch: ['**/integration-tests/**/*.test.js'],
+  testMatch: ['<rootDir>/integration-tests/**/*.test.js'],
+  testPathIgnorePatterns: ['/node_modules/'],
   verbose: true,
 };

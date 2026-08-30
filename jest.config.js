@@ -4,7 +4,12 @@ export default {
   transform: {},
   // Unit tests only.  Integration tests run separately via:
   //   npm run test:integration
-  testMatch: ['**/tests/**/*.test.js'],
+  // Anchored to <rootDir> so leftover Stryker sandboxes
+  // (.stryker-tmp/sandbox-*/tests/**) are never picked up by `npm test`,
+  // while still matching tests inside an active sandbox (its rootDir is
+  // the sandbox itself).
+  testMatch: ['<rootDir>/tests/**/*.test.js'],
+  testPathIgnorePatterns: ['/node_modules/'],
   verbose: true,
 
   // Coverage configuration (used with --coverage flag, e.g. test:coverage).

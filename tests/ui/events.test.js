@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @stryker-mutator/jest-runner/jest-env/jsdom
  *
  * Integration tests for the UI event layer (events.js facade).
  *

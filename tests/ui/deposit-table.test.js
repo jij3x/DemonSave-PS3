@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @stryker-mutator/jest-runner/jest-env/jsdom
  *
  * Tests for deposit-table.js — deposit (Thomas Storage) table rendering,
  * decomposed weapon rows, upgrade-path sync, count clamping, and collection.

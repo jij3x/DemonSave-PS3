@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @stryker-mutator/jest-runner/jest-env/jsdom
  *
  * Tests for dom-helpers.js — DOM accessors, equipment display, debounced
  * refresh, targeted equipment refresh, and shared table-cell builders.

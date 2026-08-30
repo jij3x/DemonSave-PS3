@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @stryker-mutator/jest-runner/jest-env/jsdom
  *
  * Tests for the canvas measureText() branch of select-width computation in
  * controls.js.

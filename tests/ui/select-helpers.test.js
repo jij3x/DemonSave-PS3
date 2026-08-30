@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @stryker-mutator/jest-runner/jest-env/jsdom
  *
  * Tests for select-helpers.js — SVG icons, lazy-load dropdown population,
  * duplicate prevention filtering, and row delete/restore buttons.

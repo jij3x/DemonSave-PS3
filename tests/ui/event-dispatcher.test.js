@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @stryker-mutator/jest-runner/jest-env/jsdom
  *
  * Tests for the centralized event dispatcher — handler registration,
  * routing, ordering, error isolation, and reset.
