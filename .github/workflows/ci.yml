@@ -105,20 +105,6 @@ jobs:
       - name: Coverage gate
         run: npm run test:coverage
 
-      # Feeds the README coverage badge. Tokenless uploads work for public
-      # repos; if the repo is private, add CODECOV_TOKEN as a repository
-      # secret. !cancelled() so a failed threshold gate still uploads and
-      # the badge reflects the drop (but a cancelled run — this workflow
-      # cancels superseded runs — doesn't upload partial coverage), while
-      # fail_ci_if_error: false keeps a Codecov outage from ever failing
-      # the real quality gate.
-      - name: Upload coverage to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
-        with:
-          files: coverage/lcov.info
-          fail_ci_if_error: false
-
   # ──────────────────────────────────────────────────────────────────
   # Rust gates — cargo test. Needs Rust + the webkit/system dev libs;
   # no npm/frontend (tauri_build tolerates the missing dist/ dir).

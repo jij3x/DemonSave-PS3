@@ -4,7 +4,6 @@
 [![Release](https://img.shields.io/github/v/release/jij3x/DemonSave-PS3)](https://github.com/jij3x/DemonSave-PS3/releases)
 [![License: MIT](https://img.shields.io/github/license/jij3x/DemonSave-PS3)](https://github.com/jij3x/DemonSave-PS3/blob/main/LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/jij3x/DemonSave-PS3/main)](https://github.com/jij3x/DemonSave-PS3/commits/main)
-[![Coverage](https://codecov.io/gh/jij3x/DemonSave-PS3/branch/main/graph/badge.svg)](https://codecov.io/gh/jij3x/DemonSave-PS3)
 
 *A write-up from Aug 1, 2026.*
 
