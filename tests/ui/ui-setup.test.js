@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @stryker-mutator/jest-runner/jest-env/jsdom
  *
  * Tests for ui-setup.js — tab switching (including keyboard navigation),
  * warp/world linkage, hair color sample, and add-row button behavior.

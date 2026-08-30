@@ -1,0 +1,18 @@
+{
+  "$schema": "https://onpu.io/packages/stryker-config.json",
+  "testRunner": "jest",
+  "coverageAnalysis": "perTest",
+  "concurrency": 2,
+  "testRunnerNodeArgs": ["--experimental-vm-modules"],
+  "mutate": [
+    "js/des-savefile/**/*.js",
+    "js/lib/**/*.js",
+    "js/ui/**/*.js",
+    "js/des-db/index.js",
+    "!js/lib/ps3-save-lib/index.js",
+    "!js/ui/events.js",
+    "!js/ui/app.js"
+  ],
+  "timeoutMS": 30000,
+  "reporters": ["clear-text", "progress", "html"]
+}

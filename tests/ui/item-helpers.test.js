@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @stryker-mutator/jest-runner/jest-env/jsdom
  *
  * Tests for item-helpers.js — Item/type lookups, durability lookup, note
  * resolution, dropdown width, and select-tooltip management.

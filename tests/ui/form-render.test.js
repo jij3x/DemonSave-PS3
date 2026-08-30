@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @stryker-mutator/jest-runner/jest-env/jsdom
  *
  * Tests for form-render.js — focused on setupSelectTooltipSync(), which
  * updates item-name select tooltips in response to `change` events.

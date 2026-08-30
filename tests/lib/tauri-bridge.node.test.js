@@ -1,5 +1,5 @@
 /**
- * @jest-environment node
+ * @jest-environment @stryker-mutator/jest-runner/jest-env/node
  *
  * Companion to tauri-bridge.test.js.  That file runs under jsdom, where
  * `window` always exists, so it cannot reach the `window === undefined`

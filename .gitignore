@@ -22,6 +22,10 @@ tmp/
 # Test coverage
 coverage/
 
+# Mutation testing (Stryker)
+.stryker-tmp/
+reports/
+
 # Fuzzing artifacts (regenerable). The corpus is produced by
 # `npm run fuzz:corpus`; crash/timeout/oom inputs are libFuzzer outputs.
 fuzz/corpus/
