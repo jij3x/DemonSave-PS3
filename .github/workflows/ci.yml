@@ -13,6 +13,12 @@
 #          it, ONLY when .devcontainer/ / docker-compose.yml / .dockerignore
 #          change. Guards the "develop with zero host installs" path against
 #          Dockerfile/compose drift (heavy: full image build).
+#   pages — builds the browser frontend (dist/) and publishes it to GitHub
+#          Pages, ONLY on pushes to main and ONLY after the js + fuzz gates
+#          pass, so a failing commit can never take the live site down.
+#          Requires the one-time repo setting: Settings → Pages → Source:
+#          "GitHub Actions". rust/container do not gate it (they cover the
+#          Tauri app and the dev env, not the shipped web files).
 #
 # All jobs run on ubuntu-24.04: required because @jazzer.js/fuzzer's native
 # addon (fuzzer-linux-x64.node) needs GLIBC 2.38; ubuntu-22.04 (GLIBC 2.35)
@@ -251,3 +257,81 @@ jobs:
       - name: Unit tests (inside container)
         if: steps.changes.outputs.container == 'true'
         run: docker compose exec -T app npm test
+
+  # ──────────────────────────────────────────────────────────────────
+  # GitHub Pages deploy — builds the browser frontend (dist/) and
+  # publishes it as the hosted site (https://jij3x.github.io/
+  # DemonSave-PS3/). Runs ONLY on pushes to main, ONLY after the js +
+  # fuzz gates pass, and never on PRs — a failing commit cannot take
+  # the live site down. Requires the one-time repo setting:
+  # Settings → Pages → Source: "GitHub Actions" (without it the
+  # deploy-pages step fails with a clear error; nothing else is
+  # affected). dist/ is gitignored, so a branch-based Pages deploy is
+  # not an option — the artifact must be built here.
+  # ──────────────────────────────────────────────────────────────────
+  pages:
+    needs: [js, fuzz]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Job-scoped: the workflow-level contents:read stays for all other
+    # jobs; Pages deploy needs the OIDC token (id-token) + pages:write.
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install npm dependencies
+        run: npm ci || npm install
+
+      - name: Build frontend (dist/)
+        run: npm run build:frontend
+
+      # Fail loudly BEFORE publishing if the build output is not the
+      # expected self-contained ESM layout. build-frontend.mjs already
+      # fails on vendor-graph gaps; this catches gross regressions in
+      # the copy / import-map-rewrite logic.
+      - name: Sanity-check dist/
+        run: |
+          set -euo pipefail
+          test -f dist/index.html
+          test -f dist/css/styles.css
+          test -d dist/vendor
+          grep -q './vendor/@noble/' dist/index.html
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+      - name: Deploy Pages
+        uses: actions/deploy-pages@v4
+        id: deployment
+
+      # Post-deploy smoke: the published URL must serve the shell, the
+      # stylesheet, one vendored dep, and one app module — catches
+      # subpath / import-map regressions within seconds instead of via
+      # user reports. Retries absorb Pages' CDN propagation delay.
+      - name: Smoke-check live site
+        run: |
+          set -euo pipefail
+          BASE="${{ steps.deployment.outputs.page_url }}"
+          BASE="${BASE%/}"
+          for p in "index.html" "css/styles.css" "vendor/@noble/ciphers/aes.js" "js/ui/app.js"; do
+            curl -fsSL --retry 5 --retry-delay 3 --retry-connrefused -o /dev/null \
+              "${BASE}/${p}" || { echo "::error::${BASE}/${p} not reachable" >&2; exit 1; }
+          done
